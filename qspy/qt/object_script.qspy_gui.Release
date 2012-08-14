@@ -1,0 +1,14 @@
+INPUT(
+./release\getopt.o
+./release\qspy.o
+./release\qspy_app.o
+./release\qspy_gui.o
+./release\main.o
+./release\qspy_thread.o
+./release\com.o
+./release\tcp.o
+./release\moc_qspy_app.o
+./release\moc_qspy_thread.o
+./release\moc_qspy_gui.o
+./release\qrc_qspy_gui.o
+);

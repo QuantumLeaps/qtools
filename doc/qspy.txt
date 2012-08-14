@@ -1,0 +1,98 @@
+QSPY Host Application ReadMe
+============================
+QSPY is the host component of the QS-QSPY software tracing system
+instrumented into the QP/C and QP/C++ frameworks. The QSPY
+application runs on the monitoring workstation, such as a Windows
+or Linux PC, and performs the following functions:
+
+1. Receive the software tracing data from the QS software tracing
+   component executing inside an embedded target,
+2. Decompress the tracing data,
+3. Validate the sequence numbers and checksums,
+4. Display the tracing data in a human-readable format,
+5. Optionally save the data for post-processing in various
+   format, such as binary, ASCII, MATLAB, etc.
+ 
+Currently QSPY is a simple console-type application. QSPY is pre-
+compiled and ready to use on Windows and Linux/Unix, but the source
+code is provided as well.
+
+NOTE: you might want to add the directory <qutils>\bin\ containing
+the qspy executable to the PATH variable on your system.
+
+NOTE: On Linux/Unix, you need to additionally make sure that the file
+qspy is executable in order to run it. You can either do this with
+your desktop's file manager or, at the command line, type:
+
+chmod u+x qspy
+
+
+COMMAND LINE OPTIONS
+--------------------
+The following help is shown when you invoke qspy with the -h option:
+
+
+Syntax is: qspy [options]          * = default
+
+OPTION                    DEFAULT  COMMENT
+----------------------------------------------------------------
+-h                                 help (this message)
+-q                                 quiet mode (no stdout output)
+-o<File_name>                      produce output to a file
+-s<File_name>                      save the binary data to a file
+-m<File_name>                      produce a Matlab file
+-c<COM_port>  *           COM1     com port input
+-b<Baud_rate>             38400    baud rate selection
+-f<File_name>             qs.bin   file input
+-t                                 TCP/IP input
+-p<TCP_Port_number>       6601     TCP/IP server port
+-T<tstamp_size>           4        QS timestamp size (bytes)
+-O<pointer_size>          4        object pointer size (bytes)
+-F<pointer_size>          4        function pointer size (bytes)
+-S<signal_size>           1        signal size (bytes)
+-E<event_size>            2        event size size (bytes)
+-Q<queue_counter_size>    1        queue counter size (bytes)
+-P<pool_counter_size>     2        pool counter size (bytes)
+-B<pool_blocksize_size>   2        pool blocksize size (bytes)
+-C<QTimeEvt_counter_size> 2        QTimeEvt counter size
+
+
+DOCUMENTATION
+-------------
+QSPY documentation in the .CHM format is available in the file:
+
+    <qspy-intall-dir>\qspy.chm
+
+
+TARGET-HOST COMPATIBILITY
+-------------------------
+As in any software tracing system, the version of the QS software
+instrumentation running on the embedded target must match the
+version of the QSPY host application running on the monitoring
+workstation. Please make sure that the version of QSPY matches
+the version of the QP framework that you are using.
+
+Generally, the same major and minor numbers indicate compatibility.
+For example QP 4.1.06 will match QSPY 4.1.00, but not necessarily
+QSPY 4.0.00.  
+
+
+LICENSING
+---------
+This software may be distributed and modified under the terms of
+the GNU General Public License version 2 (GPL) as published by the
+Free Software Foundation and appearing in the file GPL.TXT included
+in the packaging of this file. Please note that GPL Section 2[b]
+requires that all works based on this software must also be made
+publicly available under the terms of the GPL ("Copyleft").
+
+Alternatively, this software may be distributed and modified under
+the terms of Quantum Leaps commercial licenses, which expressly
+supersede the GPL and are specifically designed for licensees
+interested in retaining the proprietary status of their code.
+
+
+CONTACT INFORMATION
+-------------------
+Quantum Leaps Web site:  http://www.quantum-leaps.com
+e-mail:                  info@quantum-leaps.com

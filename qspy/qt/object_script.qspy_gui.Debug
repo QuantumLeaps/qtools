@@ -1,0 +1,14 @@
+INPUT(
+./debug\getopt.o
+./debug\qspy.o
+./debug\qspy_app.o
+./debug\qspy_gui.o
+./debug\main.o
+./debug\qspy_thread.o
+./debug\com.o
+./debug\tcp.o
+./debug\moc_qspy_app.o
+./debug\moc_qspy_thread.o
+./debug\moc_qspy_gui.o
+./debug\qrc_qspy_gui.o
+);

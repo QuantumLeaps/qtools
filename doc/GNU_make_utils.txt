@@ -1,0 +1,47 @@
+About GNU_make_utils
+====================
+This distribution contains the GNU make 3.82 and other related UNIX-style file
+utilities, such as cp, mkdir, mv, mvdir, rm, rmdir, and touch, which are commonly
+used in the makefiles. The utilities are compiled to run natively on Windows
+without any additional DLLs.
+
+All programs included in this distribution are licensed under the GNU General
+Public License (GPL), which is included in the file copying.txt.
+
+
+Source Code
+=========== 
+In compliance with the GPL section 2(b), this distribution contains the source code
+in the 'GNU_make_utils' subdirectory.
+
+The GNU make program has been taken from the MinGW project at SourceForge.net:  
+
+http://prdownloads.sourceforge.net/mingw/mingw32-make-3.81-1.tar.gz
+
+The GNU make source (make-3.82-src.zip) has been taken from: 
+
+http://prdownloads.sourceforge.net/mingw/mingw32-make-3.81-1-src.tar.gz
+
+The "GNU Make" manual (make.pdf) has been copied from the GNU make project at:
+
+http://www.gnu.org/software/make
+
+
+The file utilities have been taken from the UnixUtils project at SourceForge.net:
+
+http://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
+
+The file utilities source (source/fileutils-3.16-src.zip) has been taken from: 
+
+http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
+
+
+
+Contact Information
+===================
+Quantum Leaps, LLC
+www.state-machine.com
+info@quantum-leaps.com
+
+09-Jan-2010
+ 
