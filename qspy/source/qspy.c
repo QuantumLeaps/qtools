@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host resident component
-* Last Updated for Version: 4.5.02
-* Date of the Last Update:  Jul 06, 2012
+* Last Updated for Version: 4.5.03
+* Date of the Last Update:  Oct 30, 2012
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1649,14 +1649,14 @@ void QSPY_stop(void) {
 }
 
 /*..........................................................................*/
-#define QS_FRAME            ((uint8_t)0x7E)
-#define QS_ESC              ((uint8_t)0x7D)
-#define QS_GOOD_CHKSUM      ((uint8_t)0xFF)
-#define QS_ESC_XOR          0x20
+#define QS_FRAME            ((uint8_t)0x7EU)
+#define QS_ESC              ((uint8_t)0x7DU)
+#define QS_GOOD_CHKSUM      ((uint8_t)0xFFU)
+#define QS_ESC_XOR          0x20U
 
 #define QS_MAX_RECORD_SIZE  256
 
-void QSPY_parse(uint8_t const *buf, size_t nBytes) {
+void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
     static uint8_t esc;
     static uint8_t seq;
     static uint8_t chksum;

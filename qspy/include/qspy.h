@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host application interface
-* Last Updated for Version: 4.5.02
-* Date of the Last Update:  Jul 06, 2012
+* Last Updated for Version: 4.5.03
+* Date of the Last Update:  Oct 30, 2012
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -35,7 +35,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "4.5.02"
+#define QSPY_VER "4.5.03"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,7 +75,7 @@ void QSPY_config(uint8_t version,
                  void   *mscFile,
                  QSPY_CustParseFun custParseFun);
 
-void QSPY_parse(uint8_t const *buf, unsigned nBytes);
+void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
 void QSPY_stop(void);                       /* orderly close all used files */
 
 extern char QSPY_line[];

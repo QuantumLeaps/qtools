@@ -23,6 +23,9 @@
 *.tar.gz
 *.avrsuo
 
+bin/
+include/
+libexec/
 dbg/
 rel/
 spy/
