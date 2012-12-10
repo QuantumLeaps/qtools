@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qfsgen utility
-// Last Updated for Version: 4.5.00
-// Date of the Last Update:  May 17, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Nov 26, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -225,7 +225,7 @@ void onMatchFound(char const *fullPath, unsigned /*flags*/) {
 int main(int argc, char *argv[]) {
     char const *fileName = "fsdata.h";
 
-    printf("qfsgen 4.5.00 (c) Quantum Leaps, www.state-machine.com\n"
+    printf("qfsgen 4.5.03 (c) Quantum Leaps, www.state-machine.com\n"
            "Usage: qfsgen [root-dir [output-file]] [-h]\n"
            "      -h suppresses generation of the HTTP headers\n\n");
 

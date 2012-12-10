@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qclean utility
-// Last Updated for Version: 4.5.02
-// Date of the Last Update:  Oct 24, 2012
+// Last Updated for Version: 4.5.03
+// Date of the Last Update:  Nov 26, 2012
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -199,7 +199,7 @@ void onMatchFound(char const *fname, unsigned flags) {
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
 
-    printf("qclean 4.5.02 (c) Quantum Leaps. www.state-machine.com\n");
+    printf("qclean 4.5.03 (c) Quantum Leaps. www.state-machine.com\n");
     if (argc > 1) {
         rootDir = argv[1];
     }
