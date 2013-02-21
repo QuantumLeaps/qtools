@@ -1,13 +1,13 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host application interface
-* Last Updated for Version: 4.5.03
-* Date of the Last Update:  Oct 30, 2012
+* Last Updated for Version: 4.5.04
+* Date of the Last Update:  Jan 31, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -35,7 +35,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "4.5.03"
+#define QSPY_VER "4.5.04"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,13 +1,13 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Serial communication HAL
-* Last Updated for Version: 4.5.00
-* Date of the Last Update:  May 22, 2012
+* Last Updated for Version: 4.5.04
+* Date of the Last Update:  Jan 31, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -34,12 +34,12 @@
 *****************************************************************************/
 #include <string.h>                                           /* for size_t */
 #include <stdint.h>
-#include "hal.h"
-#include "qspy.h"
-
 #include <windows.h>         /* for Windows serial communication facilities */
 #include <stdio.h>
 #include <conio.h>
+
+#include "hal.h"
+#include "qspy.h"
 
 /*..........................................................................*/
 static HANDLE l_com;

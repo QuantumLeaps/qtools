@@ -1,14 +1,14 @@
 @echo off
 :: ==========================================================================
 :: Product: QSPY buld script for Win32 port with GNU (MinGW)
-:: Last Updated for Version: 4.5.01
-:: Date of the Last Update:  May 25, 2012
+:: Last Updated for Version: 4.5.04
+:: Date of the Last Update:  Jan 31, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -37,14 +37,13 @@ setlocal
 
 :: NOTE:
 :: -----
-:: define the MINGW environment variable to point to the location 
-:: where you've installed the MinGW toolset or adjust the following 
-:: set instruction 
-if "%MINGW%"=="" set MINGW=C:\tools\MinGW
+:: This Makefile assumes that the MinGW compiler is in the PATH.
+:: The Qtools collection for Windows now includes the MinGW compiler,
+:: so if you have added the Qtools\bin\ directory to your PATH,
+:: you should be covered.
 
-set CC=%MINGW%\bin\gcc
-set LINK=%MINGW%\bin\gcc
-set LIBDIR=%MINGW%\lib
+set CC=gcc
+set LINK=gcc
 
 :: ==========================================================================
 if "%1"=="" (
@@ -71,7 +70,7 @@ set CCINC=-I..\..\include
 %CC% %CCFLAGS% %CCINC% -o%BINDIR%\com.o      .\com.c     
 %CC% %CCFLAGS% %CCINC% -o%BINDIR%\tcp.o      .\tcp.c
 
-%LINK% %LINKFLAGS% -o %BINDIR%\qspy.exe %BINDIR%\getopt.o %BINDIR%\main.o %BINDIR%\qspy.o %BINDIR%\com.o %BINDIR%\tcp.o %LIBDIR%\libwsock32.a
+%LINK% %LINKFLAGS% -o %BINDIR%\qspy.exe %BINDIR%\getopt.o %BINDIR%\main.o %BINDIR%\qspy.o %BINDIR%\com.o %BINDIR%\tcp.o -lwsock32
 @echo off
 erase %BINDIR%\*.o
 

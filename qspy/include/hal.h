@@ -1,13 +1,13 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host Hardware Abstraction Layer
-* Last Updated for Version: 4.5.00
-* Date of the Last Update:  May 22, 2012
+* Last Updated for Version: 4.5.04
+* Date of the Last Update:  Jan 31, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -41,11 +41,11 @@ extern "C" {
 
 int  HAL_comOpen(char const *comName, int baudRate);
 void HAL_comClose(void);
-int  HAL_comRead(unsigned char *buf, unsigned size);
+int  HAL_comRead(unsigned char *buf, size_t size);
 
 int  HAL_tcpOpen(int portNum);
 void HAL_tcpClose(void);
-int  HAL_tcpRead(unsigned char *buf, unsigned size);
+int  HAL_tcpRead(unsigned char *buf, size_t size);
 
 #ifdef __cplusplus
 }

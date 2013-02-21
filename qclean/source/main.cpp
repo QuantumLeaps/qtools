@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qclean utility
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Nov 26, 2012
+// Last Updated for Version: 4.5.04
+// Date of the Last Update:  Feb 21, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -199,7 +199,7 @@ void onMatchFound(char const *fname, unsigned flags) {
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
 
-    printf("qclean 4.5.03 (c) Quantum Leaps. www.state-machine.com\n");
+    printf("qclean 4.5.04 (c) Quantum Leaps. www.state-machine.com\n");
     if (argc > 1) {
         rootDir = argv[1];
     }
