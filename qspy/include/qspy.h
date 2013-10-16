@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host application interface
-* Last Updated for Version: 4.5.04
-* Date of the Last Update:  Jan 31, 2013
+* Last Updated for Version: 5.1.1
+* Date of the Last Update:  Oct 15, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -11,7 +11,7 @@
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 2 of the License, or
+* by the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
 * Alternatively, this program may be distributed and modified under the
@@ -35,7 +35,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "4.5.04"
+#define QSPY_VER "5.1.1"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +61,7 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me, uint8_t *pl);
 /* QSPY configuration and high-level interface .............................*/
 typedef int (*QSPY_CustParseFun)(QSpyRecord * const me);
 
-void QSPY_config(uint8_t version,
+void QSPY_config(uint16_t version,
                  uint8_t objPtrSize,
                  uint8_t funPtrSize,
                  uint8_t tstampSize,

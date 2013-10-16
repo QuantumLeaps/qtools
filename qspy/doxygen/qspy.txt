@@ -55,6 +55,7 @@ is provided. Once the data is available in MATLAB matrices, it can be convenient
 manipulated and visualized with this powerful tool. (See Section \ref
 qspy_matlab and \ref qspy_mscgen).
 
+<HR>
 \section qspy_command QSPY Command-Line Parameters
 
 The QSPY host application is designed to work with all possible target CPUs
@@ -276,7 +277,6 @@ that could not be parsed.
 
 
 <HR>
-
 \section qspy_licensing Licensing QSPY
 
 The QSPY host application is licensed the same way as all other components of

@@ -1,6 +1,47 @@
 /**
 \page rev_page_qspy QSPY Revision History
 
+\section qspy_5_1_1 Version 5.1.1 Release date: Oct 15, 2013
+
+Fixed the bug in the QSPY host application, which didn't handle
+correctly object/functions/signal names longer than 32 characters. The
+name limit has been raised to 64 characters and this version also
+correctly truncates the names at the limit without printing any garbage
+characters.
+
+
+<HR>
+\section qspy_5_1_0a Version 5.1.0a Release date: Sep 18, 2013
+
+Modified QSPY utility to support changes in QP 5.1.x:
+
+-improved handling of target resets by adding an empty QS record
+ before the QS_QP_RESET record. The empty record provides the frame
+ delimiter in case the last record in incomplete, so that the
+ following QS_QP_RESET record can be recognized. 
+
+-improved hanlding of internal object/function/signal dictionaries
+ so that symbolic information is displayd for all occurrences of an
+ object/function/signal, for which a dictionary record was received.  
+
+
+<HR>
+\section qspy_5_0_0a Version 5.0.0a Release date: Sep 08, 2013
+
+Modified QSPY utility to support changes in QP 5.0.x:
+
+-modified the standard trace records QS_QF_TICK, and QS_QF_TIMEEVT_*
+ to contain the tick-rate number.
+
+-added trace records QS_TEST_RUN and QS_TEST_FAIL for unit testing.
+
+-added version compatibility level 5.0, whereas specifying version
+ -v 4.5 runs qspy in the compatibility mode with QP 4.5.x. 
+
+-added Find And Replace Text (FART) utility for Windows 
+
+
+<HR>
 \section qspy_4_5_02 Version 4.5.02 Release date: Jul 21, 2012
 
 Re-designed the QSPY interface to support more flexible parsing
@@ -11,6 +52,7 @@ dictionaries (and other cleanup in the future) when the target
 resets.
 
 
+<HR>
 \section qspy_4_5_01 Version 4.5.01 Release date: Jun 25, 2012
 
 Added the QS_USR_DICTIONARY() entry for storing dictionaries of
@@ -18,6 +60,7 @@ the user trace records. Replaced all remaining sprintf() calls
 with snprintf().
 
 
+<HR>
 \section qspy_4_5_00 Version 4.5.00 Release date: May 26, 2012
 
 Re-designed the implementation of the QSPY host application, so
@@ -27,6 +70,7 @@ running on the desktop. The QSPY application has been converted from
 C++ to plain C for easier integration with QP/C.
 
 
+<HR>
 \section qspy_4_3_00 Version 4.3.00 Release date: Nov 03, 2011
 
 This QSPY version mataches the changes to the critical section
@@ -35,6 +79,7 @@ QS_QF_INT_UNLOCK have been replaced with QS_QF_CRIT_ENTRY and
 QS_QF_CRIT_EXIT, respectively.
 
 
+<HR>
 \section qspy_4_2_04 Version 4.2.04 Release date: Sep 27, 2011
 
 This QSPY version fixes the bug of incorrect reporting function
@@ -50,6 +95,7 @@ Queue(nFree=  5, nMin=  5)
 The Sndr= and Obj= are reported to be the same, but they were not.
 
 
+<HR>
 \section qspy_4_2_01 Version 4.2.01 Release date: Aug 01, 2011
 
 This QSPY version adds generation of sequence diagrams as
@@ -61,6 +107,7 @@ Also, this version of QSPY for Windows allows COM ports
 larger than COM9. 
 
 
+<HR>
 \section qspy_4_2_00 Version 4.2.00 Release date: Jul 13, 2011
 
 This QSPY version matches the changes made to QS target code in
@@ -112,6 +159,7 @@ switch QSPY into the backwards-compatibility mode with the
 earlier versions of QP.
 
 
+<HR>
 \section qspy_4_1_06 Version 4.1.06 Release date: Feb 09, 2011
 
 This is the intial standalone release of the QSPY host application.

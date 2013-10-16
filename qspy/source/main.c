@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host resident component, main entry point
-* Last Updated for Version: 4.5.04
-* Date of the Last Update:  Jan 31, 2013
+* Last Updated for Version: 5.0.0
+* Date of the Last Update:  Aug 23, 2013
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -11,7 +11,7 @@
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 2 of the License, or
+* by the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
 * Alternatively, this program may be distributed and modified under the
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         "----------------------------------------------------------------\n"
         "-h                                 help (this message)\n"
         "-q                                 quiet mode (no stdout output)\n"
-        "-v<Version_number>        4.2      compatibility with QS version\n"
+        "-v<Version_number>        5.0      compatibility with QS version\n"
         "-o<File_name>                      produce output to a file\n"
         "-s<File_name>                      save the binary data to a file\n"
         "-m<File_name>                      produce a Matlab/Octave file\n"
@@ -100,16 +100,16 @@ int main(int argc, char *argv[]) {
                                            /* default configuration options */
     int tcpPort          = 6601;
     int baudRate         = 115200;
-    uint8_t version      = 42;
-    uint8_t tstampSize   = 4;
-    uint8_t objPtrSize   = 4;
-    uint8_t funPtrSize   = 4;
-    uint8_t sigSize      = 2;
-    uint8_t evtSize      = 2;
-    uint8_t queueCtrSize = 1;
-    uint8_t poolCtrSize  = 2;
-    uint8_t poolBlkSize  = 2;
-    uint8_t tevtCtrSize  = 2;
+    uint16_t version     = 0x500U;
+    uint8_t tstampSize   = 4U;
+    uint8_t objPtrSize   = 4U;
+    uint8_t funPtrSize   = 4U;
+    uint8_t sigSize      = 2U;
+    uint8_t evtSize      = 2U;
+    uint8_t queueCtrSize = 1U;
+    uint8_t poolCtrSize  = 2U;
+    uint8_t poolBlkSize  = 2U;
+    uint8_t tevtCtrSize  = 2U;
     FILE *savFile = (FILE *)0;
     FILE *matFile = (FILE *)0;
     FILE *mscFile = (FILE *)0;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
                     && (optarg[1] == '.')
                     && ('0' <= optarg[2] && optarg[2] <= '9'))
                 {
-                    version = 10*(optarg[0] - '0') + (optarg[2] - '0');
+                    version = (((optarg[0] - '0') << 8) | (optarg[2] - '0')) << 8;
                     printf("-v %c.%c\n", optarg[0], optarg[2]);
                 }
                 else {

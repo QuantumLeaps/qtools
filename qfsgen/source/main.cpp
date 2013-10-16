@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qfsgen utility
-// Last Updated for Version: 4.5.03
-// Date of the Last Update:  Nov 26, 2012
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 15, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2012 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) 2002-2013 Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 2 of the License, or
+// by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Alternatively, this program may be distributed and modified under the
@@ -225,7 +225,7 @@ void onMatchFound(char const *fullPath, unsigned /*flags*/) {
 int main(int argc, char *argv[]) {
     char const *fileName = "fsdata.h";
 
-    printf("qfsgen 4.5.03 (c) Quantum Leaps, www.state-machine.com\n"
+    printf("qfsgen 5.1.1 (c) Quantum Leaps, www.state-machine.com\n"
            "Usage: qfsgen [root-dir [output-file]] [-h]\n"
            "      -h suppresses generation of the HTTP headers\n\n");
 

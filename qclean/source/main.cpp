@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qclean utility
-// Last Updated for Version: 4.5.04
-// Date of the Last Update:  Feb 21, 2013
+// Last Updated for Version: 5.1.1
+// Date of the Last Update:  Oct 15, 2013
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -11,7 +11,7 @@
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
-// by the Free Software Foundation, either version 2 of the License, or
+// by the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Alternatively, this program may be distributed and modified under the
@@ -70,6 +70,8 @@ unsigned isMatching(char const *fname, bool isReadonly) {
     }
     else if ((len > 4)
              && ((strcmp(&fname[len - 4], ".cpp") == 0)          // C++ source
+                  || (strcmp(&fname[len - 4], ".hpp") == 0)      // C++ header
+                  || (strcmp(&fname[len - 4], ".tcl") == 0)          // TCL/TK
                   || (strcmp(&fname[len - 4], ".asm") == 0)))     // assembler
     {
         flags |= (CR_FLG | TAB_FLG | TRAIL_BLANK_FLG | LONG_LINE_FLG);
@@ -84,6 +86,7 @@ unsigned isMatching(char const *fname, bool isReadonly) {
     }
     else if ((len > 4)
              && ((strcmp(&fname[len - 4], ".bat") == 0)          // batch file
+                  || (strcmp(&fname[len - 4], ".txt") == 0)       // text file
                   || (strcmp(&fname[len - 4], ".lnt") == 0)))     // lint file
     {
         flags |= (TAB_FLG | TRAIL_BLANK_FLG);  // don't clean CR or long lines
@@ -123,7 +126,7 @@ void onMatchFound(char const *fname, unsigned flags) {
     int nBytes = fread(l_src, 1, sizeof(l_src), f);
     fclose(f);
     if (nBytes == sizeof(l_src)) {                             // full buffer?
-        printf("Error: too big!\n");
+        printf("%s(big!)\n", fname);
         return;
     }
     int lineCtr = 1;
@@ -190,7 +193,14 @@ void onMatchFound(char const *fname, unsigned flags) {
         }
         fwrite(l_dst, 1, dst - l_dst, f);
         fclose(f);
-        printf(" CLEANED(%02X)\n", (int)diff);
+
+        printf(" CLEANED(");
+        if ((diff & CR_FLG         ) != 0) printf("CR,");
+        if ((diff & TAB_FLG        ) != 0) printf("TAB,");
+        if ((diff & TRAIL_BLANK_FLG) != 0) printf("BLK,");
+        if ((diff & LONG_LINE_FLG  ) != 0) printf("LL,");
+        if ((diff & RDONLY_FLG     ) != 0) printf("RO,");
+        printf(" )\n");
     }
 
     fflush(stdout);
@@ -199,7 +209,7 @@ void onMatchFound(char const *fname, unsigned flags) {
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
 
-    printf("qclean 4.5.04 (c) Quantum Leaps. www.state-machine.com\n");
+    printf("qclean 5.1.1 (c) Quantum Leaps. www.state-machine.com\n");
     if (argc > 1) {
         rootDir = argv[1];
     }

@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QSPY buld script for Win32 port with GNU (MinGW)
-:: Last Updated for Version: 4.5.04
-:: Date of the Last Update:  Jan 31, 2013
+:: Last Updated for Version: 4.5.05
+:: Date of the Last Update:  Mar 26, 2013
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -12,7 +12,7 @@
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
-:: by the Free Software Foundation, either version 2 of the License, or
+:: by the Free Software Foundation, either version 3 of the License, or
 :: (at your option) any later version.
 ::
 :: Alternatively, this program may be distributed and modified under the
@@ -49,12 +49,12 @@ set LINK=gcc
 if "%1"=="" (
     echo default selected
     set BINDIR=rel
-    set CCFLAGS=-O2 -c -std=c99
+    set CCFLAGS=-O2 -c -std=c99 -Wall
 )
 if "%1"=="dbg" (
     echo dbg selected
     set BINDIR=dbg
-    set CCFLAGS=-g -c -std=c99  
+    set CCFLAGS=-g -c -std=c99 -Wall 
 )
 
 set LINKFLAGS=-static-libgcc
