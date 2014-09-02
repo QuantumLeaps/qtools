@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host resident component, main entry point
-* Last updated for version 5.3.0
-* Last updated on  2014-03-14
+* Last updated for version 5.3.1
+* Last updated on  2014-09-02
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
                                            /* default configuration options */
     int tcpPort          = 6601;
     int baudRate         = 115200;
-    uint16_t version     = 0x500U;
+    uint16_t version     = 500U;
     uint8_t tstampSize   = 4U;
     uint8_t objPtrSize   = 4U;
     uint8_t funPtrSize   = 4U;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
                     && (optarg[1] == '.')
                     && ('0' <= optarg[2] && optarg[2] <= '9'))
                 {
-                    version = (((optarg[0] - '0') << 8) | (optarg[2] - '0')) << 8;
+                    version = (((optarg[0] - '0') * 10) + (optarg[2] - '0')) * 10;
                     printf("-v %c.%c\n", optarg[0], optarg[2]);
                 }
                 else {

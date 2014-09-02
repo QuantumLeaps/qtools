@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host resident component
-* Last updated for version 5.3.0
-* Last updated on  2014-03-28
+* Last updated for version 5.3.1
+* Last updated on  2014-04-21
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -932,7 +932,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
         case QS_QF_ACTIVE_POST_ATTEMPT: {
             if (s == 0) s = "ATT!";
             t = QSpyRecord_getUint32(me, l_tstampSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 q = (uint64_t)0;
             }
             else {
@@ -940,7 +940,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             }
             a = QSpyRecord_getUint32(me, l_sigSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -994,7 +994,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_tstampSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -1042,7 +1042,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_tstampSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -1077,7 +1077,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_tstampSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -1131,7 +1131,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_tstampSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -1229,7 +1229,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
         }
         case QS_QF_PUBLISH: {
             t = QSpyRecord_getUint32(me, l_tstampSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 p = (uint64_t)0;
                 a = QSpyRecord_getUint32(me, l_sigSize);
                 b = QSpyRecord_getUint32(me, 1);
@@ -1295,7 +1295,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             if (s == 0) s = "GC    ";
             t = QSpyRecord_getUint32(me, l_tstampSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
-            if (l_version < 0x420U) {
+            if (l_version < 420U) {
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
@@ -1321,7 +1321,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
         }
         case QS_QF_TICK: {
             a = QSpyRecord_getUint32(me, l_tevtCtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1355,7 +1355,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             q = QSpyRecord_getUint64(me, l_objPtrSize);
             c = QSpyRecord_getUint32(me, l_tevtCtrSize);
             d = QSpyRecord_getUint32(me, l_tevtCtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1383,7 +1383,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
         case QS_QF_TIMEEVT_AUTO_DISARM: {
             p = QSpyRecord_getUint64(me, l_objPtrSize);
             q = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1407,7 +1407,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_tstampSize);
             p = QSpyRecord_getUint64(me, l_objPtrSize);
             q = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1435,7 +1435,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             c = QSpyRecord_getUint32(me, l_tevtCtrSize);
             d = QSpyRecord_getUint32(me, l_tevtCtrSize);
             e = QSpyRecord_getUint32(me, 1);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1464,7 +1464,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             p = QSpyRecord_getUint64(me, l_objPtrSize);
             a = QSpyRecord_getUint32(me, l_sigSize);
             q = QSpyRecord_getUint64(me, l_objPtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {
@@ -1492,7 +1492,7 @@ static void QSpyRecord_parse(QSpyRecord * const me) {
             q = QSpyRecord_getUint64(me, l_objPtrSize);
             c = QSpyRecord_getUint32(me, l_tevtCtrSize);
             d = QSpyRecord_getUint32(me, l_tevtCtrSize);
-            if (l_version < 0x500U) {
+            if (l_version < 500U) {
                 b = 0U;
             }
             else {

@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: Quantum Spy -- Host application interface
-* Last updated for version 5.3.0
-* Last updated on  2014-03-14
+* Last updated for version 5.3.1
+* Last updated on  2014-04-21
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -34,7 +34,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "5.3.0"
+#define QSPY_VER "5.3.1"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,9 +42,9 @@ extern "C" {
 
 /* low-level facilities for parsing QSpyRecords ............................*/
 typedef struct QSpyRecordTag {
-    uint8_t rec;                           /* enumerated type of the record */
-    uint8_t const *pos;                   /* current position in the stream */
-    int32_t len;       /* current length of the stream (till the last byte) */
+    uint8_t rec;        /* enumerated type of the record */
+    uint8_t const *pos; /* current position in the stream */
+    int32_t len; /* current length of the stream (till the last byte) */
 } QSpyRecord;
 
 void     QSpyRecord_ctor (QSpyRecord * const me,
@@ -75,13 +75,13 @@ void QSPY_config(uint16_t version,
                  QSPY_CustParseFun custParseFun);
 
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
-void QSPY_stop(void);                       /* orderly close all used files */
+void QSPY_stop(void); /* orderly close all used files */
 
 extern char QSPY_line[];
-void QSPY_onPrintLn(void);        /* print formatted line callback function */
+void QSPY_onPrintLn(void); /* print formatted line callback function */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif                                                            /* qspy_h */
+#endif /* qspy_h */

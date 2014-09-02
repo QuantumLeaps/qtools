@@ -1,6 +1,12 @@
 /**
 \page rev_page_qspy QSPY Revision History
 
+\section qspy_5_3_1 Version 5.3.1 Release date: Apr 21, 2014
+
+Corrected the version representation from hex to decimal, to match the change in the QP framework. The version representation missmatch caused problems in parsing newly modified trace records, when the qspy.c implementation was inserted directly into the projects. 
+
+
+<HR>
 \section qspy_5_3_0 Version 5.3.0 Release date: Mar 31, 2014
 
 Added new trace records to QSPY host application: QS_QEP_TRAN_HIST, QS_QEP_TRAN_EP, and QS_QEP_TRAN_XP. Changed labels for standard records from Q_ENTRY, Q_EXIT, Q_INIT to ENTRY, EXIT, INIT. 
