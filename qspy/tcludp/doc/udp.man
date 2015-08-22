@@ -1,0 +1,208 @@
+[comment {-*- tcl -*- doctools manpage}]
+[comment {To convert this to another documentation format use the mpexpand
+          script from tcllib: dtplite -o udp.n nroff udp.man
+                              dtplite -o udp.html html udp.man
+}]
+[manpage_begin udp n 1.0.11]
+[copyright {1999-2000 Columbia University; all rights reserved}]
+[moddesc {Tcl UDP extension}]
+[titledesc {Create UDP sockets in Tcl}]
+[require Tcl 8.2]
+[require udp 1.0.11]
+[description]
+
+This package provides support for using UDP through Tcl. The package provides
+a new channel type and attempts to permit the use of packet oriented UDP
+over stream oriented Tcl channels. The package defined three commands but
+[cmd udp_conf] should be considered depreciated in favour of the standard
+Tcl command [cmd fconfigure].
+
+[section "COMMANDS"]
+
+[list_begin definitions]
+
+[call [cmd "udp_open"] [opt "[arg port]"] [opt "[arg reuse]"] [opt "[arg ipv6]"]]
+
+[cmd udp_open] will open a UDP socket. If a [arg port] is specified the UDP
+socket will be opened on that port. Otherwise the system will choose a port
+and the user can use the [cmd udp_conf] command to obtain the port number
+if required.
+
+[nl]
+The following keywords can be used to specify options on the opened socket.
+
+[list_begin definitions]
+
+[lst_item "[arg reuse]"]
+Using this keyword sets the SO_REUSEADDR socket option which permits multiple sockets to 
+be bound to the same address/port combination.
+
+[lst_item "[arg ipv6]"]
+By default a IPv4 socket is created. When keyword [arg ipv6] is specified an IPv6
+socket is opened. 
+
+[list_end]
+
+[call [cmd "udp_conf"] [arg "sock"] [arg "host"] [arg "port"]]
+
+[emph Deprecated] in favour of the standard Tcl [cmd fconfigure] command.
+[nl]
+[cmd udp_conf] in this configuration is used to specify the remote destination
+for packets written to this [arg "sock"]. You must call this command before
+writing data to the UDP socket.
+
+[call [cmd "udp_conf"] [arg "sock"] [arg [opt -myport]] [arg [opt -remote]] [arg [opt -peer]] [arg [opt "-broadcast bool"]] \
+	[arg [opt "-ttl count"]] [arg [opt "-mcastadd \"groupaddr [opt netwif]\""]] [arg [opt "-mcastdrop \"groupaddr [opt netwif]\""]]\
+	[arg [opt -mcastgroups]] [arg [opt "-mcastloop bool"]]]
+
+[emph Deprecated] in favour of the standard Tcl [cmd fconfigure] command.
+[nl]
+In addition to being used to configure the remote host, the [cmd "udp_conf"]
+command is used to obtain information about the UDP socket. NOTE all these options
+are now available using the standard Tcl [cmd fconfigure] command.
+
+[list_begin definitions]
+
+[lst_item "[arg -myport]"]
+Returns the local port number of the socket.
+
+[lst_item "[arg -remote]"]
+Returns the remote hostname and port number as set using 
+[cmd udp_conf] [arg sock] [arg host] [arg port].
+
+[lst_item "[arg -peer]"]
+Returns the remote hostname and port number for the packet most recently
+received by this socket.
+
+[lst_item "[arg -broadcast\ [opt boolean]]"]
+UDP packets can listen and send on the broadcast address. For some systems 
+a flag must be set on the socket to use broadcast. 
+With no argument this option will return the broadcast setting. With a 
+boolean argument the setting can be modified. This option is not permitted when
+using IPv6.
+
+[lst_item "[arg -ttl\ [opt count]]"]
+
+The time-to-live is given as the number of router hops the packet may do. For
+multicast packets this is important in specifying the distribution of the
+packet. The system default for multicast is 1 which restricts the packet 
+to the local subnet. To permit packets to pass routers, you must increase the
+ttl. A value of 31 should keep it within a site, while 255 is global.
+
+[lst_item "[arg -mcastadd] groupaddr"]
+[lst_item "[arg -mcastadd] \"groupaddr netwif\""]
+[lst_item "[arg -mcastdrop] groupaddr"]
+[lst_item "[arg -mcastdrop] \"groupaddr netwif\""]
+[lst_item "[arg -mcastgroups]"]
+
+[package tcludp] sockets can support IPv4 and IPv6 multicast operations. To receive
+multicast packets the application has to notify the operating system that
+it should join a particular multicast group. For IPv4 these are specified as addresses
+in the range 224.0.0.0 to 239.255.255.255.
+[nl]
+When specifying only the [arg groupaddr] the system will determine the network interface to use. 
+Specifying the [arg netwif] will join a multicast group on a specific network interface.
+This is useful on a multihomed system with multiple network interfaces.
+On windows you must specify the network interface index. For other platforms the network
+interface (e.g. 'eth0') name can be specified. 
+[nl]
+To view the current set of multicast groups for a channel use [arg -mcastgroups]
+
+[lst_item "[arg -mcastloop\ [opt boolean]]"]
+
+With multicast udp the system can choose to receive packets that it has sent
+or it can drop them. This is known as multicast loopback and can be controlled
+using this option. By default the value is true and your application will receive
+its own transmissions.
+
+[list_end]
+
+[call [cmd "udp_peek"] [arg "sock"] [opt [arg "buffersize"]]]
+
+Examine a packet without removing it from the buffer. Option [arg buffersize] specifies the 
+maximum buffer size. Value must be between 0 and 16.
+[nl]
+This function is not available on windows.
+
+[list_end]
+
+[section EXAMPLES]
+[para]
+[example {
+# Send data to a remote UDP socket
+proc udp_puts {host port} {
+    set s [udp_open]
+    fconfigure $s -remote [list $host $port]
+    puts $s "Hello, World"
+    close $f
+}
+}]
+
+[example {
+# A simple UDP server
+package require udp
+
+proc udpEventHandler {sock} {
+    set pkt [read $sock]
+    set peer [fconfigure $sock -peer]
+    puts "$peer: [string length $pkt] {$pkt}"
+    return
+}
+
+proc udp_listen {port} {
+    set srv [udp_open $port]
+    fconfigure $srv -buffering none -translation binary
+    fileevent $srv readable [list ::udpEventHandler $srv]
+    puts "Listening on udp port: [fconfigure $srv -myport]"
+    return $srv
+}
+
+set sock [udp_listen 53530]
+vwait forever
+close $sock
+}]
+
+[example {
+# A multicast demo.
+proc udpEvent {chan} {
+    set data [read $chan]
+    set peer [fconfigure $chan -peer]
+    puts "$peer [string length $data] '$data'"
+    if {[string match "QUIT*" $data]} {
+        close $chan
+        set ::forever 1
+    }
+    return
+}
+
+set group 224.5.1.21
+set port  7771
+set s [udp_open $port]
+fconfigure $s -buffering none -blocking 0
+fconfigure $s -mcastadd $group -remote [list $group $port]
+fileevent $s readable [list udpEvent $s]
+puts -nonewline $s "hello, world"
+set ::forever 0
+vwait ::forever
+exit
+}]
+
+[section "HISTORY"]
+
+Some of the code in this extension is copied from Michael Miller's tcludp
+package. (http://www.neosoft.com/tcl/ftparchive/sorted/comm/tcludp-1.0/)
+Compared with Michael's UDP extension, this extension provides Windows
+support and provides the ability of using 'gets/puts' to read/write
+the socket. In addition, it provides more configuration ability.
+
+[para]
+
+Enhancements to support binary data and to setup the package for the Tcl
+Extension Architecture by Pat Thoyts.
+
+[para]
+Support for IPv6 and allowing a multicast join on a specific network interface is added by Huub Eikens.
+
+[see_also socket(n)]
+[keywords udp socket networking]
+[manpage_end]

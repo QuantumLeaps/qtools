@@ -1,0 +1,349 @@
+# Commands covered:  udp_open udp_conf udp_peek
+#
+# This file contains a collection of tests for one or more of the Tcl
+# UDP package commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 2003 by Pat Thoyts <patthoyts@users.sourceforge.net>
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) $Id: udp.test,v 1.13 2014/08/24 07:51:11 huubeikens Exp $
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+package require udp
+
+# -------------------------------------------------------------------------
+
+test udp-1.0 {udp_open with any port} -body {
+    set s [udp_open]
+} -cleanup {
+    close $s
+} -match regexp -result {sock\d+}
+
+test udp-1.1 {udp_conf -myport} -setup {
+    set s [udp_open]
+} -body {
+    udp_conf $s -myport
+} -cleanup {
+    close $s
+} -match regexp -result {^\d+$}
+
+test udp_1.3 {fconfigure -myport} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -myport
+} -cleanup {
+    close $s
+} -match regexp -result {^\d+$}
+
+test udp-1.4 {udp_open on assigned port} -body {
+    set port 0xf0b0
+    set s [udp_open $port]
+    format 0x%04x [udp_conf $s -myport]
+} -cleanup {
+    close $s
+} -result {0xf0b0}
+
+test udp-1.5 {udp_conf -remote before seting remote details} {
+    list [catch {
+        set s [udp_open]
+        set r [udp_conf $s -remote]
+        close $s
+        set r
+    } msg] $msg
+} {0 {}}
+
+test udp-1.6 {udp_conf -peer before setting remote details} {
+    list [catch {
+        set s [udp_open]
+        set r [udp_conf $s -peer]
+        close $s
+        set r
+    } msg] $msg
+} {0 {}}
+
+
+test udp-2.0 {udp_conf using service name} {
+    list [catch {
+        set s [udp_open]
+        udp_conf $s localhost ntp
+        set r [udp_conf $s -remote]
+        close $s
+        set r} msg] $msg
+} {0 {localhost 123}}
+
+test udp-2.1 {udp_conf using service number} {
+    list [catch {
+        set s [udp_open]
+        udp_conf $s localhost 123
+        set r [udp_conf $s -remote]
+        close $s
+        set r} msg] $msg
+} {0 {localhost 123}}
+
+test udp-3.0 {test -mcastadd} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastadd 224.0.10.10
+} -cleanup {
+    close $s
+} -result {224.0.10.10}
+
+test udp-3.1 {test -mcastadd} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastadd 224.0.10.10
+    fconfigure $s -mcastadd 224.0.10.11
+} -cleanup {
+    close $s
+} -result {224.0.10.10 224.0.10.11}
+
+test udp-3.2 {test -mcastadd} -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd 224.0.10.10]
+    set a [fconfigure $s -mcastadd 224.0.10.11]
+} -cleanup {
+    close $s
+} -result {224.0.10.10 224.0.10.11}
+
+test udp-3.3 {test -mcastdrop} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastadd 224.0.10.10
+    fconfigure $s -mcastadd 224.0.10.11
+    fconfigure $s -mcastdrop 224.0.10.11
+} -cleanup {
+    close $s
+} -result {224.0.10.10}
+
+test udp-3.4 {test -mcastdrop} -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd 224.0.10.10]
+    set a [fconfigure $s -mcastadd 224.0.10.11]
+    set a [fconfigure $s -mcastdrop 224.0.10.11]
+} -cleanup {
+    close $s
+} -result {224.0.10.10}
+
+test udp-3.5 {join invalid multicast group} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastadd 192.168.0.1
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-3.6 {drop invalid multicast group} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastdrop 192.168.0.1
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-3.7 {-mcastloop invalid option} -setup {
+    set s [udp_open]
+} -body {
+    fconfigure $s -mcastloop stupid
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {error setting -mcastloop*}
+
+test udp-3.8 {-mcastloop is boolean - 1/0} -setup {
+    set s [udp_open]
+} -body {
+    set a [list [fconfigure $s -mcastloop 1]]
+    lappend a [fconfigure $s -mcastloop 0]
+    set a
+} -cleanup {
+    close $s
+} -result {1 0}
+
+test udp-3.9 {-mcastloop is boolean - true/false} -setup {
+    set s [udp_open]
+} -body {
+    set a [list [fconfigure $s -mcastloop true]]
+    lappend a [fconfigure $s -mcastloop false]
+    set a
+} -cleanup {
+    close $s
+} -result {1 0}
+
+test udp-3.10 {-mcastloop is boolean - yes/no} -setup {
+    set s [udp_open]
+} -body {
+    set a [list [fconfigure $s -mcastloop yes]]
+    lappend a [fconfigure $s -mcastloop no]
+    set a
+} -cleanup {
+    close $s
+} -result {1 0}
+
+test udp-3.11 {-mcastloop is boolean - on/off} -setup {
+    set s [udp_open]
+} -body {
+    set a [list [fconfigure $s -mcastloop on]]
+    lappend a [fconfigure $s -mcastloop off]
+} -cleanup {
+    close $s
+} -result {1 0}
+
+test udp-3.12 {test -mcastadd with network interface} -constraints win -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd {224.0.10.10 1}]
+    set a [fconfigure $s -mcastadd {224.0.10.11 1}]
+} -cleanup {
+    close $s
+} -result {{224.0.10.10 1} {224.0.10.11 1}}
+
+test udp-3.13 {test -mcastadd with invalid network interface}  -constraints win -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd {224.0.10.11 notanumber}]
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-3.14 {test -mcastadd with network interface} -constraints unix -setup {
+    set s [udp_open]
+} -body {
+	set error 0
+	# loopback interface is either lo (linux) or lo0 (mac)
+    if {[catch {fconfigure $s -mcastadd {224.0.10.10 lo}}] ^ 
+        [catch {fconfigure $s -mcastadd {224.0.10.10 lo0}}]} {
+    	set error 1
+    }
+} -cleanup {
+    close $s
+} -result {1}
+
+test udp-3.15 {test -mcastadd with invalid network interface} -constraints unix -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd {224.0.10.11 averylongwronginterface}]
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-3.16 {test -mcastadd with invalid network interface} -constraints unix -setup {
+    set s [udp_open]
+} -body {
+    set a [fconfigure $s -mcastadd {224.0.10.11 wrongif}]
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-4.0 {udp_peek} -constraints unix -setup {
+    set s [udp_open]
+} -body {
+    udp_peek $s
+} -cleanup {
+    close $s
+} -result {}
+
+test udp-4.1 {udp_peek} -constraints unix -setup {
+	set port 9009
+	set client [udp_open] 
+    fconfigure $client -remote [list localhost $port] -buffering none -translation binary 
+    puts -nonewline $client "Hello, World" 
+
+    set srv [udp_open $port] 
+    fconfigure $srv -buffering none -translation binary 
+} -body {
+	puts $client "message"
+    udp_peek $srv
+} -cleanup {
+    close $client
+    close $srv
+} -result {message}
+
+test udp-4.2 "udp_peek: bug #1828920 - args" -constraints unix -setup {
+    set s [udp_open]
+} -body {
+    udp_peek
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {wrong * args: *}
+
+test udp-5.0 {udp_open with reused port} -body {
+    set s [udp_open 9001 reuse]
+    set u [udp_open 9001 reuse]
+} -cleanup {
+    close $s
+} -match regexp -result {sock\d+}
+
+test udp-5.0 {udp_open with no port reuse option} -body {
+    set s [udp_open 9001 reuse]
+    catch {set u [udp_open 9001]} error
+} -cleanup {
+    close $s
+    close $u
+} -match glob -result {1}
+
+test udp-6.0 {udp_open with ipv6} -body {
+    set s [udp_open 9001 ipv6]
+} -cleanup {
+    close $s
+} -match regexp -result {sock\d+}
+
+test udp-6.1 {test ipv6 mcastadd with an ipv6 group} -setup {
+    set s [udp_open ipv6]
+} -body {
+	if {[string equal $::tcl_platform(os) Darwin]} {\
+		# On MacOSX the default network interface for IPv6 is not set
+		# Therefor, specifically specify the used interface
+   		fconfigure $s -mcastadd "ff15::e755 en0"
+   	} else {
+   		fconfigure $s -mcastadd ff15::e755
+   	}
+} -cleanup {
+    close $s
+} -match regexp -result {ff15::e755}
+
+test udp-6.2 {test ipv6 mcastadd with an ipv4 group} -setup {
+    set s [udp_open ipv6]
+} -body {
+   fconfigure $s -mcastadd 224.0.10.10
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-6.3 {test ipv4 mcastadd with an ipv6 group} -setup {
+    set s [udp_open]
+} -body {
+   fconfigure $s -mcastadd ff15::e755
+} -cleanup {
+    close $s
+} -returnCodes error -match glob -result {*}
+
+test udp-10.1 "bug #1838467 - crash on exit" -setup {
+    set s [udp_open]
+} -body {
+    # Note: this test actually causes a crash on process exit when it
+    # fails. The socket needs to be left open ...
+    fconfigure $s -mcastadd 224.0.10.10
+    fconfigure $s -mcastadd 224.0.10.11
+    fconfigure $s -mcastadd 224.0.10.12
+} -cleanup {
+    # close $s - not closed on purpose
+} -result {224.0.10.10 224.0.10.11 224.0.10.12}
+
+# -------------------------------------------------------------------------
+# cleanup
+catch {unset _udp}
+::tcltest::cleanupTests
+return
+
+# Local variables:
+# mode: tcl
+# indent-tabs-mode: nil
+# End:

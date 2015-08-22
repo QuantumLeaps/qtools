@@ -1,7 +1,7 @@
 /*****************************************************************************
-* Product: Quantum Spy -- Host application interface
-* Last updated for version 5.3.1
-* Last updated on  2014-04-21
+* Product: QSPY -- Host API
+* Last updated for version 5.5.0
+* Last updated on  2015-08-18
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -34,32 +34,57 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "5.3.1"
+#define QSPY_VER "5.5.0"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* low-level facilities for parsing QSpyRecords ............................*/
-typedef struct QSpyRecordTag {
-    uint8_t rec;        /* enumerated type of the record */
-    uint8_t const *pos; /* current position in the stream */
-    int32_t len; /* current length of the stream (till the last byte) */
+/* low-level facilities for configuring QSpy and parsing QS records ........*/
+typedef enum {
+    QSPY_ERROR,
+    QSPY_SUCCESS
+} QSpyStatus;
+
+typedef struct {
+    uint8_t const *start;  /* start of the record */
+    uint8_t const *pos;    /* current position in the stream */
+    uint32_t tot_len;      /* total length of the record (including chksum) */
+    int32_t  len;          /* current length of the stream */
+    uint8_t  rec;          /* the record-ID (see enum QSpyRecords in qs.h) */
 } QSpyRecord;
 
-void     QSpyRecord_ctor (QSpyRecord * const me,
-                          uint8_t rec, uint8_t const *pos, int32_t len);
-int      QSpyRecord_OK          (QSpyRecord * const me);
-uint32_t QSpyRecord_getUint32   (QSpyRecord * const me, uint8_t size);
-int32_t  QSpyRecord_getInt32    (QSpyRecord * const me, uint8_t size);
-uint64_t QSpyRecord_getUint64   (QSpyRecord * const me, uint8_t size);
-int64_t  QSpyRecord_getInt64    (QSpyRecord * const me, uint8_t size);
-char const    *QSpyRecord_getStr(QSpyRecord * const me);
-uint8_t const *QSpyRecord_getMem(QSpyRecord * const me, uint8_t *pl);
+typedef struct {
+    uint16_t version;
+    uint8_t objPtrSize;
+    uint8_t funPtrSize;
+    uint8_t tstampSize;
+    uint8_t sigSize;
+    uint8_t evtSize;
+    uint8_t queueCtrSize;
+    uint8_t poolCtrSize;
+    uint8_t poolBlkSize;
+    uint8_t tevtCtrSize;
+    uint8_t tstamp[6];
+} QSpyConfig;
 
-/* QSPY configuration and high-level interface .............................*/
+/* the largest valid QS record size [bytes] */
+#define QS_MAX_RECORD_SIZE  1024
+
+/* pointer to the callback function for customized QS record parsing  */
 typedef int (*QSPY_CustParseFun)(QSpyRecord * const me);
 
+void        QSpyRecord_init     (QSpyRecord * const me,
+                                 uint8_t const *start, uint32_t tot_len);
+QSpyStatus  QSpyRecord_OK       (QSpyRecord * const me);
+uint32_t    QSpyRecord_getUint32(QSpyRecord * const me, uint8_t size);
+int32_t     QSpyRecord_getInt32 (QSpyRecord * const me, uint8_t size);
+uint64_t    QSpyRecord_getUint64(QSpyRecord * const me, uint8_t size);
+int64_t     QSpyRecord_getInt64 (QSpyRecord * const me, uint8_t size);
+char const *QSpyRecord_getStr   (QSpyRecord * const me);
+uint8_t const *QSpyRecord_getMem(QSpyRecord * const me, uint32_t *pLen);
+
+/* QSPY configuration and high-level interface .............................*/
 void QSPY_config(uint16_t version,
                  uint8_t objPtrSize,
                  uint8_t funPtrSize,
@@ -73,8 +98,24 @@ void QSPY_config(uint16_t version,
                  void   *matFile,
                  void   *mscFile,
                  QSPY_CustParseFun custParseFun);
+void QSPY_configMatFile(void *matFile);
+void QSPY_configMscFile(void *mscFile);
+
+QSpyConfig const *QSPY_getConfig(void);
 
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
+
+
+char const *QSPY_writeDictionaries(void);
+char const *QSPY_readDictionaries(void);
+bool QSPY_command(uint8_t cmdId); /* execute an internal QSPY command */
+
+uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
+                     uint8_t const *srcBuf, uint32_t srcBytes);
+uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize);
+uint32_t QSPY_encodeInfoCmd (uint8_t *dstBuf, uint32_t dstSize);
+uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate);
+
 void QSPY_stop(void); /* orderly close all used files */
 
 extern char QSPY_line[];

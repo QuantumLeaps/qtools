@@ -1,0 +1,249 @@
+2014-08-22  Huub Eikens  <huubeikens@users.sourceforge.net>
+
+	* generic/udp_tcl.c,tests/*.test:
+		- solved tcl8.6.2 incompatility issue (see http://core.tcl.tk/tcl/tktview/1ff0660e6e)
+		- updated unit tests
+
+2014-02-14  Huub Eikens  <huubeikens@users.sourceforge.net>
+
+	* generic/udp_tcl.c,tests/*.test:
+		- added IPV6 support
+		- enhanced reuse option for use on all platforms
+		- refactored get/set option functions
+		- enhanced mcastadd/drop option to be able to specify network interface
+
+2008-07-06  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Applied patch #1828920 (marttj) to prevent a
+	* tests/udp.test:    crash calling udp_peek with wrong args.
+	
+	* generic/udp_tcl.c: Applied patch #1838467 (marttj) to avoid a crash
+	* tests/udp.test:    when exiting with an open mcast socket.
+
+	* generic/udp_tcl.c: Applied patch #1838459 (marttj) to properly
+	* tests/udp.test:    handle appending to a shared list object in 
+	                     -mcastadd. Added tests.
+
+2008-07-05  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Applied patch 1848365 (marttj) to accept any
+	* tests/udp.test:    boolean value for -mcastloop (plus tests).
+
+2007-04-10  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Applied patch 1693037 from Uwe Klein to
+	enable setting the SO_REUSEADDR socket option when creating a new
+	udp socket.
+	Improved error reporting on Windows.
+
+2007-03-30  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Added support for IP_MULTICAST_LOOP for
+	Konstantin Khomoutov to control multicast loopback transmission.
+	Improved the error reporting by using strerror if available.
+	* Makefile.in: Fix 'make shell' to load the built library.
+	* configure.in: Incremented version and use TEA 3.6
+	* tclconfig/*: Upgraded to TEA 3.6
+	* aclocal.m4: Check for strerror presence.
+
+2007-01-31  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Turns out the HP-UX patch break buiding on
+	AIX so made the check more specific (from Jeff Hobbs again).
+
+2007-01-21  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Applied HP-UX patch #1639930 from tclguy.
+
+2006-07-11  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Added some timing to tests and changed the
+	* tests/udp-srv.tcl: service name lookup (was very slow on linux)
+
+2006-06-20  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* TAG:      ==== tcludp-1_0_8 ====
+        * RELEASE:  Released version 1.0.8
+
+2006-06-20  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c:  Stick to ckalloc/ckfree.
+	* tests/udp-srv.test: Added new test file which runs a child
+	                      proces as a udp server.
+	* tests/all.tcl:      Support 8.2 and 8.3 test package.
+
+2006-05-15  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* aclocal.m4:        Added check for fcntl.h and the FD_CLOEXEC flag
+	* generic/udp_tcl.c: bug #1477669 - set the close-on-exec flag for 
+	                     the socket to avoid child processes inheriting
+	                     our sockets
+	* configure:         Regenerated with autoconf 2.59
+	* configure.in:      Added call to project specific code.
+	* tclconfig/tcl.m4:  Updated
+
+2006-03-03  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* tclconfig/*:        Updated to TEA 3.5
+	* configure:          Regenerated.
+	* generic/udp_tcl.c:  Applied patch from bug #1245141 to use
+	                      socklen_t type correctly (Tru64 uses a
+	                      64bit long for socklen_t)
+	* generic/udp_tcl.c:  Included a Udp_SafeInit function. Some versions
+	                      of MacOSX are wierd about apps testing for
+	                      missing functions in shared libs. (#1439508)
+
+2005-11-27  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c:  bug #1240127 - handle possible missing IP_TTL
+	* generic/udp_tcl.c:  bug #1358181 - fix for NetBSD 2.0
+	* aclocal.m4:         bug #1358189 - better method for finding dtplite
+	* win/makefile.vc:    Increment version to 1.0.8
+	* configure.in:       
+	* configure:          regenerated
+
+2005-05-20  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* TAG:      ==== tcludp-1_0_7 ====
+        * RELEASE:  Released version 1.0.7
+
+2005-05-19  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Deal with bug #1178996 by changing the code
+	used to cleanup sockets under Windows.
+	* generic/udp_tcl.c: fconfigure options were returning lists of
+	lists. Fixed.
+	* tclconfig/*:  Updated TEA files to TEA 3.2
+	* configure.in:
+	* Makefile.in: 
+
+2005-05-17  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* win/rules.vc: Applied patch 1092432 by westrick85 to handle
+	paths with spaces better.
+
+2005-04-27  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* demos/bug1158628.tcl: Demo file for this bug.
+	* generic/udp_tcl.c: Applied a fix for bug #1158628 from Reinhard
+	Max which avoids hanging Tcl while exiting with open channels.
+	* configure.in:     Moved version to 1.0.7
+	* win/makefile.vc: 
+
+2004-11-23  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* demos/chat.tcl: Sample Tk chat app using multicast udp.
+
+2004-11-22  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* TAG:          ====  tcludp-1_0_6 ====
+	
+	* win/makefile.vc: Improved the win build system.
+	* demos/*: Added a few sample applications, demos of broadcast, 
+	multicast and normal operation.
+	* tools/mpexpand.tcl: Added app for generating documentation.
+
+	* generic/udp_tcl.h: Done some testing with multicast and have
+	* generic/udp_tcl.c: rationalised the fconfigure/udp_conf interfaces
+	a bit better. The -ttl option will set the multicast ttl if the
+	socket has been added to a multicast group. 
+	Now maintains a list of groups so that this can be inspected and
+	when the socket is closed we will call mcastdrop for each item.
+	
+	* generic/udp_tcl.h: Fixed the -ttl option for Windows.
+	* generic/udp_tcl.c: Added support for setting and retrieving the
+	TTL option on the socket. The default is specified by the system
+	but can be set for individual sockets. 
+
+2004-02-09  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Followed up a suggestion in patch #794072 to
+	support udp broadcast packets. This can be queried/enabled using
+	fconfigure $s -broadcast ?1|0?
+
+	* generic/udp_tcl.c: Fixes for some errors in the Win32 code
+	in udpClose provided in patch #820255.
+
+	* all:        INCREMENTED VERSION TO 1.0.6
+
+	* generic/udp_tcl.c: Applied fix from bug #833700 to close a
+	memory leak in UDP_CheckProc.
+
+	* Makefile.in: Fixed to build in directories other than the top
+	of the source tree.
+
+	* generic/udp_tcl.c: Applied the patch from bug #810572 which
+	fixes a memory leak in udp_open - from D. Richard Hipp?
+
+	* generic/udp_tcl.h: Fix for missing define WIN32 sometimes.
+	
+	* win/makefile.vc:  Added the standard windows nmake makefiles
+	* win/nmakehlp.c:   from the sampleextension project.
+	* win/rules.vc:     Visual Studio project updated as a Makefile
+	* win/tcludp.dsp:   project.
+
+2003-10-14  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Fix CONSTness for Tcl < 8.4
+
+2003-06-13  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Cleaned up some -Wall warnings under unix.
+	* generic/udp_tcl.h:    "         "
+	* win/tcludp.rc:     Updated the version number and fixed line endings
+	* doc/udp.man:          "          "
+
+2003-03-21  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: define ioctlsocket for unix
+
+2003-03-12  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* win/tcludp.dsp:
+	* configure.in: bumped patchlevel to 1.0.5
+
+2003-03-05  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: General layout rearrangement to put tcl
+	command procs, channel handler procs and utility procs together.
+	* generic/udp_tcl.c: Added channel option handlers to enable the
+	use of 'fconfigure' to hopefully replace udp_conf.
+	* generic/udp_tcl.c (udpGetHandle): Fixed to return the handle
+	properly.
+
+2003-03-03  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Fix include list to use the autoconfig test
+	results. Fixes for CONST Tcl 8.3/8.4 compatability.
+	* genetic/udp_tcl.c: Enhanced udp_open and udp_conf to permit the
+	use of symbolic port names. Added some tests for this.
+
+2003-02-27  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* generic/udp_tcl.c: Stop a crash when udp_conf -remote called
+	before setting the remote host.
+	* tests: Added tests directory and some basic tests.
+	* doc: Added doc directory with doctools format man page.
+	* Makefile.in: fixed the documentation in the build.
+	* README: rewrote as installation instructions.
+	* license.terms: copyright as perl the udp_tcl.c file.
+	* tclconfig: brought in the newer versions from tcl cvs.
+	* tcludp.dsp: updated.
+
+2003-02-20  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* all: Re-structured as a TEA2 compatible package and sorted out
+	the configure/make files.
+
+2003-02-20  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* udp_tcl.c: Reduced the number of WIN32 sections using a few
+	macros and reformatted whitespace. Also CONSITification.
+	* udp_tcl.c (udpInput): Fixed a problem with receiving binary data.
+
+2003-01-30  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* udp_tcl.c: Added support for stubs and a package declaration.
+
+
+	

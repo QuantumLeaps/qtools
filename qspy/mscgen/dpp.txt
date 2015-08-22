@@ -1,0 +1,1696 @@
+QSPY host application 5.3.1a
+Copyright (c) Quantum Leaps, state-machine.com
+Wed Nov 12 09:44:34 2014
+
+-T 4
+-O 4
+-F 4
+-S 2
+-E 2
+-Q 1
+-P 2
+-B 2
+-C 2
+
+********** RESET
+           Obj Dic: 0000000020000FC4->&l_SysTick_Handler
+           Obj Dic: 0000000020000FC5->&l_GPIOPortA_IRQHandler
+           Obj Dic: 0000000020000E18->smlPoolSto
+           Obj Dic: 0000000020000F84->tableQueueSto
+           Obj Dic: 0000000020000DB4->philoQueueSto[0]
+           Obj Dic: 0000000020000DC8->philoQueueSto[1]
+           Obj Dic: 0000000020000DDC->philoQueueSto[2]
+           Obj Dic: 0000000020000DF0->philoQueueSto[3]
+           Obj Dic: 0000000020000E04->philoQueueSto[4]
+           MP.INIT: Obj=smlPoolSto nBlocks=  10
+           EQ.INIT: Obj=20000C10 Len= 5
+0000400000 AO.ADD : Active=20000C04 Prio= 1
+           Obj Dic: 0000000020000C04->&l_philo[0]
+           Obj Dic: 0000000020000C30->&l_philo[0].timeEvt
+           Obj Dic: 0000000020000C40->&l_philo[1]
+           Obj Dic: 0000000020000C6C->&l_philo[1].timeEvt
+           Obj Dic: 0000000020000C7C->&l_philo[2]
+           Obj Dic: 0000000020000CA8->&l_philo[2].timeEvt
+           Obj Dic: 0000000020000CB8->&l_philo[3]
+           Obj Dic: 0000000020000CE4->&l_philo[3].timeEvt
+           Obj Dic: 0000000020000CF4->&l_philo[4]
+           Obj Dic: 0000000020000D20->&l_philo[4].timeEvt
+           Fun Dic: 0000000000002CF1->&Philo_initial
+           Fun Dic: 0000000000002E49->&Philo_thinking
+           Fun Dic: 0000000000002EC9->&Philo_hungry
+           Fun Dic: 0000000000002F7D->&Philo_eating
+           Sig Dic: 00000009,Obj=0000000020000C04 ->HUNGRY_SIG
+           Sig Dic: 0000000A,Obj=0000000020000C04 ->TIMEOUT_SIG
+0000400000 AO.SUB: Active=l_philo[0] Sig=00000004,Obj=20000C04
+           INIT : Obj=l_philo[0] Source=NULL Target=Philo_thinking
+0000400000 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  59 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_thinking
+0000400000 ==>Init: Obj=l_philo[0] New=Philo_thinking
+           EQ.INIT: Obj=20000C4C Len= 5
+0000400000 AO.ADD : Active=l_philo[1] Prio= 2
+           Sig Dic: 00000009,Obj=0000000020000C40 ->HUNGRY_SIG
+           Sig Dic: 0000000A,Obj=0000000020000C40 ->TIMEOUT_SIG
+0000400000 AO.SUB: Active=l_philo[1] Sig=00000004,Obj=20000C40
+           INIT : Obj=l_philo[1] Source=NULL Target=Philo_thinking
+0000400000 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  32 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_thinking
+0000400000 ==>Init: Obj=l_philo[1] New=Philo_thinking
+           EQ.INIT: Obj=20000C88 Len= 5
+0000400000 AO.ADD : Active=l_philo[2] Prio= 3
+           Sig Dic: 00000009,Obj=0000000020000C7C ->HUNGRY_SIG
+           Sig Dic: 0000000A,Obj=0000000020000C7C ->TIMEOUT_SIG
+0000400000 AO.SUB: Active=l_philo[2] Sig=00000004,Obj=20000C7C
+           INIT : Obj=l_philo[2] Source=NULL Target=Philo_thinking
+0000400000 TE[0].ARM : Obj=l_philo[2].timeEvt Act=l_philo[2] nTicks=  27 Interval=   0
+           ENTRY: Obj=l_philo[2] State=Philo_thinking
+0000400000 ==>Init: Obj=l_philo[2] New=Philo_thinking
+           EQ.INIT: Obj=20000CC4 Len= 5
+0000400000 AO.ADD : Active=l_philo[3] Prio= 4
+           Sig Dic: 00000009,Obj=0000000020000CB8 ->HUNGRY_SIG
+           Sig Dic: 0000000A,Obj=0000000020000CB8 ->TIMEOUT_SIG
+0000400000 AO.SUB: Active=l_philo[3] Sig=00000004,Obj=20000CB8
+           INIT : Obj=l_philo[3] Source=NULL Target=Philo_thinking
+0000400000 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  73 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_thinking
+0000400000 ==>Init: Obj=l_philo[3] New=Philo_thinking
+           EQ.INIT: Obj=20000D00 Len= 5
+0000400000 AO.ADD : Active=l_philo[4] Prio= 5
+           Sig Dic: 00000009,Obj=0000000020000CF4 ->HUNGRY_SIG
+           Sig Dic: 0000000A,Obj=0000000020000CF4 ->TIMEOUT_SIG
+0000400000 AO.SUB: Active=l_philo[4] Sig=00000004,Obj=20000CF4
+           INIT : Obj=l_philo[4] Source=NULL Target=Philo_thinking
+0000400000 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  26 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_thinking
+0000400000 ==>Init: Obj=l_philo[4] New=Philo_thinking
+           EQ.INIT: Obj=20000EF4 Len= 5
+0000400000 AO.ADD : Active=20000EE8 Prio= 6
+           Obj Dic: 0000000020000EE8->&l_table
+           Fun Dic: 00000000000041D1->&QHsm_top
+           Fun Dic: 0000000000002519->&Table_initial
+           Fun Dic: 0000000000002705->&Table_serving
+           Sig Dic: 00000005,Obj=0000000000000000 ->DONE_SIG
+           Sig Dic: 00000004,Obj=0000000000000000 ->EAT_SIG
+           Sig Dic: 00000006,Obj=0000000000000000 ->PAUSE_SIG
+           Sig Dic: 00000007,Obj=0000000000000000 ->TERMINATE_SIG
+           Sig Dic: 00000009,Obj=0000000020000EE8 ->HUNGRY_SIG
+0000400000 AO.SUB: Active=l_table Sig=DONE_SIG
+0000400000 AO.SUB: Active=l_table Sig=PAUSE_SIG
+0000400000 AO.SUB: Active=l_table Sig=TERMINATE_SIG
+0000400000 User000: 0 thinking 
+0000400000 User000: 1 thinking 
+0000400000 User000: 2 thinking 
+0000400000 User000: 3 thinking 
+0000400000 User000: 4 thinking 
+           INIT : Obj=l_table Source=NULL Target=Table_serving
+           ENTRY: Obj=l_table State=Table_serving
+0000400000 ==>Init: Obj=l_table New=Table_serving
+           TICK[0]: Ctr=         1
+           TICK[0]: Ctr=         2
+           TICK[0]: Ctr=         3
+           TICK[0]: Ctr=         4
+           TICK[0]: Ctr=         5
+           TICK[0]: Ctr=         6
+           TICK[0]: Ctr=         7
+           TICK[0]: Ctr=         8
+           TICK[0]: Ctr=         9
+           TICK[0]: Ctr=        10
+           TICK[0]: Ctr=        11
+           TICK[0]: Ctr=        12
+           TICK[0]: Ctr=        13
+           TICK[0]: Ctr=        14
+           TICK[0]: Ctr=        15
+           TICK[0]: Ctr=        16
+           TICK[0]: Ctr=        17
+           TICK[0]: Ctr=        18
+           TICK[0]: Ctr=        19
+           TICK[0]: Ctr=        20
+           TICK[0]: Ctr=        21
+           TICK[0]: Ctr=        22
+           TICK[0]: Ctr=        23
+           TICK[0]: Ctr=        24
+           TICK[0]: Ctr=        25
+           TICK[0]: Ctr=        26
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0010400652 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0010401130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  6)
+0010402079 QK_sche: prio= 5, pin=  0
+0010402430 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0010402873 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_thinking
+0010403446 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0010403809 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   9
+0010404273 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  6)
+0010404937 QK_sche: prio= 6, pin=  5
+0010405288 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0010405709 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0010414674 User000: 4 hungry   
+0010415153 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0010415516 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0010415953 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0010416469 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0010417185 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  6)
+0010417902 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  6)
+0010418619 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  6)
+0010419347 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  6)
+0010420028 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0010428864 User000: 4 eating   
+0010429307 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0010429751 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0010430102 MP.PUT : Obj=smlPoolSto nFree=   9
+           ENTRY: Obj=l_philo[4] State=Philo_hungry
+0010430833 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+0010431410 QK_sche: prio= 5, pin=  0
+0010431747 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0010432168 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0010432802 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  88 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_eating
+0010433636 ==>Tran: Obj=l_philo[4] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0010434170 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0010434533 QK_sche: prio= 4, pin=  0
+0010434870 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0010435291 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_thinking
+0010435766 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_thinking
+0010436211 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0010436574 QK_sche: prio= 3, pin=  0
+0010436911 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0010437332 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_thinking
+0010437818 Intern : Obj=l_philo[2] Sig=EAT_SIG Source=Philo_thinking
+0010438263 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0010438626 QK_sche: prio= 2, pin=  0
+0010438963 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0010439384 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0010439859 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0010440304 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0010440667 QK_sche: prio= 1, pin=  0
+0010441018 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0010441439 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0010441911 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0010442355 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0010442706 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=        27
+           TE[0].ADRM: Obj=l_philo[2].timeEvt Act=l_philo[2]
+0010800682 TE[0].POST: Obj=l_philo[2].timeEvt Sig=TIMEOUT_SIG Act=l_philo[2]
+0010801160 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0010802106 QK_sche: prio= 3, pin=  0
+0010802457 AO.GETL: Active= l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0010802878 Disp==>: Obj=l_philo[2] Sig=TIMEOUT_SIG Active=Philo_thinking
+0010803440 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0010803802 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0010804266 AO.FIFO: Sndr=l_philo[2] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0010804929 QK_sche: prio= 6, pin=  3
+0010805280 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0010805701 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0010814666 User000: 2 hungry   
+0010815143 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0010815505 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0010815942 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0010816458 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0010817174 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0010817890 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0010818606 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0010819322 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0010820002 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0010828838 User000: 2 eating   
+0010829281 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0010829725 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0010830076 MP.PUT : Obj=smlPoolSto nFree=   9
+0010830474 QK_sche: prio= 5, pin=  3
+0010830811 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0010831232 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_eating
+0010831718 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_eating
+0010832174 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0010832537 QK_sche: prio= 4, pin=  3
+0010832874 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0010833295 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_thinking
+0010833770 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_thinking
+0010834215 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+           ENTRY: Obj=l_philo[2] State=Philo_hungry
+0010834911 ==>Tran: Obj=l_philo[2] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+0010835488 QK_sche: prio= 3, pin=  0
+0010835825 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0010836246 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0010836880 TE[0].ARM : Obj=l_philo[2].timeEvt Act=l_philo[2] nTicks=  81 Interval=   0
+           ENTRY: Obj=l_philo[2] State=Philo_eating
+0010837714 ==>Tran: Obj=l_philo[2] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0010838248 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0010838611 QK_sche: prio= 2, pin=  0
+0010838948 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0010839369 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0010839844 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0010840289 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0010840652 QK_sche: prio= 1, pin=  0
+0010841003 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0010841424 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0010841896 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0010842340 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0010842691 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=        28
+           TICK[0]: Ctr=        29
+           TICK[0]: Ctr=        30
+           TICK[0]: Ctr=        31
+           TICK[0]: Ctr=        32
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0012800679 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0012801157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0012802078 QK_sche: prio= 2, pin=  0
+0012802429 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0012802861 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_thinking
+0012803423 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0012803785 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0012804249 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0012804912 QK_sche: prio= 6, pin=  2
+0012805263 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0012805684 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0012814649 User000: 1 hungry   
+0012815112 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0012815556 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0012815907 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[1] State=Philo_hungry
+0012816620 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=        33
+           TICK[0]: Ctr=        34
+           TICK[0]: Ctr=        35
+           TICK[0]: Ctr=        36
+           TICK[0]: Ctr=        37
+           TICK[0]: Ctr=        38
+           TICK[0]: Ctr=        39
+           TICK[0]: Ctr=        40
+           TICK[0]: Ctr=        41
+           TICK[0]: Ctr=        42
+           TICK[0]: Ctr=        43
+           TICK[0]: Ctr=        44
+           TICK[0]: Ctr=        45
+           TICK[0]: Ctr=        46
+           TICK[0]: Ctr=        47
+           TICK[0]: Ctr=        48
+           TICK[0]: Ctr=        49
+           TICK[0]: Ctr=        50
+           TICK[0]: Ctr=        51
+           TICK[0]: Ctr=        52
+           TICK[0]: Ctr=        53
+           TICK[0]: Ctr=        54
+           TICK[0]: Ctr=        55
+           TICK[0]: Ctr=        56
+           TICK[0]: Ctr=        57
+           TICK[0]: Ctr=        58
+           TICK[0]: Ctr=        59
+           TE[0].ADRM: Obj=l_philo[0].timeEvt Act=l_philo[0]
+0023600681 TE[0].POST: Obj=l_philo[0].timeEvt Sig=TIMEOUT_SIG Act=l_philo[0]
+0023601159 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0023602053 QK_sche: prio= 1, pin=  0
+0023602404 AO.GETL: Active= l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0023602825 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_thinking
+0023603387 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0023603749 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0023604210 AO.FIFO: Sndr=l_philo[0] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0023604873 QK_sche: prio= 6, pin=  1
+0023605224 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0023605645 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0023614610 User000: 0 hungry   
+0023615080 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0023615524 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0023615875 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[0] State=Philo_hungry
+0023616588 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=        60
+           TICK[0]: Ctr=        61
+           TICK[0]: Ctr=        62
+           TICK[0]: Ctr=        63
+           TICK[0]: Ctr=        64
+           TICK[0]: Ctr=        65
+           TICK[0]: Ctr=        66
+           TICK[0]: Ctr=        67
+           TICK[0]: Ctr=        68
+           TICK[0]: Ctr=        69
+           TICK[0]: Ctr=        70
+           TICK[0]: Ctr=        71
+           TICK[0]: Ctr=        72
+           TICK[0]: Ctr=        73
+           TE[0].ADRM: Obj=l_philo[3].timeEvt Act=l_philo[3]
+0029200656 TE[0].POST: Obj=l_philo[3].timeEvt Sig=TIMEOUT_SIG Act=l_philo[3]
+0029201134 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0029202028 QK_sche: prio= 4, pin=  0
+0029202379 AO.GETL: Active= l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0029202800 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_thinking
+0029203362 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0029203724 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0029204188 AO.FIFO: Sndr=l_philo[3] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0029204851 QK_sche: prio= 6, pin=  4
+0029205202 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0029205623 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0029214588 User000: 3 hungry   
+0029215053 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0029215497 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0029215848 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[3] State=Philo_hungry
+0029216561 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=        74
+           TICK[0]: Ctr=        75
+           TICK[0]: Ctr=        76
+           TICK[0]: Ctr=        77
+           TICK[0]: Ctr=        78
+           TICK[0]: Ctr=        79
+           TICK[0]: Ctr=        80
+           TICK[0]: Ctr=        81
+           TICK[0]: Ctr=        82
+           TICK[0]: Ctr=        83
+           TICK[0]: Ctr=        84
+           TICK[0]: Ctr=        85
+           TICK[0]: Ctr=        86
+           TICK[0]: Ctr=        87
+           TICK[0]: Ctr=        88
+           TICK[0]: Ctr=        89
+           TICK[0]: Ctr=        90
+           TICK[0]: Ctr=        91
+           TICK[0]: Ctr=        92
+           TICK[0]: Ctr=        93
+           TICK[0]: Ctr=        94
+           TICK[0]: Ctr=        95
+           TICK[0]: Ctr=        96
+           TICK[0]: Ctr=        97
+           TICK[0]: Ctr=        98
+           TICK[0]: Ctr=        99
+           TICK[0]: Ctr=       100
+           TICK[0]: Ctr=       101
+           TICK[0]: Ctr=       102
+           TICK[0]: Ctr=       103
+           TICK[0]: Ctr=       104
+           TICK[0]: Ctr=       105
+           TICK[0]: Ctr=       106
+           TICK[0]: Ctr=       107
+           TICK[0]: Ctr=       108
+           TE[0].ADRM: Obj=l_philo[2].timeEvt Act=l_philo[2]
+0043200679 TE[0].POST: Obj=l_philo[2].timeEvt Sig=TIMEOUT_SIG Act=l_philo[2]
+0043201157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0043201997 QK_sche: prio= 3, pin=  0
+0043202348 AO.GETL: Active= l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0043202769 Disp==>: Obj=l_philo[2] Sig=TIMEOUT_SIG Active=Philo_eating
+0043203342 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0043203704 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0043204149 PUBLISH: Sndr=l_philo[2] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0043204665 AO.FIFO: Sndr=l_philo[2] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0043205328 QK_sche: prio= 6, pin=  3
+0043205679 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0043206100 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0043215072 User000: 2 thinking 
+0043215601 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0043215963 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0043216400 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0043216916 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0043217632 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0043218348 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0043219064 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0043219780 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0043220460 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0043229307 User000: 1 eating   
+0043229783 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0043230228 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0043230591 QK_sche: prio= 5, pin=  3
+0043230928 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0043231349 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_eating
+0043231835 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_eating
+0043232291 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0043232654 QK_sche: prio= 4, pin=  3
+0043232991 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0043233412 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0043234217 Ignored: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0043234658 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0043235059 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0043235410 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[2] State=Philo_eating
+0043236177 TE[0].ARM : Obj=l_philo[2].timeEvt Act=l_philo[2] nTicks=  38 Interval=   0
+           ENTRY: Obj=l_philo[2] State=Philo_thinking
+0043237000 ==>Tran: Obj=l_philo[2] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0043237588 QK_sche: prio= 3, pin=  0
+0043237925 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0043238346 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_thinking
+0043238821 Intern : Obj=l_philo[2] Sig=EAT_SIG Source=Philo_thinking
+0043239266 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0043239640 QK_sche: prio= 2, pin=  0
+0043239977 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0043240398 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+0043241032 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  75 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_eating
+0043241866 ==>Tran: Obj=l_philo[1] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0043242400 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0043242763 QK_sche: prio= 1, pin=  0
+0043243114 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0043243535 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0043244337 Ignored: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0043244777 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0043245128 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       109
+           TICK[0]: Ctr=       110
+           TICK[0]: Ctr=       111
+           TICK[0]: Ctr=       112
+           TICK[0]: Ctr=       113
+           TICK[0]: Ctr=       114
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0045600652 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0045601130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0045602024 QK_sche: prio= 5, pin=  0
+0045602375 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0045602796 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_eating
+0045603369 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0045603731 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0045604176 PUBLISH: Sndr=l_philo[4] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0045604692 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0045605355 QK_sche: prio= 6, pin=  5
+0045605717 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0045606138 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0045615099 User000: 4 thinking 
+0045615619 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0045615981 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0045616418 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0045616934 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0045617650 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0045618366 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0045619082 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0045619798 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0045620478 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0045629314 User000: 3 eating   
+0045629790 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0045630235 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0045630636 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0045630987 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[4] State=Philo_eating
+0045631754 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  72 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_thinking
+0045632577 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0045633165 QK_sche: prio= 5, pin=  0
+0045633502 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0045633923 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0045634398 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0045634843 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0045635206 QK_sche: prio= 4, pin=  0
+0045635543 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0045635964 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0045636597 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  77 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_eating
+0045637431 ==>Tran: Obj=l_philo[3] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0045637965 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0045638328 QK_sche: prio= 3, pin=  0
+0045638665 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0045639086 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_thinking
+0045639561 Intern : Obj=l_philo[2] Sig=EAT_SIG Source=Philo_thinking
+0045640006 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0045640369 QK_sche: prio= 2, pin=  0
+0045640706 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0045641127 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_eating
+0045641613 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_eating
+0045642069 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0045642432 QK_sche: prio= 1, pin=  0
+0045642783 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0045643204 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0045644006 Ignored: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0045644446 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0045644797 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       115
+           TICK[0]: Ctr=       116
+           TICK[0]: Ctr=       117
+           TICK[0]: Ctr=       118
+           TICK[0]: Ctr=       119
+           TICK[0]: Ctr=       120
+           TICK[0]: Ctr=       121
+           TICK[0]: Ctr=       122
+           TICK[0]: Ctr=       123
+           TICK[0]: Ctr=       124
+           TICK[0]: Ctr=       125
+           TICK[0]: Ctr=       126
+           TICK[0]: Ctr=       127
+           TICK[0]: Ctr=       128
+           TICK[0]: Ctr=       129
+           TICK[0]: Ctr=       130
+           TICK[0]: Ctr=       131
+           TICK[0]: Ctr=       132
+           TICK[0]: Ctr=       133
+           TICK[0]: Ctr=       134
+           TICK[0]: Ctr=       135
+           TICK[0]: Ctr=       136
+           TICK[0]: Ctr=       137
+           TICK[0]: Ctr=       138
+           TICK[0]: Ctr=       139
+           TICK[0]: Ctr=       140
+           TICK[0]: Ctr=       141
+           TICK[0]: Ctr=       142
+           TICK[0]: Ctr=       143
+           TICK[0]: Ctr=       144
+           TICK[0]: Ctr=       145
+           TICK[0]: Ctr=       146
+           TE[0].ADRM: Obj=l_philo[2].timeEvt Act=l_philo[2]
+0058400679 TE[0].POST: Obj=l_philo[2].timeEvt Sig=TIMEOUT_SIG Act=l_philo[2]
+0058401157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0058402051 QK_sche: prio= 3, pin=  0
+0058402402 AO.GETL: Active= l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0058402823 Disp==>: Obj=l_philo[2] Sig=TIMEOUT_SIG Active=Philo_thinking
+0058403385 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0058403747 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0058404211 AO.FIFO: Sndr=l_philo[2] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0058404874 QK_sche: prio= 6, pin=  3
+0058405225 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0058405646 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0058414611 User000: 2 hungry   
+0058415074 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0058415518 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0058415869 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[2] State=Philo_hungry
+0058416582 ==>Tran: Obj=l_philo[2] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       147
+           TICK[0]: Ctr=       148
+           TICK[0]: Ctr=       149
+           TICK[0]: Ctr=       150
+           TICK[0]: Ctr=       151
+           TICK[0]: Ctr=       152
+           TICK[0]: Ctr=       153
+           TICK[0]: Ctr=       154
+           TICK[0]: Ctr=       155
+           TICK[0]: Ctr=       156
+           TICK[0]: Ctr=       157
+           TICK[0]: Ctr=       158
+           TICK[0]: Ctr=       159
+           TICK[0]: Ctr=       160
+           TICK[0]: Ctr=       161
+           TICK[0]: Ctr=       162
+           TICK[0]: Ctr=       163
+           TICK[0]: Ctr=       164
+           TICK[0]: Ctr=       165
+           TICK[0]: Ctr=       166
+           TICK[0]: Ctr=       167
+           TICK[0]: Ctr=       168
+           TICK[0]: Ctr=       169
+           TICK[0]: Ctr=       170
+           TICK[0]: Ctr=       171
+           TICK[0]: Ctr=       172
+           TICK[0]: Ctr=       173
+           TICK[0]: Ctr=       174
+           TICK[0]: Ctr=       175
+           TICK[0]: Ctr=       176
+           TICK[0]: Ctr=       177
+           TICK[0]: Ctr=       178
+           TICK[0]: Ctr=       179
+           TICK[0]: Ctr=       180
+           TICK[0]: Ctr=       181
+           TICK[0]: Ctr=       182
+           TICK[0]: Ctr=       183
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0073200673 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0073201151 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0073202045 QK_sche: prio= 2, pin=  0
+0073202407 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0073202828 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_eating
+0073203401 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0073203763 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0073204208 PUBLISH: Sndr=l_philo[1] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0073204724 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0073205387 QK_sche: prio= 6, pin=  2
+0073205738 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0073206159 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0073215120 User000: 1 thinking 
+0073215638 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0073216000 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0073216437 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0073216953 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0073217671 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0073218387 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0073219103 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0073219819 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0073220499 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0073229335 User000: 0 eating   
+0073229809 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0073230254 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0073230617 QK_sche: prio= 5, pin=  2
+0073230954 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0073231375 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0073231850 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0073232295 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0073232658 QK_sche: prio= 4, pin=  2
+0073232995 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0073233416 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_eating
+0073233902 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_eating
+0073234358 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0073234721 QK_sche: prio= 3, pin=  2
+0073235058 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0073235479 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0073236284 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0073236725 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0073237126 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0073237477 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[1] State=Philo_eating
+0073238244 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  26 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_thinking
+0073239067 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0073239655 QK_sche: prio= 2, pin=  0
+0073239992 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0073240413 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0073240888 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0073241333 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0073241707 QK_sche: prio= 1, pin=  0
+0073242069 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0073242490 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0073243121 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  67 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_eating
+0073243955 ==>Tran: Obj=l_philo[0] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0073244488 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0073244839 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       184
+           TICK[0]: Ctr=       185
+           TICK[0]: Ctr=       186
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0074400683 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0074401161 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0074402055 QK_sche: prio= 5, pin=  0
+0074402406 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0074402827 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_thinking
+0074403389 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0074403751 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0074404215 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0074404878 QK_sche: prio= 6, pin=  5
+0074405229 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0074405650 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0074414615 User000: 4 hungry   
+0074415080 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0074415524 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0074415886 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[4] State=Philo_hungry
+0074416599 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       187
+           TICK[0]: Ctr=       188
+           TICK[0]: Ctr=       189
+           TICK[0]: Ctr=       190
+           TICK[0]: Ctr=       191
+           TE[0].ADRM: Obj=l_philo[3].timeEvt Act=l_philo[3]
+0076400657 TE[0].POST: Obj=l_philo[3].timeEvt Sig=TIMEOUT_SIG Act=l_philo[3]
+0076401135 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0076402029 QK_sche: prio= 4, pin=  0
+0076402380 AO.GETL: Active= l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0076402801 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_eating
+0076403374 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0076403736 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0076404181 PUBLISH: Sndr=l_philo[3] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0076404697 AO.FIFO: Sndr=l_philo[3] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0076405360 QK_sche: prio= 6, pin=  4
+0076405711 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0076406132 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0076415093 User000: 3 thinking 
+0076415613 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0076415986 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0076416423 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0076416939 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0076417655 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0076418371 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0076419087 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0076419803 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0076420483 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0076429319 User000: 2 eating   
+0076429797 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0076430242 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0076430605 QK_sche: prio= 5, pin=  4
+0076430942 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0076431363 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0076432168 Ignored: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0076432609 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0076433010 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0076433361 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[3] State=Philo_eating
+0076434128 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  40 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_thinking
+0076434951 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0076435539 QK_sche: prio= 4, pin=  0
+0076435876 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0076436297 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_thinking
+0076436772 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_thinking
+0076437217 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0076437580 QK_sche: prio= 3, pin=  0
+0076437917 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0076438338 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0076438972 TE[0].ARM : Obj=l_philo[2].timeEvt Act=l_philo[2] nTicks=  66 Interval=   0
+           ENTRY: Obj=l_philo[2] State=Philo_eating
+0076439806 ==>Tran: Obj=l_philo[2] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0076440340 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0076440703 QK_sche: prio= 2, pin=  0
+0076441040 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0076441461 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0076441936 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0076442381 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0076442744 QK_sche: prio= 1, pin=  0
+0076443106 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0076443527 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_eating
+0076444010 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_eating
+0076444465 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0076444816 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       192
+           TICK[0]: Ctr=       193
+           TICK[0]: Ctr=       194
+           TICK[0]: Ctr=       195
+           TICK[0]: Ctr=       196
+           TICK[0]: Ctr=       197
+           TICK[0]: Ctr=       198
+           TICK[0]: Ctr=       199
+           TICK[0]: Ctr=       200
+           TICK[0]: Ctr=       201
+           TICK[0]: Ctr=       202
+           TICK[0]: Ctr=       203
+           TICK[0]: Ctr=       204
+           TICK[0]: Ctr=       205
+           TICK[0]: Ctr=       206
+           TICK[0]: Ctr=       207
+           TICK[0]: Ctr=       208
+           TICK[0]: Ctr=       209
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0083600679 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0083601157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0083602051 QK_sche: prio= 2, pin=  0
+0083602402 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0083602823 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_thinking
+0083603385 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0083603747 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0083604211 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0083604874 QK_sche: prio= 6, pin=  2
+0083605225 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0083605646 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0083614611 User000: 1 hungry   
+0083615074 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0083615518 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0083615869 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[1] State=Philo_hungry
+0083616593 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       210
+           TICK[0]: Ctr=       211
+           TICK[0]: Ctr=       212
+           TICK[0]: Ctr=       213
+           TICK[0]: Ctr=       214
+           TICK[0]: Ctr=       215
+           TICK[0]: Ctr=       216
+           TICK[0]: Ctr=       217
+           TICK[0]: Ctr=       218
+           TICK[0]: Ctr=       219
+           TICK[0]: Ctr=       220
+           TICK[0]: Ctr=       221
+           TICK[0]: Ctr=       222
+           TICK[0]: Ctr=       223
+           TICK[0]: Ctr=       224
+           TICK[0]: Ctr=       225
+           TICK[0]: Ctr=       226
+           TICK[0]: Ctr=       227
+           TICK[0]: Ctr=       228
+           TICK[0]: Ctr=       229
+           TICK[0]: Ctr=       230
+           TICK[0]: Ctr=       231
+           TE[0].ADRM: Obj=l_philo[3].timeEvt Act=l_philo[3]
+0092400715 TE[0].POST: Obj=l_philo[3].timeEvt Sig=TIMEOUT_SIG Act=l_philo[3]
+0092401193 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0092402033 QK_sche: prio= 4, pin=  0
+0092402384 AO.GETL: Active= l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0092402805 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_thinking
+0092403367 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0092403729 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0092404193 AO.FIFO: Sndr=l_philo[3] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0092404856 QK_sche: prio= 6, pin=  4
+0092405207 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0092405628 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0092414593 User000: 3 hungry   
+0092415065 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0092415509 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0092415860 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[3] State=Philo_hungry
+0092416573 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       232
+           TICK[0]: Ctr=       233
+           TICK[0]: Ctr=       234
+           TICK[0]: Ctr=       235
+           TICK[0]: Ctr=       236
+           TICK[0]: Ctr=       237
+           TICK[0]: Ctr=       238
+           TICK[0]: Ctr=       239
+           TICK[0]: Ctr=       240
+           TICK[0]: Ctr=       241
+           TICK[0]: Ctr=       242
+           TICK[0]: Ctr=       243
+           TICK[0]: Ctr=       244
+           TICK[0]: Ctr=       245
+           TICK[0]: Ctr=       246
+           TICK[0]: Ctr=       247
+           TICK[0]: Ctr=       248
+           TICK[0]: Ctr=       249
+           TICK[0]: Ctr=       250
+           TE[0].ADRM: Obj=l_philo[0].timeEvt Act=l_philo[0]
+0100000676 TE[0].POST: Obj=l_philo[0].timeEvt Sig=TIMEOUT_SIG Act=l_philo[0]
+0100001154 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0100002021 QK_sche: prio= 1, pin=  0
+0100002372 AO.GETL: Active= l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0100002793 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_eating
+0100003366 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0100003728 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0100004170 PUBLISH: Sndr=l_philo[0] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0100004686 AO.FIFO: Sndr=l_philo[0] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0100005349 QK_sche: prio= 6, pin=  1
+0100005700 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0100006121 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0100015082 User000: 0 thinking 
+0100015600 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0100015962 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0100016399 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0100016915 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0100017631 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0100018347 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0100019063 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0100019779 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0100020459 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0100029295 User000: 4 eating   
+0100029769 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0100030214 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0100030577 QK_sche: prio= 5, pin=  1
+0100030914 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0100031335 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0100031969 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  69 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_eating
+0100032803 ==>Tran: Obj=l_philo[4] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0100033337 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0100033700 QK_sche: prio= 4, pin=  1
+0100034037 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0100034458 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0100035263 Ignored: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0100035704 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0100036067 QK_sche: prio= 3, pin=  1
+0100036404 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0100036825 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_eating
+0100037311 Intern : Obj=l_philo[2] Sig=EAT_SIG Source=Philo_eating
+0100037767 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0100038130 QK_sche: prio= 2, pin=  1
+0100038467 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0100038888 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+0100039693 Ignored: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+0100040134 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0100040546 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0100040897 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[0] State=Philo_eating
+0100041664 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  29 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_thinking
+0100042487 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0100043075 QK_sche: prio= 1, pin=  0
+0100043426 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0100043847 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0100044319 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0100044763 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0100045114 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       251
+           TICK[0]: Ctr=       252
+           TICK[0]: Ctr=       253
+           TICK[0]: Ctr=       254
+           TICK[0]: Ctr=       255
+           TICK[0]: Ctr=       256
+           TICK[0]: Ctr=       257
+           TE[0].ADRM: Obj=l_philo[2].timeEvt Act=l_philo[2]
+0102800652 TE[0].POST: Obj=l_philo[2].timeEvt Sig=TIMEOUT_SIG Act=l_philo[2]
+0102801132 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0102802026 QK_sche: prio= 3, pin=  0
+0102802377 AO.GETL: Active= l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0102802798 Disp==>: Obj=l_philo[2] Sig=TIMEOUT_SIG Active=Philo_eating
+0102803371 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0102803733 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0102804178 PUBLISH: Sndr=l_philo[2] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0102804694 AO.FIFO: Sndr=l_philo[2] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0102805357 QK_sche: prio= 6, pin=  3
+0102805708 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0102806129 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0102815090 User000: 2 thinking 
+0102815608 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0102815970 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0102816407 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0102816923 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0102817639 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0102818355 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0102819071 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0102819787 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0102820467 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0102829303 User000: 1 eating   
+0102829779 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0102830224 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0102830587 QK_sche: prio= 5, pin=  3
+0102830924 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0102831345 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_eating
+0102831831 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_eating
+0102832287 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0102832650 QK_sche: prio= 4, pin=  3
+0102832987 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0102833408 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0102834213 Ignored: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0102834654 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0102835055 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0102835406 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[2] State=Philo_eating
+0102836173 TE[0].ARM : Obj=l_philo[2].timeEvt Act=l_philo[2] nTicks=  57 Interval=   0
+           ENTRY: Obj=l_philo[2] State=Philo_thinking
+0102836996 ==>Tran: Obj=l_philo[2] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0102837584 QK_sche: prio= 3, pin=  0
+0102837921 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0102838342 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_thinking
+0102838817 Intern : Obj=l_philo[2] Sig=EAT_SIG Source=Philo_thinking
+0102839262 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0102839625 QK_sche: prio= 2, pin=  0
+0102839962 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0102840383 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+0102841017 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  77 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_eating
+0102841851 ==>Tran: Obj=l_philo[1] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0102842385 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0102842748 QK_sche: prio= 1, pin=  0
+0102843099 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0102843520 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0102843992 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0102844436 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0102844787 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       258
+           TICK[0]: Ctr=       259
+           TICK[0]: Ctr=       260
+           TICK[0]: Ctr=       261
+           TICK[0]: Ctr=       262
+           TICK[0]: Ctr=       263
+           TICK[0]: Ctr=       264
+           TICK[0]: Ctr=       265
+           TICK[0]: Ctr=       266
+           TICK[0]: Ctr=       267
+           TICK[0]: Ctr=       268
+           TICK[0]: Ctr=       269
+           TICK[0]: Ctr=       270
+           TICK[0]: Ctr=       271
+           TICK[0]: Ctr=       272
+           TICK[0]: Ctr=       273
+           TICK[0]: Ctr=       274
+           TICK[0]: Ctr=       275
+           TICK[0]: Ctr=       276
+           TICK[0]: Ctr=       277
+           TICK[0]: Ctr=       278
+           TICK[0]: Ctr=       279
+           TE[0].ADRM: Obj=l_philo[0].timeEvt Act=l_philo[0]
+0111600652 TE[0].POST: Obj=l_philo[0].timeEvt Sig=TIMEOUT_SIG Act=l_philo[0]
+0111601130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0111602051 QK_sche: prio= 1, pin=  0
+0111602402 AO.GETL: Active= l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0111602823 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_thinking
+0111603385 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0111603747 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0111604208 AO.FIFO: Sndr=l_philo[0] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0111604871 QK_sche: prio= 6, pin=  1
+0111605222 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0111605643 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0111614608 User000: 0 hungry   
+0111615071 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0111615515 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0111615866 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[0] State=Philo_hungry
+0111616579 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       280
+           TICK[0]: Ctr=       281
+           TICK[0]: Ctr=       282
+           TICK[0]: Ctr=       283
+           TICK[0]: Ctr=       284
+           TICK[0]: Ctr=       285
+           TICK[0]: Ctr=       286
+           TICK[0]: Ctr=       287
+           TICK[0]: Ctr=       288
+           TICK[0]: Ctr=       289
+           TICK[0]: Ctr=       290
+           TICK[0]: Ctr=       291
+           TICK[0]: Ctr=       292
+           TICK[0]: Ctr=       293
+           TICK[0]: Ctr=       294
+           TICK[0]: Ctr=       295
+           TICK[0]: Ctr=       296
+           TICK[0]: Ctr=       297
+           TICK[0]: Ctr=       298
+           TICK[0]: Ctr=       299
+           TICK[0]: Ctr=       300
+           TICK[0]: Ctr=       301
+           TICK[0]: Ctr=       302
+           TICK[0]: Ctr=       303
+           TICK[0]: Ctr=       304
+           TICK[0]: Ctr=       305
+           TICK[0]: Ctr=       306
+           TICK[0]: Ctr=       307
+           TICK[0]: Ctr=       308
+           TICK[0]: Ctr=       309
+           TICK[0]: Ctr=       310
+           TICK[0]: Ctr=       311
+           TICK[0]: Ctr=       312
+           TICK[0]: Ctr=       313
+           TICK[0]: Ctr=       314
+           TE[0].ADRM: Obj=l_philo[2].timeEvt Act=l_philo[2]
+0125600727 TE[0].POST: Obj=l_philo[2].timeEvt Sig=TIMEOUT_SIG Act=l_philo[2]
+0125601205 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0125602045 QK_sche: prio= 3, pin=  0
+0125602396 AO.GETL: Active= l_philo[2] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0125602817 Disp==>: Obj=l_philo[2] Sig=TIMEOUT_SIG Active=Philo_thinking
+0125603379 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0125603741 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0125604205 AO.FIFO: Sndr=l_philo[2] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0125604868 QK_sche: prio= 6, pin=  3
+0125605219 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0125605640 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0125614605 User000: 2 hungry   
+0125615075 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0125615519 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0125615870 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[2] State=Philo_hungry
+0125616583 ==>Tran: Obj=l_philo[2] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       315
+           TICK[0]: Ctr=       316
+           TICK[0]: Ctr=       317
+           TICK[0]: Ctr=       318
+           TICK[0]: Ctr=       319
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0127600652 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0127601130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0127601997 QK_sche: prio= 5, pin=  0
+0127602348 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0127602771 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_eating
+0127603344 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0127603706 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0127604151 PUBLISH: Sndr=l_philo[4] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0127604667 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0127605330 QK_sche: prio= 6, pin=  5
+0127605681 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0127606102 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0127615063 User000: 4 thinking 
+0127615583 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0127615945 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0127616382 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0127616909 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0127617625 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0127618341 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0127619057 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0127619773 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0127620453 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0127629289 User000: 3 eating   
+0127629765 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0127630210 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0127630611 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0127630973 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[4] State=Philo_eating
+0127631762 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  26 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_thinking
+0127632585 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0127633173 QK_sche: prio= 5, pin=  0
+0127633510 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0127633931 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0127634406 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0127634851 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0127635214 QK_sche: prio= 4, pin=  0
+0127635551 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0127635972 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0127636606 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  84 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_eating
+0127637451 ==>Tran: Obj=l_philo[3] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0127637985 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0127638348 QK_sche: prio= 3, pin=  0
+0127638685 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0127639106 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0127639911 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0127640352 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0127640715 QK_sche: prio= 2, pin=  0
+0127641052 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0127641473 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_eating
+0127641959 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_eating
+0127642415 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0127642778 QK_sche: prio= 1, pin=  0
+0127643129 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0127643550 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0127644352 Ignored: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0127644792 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0127645143 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       320
+           TICK[0]: Ctr=       321
+           TICK[0]: Ctr=       322
+           TICK[0]: Ctr=       323
+           TICK[0]: Ctr=       324
+           TICK[0]: Ctr=       325
+           TICK[0]: Ctr=       326
+           TICK[0]: Ctr=       327
+           TICK[0]: Ctr=       328
+           TICK[0]: Ctr=       329
+           TICK[0]: Ctr=       330
+           TICK[0]: Ctr=       331
+           TICK[0]: Ctr=       332
+           TICK[0]: Ctr=       333
+           TICK[0]: Ctr=       334
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0133600652 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0133601130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0133602024 QK_sche: prio= 2, pin=  0
+0133602375 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0133602796 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_eating
+0133603369 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0133603731 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0133604176 PUBLISH: Sndr=l_philo[1] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0133604692 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0133605355 QK_sche: prio= 6, pin=  2
+0133605706 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0133606127 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0133615088 User000: 1 thinking 
+0133615606 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0133615968 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0133616405 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0133616932 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0133617659 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0133618375 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0133619091 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0133619807 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0133620487 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0133629323 User000: 0 eating   
+0133629797 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0133630242 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0133630605 QK_sche: prio= 5, pin=  2
+0133630942 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0133631363 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0133631838 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0133632283 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0133632646 QK_sche: prio= 4, pin=  2
+0133632983 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0133633404 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_eating
+0133633890 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_eating
+0133634346 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0133634709 QK_sche: prio= 3, pin=  2
+0133635046 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0133635467 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0133636272 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0133636713 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0133637114 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0133637465 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[1] State=Philo_eating
+0133638232 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  68 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_thinking
+0133639055 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0133639643 QK_sche: prio= 2, pin=  0
+0133639980 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0133640401 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0133640876 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0133641321 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0133641684 QK_sche: prio= 1, pin=  0
+0133642035 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0133642456 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0133643087 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  65 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_eating
+0133643932 ==>Tran: Obj=l_philo[0] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0133644465 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0133644816 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       335
+           TICK[0]: Ctr=       336
+           TICK[0]: Ctr=       337
+           TICK[0]: Ctr=       338
+           TICK[0]: Ctr=       339
+           TICK[0]: Ctr=       340
+           TICK[0]: Ctr=       341
+           TICK[0]: Ctr=       342
+           TICK[0]: Ctr=       343
+           TICK[0]: Ctr=       344
+           TICK[0]: Ctr=       345
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0138000683 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0138001161 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0138002055 QK_sche: prio= 5, pin=  0
+0138002406 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0138002827 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_thinking
+0138003389 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0138003751 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0138004215 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0138004878 QK_sche: prio= 6, pin=  5
+0138005229 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0138005650 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0138014615 User000: 4 hungry   
+0138015080 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0138015524 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0138015875 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[4] State=Philo_hungry
+0138016588 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       346
+           TICK[0]: Ctr=       347
+           TICK[0]: Ctr=       348
+           TICK[0]: Ctr=       349
+           TICK[0]: Ctr=       350
+           TICK[0]: Ctr=       351
+           TICK[0]: Ctr=       352
+           TICK[0]: Ctr=       353
+           TICK[0]: Ctr=       354
+           TICK[0]: Ctr=       355
+           TICK[0]: Ctr=       356
+           TICK[0]: Ctr=       357
+           TICK[0]: Ctr=       358
+           TICK[0]: Ctr=       359
+           TICK[0]: Ctr=       360
+           TICK[0]: Ctr=       361
+           TICK[0]: Ctr=       362
+           TICK[0]: Ctr=       363
+           TICK[0]: Ctr=       364
+           TICK[0]: Ctr=       365
+           TICK[0]: Ctr=       366
+           TICK[0]: Ctr=       367
+           TICK[0]: Ctr=       368
+           TICK[0]: Ctr=       369
+           TICK[0]: Ctr=       370
+           TICK[0]: Ctr=       371
+           TICK[0]: Ctr=       372
+           TICK[0]: Ctr=       373
+           TICK[0]: Ctr=       374
+           TICK[0]: Ctr=       375
+           TICK[0]: Ctr=       376
+           TICK[0]: Ctr=       377
+           TICK[0]: Ctr=       378
+           TICK[0]: Ctr=       379
+           TICK[0]: Ctr=       380
+           TICK[0]: Ctr=       381
+           TICK[0]: Ctr=       382
+           TICK[0]: Ctr=       383
+           TICK[0]: Ctr=       384
+           TICK[0]: Ctr=       385
+           TICK[0]: Ctr=       386
+           TICK[0]: Ctr=       387
+           TICK[0]: Ctr=       388
+           TICK[0]: Ctr=       389
+           TICK[0]: Ctr=       390
+           TICK[0]: Ctr=       391
+           TICK[0]: Ctr=       392
+           TICK[0]: Ctr=       393
+           TICK[0]: Ctr=       394
+           TICK[0]: Ctr=       395
+           TICK[0]: Ctr=       396
+           TICK[0]: Ctr=       397
+           TICK[0]: Ctr=       398
+           TICK[0]: Ctr=       399
+           TE[0].ADRM: Obj=l_philo[0].timeEvt Act=l_philo[0]
+0159600679 TE[0].POST: Obj=l_philo[0].timeEvt Sig=TIMEOUT_SIG Act=l_philo[0]
+0159601157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0159602024 QK_sche: prio= 1, pin=  0
+0159602375 AO.GETL: Active= l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0159602796 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_eating
+0159603369 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0159603731 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0159604173 PUBLISH: Sndr=l_philo[0] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0159604689 AO.FIFO: Sndr=l_philo[0] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0159605352 QK_sche: prio= 6, pin=  1
+0159605703 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0159606124 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0159615085 User000: 0 thinking 
+0159615612 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0159616057 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0159616440 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0159616791 MP.PUT : Obj=smlPoolSto nFree=  10
+           EXIT : Obj=l_philo[0] State=Philo_eating
+0159617558 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  66 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_thinking
+0159618381 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+           TICK[0]: Ctr=       400
+           TICK[0]: Ctr=       401
+           TICK[0]: Ctr=       402
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0160800681 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0160801159 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0160802026 QK_sche: prio= 2, pin=  0
+0160802377 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0160802798 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_thinking
+0160803360 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0160803722 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0160804186 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0160804849 QK_sche: prio= 6, pin=  2
+0160805200 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0160805621 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0160814586 User000: 1 hungry   
+0160815063 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0160815425 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0160815862 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0160816378 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0160817094 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0160817810 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0160818526 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0160819242 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0160819922 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0160828758 User000: 1 eating   
+0160829201 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0160829645 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0160829996 MP.PUT : Obj=smlPoolSto nFree=   9
+0160830394 QK_sche: prio= 5, pin=  2
+0160830731 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0160831152 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0160831957 Ignored: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0160832398 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0160832761 QK_sche: prio= 4, pin=  2
+0160833098 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0160833519 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_eating
+0160834005 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_eating
+0160834461 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0160834824 QK_sche: prio= 3, pin=  2
+0160835161 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0160835582 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0160836387 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0160836828 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+           ENTRY: Obj=l_philo[1] State=Philo_hungry
+0160837524 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+0160838101 QK_sche: prio= 2, pin=  0
+0160838438 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0160838859 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_hungry
+0160839493 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  63 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_eating
+0160840327 ==>Tran: Obj=l_philo[1] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0160840861 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0160841224 QK_sche: prio= 1, pin=  0
+0160841575 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0160841996 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0160842468 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0160842912 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0160843263 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       403
+           TE[0].ADRM: Obj=l_philo[3].timeEvt Act=l_philo[3]
+0161200653 TE[0].POST: Obj=l_philo[3].timeEvt Sig=TIMEOUT_SIG Act=l_philo[3]
+0161201133 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0161202052 QK_sche: prio= 4, pin=  0
+0161202403 AO.GETL: Active= l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0161202824 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_eating
+0161203397 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0161203759 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0161204204 PUBLISH: Sndr=l_philo[3] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0161204720 AO.FIFO: Sndr=l_philo[3] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0161205383 QK_sche: prio= 6, pin=  4
+0161205734 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0161206155 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0161215116 User000: 3 thinking 
+0161215673 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0161216035 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0161216472 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0161216988 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0161217704 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0161218420 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0161219136 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0161219852 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0161220532 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0161229368 User000: 4 eating   
+0161229809 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0161230254 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0161230617 QK_sche: prio= 5, pin=  4
+0161230954 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0161231375 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
+0161232009 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  56 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_eating
+0161232843 ==>Tran: Obj=l_philo[4] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0161233377 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0161233778 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0161234129 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[3] State=Philo_eating
+0161234896 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  41 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_thinking
+0161235719 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0161236307 QK_sche: prio= 4, pin=  0
+0161236644 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0161237065 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_thinking
+0161237540 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_thinking
+0161237985 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0161238348 QK_sche: prio= 3, pin=  0
+0161238696 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0161239128 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0161239933 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0161240385 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0161240748 QK_sche: prio= 2, pin=  0
+0161241085 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0161241506 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_eating
+0161241992 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_eating
+0161242448 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0161242811 QK_sche: prio= 1, pin=  0
+0161243162 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0161243583 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0161244055 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0161244499 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0161244850 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       404
+           TICK[0]: Ctr=       405
+           TICK[0]: Ctr=       406
+           TICK[0]: Ctr=       407
+           TICK[0]: Ctr=       408
+           TICK[0]: Ctr=       409
+           TICK[0]: Ctr=       410
+           TICK[0]: Ctr=       411
+           TICK[0]: Ctr=       412
+           TICK[0]: Ctr=       413
+           TICK[0]: Ctr=       414
+           TICK[0]: Ctr=       415
+           TICK[0]: Ctr=       416
+           TICK[0]: Ctr=       417
+           TICK[0]: Ctr=       418
+           TICK[0]: Ctr=       419
+           TICK[0]: Ctr=       420
+           TICK[0]: Ctr=       421
+           TICK[0]: Ctr=       422
+           TICK[0]: Ctr=       423
+           TICK[0]: Ctr=       424
+           TICK[0]: Ctr=       425
+           TICK[0]: Ctr=       426
+           TICK[0]: Ctr=       427
+           TICK[0]: Ctr=       428
+           TICK[0]: Ctr=       429
+           TICK[0]: Ctr=       430
+           TICK[0]: Ctr=       431
+           TICK[0]: Ctr=       432
+           TICK[0]: Ctr=       433
+           TICK[0]: Ctr=       434
+           TICK[0]: Ctr=       435
+           TICK[0]: Ctr=       436
+           TICK[0]: Ctr=       437
+           TICK[0]: Ctr=       438
+           TICK[0]: Ctr=       439
+           TICK[0]: Ctr=       440
+           TICK[0]: Ctr=       441
+           TICK[0]: Ctr=       442
+           TICK[0]: Ctr=       443
+           TICK[0]: Ctr=       444
+           TE[0].ADRM: Obj=l_philo[3].timeEvt Act=l_philo[3]
+0177600722 TE[0].POST: Obj=l_philo[3].timeEvt Sig=TIMEOUT_SIG Act=l_philo[3]
+0177601200 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0177602067 QK_sche: prio= 4, pin=  0
+0177602418 AO.GETL: Active= l_philo[3] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0177602839 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_thinking
+0177603401 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0177603763 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0177604227 AO.FIFO: Sndr=l_philo[3] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0177604890 QK_sche: prio= 6, pin=  4
+0177605241 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0177605662 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0177614627 User000: 3 hungry   
+0177615092 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0177615536 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0177615887 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[3] State=Philo_hungry
+0177616600 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       445
+           TICK[0]: Ctr=       446
+           TICK[0]: Ctr=       447
+           TICK[0]: Ctr=       448
+           TICK[0]: Ctr=       449
+           TICK[0]: Ctr=       450
+           TICK[0]: Ctr=       451
+           TICK[0]: Ctr=       452
+           TICK[0]: Ctr=       453
+           TICK[0]: Ctr=       454
+           TICK[0]: Ctr=       455
+           TICK[0]: Ctr=       456
+           TICK[0]: Ctr=       457
+           TICK[0]: Ctr=       458
+           TICK[0]: Ctr=       459
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0183600727 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0183601205 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0183602045 QK_sche: prio= 5, pin=  0
+0183602407 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0183602828 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_eating
+0183603401 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0183603763 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0183604208 PUBLISH: Sndr=l_philo[4] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0183604724 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0183605387 QK_sche: prio= 6, pin=  5
+0183605738 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0183606159 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0183615120 User000: 4 thinking 
+0183615640 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0183616002 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0183616439 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0183616955 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0183617671 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0183618387 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0183619103 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0183619819 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0183620499 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0183629335 User000: 3 eating   
+0183629804 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0183630249 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0183630650 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0183631001 MP.PUT : Obj=smlPoolSto nFree=   9
+           EXIT : Obj=l_philo[4] State=Philo_eating
+0183631768 TE[0].ARM : Obj=l_philo[4].timeEvt Act=l_philo[4] nTicks=  30 Interval=   0
+           ENTRY: Obj=l_philo[4] State=Philo_thinking
+0183632591 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0183633179 QK_sche: prio= 5, pin=  0
+0183633516 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0183633937 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0183634412 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0183634857 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0183635220 QK_sche: prio= 4, pin=  0
+0183635557 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0183635978 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_hungry
+0183636612 TE[0].ARM : Obj=l_philo[3].timeEvt Act=l_philo[3] nTicks=  79 Interval=   0
+           ENTRY: Obj=l_philo[3] State=Philo_eating
+0183637446 ==>Tran: Obj=l_philo[3] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0183637980 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0183638343 QK_sche: prio= 3, pin=  0
+0183638680 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0183639101 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0183639906 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0183640347 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0183640710 QK_sche: prio= 2, pin=  0
+0183641047 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0183641468 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_eating
+0183641954 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_eating
+0183642410 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0183642773 QK_sche: prio= 1, pin=  0
+0183643124 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0183643545 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_thinking
+0183644017 Intern : Obj=l_philo[0] Sig=EAT_SIG Source=Philo_thinking
+0183644461 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0183644812 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       460
+           TICK[0]: Ctr=       461
+           TICK[0]: Ctr=       462
+           TICK[0]: Ctr=       463
+           TICK[0]: Ctr=       464
+           TICK[0]: Ctr=       465
+           TE[0].ADRM: Obj=l_philo[0].timeEvt Act=l_philo[0]
+0186000652 TE[0].POST: Obj=l_philo[0].timeEvt Sig=TIMEOUT_SIG Act=l_philo[0]
+0186001130 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+           TE[0].ADRM: Obj=l_philo[1].timeEvt Act=l_philo[1]
+0186002074 TE[0].POST: Obj=l_philo[1].timeEvt Sig=TIMEOUT_SIG Act=l_philo[1]
+0186002552 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0186003446 QK_sche: prio= 2, pin=  0
+0186003783 AO.GETL: Active= l_philo[1] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0186004204 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_eating
+0186004777 NEW    : Evt(Sig=DONE_SIG, size=    6)
+0186005139 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0186005584 PUBLISH: Sndr=l_philo[1] Evt(Sig=DONE_SIG, Pool= 1, Ref= 0)
+0186006100 AO.FIFO: Sndr=l_philo[1] Obj=l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0186006763 QK_sche: prio= 6, pin=  2
+0186007100 AO.GETL: Active= l_table Evt(Sig=DONE_SIG, Pool= 1, Ref= 2)
+0186007521 Disp==>: Obj=l_table Sig=DONE_SIG Active=Table_serving
+0186016482 User000: 1 thinking 
+0186017009 Intern : Obj=l_table Sig=DONE_SIG Source=Table_serving
+0186017454 GC-ATT : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0186017855 GC     : Evt(Sig=DONE_SIG, Pool=1, Ref= 1)
+0186018206 MP.PUT : Obj=smlPoolSto nFree=  10
+           EXIT : Obj=l_philo[1] State=Philo_eating
+0186018973 TE[0].ARM : Obj=l_philo[1].timeEvt Act=l_philo[1] nTicks=  72 Interval=   0
+           ENTRY: Obj=l_philo[1] State=Philo_thinking
+0186019796 ==>Tran: Obj=l_philo[1] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+0186020384 QK_sche: prio= 1, pin=  0
+0186020735 AO.GETL: Active= l_philo[0] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0186021156 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_thinking
+0186021718 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0186022080 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0186022541 AO.FIFO: Sndr=l_philo[0] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0186023204 QK_sche: prio= 6, pin=  1
+0186023566 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0186023998 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0186032963 User000: 0 hungry   
+0186033440 NEW    : Evt(Sig=EAT_SIG, size=    6)
+0186033802 MP.GET  : Obj=smlPoolSto nFree=   8 nMin=   8
+0186034239 PUBLISH: Sndr=l_table Evt(Sig=EAT_SIG, Pool= 1, Ref= 0)
+0186034755 AO.FIFO: Sndr=l_table Obj=l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1) Queue(nFree=  6, nMin=  5)
+0186035471 AO.FIFO: Sndr=l_table Obj=l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2) Queue(nFree=  6, nMin=  5)
+0186036187 AO.FIFO: Sndr=l_table Obj=l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3) Queue(nFree=  6, nMin=  5)
+0186036903 AO.FIFO: Sndr=l_table Obj=l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4) Queue(nFree=  6, nMin=  5)
+0186037619 AO.FIFO: Sndr=l_table Obj=l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5) Queue(nFree=  6, nMin=  5)
+0186038299 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 5)
+0186047135 User000: 0 eating   
+0186047578 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0186048022 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0186048373 MP.PUT : Obj=smlPoolSto nFree=   9
+0186048771 QK_sche: prio= 5, pin=  1
+0186049108 AO.GETL: Active= l_philo[4] Evt(Sig=EAT_SIG, Pool= 1, Ref= 5)
+0186049529 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_thinking
+0186050004 Intern : Obj=l_philo[4] Sig=EAT_SIG Source=Philo_thinking
+0186050449 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 4)
+0186050812 QK_sche: prio= 4, pin=  1
+0186051149 AO.GETL: Active= l_philo[3] Evt(Sig=EAT_SIG, Pool= 1, Ref= 4)
+0186051570 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_eating
+0186052056 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_eating
+0186052512 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 3)
+0186052875 QK_sche: prio= 3, pin=  1
+0186053212 AO.GETL: Active= l_philo[2] Evt(Sig=EAT_SIG, Pool= 1, Ref= 3)
+0186053633 Disp==>: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+           ==>UnHd: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0186054438 Ignored: Obj=l_philo[2] Sig=EAT_SIG Active=Philo_hungry
+0186054879 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 2)
+0186055242 QK_sche: prio= 2, pin=  1
+0186055579 AO.GETL: Active= l_philo[1] Evt(Sig=EAT_SIG, Pool= 1, Ref= 2)
+0186056000 Disp==>: Obj=l_philo[1] Sig=EAT_SIG Active=Philo_thinking
+0186056475 Intern : Obj=l_philo[1] Sig=EAT_SIG Source=Philo_thinking
+0186056920 GC-ATT : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+           ENTRY: Obj=l_philo[0] State=Philo_hungry
+0186057616 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+0186058193 QK_sche: prio= 1, pin=  0
+0186058544 AO.GETL: Active= l_philo[0] Evt(Sig=EAT_SIG, Pool= 1, Ref= 1)
+0186058965 Disp==>: Obj=l_philo[0] Sig=EAT_SIG Active=Philo_hungry
+0186059596 TE[0].ARM : Obj=l_philo[0].timeEvt Act=l_philo[0] nTicks=  99 Interval=   0
+           ENTRY: Obj=l_philo[0] State=Philo_eating
+0186060430 ==>Tran: Obj=l_philo[0] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
+0186060963 GC     : Evt(Sig=EAT_SIG, Pool=1, Ref= 1)
+0186061314 MP.PUT : Obj=smlPoolSto nFree=  10
+           TICK[0]: Ctr=       466
+           TICK[0]: Ctr=       467
+           TICK[0]: Ctr=       468
+           TICK[0]: Ctr=       469
+           TICK[0]: Ctr=       470
+           TICK[0]: Ctr=       471
+           TICK[0]: Ctr=       472
+           TICK[0]: Ctr=       473
+           TICK[0]: Ctr=       474
+           TICK[0]: Ctr=       475
+           TICK[0]: Ctr=       476
+           TICK[0]: Ctr=       477
+           TICK[0]: Ctr=       478
+           TICK[0]: Ctr=       479
+           TICK[0]: Ctr=       480
+           TICK[0]: Ctr=       481
+           TICK[0]: Ctr=       482
+           TICK[0]: Ctr=       483
+           TICK[0]: Ctr=       484
+           TICK[0]: Ctr=       485
+           TICK[0]: Ctr=       486
+           TICK[0]: Ctr=       487
+           TICK[0]: Ctr=       488
+           TICK[0]: Ctr=       489
+           TE[0].ADRM: Obj=l_philo[4].timeEvt Act=l_philo[4]
+0195600679 TE[0].POST: Obj=l_philo[4].timeEvt Sig=TIMEOUT_SIG Act=l_philo[4]
+0195601157 AO.FIFO: Sndr=l_SysTick_Handler Obj=l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0) Queue(nFree=  6, nMin=  5)
+0195602051 QK_sche: prio= 5, pin=  0
+0195602402 AO.GETL: Active= l_philo[4] Evt(Sig=TIMEOUT_SIG, Pool= 0, Ref= 0)
+0195602823 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_thinking
+0195603385 NEW    : Evt(Sig=HUNGRY_SIG, size=    6)
+0195603747 MP.GET  : Obj=smlPoolSto nFree=   9 nMin=   8
+0195604211 AO.FIFO: Sndr=l_philo[4] Obj=l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 0) Queue(nFree=  6, nMin=  5)
+0195604874 QK_sche: prio= 6, pin=  5
+0195605225 AO.GETL: Active= l_table Evt(Sig=HUNGRY_SIG, Pool= 1, Ref= 1)
+0195605646 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0195614611 User000: 4 hungry   
+0195615076 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0195615520 GC     : Evt(Sig=HUNGRY_SIG, Pool=1, Ref= 1)
+0195615871 MP.PUT : Obj=smlPoolSto nFree=  10
+           ENTRY: Obj=l_philo[4] State=Philo_hungry
+0195616584 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
+           TICK[0]: Ctr=       490

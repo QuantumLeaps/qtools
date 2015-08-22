@@ -7,23 +7,29 @@
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) 2002-2011 Quantum Leaps, LLC. All rights reserved.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
-// This software may be distributed and modified under the terms of the GNU
-// General Public License version 2 (GPL) as published by the Free Software
-// Foundation and appearing in the file GPL.TXT included in the packaging of
-// this file. Please note that GPL Section 2[b] requires that all works based
-// on this software must also be made publicly available under the terms of
-// the GPL ("Copyleft").
+// This program is open source software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Alternatively, this software may be distributed and modified under the
+// Alternatively, this program may be distributed and modified under the
 // terms of Quantum Leaps commercial licenses, which expressly supersede
-// the GPL and are specifically designed for licensees interested in
-// retaining the proprietary status of their code.
+// the GNU General Public License and are specifically designed for
+// licensees interested in retaining the proprietary status of their code.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Quantum Leaps Web site:  http://www.quantum-leaps.com
-// e-mail:                  info@quantum-leaps.com
+// Web:   www.state-machine.com
+// Email: info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 #ifndef filesearch_h
 #define filesearch_h
@@ -32,6 +38,6 @@ unsigned isMatching  (char const *fullPath, bool isReadonly);
 void     onMatchFound(char const *fullPath, unsigned flags);
 void     filesearch  (char const *dirname);
 
-extern char const dir_separator;     // platform-dependent directory separator
+extern char const dir_separator; // platform-dependent directory separator
 
 #endif // filesearch_h

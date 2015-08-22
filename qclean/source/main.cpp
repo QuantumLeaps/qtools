@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qclean utility
-// Last updated for version 5.3.0
-// Last updated on  2014-03-31
+// Last updated for version 5.5.0
+// Last updated on  2015-08-13
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
 //                    innovating embedded systems
 //
-// Copyright (C) Quantum Leaps, www.state-machine.com.
+// Copyright (C) Quantum Leaps, LLC. All rights reserved.
 //
 // This program is open source software: you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as published
@@ -35,11 +35,17 @@
 #include <string.h>
 #include "filesearch.h"
 
-static char l_src[1024*1024];                                           // 1MB
-static char l_dst[1024*1024];                                           // 1MB
+static char l_src[1024*1024]; // 1MB
+static char l_dst[1024*1024]; // 1MB
 static long l_nFiles = 0UL;
 static long l_nSkipped = 0UL;
 static long l_nCleaned = 0UL;
+
+enum SpecalChars {
+   TAB = 0x09,
+   LF  = 0x0A,
+   CR  = 0x0D
+};
 
 enum CleanupFlags {
     CR_FLG          = (1U << 0),
@@ -49,6 +55,7 @@ enum CleanupFlags {
 
     RDONLY_FLG      = (1U << 8),
 };
+
 
 //............................................................................
 unsigned isMatching(char const *fname, bool isReadonly) {
@@ -130,12 +137,13 @@ void onMatchFound(char const *fname, unsigned flags) {
     }
     int lineCtr = 1;
     int lineLen = 0;
+    char prev = 0x00;
     char *src = l_src;
     char *dst = l_dst;
     unsigned char diff = 0;
     for (; nBytes > 0; --nBytes, ++src) {
         switch (*src) {
-            case 0x09: {                                                // tab
+            case TAB: {
                 if ((flags & TAB_FLG) != 0) {                 // cleanup tabs?
                     diff |= TAB_FLG;                            // removed TAB
                     *dst++ = ' ';
@@ -149,7 +157,7 @@ void onMatchFound(char const *fname, unsigned flags) {
                 lineLen += 4;
                 break;
             }
-            case 0x0A: {                                                // EOL
+            case LF: {
                 lineLen = 0;
                 ++lineCtr;
                 if ((flags & TRAIL_BLANK_FLG) != 0) {       // cleanup blanks?
@@ -158,10 +166,16 @@ void onMatchFound(char const *fname, unsigned flags) {
                         --dst;
                     }
                 }
-                *dst++ = *src;
+                if (((flags & CR_FLG) == 0)                // NOT cleaning CR?
+                    && (prev != CR))                        // CR NOT present?
+                {
+                    *dst++ = CR;                       // add CR to the stream
+                    diff |= CR_FLG;                                // added CR
+                }
+                *dst++ = *src;                                 // copy LF over
                 break;
             }
-            case 0x0D: {                                                 // CR
+            case CR: {
                 if ((flags & CR_FLG) != 0) {                    // cleanup CR?
                     diff |= CR_FLG;                              // removed CR
                 }
@@ -177,6 +191,7 @@ void onMatchFound(char const *fname, unsigned flags) {
                 break;
             }
         }
+        prev = *src;
         if (dst >= &l_dst[sizeof(l_dst)]) {
             printf("\nError: too big!\n");
             return;
@@ -208,7 +223,7 @@ void onMatchFound(char const *fname, unsigned flags) {
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
 
-    printf("qclean 5.3.0 (c) Quantum Leaps. www.state-machine.com\n");
+    printf("qclean 5.5.0 (c) Quantum Leaps. www.state-machine.com\n");
     if (argc > 1) {
         rootDir = argv[1];
     }

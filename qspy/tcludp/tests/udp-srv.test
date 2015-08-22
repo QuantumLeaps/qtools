@@ -1,0 +1,341 @@
+if {[catch {
+    package require tcltest 2
+    namespace import -force ::tcltest::*
+} err]} {
+    puts "skipping [file tail [info script]]: these tests require tcltest 2.0"
+    return
+}
+
+package require udp
+
+# Some tests are marked as slow as they can take 30s to test a volume
+# of packets.  We generally just test for correctness and these do not
+# significantly contribute in testing correctness.
+::tcltest::testConstraint slow 0
+
+# Enable printing timing information during some tests.
+::tcltest::testConstraint timestamp 1
+
+set scriptName [makeFile {} udptest2.tcl]
+set script {
+    # UDP Test Server
+    package require udp
+    proc Wait {n} {
+        set ::forever 0
+        after $n {set ::forever 1}
+        vwait ::forever
+    }
+    
+    # If an error occurs during the tests, this process may end up not
+    # being closed down. To deal with this we create a 30s timeout.
+    proc DoTimeout {} {
+        set ::done 1
+        puts stderr "udp-srv.test child process [pid] timed out."
+        flush stdout
+    }
+    
+    proc ReadSock {chan} {
+        set data [read $chan]
+        set peer [fconfigure $chan -peer]
+        puts [list $peer [string length $data] $data]
+    }
+    
+    proc ReadControl {chan} {
+        if {[eof $chan]} {
+            fileevent $chan readable {}
+            set ::done 1
+            return
+        }
+        gets $chan line
+        if {[string equal [string trim $line] "quit"]} {
+            set ::done 1
+        }
+    }
+    
+    set timeout [after %TIMEOUT ::DoTimeout]
+    fconfigure stdout -buffering line
+    fconfigure stdin -buffering line
+    set socket [udp_open %OPTIONS]
+    fconfigure $socket -buffering none -encoding binary -translation binary
+    fileevent $socket readable [list ReadSock $socket]
+    fileevent stdin readable [list ReadControl stdin]
+    Wait 100
+    puts ready
+    puts [fconfigure $socket -myport]
+    vwait ::done
+    after cancel $timeout
+    close $socket
+    Wait 100
+    exit
+}
+
+proc Wait {n} {
+    set ::forever 0
+    after $n {set ::forever 1}
+    vwait ::forever
+}
+
+proc createChildProcess {filename {timeout 5000} {udp_open_options {}}} {
+    file delete -force $filename
+    set f [open $filename w]
+    puts $f [string map [list %TIMEOUT $timeout %OPTIONS $udp_open_options] $::script]
+    close $f
+    set p [open |[list [interpreter] $filename] r+]
+    fconfigure $p -buffering line
+    gets $p line
+    return $p
+}
+
+proc closeChildProcess {pipe} {
+    if {![catch {puts $pipe quit}]} {
+		while {[gets $pipe line] != -1} { puts "EXTRA: $line" }
+		close $pipe
+	}
+	return
+}
+
+proc timestamp {cmd {label ""} {t 0}} {
+    if {![::tcltest::testConstraint timestamp]} {
+        return
+    }
+    switch -exact -- $cmd {
+        start { return [clock clicks -milliseconds] }
+        display {
+            set delta [expr {[clock clicks -milliseconds] - $t}]
+            puts "$label: ${delta}ms"
+        }
+        default {
+            return -code error "invalid command \"$cmd\": must be one of start or display"
+        }
+    }
+    return
+}
+
+test udp-srv-1 {basic server operation (ascii)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName 10000]
+    gets $child port
+} -body {
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port]
+    puts -nonewline $u "abcdefgh"
+    close $u
+    Wait 100
+    gets $child r
+    lindex $r 1
+} -cleanup {
+	puts "closing child process $child"
+    closeChildProcess $child
+	puts "closed..."
+} -result {8}
+	
+test udp-srv-2 {basic server operation (binary)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+} -body {
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port]
+    puts -nonewline $u "\0\1\2\3\4\5\6\7"
+    close $u
+    Wait 100
+    gets $child r
+    lindex $r 1
+} -cleanup {
+    closeChildProcess $child
+} -result {8}
+
+test udp-srv-3 {basic server operation (large packet)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+} -body {
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port]
+    puts -nonewline $u [string repeat x 1024]
+    close $u
+    Wait 100
+    gets $child r
+    lindex $r 1
+} -cleanup {
+    closeChildProcess $child
+} -result {1024}
+
+test udp-srv-4 {basic server operation (short packet)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+} -body {
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port] -buffering none
+    puts -nonewline $u "\0"
+    close $u
+    Wait 100
+    gets $child r
+    lindex $r 1
+} -cleanup {
+    closeChildProcess $child
+} -result {1}
+
+test udp-srv-5.1 {multiple client packets (10)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port] -buffering none \
+        -blocking 0 -encoding binary -translation binary
+    for {set n 0} {$n < 10} {incr n} {
+        puts -nonewline $u "packet $n"
+        gets $child line
+        incr r
+    }
+    close $u
+    set r
+} -cleanup {
+    timestamp display 5.1 $t
+    closeChildProcess $child
+} -result {10}
+
+test udp-srv-5.2 {multiple client packets (1000)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port] -buffering none \
+        -blocking 0 -encoding binary -translation binary
+    for {set n 0} {$n < 1000} {incr n} {
+    	set message "packet $n"
+        puts -nonewline $u $message
+        gets $child line
+ 	    incr r
+    }
+    close $u
+    set r
+} -cleanup {
+    timestamp display 5.2 $t
+    closeChildProcess $child
+} -result {1000}
+
+test udp-srv-5.3 {multiple client packets (10000)} -constraints {stdio slow} -setup {
+    set child [createChildProcess $::scriptName 30000]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port] -buffering none \
+        -blocking 0 -encoding binary -translation binary
+    for {set n 0} {$n < 10000} {incr n} {
+        puts -nonewline $u "packet $n"
+        gets $child line
+        incr r
+    }
+    close $u
+    set r
+} -cleanup {
+    timestamp display 5.3 $t
+    closeChildProcess $child
+} -result {10000}
+
+test udp-srv-5.4 {multiple client packets (100) - check packet validity} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+} -body {
+    set r 0
+    set u [udp_open]
+    fconfigure $u -remote [list localhost $port] -buffering none \
+        -blocking 0 -encoding binary -translation binary
+	for {set n 0} {$n < 100} {incr n} {
+    	set message "packet $n"
+        puts -nonewline $u $message
+        gets $child line
+        
+        # Variable line has syntax:
+        # {<ip address> <port>} <message size> <message>
+        # Check if what we've sent is what we've received
+        if {[string equal $message [lindex $line 2]]} {
+	        incr r
+        } else {
+			lappend errorPackets "Error packet: $line\n"
+		}
+    }
+    close $u
+    # Check the number of valid messages we've received
+    set r
+} -cleanup {
+    closeChildProcess $child
+} -result {100}
+
+
+test udp-srv-6.1 {multiple client sockets (10)} -constraints {stdio} -setup {
+    set child [createChildProcess $::scriptName]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    for {set n 0} {$n < 10} {incr n} {
+        set u [udp_open]
+        fconfigure $u -remote [list localhost $port] -buffering none \
+            -blocking 0 -encoding binary -translation binary
+        puts -nonewline $u "packet $n"
+        gets $child line
+        close $u
+        incr r
+    }
+    set r
+} -cleanup {
+    timestamp display 6.1 $t
+    closeChildProcess $child
+} -result {10}
+
+test udp-srv-6.2 {multiple client sockets (1000)} -constraints {stdio slow} -setup {
+    set child [createChildProcess $::scriptName 30000]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    for {set n 0} {$n < 1000} {incr n} {
+        set u [udp_open]
+        fconfigure $u -remote [list localhost $port] -buffering none \
+            -blocking 0 -encoding binary -translation binary
+        puts -nonewline $u "packet $n"
+        gets $child line
+        close $u
+        incr r
+    }
+    set r
+} -cleanup {
+    timestamp display 6.2 $t
+    closeChildProcess $child
+} -result {1000}
+
+test udp-srv-6.3 {multiple client sockets (10000)} -constraints {stdio slow} -setup {
+    set child [createChildProcess $::scriptName 60000]
+    gets $child port
+    set t [timestamp start]
+} -body {
+    set r 0
+    for {set n 0} {$n < 10000} {incr n} {
+        set u [udp_open]
+        fconfigure $u -remote [list localhost $port] -buffering none \
+            -blocking 0 -encoding binary -translation binary
+        puts -nonewline $u "packet $n"
+        gets $child line
+        close $u
+        incr r
+    }
+    set r
+} -cleanup {
+    timestamp display 6.3 $t
+    closeChildProcess $child
+} -result {10000}
+
+
+# -------------------------------------------------------------------------
+file delete -force $::scriptName
+::tcltest::cleanupTests
+return
+
+# Local variables:
+# mode: tcl
+# End:
