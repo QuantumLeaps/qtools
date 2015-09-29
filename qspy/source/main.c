@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- main entry point
 * Last updated for version 5.5.0
-* Last updated on  2015-08-14
+* Last updated on  2015-09-18
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -62,6 +62,7 @@ static FILE *l_outFile = (FILE *)0;
 static FILE *l_savFile = (FILE *)0;
 static FILE *l_matFile = (FILE *)0;
 static FILE *l_mscFile = (FILE *)0;
+static FILE *l_dicFile = (FILE *)0;
 
 static char  l_comPort    [FNAME_SIZE];
 static char  l_inpFileName[FNAME_SIZE];
@@ -69,6 +70,7 @@ static char  l_outFileName[FNAME_SIZE];
 static char  l_savFileName[FNAME_SIZE];
 static char  l_matFileName[FNAME_SIZE];
 static char  l_mscFileName[FNAME_SIZE];
+static char  l_dicFileName[FNAME_SIZE];
 
 static char  l_tstampStr  [16];
 
@@ -103,6 +105,7 @@ static char const l_helpStr[] =
     "-b<baud_rate>     115200  baud rate for the com port\n"
     "-t[TCP_port]      6601    TCP/IP input with optional port\n"
     "-f<file_name>             file input (postprocessing)\n"
+    "-d<file_name>             dictionary input\n"
     "-T<tstamp_size>   4       QS timestamp size     (bytes)\n"
     "-O<pointer_size>  4       object pointer size   (bytes)\n"
     "-F<pointer_size>  4       function pointer size (bytes)\n"
@@ -166,7 +169,7 @@ int main(int argc, char *argv[]) {
 
                 case QSPY_TARGET_INPUT_EVT: /* the Target sent some data... */
                     if (nBytes > 0) {
-                        QSPY_parse(l_buf, nBytes);
+                        QSPY_parse(l_buf, (uint32_t)nBytes);
                         if (l_savFile != (FILE *)0) {
                             fwrite(l_buf, 1, nBytes, l_savFile);
                         }
@@ -245,7 +248,7 @@ void QSPY_onPrintLn(void) {
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hqu::v:osmgc:b:t::p:f:T:O:F:S:E:Q:P:B:C:";
+        "hqu::v:osmgc:b:t::p:f:d:T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
     uint16_t version     = 550U;
@@ -367,6 +370,11 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 l_link = FILE_LINK;
                 break;
             }
+            case 'd': { /* Dictionary input */
+                STRNCPY_S(l_dicFileName, optarg, sizeof(l_dicFileName));
+                printf("-d%s\n", l_dicFileName);
+                break;
+            }
             case 't': { /* TCP/IP input */
                 if ((l_link != NO_LINK) && (l_link != TCP_LINK)) {
                     fprintf(stderr,
@@ -435,7 +443,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     }
     if (argc != optind) {
         fprintf(stderr,
-            "%d comman-line options were not processed\n", (argc - optind));
+            "%d command-line options were not processed\n", (argc - optind));
         printf("\n%s\n%s", l_helpStr, l_kbdHelpStr);
         return QSPY_ERROR;
     }
@@ -475,7 +483,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     }
 
     /* open files specified on the command line... */
-    if (l_outFileName[0] != 'O') {
+    if (l_outFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_outFile, l_outFileName, "w");
         if (l_outFile != (FILE *)0) {
             fprintf(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
@@ -485,28 +493,27 @@ static QSpyStatus configure(int argc, char *argv[]) {
             return QSPY_ERROR;
         }
     }
-    if (l_savFileName[0] != 'O') {
+    if (l_savFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_savFile, l_savFileName, "wb"); /* open for writing binary */
         if (l_savFile == (FILE *)0) {
             fprintf(stderr, "Cannot open the file %s\n", l_savFileName);
             return QSPY_ERROR;
         }
     }
-    if (l_matFileName[0] != 'O') {
+    if (l_matFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_matFile, l_matFileName, "w");
         if (l_matFile == (FILE *)0) {
             fprintf(stderr, "Cannot open the file %s\n", l_matFileName);
             return QSPY_ERROR;
         }
     }
-    if (l_mscFileName[0] != 'O') {
+    if (l_mscFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_mscFile, l_mscFileName, "w");
         if (l_mscFile == (FILE *)0) {
             fprintf(stderr, "Cannot open the file %s\n", l_mscFileName);
             return QSPY_ERROR;
         }
     }
-
     QSPY_config(version,
                 objPtrSize,
                 funPtrSize,
@@ -522,6 +529,20 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 (l_bePort != 0)
                     ? &BE_parseRecFromTarget
                     : (QSPY_CustParseFun)0);
+
+    /* NOTE: dictionaries must be read AFTER configuring QSPY */
+    if (l_dicFileName[0] != '\0') {
+        FOPEN_S(l_dicFile, l_dicFileName, "r");
+        if (l_dicFile == (FILE *)0) {
+            fprintf(stderr, "Cannot open the file %s\n", l_dicFileName);
+            return QSPY_ERROR;
+        }
+        if (QSPY_readDict(l_dicFile) != QSPY_ERROR) {
+            printf(
+                "           Dictionaries read from %s\n", l_dicFileName);
+        }
+        fclose(l_dicFile);
+    }
 
     return QSPY_SUCCESS;
 }
@@ -567,7 +588,7 @@ bool QSPY_command(uint8_t cmdId) {
             break;
 
         case 'd':  /* save Dictionaries to a file */
-            str = QSPY_writeDictionaries();
+            str = QSPY_writeDict();
             if (str != (char *)0) {
                 printf("********** Dictionaries written to: %s\n",
                        str);

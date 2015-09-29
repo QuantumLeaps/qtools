@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
 # Last updated for version 5.5.0
-# Last updated on  2015-08-18
+# Last updated on  2015-08-31
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -269,8 +269,8 @@ proc onGlbFilters {} {
         QS_QF_EQUEUE_POST_ATTEMPT    QS_QF_MPOOL_GET_ATTEMPT   \
         QS_QF_RESERVED1              QS_QF_RESERVED0           \
         QS_QK_MUTEX_LOCK             QS_QK_MUTEX_UNLOCK        \
-        QS_QK_SCHEDULE               QS_QK_RESERVED1           \
-        QS_QK_RESERVED0              QS_QEP_TRAN_HIST          \
+        QS_QVK_SCHEDULE              QS_QVK_IDLE               \
+        QS_QK_RESUME                 QS_QEP_TRAN_HIST          \
         QS_QEP_TRAN_EP               QS_QEP_TRAN_XP            \
         QS_QEP_RESERVED1             QS_QEP_RESERVED0          \
         QS_SIG_DICT                  QS_OBJ_DICT               \
@@ -311,7 +311,7 @@ proc onGlbFilters {} {
     label $pane.std  -text "===== Standard QS recrods ====="
     label $pane.qep  -text "QEP records..."
     label $pane.qf   -text "QF records..."
-    label $pane.qk   -text "QK records..."
+    label $pane.qk   -text "QK/QV records..."
     grid $pane.std -columnspan 4
     grid $pane.qep $pane.qf  $pane.f25 $pane.f41
     grid $pane.f1  $pane.f10 $pane.f26 $pane.f42

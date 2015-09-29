@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.5.0
-* Last updated on  2015-08-19
+* Last updated on  2015-08-31
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -119,12 +119,12 @@ enum QSpyRecords {
     QS_QF_RESERVED1,
     QS_QF_RESERVED0,
 
-    /* [50] QK records */
-    QS_QK_MUTEX_LOCK,     /*!< the QK mutex was locked */
-    QS_QK_MUTEX_UNLOCK,   /*!< the QK mutex was unlocked */
-    QS_QK_SCHEDULE,       /*!< the QK scheduled a new task to execute */
-    QS_QK_RESERVED1,
-    QS_QK_RESERVED0,
+    /* [50] QK/QV records */
+    QS_QK_MUTEX_LOCK,     /*!< QK mutex was locked */
+    QS_QK_MUTEX_UNLOCK,   /*!< QK mutex was unlocked */
+    QS_QVK_SCHEDULE,      /*!< QK/QV scheduled a new task to execute */
+    QS_QVK_IDLE,          /*!< QK/QV became idle */
+    QS_QK_RESUME,         /*!< QK resumed previous task (not idle) */
 
     /* [55] Additional QEP records */
     QS_QEP_TRAN_HIST,     /*!< a transition to history was taken */

@@ -1,0 +1,463 @@
+/*! @page qspyview QSpyView Front-End
+
+@tableofcontents
+
+@section qspyview_about About QSpyView
+<p>Starting from @ref qspy_5_5_0 "version 5.5.0", the @ref qspy "QSPY host application" has been extended with a <strong>UDP socket</strong>, which is open for communication with various Front-Ends (GUI-based or "headless"). **QSpyView** is an example of such a Front-End. `QSpyView` is written in <a href="https://en.wikipedia.org/wiki/Tcl" target="_blank" class="extern">Tcl/Tk</a> and it runs on all desktop operating systems.
+</p>
+
+@image html qspy2.gif "QSPY Back-End and QSpyView Front-End"
+
+`QSpyView` currently supports the following @subpage qspyview_ui "commands" (<strong>NOTE:</strong> `QSpyView` is @subpage qspyview_cust "extensible" with functionality specific to the project at hand, so it can provide many more features built on top of the basic functionality enumerated above.):
+
+- Set global QS filters inside the Target
+- Set local QS filters inside the Target
+- Inject an arbitrary event to the Target (direct post or publish)
+- Execute a user-defined callback function inside the Target with arguments supplied from `QSpyView`
+- Peek data inside the Target and send to `QSpyView`
+- Poke data (supplied from `QSpyView`) into the Target
+- Execute clock tick inside the Target
+- Request target information (version, all sizes of objects, build time-stamp)
+- Remotely reset of the Target
+
+@remark
+<strong>Why UDP?</strong> The communication between QSPY and QSpyView is based on UDP, because UDP is inherently packet-oriented (as opposed to TCP, which is stream-oriented) and preserves the <em>packet boundaries</em>.
+
+
+-------------------------------------------------------------------------------
+@section qspyview_install Installing `QSpyView` and Tcl/Tk
+`QSpyView` is bundled with QSPY and is installed automatically when you @ref install "install Qtools". Specifically, `QSpyView` consists of the <span class="img file_tcl">qspy.tcl</span> and  <span class="img file_wish">qspyview.tcl</span> Tcl scripts located in the @ref qspy_files "qtools\qspy\qspyview" folder.
+
+<div class="separate"></div>
+@subsection qspyview_windows Windows
+In order to run `QSpyView`, you need the <em>Tk interpreter</em> called **wish** installed on your machine. `Wish` (version 8.4) is included in the Qtools collection for Windows, so it will be available if you install Qtools. Also, the Tcl/Tk distribution included in Qtools has been already extended with the UDP-Sockets for Tcl, so you can use the `tclsh` and `wish` interpreters "as is" without any additional modifications.
+
+<div class="separate"></div>
+@subsection qspyview_linux Linux
+On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/Tk distribution with the UDP Sockets for Tcl.
+
+@note
+All the tools and instructions of adding UDP Sockets to Tcl are included in the Qtools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
+
+
+-------------------------------------------------------------------------------
+@section qspyview_comm QSpyView Communication
+The sequence diagram below shows the general structure of `QSpyView`. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the Target data link (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qspy_protocol "Q-SPY Protocol". The `QSpyView` (Tcl/Tk script) attaches to the QSPY host application by means of the **UDP socket** that QSPY opens when the `-u` @ref qspy_command "command-line option" is selected. This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qspy_protocol "Q-SPY Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
+
+@image html qspy7.gif "Communication between Target, QSPY, and QSpyView"
+@n
+
+@attention
+<span class="tag">A</span> The QSPY Back-End forwards **all** trace records produced by the Target to the UDP Socket, so that any attached Front-End (such as `QSpyView`) receives all this data.
+
+<ul class="tag">
+  <li><span class="tag">B</span> The QSPY Back-End relays all UDP packets with @ref qspyview_packet "Record-ID" in the range `0..127` to the Target.
+  </li>
+
+  <li><span class="tag">C</span> UDP packets with  @ref qspyview_packet "Record-ID" in the range `128..255` are not relayed to the Target, but instead are used for communication between the Front-End and the QSPY Back-End.
+  </li>
+</ul>
+
+
+<div class="separate"></div>
+@subsection qspyview_packet UDP Socket Packet Structure
+To be able to @ref qspyview_cust "customize and extend QSpyView" to your specific projects, you need to understand the structure of the UDP packets exchanged between the QSPY Back-End and the `QSpyView` Front-End (<span style="color:blue"><strong>blue arrows</strong></span> in the sequence diagram above).
+
+@image html qspy8.gif "UDP packet structure"
+
+The UDP packets are **binary**, and consists of:
+
+- 1-byte sequence number, which increments by 1 for every packet and wraps naturally from 0xFF to 0. The sequence number allows `QSpyView` to detect any data discontinuities.
+
+- 1-byte Record-ID. The Record-IDs are divided into two categories and  <strong>128..255</strong>:
+    - Records to and from the Target have Record-IDs in the range <strong>0..127</strong>. Specifically, QS records originated from the Target are enumerated in ::QSpyRecords. Records destined to the Target are enumerated in ::QSpyRxRecords.
+    - Records to and from the QSPY Back-End have record-IDs in the range <strong>128..255</strong>. Specifically, records destined to QSPY are enumerated in ::QSpyCommands.
+
+- optional variable-length data.
+
+@note
+The Tcl <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary</a> command is ideal for working with QSPY packets.
+
+
+-------------------------------------------------------------------------------
+@section qspyview_run Running QSpyView
+
+Being a Tcl/Tk application, `QSpyView` requires the Tk interpreter called **wish** (windowing shell) to run. This Tcl/Tk interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl/Tk interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/Qtools/" target="_blank" class="extern">Qtools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QSpyView`).
+
+In the simplest form, `QSpyView` might be started by changing to the folder `qtools\qspy\qspyview` and double-clicking on the <span class="img file_wish">qspyview.tcl</span> script. Alternatively, you might open the Command Prompt and type:
+
+@verbatim
+wish qspyview.tcl
+@endverbatim
+
+This would launch `QSpyView` in the "default" configuration, without any @ref qspyview_cust "customization" specific to a project at hand.
+
+However, it also possible to launch `QSpyView` @ref qspyview_cust "customized to a particular project", such as the DPP application, by providing commands and views specific to the project at hand. For this `QSpyView` provides an extension mechanism to provide another script as a <em>command-line parameter</em> to the <span class="img file_wish">qspyview.tcl</span> script.
+
+@note
+QSpyView takes up to three optional command-line parameters, with the following usage:@n@n
+`wish qspyview.tcl [<cust_script> [<qspy_host> [<qspy_port>]]]`@n@n
+where `<cust_script>` is the customization script (e.g., `dpp.tcl`), `<qspy_host>` is the network host name or IP address of the host running the QSPY "Back-End", and `<qspy_port>` is the UDP port number opened by the QSPY "Back-End". If the parameters `<qspy_host>` and `<qspy_port>` are not provided, the defaults of `localhost` and `7701` are assumed.
+
+For example, the DPP example provides the extension script named <span class="img file_wish">dpp.tcl</span>, located in the QP examples directory. In this case, you need to choose from which directory you want to launch `QSpyView`. If you choose to launch it from the directory containing the extension script, you need to fully-qualify the location of the <span class="img file_wish">qspyview.tcl</span> script, as follows:
+
+@verbatim
+wish %QTOOLS%\qspy\qspyview\qspyview.tcl dpp.tcl
+@endverbatim
+
+
+@note
+In practice, the easiest way to launch `QSpyView` is to define a <strong>shortcut</strong>, like the one provided with the DPP example:@n@n
+@image html qspyview_shortcut.gif "qspyview shortcut properties"
+
+
+<div class="separate"></div>
+@subsection qspyview_attaching Attaching QSpyView to QSPY
+In contrast to TCP, which is stream-oriented, UDP is packet-oriented, so the only way to "attach" two ends of communication is to exchange packets. Consequently, immediately after `QSpyView` is launched, it tries to **attach** by sending the ::ATTACH packet to QSPY. If QSPY responds with the same ::ATTACH packet, `QSpyView` considers that it is "attached".
+
+However, if the ::ATTACH packet does not arrive within a second or two (because perhaps QSPY is not running), `QSpyView` opens a modal dialog box that reminds you to run QSPY with the `-u` command-line option, as shown in the screen-shot below:
+
+@image html qspyview_before.gif "Attach to QSPY dialog box"
+
+Depending how you start @ref qspy "QSPY", the dialog box might close automatically, which means that QSpyView has successfully **attached** to QSPY. However, if the dialog box does not close, you need to click the **OK** button to send ::ATTACH packet to QSPY, until `QSpyView` receives the ::ATTACH response from QSPY. If you can't "attach", you can click the **Cancel** button to close `QSpyView`.
+
+@note
+Because UDP works over networks, the QSPY Back-End can run on a <strong>different machine</strong> (e.g., a lab computer) that the the `QSpyView` Front-End (e.g., office computer). These two machines can even run different operating systems, for example Linux on the lab computer and Windows in the office, or vice versa. All you need to do is to provide the host-name parameter as the third command-line argument to the `qspyview.tcl` script (e.g., `wish qspyview.tcl dpp.tcl 192.168.1.101`).
+
+
+<div class="separate"></div>
+@subsection qspyview_tstamp Recognizing the Target
+Before `QSpyView` can correctly interpret any data from the Target, it needs to obtain certain information about the Target, such as the sizes of object pointers, function pointers, event signals, etc. This information is provided in the ::QS_TARGET_INFO trace record coming from the Target.
+
+To inform you about the Target status, `QSpyView` displays the **Target: UNKNOWN** in the status bar when the target is "unknown":
+
+@image html qspyview_unknown.gif "Target UNKNONW status"
+
+If this happens, you can explicitly request the Target information by means of the "Commands->Query Target Info" menu:
+
+@image html qspyview_known.gif "Target KNONW status (build time-stamp)"
+
+After the Target information is received, the `QSpyView` status bar shows the build time-stamp of the Target image.
+
+@next{qspyview_ui}
+*/
+/*###########################################################################*/
+/**
+@page qspyview_ui QSpyView User Interface
+
+@tableofcontents
+
+<p>The <span class="img file_wish">qspyview.tcl</span> script provides a simple Graphical User Interface (GUI) consisting of the main menu, the text view, the canvas view, and the status bar.
+</p>
+@image html qspyview.gif "QSpyView user interface"
+
+The main menu includes several useful commands, which are quickly reviewed and the following sections. The main menu might subsequently be augmented in your own @ref qspyview_cust "customizations".
+
+
+-------------------------------------------------------------------------------
+@section qspyview_file File Menu
+The File menu provides interface to the @ref qspy_saving "QSPY saving files" feature. This menu allows you to trigger QSPY to save @ref qspy_dict "dictionaries", as well as to open/close all other file formats supported by QSPY.
+
+@image html qspyview_file.gif
+
+
+-------------------------------------------------------------------------------
+@section qspyview_view View Menu
+The View menu allows you to toggle (show/hide) the two main views: the Text view and the Canvas view.
+
+@image html qspyview_view.gif "Text-view and Canvas-view menus"
+
+@image html qspyview_canvas.gif "Canvas-view enabled"
+
+@image html qspyview_no_text.gif "Text-view disabled"
+
+@note
+The provided screen shots of the Text-view and the Canvas-view are specific to the DPP example application (see @ref qspyview_cust).
+
+
+-------------------------------------------------------------------------------
+@section qspyview_filters Filters Menu
+The Filters menu opens dialog boxes through which you can set the @ref qspy_filters "QSPY filters".
+
+@image html qspyview_filters.gif
+
+<div class="separate"></div>
+@subsection qspyview_global Setting Global Filters
+The Q-SPY Global Filter dialog box allows you to turn each individual @ref qspy_global "global trace record" on and off. The Global Filter has two main components: the standard Q-SPY trace records (see ::QSpyRecords), and the User-specific trace records (starting with the offset ::QS_USER). The User QS Records are visible when you **scroll down** the "Global Filters" dialog box.
+
+@image html qspyview_global.gif
+
+@note
+The "Global Filter" dialog box does not show the "Miscellaneous" QS trace records (such as ::QS_OBJ_DICT, ::QS_TARGET_INFO, etc.), because these trace records are "not maskable", meaning that they are always enabled and cannot be turned off by the Global Filter.
+
+<div class="separate"></div>
+@subsection qspyview_local Setting Local Filters
+The Q-SPY Local Filter dialog box allows you to set each individual @ref qspy_local "local filter".
+
+@image html qspyview_local.png
+
+@note
+The dialog box accepts the addresses of the objects in decimal and in hexadecimal (with the `0x` prefix), as shown in the screen-shot above.
+
+<div class="separate"></div>
+@subsection qspyview_ao Setting Active Object Filter
+The "Active Object" filter is a shortcut to setting the @ref qspy_local "Q-SPY local filter" for a given active object in the Target. Specifically, the "Active Object" filter sets the two local filters ::QS_FILTER_AO_OBJ and ::QS_FILTER_SM_OBJ to the same Active Object with the specified priority (<strong>NOTE:</strong> Each Active Object has a unique priority in QP).
+
+@image html qspyview_ao.png "setting Active Object filter to AO with priority 6"
+
+
+-------------------------------------------------------------------------------
+@section qspyview_commands Commands Menu
+The Commands menu allows you to execute simple commands (without parameters) in the Target, such as Reset the Target, Query the Target, and clock Tick at rate 0 and rate 1. Also, this menu allows you to execute commands with parameters, which are quickly discussed below
+
+@image html qspyview_commands.gif
+
+<div class="separate"></div>
+@subsection qspyview_user Executing User Command
+The "User Command..." menu allows you to invoke a command in the Target and pass a parameter to this command. (**NOTE:** a command is an application-specific callback function that the QS-RX component executes in the Target).
+
+The following screen shot shows how to execute User Command number `10` with the parameter `1234`. Both the command number and the parameter can be specified in hexadecimal (with the `0x` prefix).
+
+@image html qspyview_cmd.png
+
+
+<div class="separate"></div>
+@subsection qspyview_peek Peek Command
+The Peek Address... command opens a dialog box, in which you can provide the Target address (RAM or ROM), and the number of bytes (1..255) you wish to "peek".
+
+@image html qspyview_peek.png
+
+The Target responds with a ::QS_PEEK_DATA trace record, which you can view in QSPY human-readable output (the packet is also sent to QSpyView, where you can react to it in your @ref qspyview_cust "customization".)
+
+@verbatim
+0424502345 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Phi
+lo_hungry
+0424503315 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
+0424504021 PHILO_STAT: 0 hungry
+0424504625 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
+0435085797 PEEK: Addr=0000000020000000 len=64
+           0F 4B 00 29 14 BF 4F F4 00 31 00 21 1A 60 4A F6
+           55 22 5A 61 01 22 1A 65 0A 4B 0B 4A 41 EA 03 03
+           13 60 0A 4B 18 60 0A 4B 1B 68 00 2B FB D0 07 4B
+           08 4A 18 68 43 F8 08 2C 00 22 43 F8 40 2C 70 47
+
+0438500795 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_thinking
+@endverbatim
+
+@note
+The Peek Command can be used to view any **readable** address, such as ROM, RAM, and also **peripheral registers** in your Target.
+
+
+<div class="separate"></div>
+@subsection qspyview_poke Poke Command
+The "Poke Address..." command allows you to write data to the specified address in Target's RAM (**NOTE:** the provided address **must** be a valid RAM address, or the Target might crash.)
+
+As shown in the screen shot below, the POKE command takes a writable address (might be hex), the **format** of the data and the data (might be in hex). The format is any valid specification of the format for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary format</a> Tcl command (the total number of bytes to poke must not exceed <strong>8</strong>). For example, here the format `i` means that the `data` should be encoded as 32-bit integer in little-endian byte order. (<strong>NOTE:</strong> The endianness you specify in the `format` field must match the endianness of the Target.)
+
+@image html qspyview_poke.png
+
+@note
+The Poke Command can be used to change any **writable** address, such as RAM, but also **peripheral registers** in your Target.
+
+
+-------------------------------------------------------------------------------
+@section qspyview_events Events Menu
+The "Generate Event..." menu allows you to send an arbitrary event (with up to 10 different parameters) to the Target. The event will be either posted directly to the specified Active Object, or it will be published.
+
+As shown in the screen-shot below, you need to provide the `prio` of the recipient active object. (If `prio` is greater than zero, the event will be posted directly to the AO with that priority, otherwise the event will be published). You also need to specify the numerical value of the event signal (`sig`).
+
+@image html qspyview_event.png
+
+The optional "Event Parameters" section allows you to specify up to 10 arbitrary parameters. Each parameter is specified as a pair of **format** followed by data.  The format is any valid specification of the format for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary format</a> Tcl command. For example, here the format `c` means a byte, while the format `i` means that the `data` should be encoded as 32-bit integer in little-endian byte order. (<strong>NOTE:</strong> The endianness you specify in the `format` field must match the endianness of the Target.
+
+@attention
+All the specified parameters are appended to the event packet for the target in the exact order and the specified binary format. If the event structure is represented in the Target memory with some **padding**, you need to provide such padding explicitly (as one of the parameters).
+
+@note
+The main purpose of the "Generate Event..." menu is to allow you to determine experimentally the correct format of events that you wish to inject into the Target. Once the correct format has been confirmed, you can generate the events programmatically in your @ref qspyview_cust "customization".
+
+
+-------------------------------------------------------------------------------
+@section qspyview_custom Custom Menu
+This top-level menu is provided for your customization. It's intent is to let you add your own commands in your script.
+
+@image html qspyview_custom.gif
+
+
+-------------------------------------------------------------------------------
+@section qspyview_help Help Menu
+This menu allows you to access the online Q-SPY help in HTML, and also allows you to open the "About" dialog box.
+
+@image html qspyview_help.gif
+
+
+@next{qspyview_cust}
+*/
+/*###########################################################################*/
+/**
+@page qspyview_cust Customizing  and Extending QSpyView
+
+@tableofcontents
+
+The <strong>QSpyView</strong> Front-End has been specifically designed for extensibility, so that you can quickly customize its behavior to your specific project. In fact, as mentioned in the section about @ref qspyview_run "running QSpyView", the <span class="img file_wish">qspyview.tcl</span> script takes a command-line parameter, which is another Tcl script designed specifically to extend and customize the basic functionality. This section describes how to write this extension script, so that you can turn QSpyView into a powerful custom Human-Machine Interface (HMI) for your projects.
+
+@note
+You don't need to change the <span class="img file_wish">qspyview.tcl</span> script to customize and extend it for your project. The customization you make go into a separate script, which is specific to your project. That way, you can have many different customization scripts and you don't pollute (and possibly break) the original code.
+
+
+-------------------------------------------------------------------------------
+@section qspyview_files QSpyView files
+
+The QSpyView Front-End has a modular source code, consisting of the following files and folders:
+
+<ul class="tag">
+  <li><span class="img folder">qtools</span>
+  </li>
+  <ul class="tag">
+    <li><span class="img folder">qspy</span> &mdash; @ref qspy "QSPY tool"
+    </li>
+    <ul class="tag">
+      <li><span class="img folder">qspyview</span> &mdash; @ref qspyview "QSpyView" sources
+      </li>
+      <ul class="tag">
+        <li><span class="img folder">img</span> &mdash; images used by `QSpyView`
+        </li>
+        <li><span class="img file_tcl">qspy.tcl</span> &mdash; Tcl script for UDP communication with the QSPY Back-End
+        </li>
+        <li><span class="img file_wish">qspyview.tcl</span> &mdash; QSpyView Tcl/Tk script
+        </li>
+        <li><span class="img file_wish">default.tcl</span> &mdash; the default customization of the QSpyView Tcl/Tk script
+        </li>
+      </ul>
+    </ul>
+  </ul>
+</ul>
+
+As you can see, the QSpyView source code is broken down into three scripts. The <span class="img file_tcl">qspy.tcl</span> script implements the UDP communication with the QSPY Back-End. This script is specifically written in pure Tcl an **no** Tk, so that it can be used both with and without a GUI (head-less scripts). This script is not standalone but rather it needs to be included (`source`ed) in other scripts.
+
+The main functionality of QSpyView is implemented in the <span class="img file_wish">qspyview.tcl</span> script, which uses Tk for the GUI. This script takes up to three optional command-line parameters: `<cust-script>`, `<qspy-host>`, and `<qspy-UDP-port>`. The `<cust-script>` the customization script that will be included (`source`ed) by `qspyview.tcl`. If you don't provide this parameter, the default customization script <span class="img file_wish">default.tcl</span> will be used.
+
+@note
+The QSpyView folder does <strong>not</strong> contain the customization for the DPP example application, because it makes much more sense to co-locate this customization with the DPP project. Consequently, the <span class="img file_wish">dpp.tcl</span> is located in the QP/C/C++ example directory `<qpx>\examples\arm-cm\dpp_ek-tm4c123gxl\qspy`, where `<qpx>` stands for QP/C or QP/C++ installation directory on your machine.
+
+
+-------------------------------------------------------------------------------
+@section qspyview_script Your Customization Script
+The easiest way to customize QSpyView is to copy the provided <span class="img file_wish">default.tcl</span> script (or the <span class="img file_wish">dpp.tcl</span> example), rename it, and add your own extensions.
+
+When you open <span class="img file_wish">default.tcl</span>, you will see that it consists of the following sections:
+
+- @ref qspyview_cust_commands "command handlers" are Tcl procedures for your custom commands
+
+- @ref qspyview_cust_menu "additional menu options" are your own menu items added to the @ref qspyview_ui "top-level menu"
+
+- @ref qspyview_cust_canvas "custom canvas" for your project, where you can provide the User Interface for your project
+
+- @ref qspyview_cust_user "user record handlers" are Tcl procedures for handling application-specific (User) trace records
+
+- @ref qspyview_cust_special "special record handlers" are Tcl procedures to handle special trace records (RESET and Target INFO)
+
+- @ref qspyview_cust_standard "standard record handlers" are Tcl procedures to handle standard QS records from the Target
+
+
+<div class="separate"></div>
+@subsection qspyview_cust_commands Adding Custom Commands
+Custom commands can come in two forms: commands with and without user-supplied parameters. A command without parameter can be simply coded as a Tcl procedure, which will be @ref qspyview_cust_menu "attached to a menu item". A command requiring user-supplied input needs to be implemented as a dialog box. The qspyview.tcl script provides plenty of examples of such dialog boxes.
+
+A command procedure typically will end with <strong>sending a packet</strong> to the Target or to the QSPY Back-End. The qspy.tcl script provides the procedure `::qspy::sendPkt` for this purpose. Please refer to the example code (default.tcl or dpp.tcl) for examples of sending packets.
+
+<div class="separate"></div>
+@subsection qspyview_cust_menu Additional Menu Options
+Menu options can be added very simply. For example, the following line of Tcl adds the menu option "MyCommand" to the menu bar `.mber.cust`, which will call the procedure `onMyCommand`:
+
+@verbatim
+.mbar.cust add command -label "MyCommand" -command onMyCommand
+@endverbatim
+
+<div class="separate"></div>
+@subsection qspyview_cust_canvas Custom Canvas (HMI)
+The Canvas view can provide a complete custom Human-Machine Interface (HMI) to your embedded Target. The Canvas can display the changing status of the application and also it can provide <strong>actuators</strong> to control the Target.
+
+@image html qspyview_canv_dpp.gif "Custom Canvas for the DPP Application"
+
+The screen shot above shows the Canvas customization from the <span class="img file_wish">dpp.tcl</span> script. Please note that the button in the center of the screen allows you to interact with the Target by sending commands to it. Please refer to this script code for the details of how various effects have been achieved.
+
+@note
+Many Tk widget packages and libraries (e.g. BWidgets, IWidgets, etc.) are available to aid you in developing your custom canvas. With such widget libraries, you can display the data in an attractive form: as gauges, bars, graphs, and sliders. The attractiveness of the GUI is limited only by your creativity.
+
+
+<div class="separate"></div>
+@subsection qspyview_cust_user User Record Handlers
+The User trace records are the application-specific trace records that are produced by your embedded application (as opposed to the QP framework). These trace records very likely require custom handling, because QSPY cannot really "know" what they represent.
+
+The DPP project provides two examples of User trace records (`PHILO_STAT` and `COMMAND_STAT`, see `bsp.c` in the `qpc\examples\arm-cm\dpp_ek-tm4c123gxl\qk` directory). The following picture shows the structure of the `PHILO_STAT` trace record:
+
+@image html qspy9.gif "PHILO_STAT User trace record"
+
+
+As all trace records, user records start with the sequence number, followed by the record-ID. However, you should also known that all user records contain a time-stamp and that all data fields are preceded by a format-byte. This format byte helps QSPY to correctly display all data fields, but is really unnecessary for you, who knows the layout of the data.) As a concrete example, here is the complete User record handler for `PHILO_STAT == QS_USER + 0 == 70`:
+
+@code{tcl}
+# user record handlers [70..0x7C] --------------------------------------------
+proc ::qspy::rec70  {} { ;# QS_USER
+    variable thePkt
+    variable theFmt
+    binary scan $thePkt xx$theFmt(tstamp)xcxa* \
+           tstamp philoNum stat
+
+    dispTxt [format "%010u Philo %1d is %s" $tstamp $philoNum $stat]
+
+    global thePhiloId
+    set img [string index $stat 0]
+    .canv.c itemconfigure [expr $thePhiloId + $philoNum] -image ::img::$img
+}
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">line 2</span> The record-handler procedure is always starts with `proc ::qspy::rec<num> {}`, where `<num>` is the trace record number in decimal. The procedure takes no parameters.
+  </li>
+
+  <li><span class="tag">line 3</span> The packet content is provided as variable `$thePkt`.
+  </li>
+
+  <li><span class="tag">line 4</span> The formats of QSPY objects are provided as the (associative) array `$theFmt`. You will need the format of time-stamp to parse the User packet.
+  </li>
+
+  <li><span class="tag">lines 5-6</span> The parsing of the packet is accomplished by the `binary scan` Tcl command. The meaning of the format fields is as follows: `x` skip sequence number, `x` skip record-ID, `$theFmt(timestamp)` extract the specified number of bytes and assign to the local variable `tstamp`, `x` skip the format byte, `c` extract a byte and assign to the local variable `philoNum`, `x` skip the format byte, `a*` extract a zero-terminated string and assign to local variable `stat`.
+  </li>
+
+  <li><span class="tag">line 8</span> the `dispTxt` command (implemented in qspyview.tcl) displays the specified string in the @ref qspyview_ui "text view".
+  </li>
+
+  <li><span class="tag">line 12</span> the Canvas is updated with the new image of the "Philosopher", which reflects its current status. This accomplishes animation of the images on the Canvas.
+  </li>
+
+</ul>
+
+<div class="separate"></div>
+@subsection qspyview_cust_special Special Record Handlers
+The custom script offers you an option to add your own customization for the special events, such as Reset of the Target and the arrival of the Target INFO. You can add your code inside the following procedures:
+
+@verbatim
+proc ::qspy::recRESET {} { ;# target reset callback
+}
+proc ::qspy::recINFO  {} { ;# target info callback
+}
+@endverbatim
+
+<div class="separate"></div>
+@subsection qspyview_cust_standard Standard Record Handlers
+As mentioned before, the QSpyView Front-End receives **all** trace records produced by the Target. This includes all standard QS records (see ::QSpyRecords). All these record-handler procedures have the general form:
+
+@verbatim
+proc ::qspy::rec<num> {}
+@endverbatim
+
+where `<num>` is a decimal trace record number in the range 1..69.
+
+@note
+In order to parse the standard QS trace records, you could view the `qspy.c` implementation, where all the standard trace records are parsed and displayed to the screen.
+
+@next{history}
+*/
+

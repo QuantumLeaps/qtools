@@ -1,20 +1,32 @@
 /**
-\page rev_page_qspy QSPY Revision History
+@page history Revision History
 
-\section qspy_5_3_1 Version 5.3.1 Release date: Apr 21, 2014
 
+@section qspy_5_5_0 Version 5.5.0, 2015-08-21
+Extended the QSPY software tracing host application for bi-directional
+communication with embedded targets (output and *input* into the
+target). Added a UDP socket to QSPY, as an extensibility mechanism for
+adding external GUIs and/or scripts to control the embedded targets.
+
+Provided new QSpyView Tcl/Tk extension of the QSPY host application for
+control testing, and visualization of the real-time tracing data from
+embedded targets at real-time. QSpyView enables developers to rapidly
+build both GUI-based and "headless" scripts for their specific
+applications (see http://www.state-machine.com/qpc/arm-cm_dpp_ek-tm4c123gxl.html)
+
+
+------------------------------------------------------
+@section qspy_5_3_1 Version 5.3.1, 2014-04-21
 Corrected the version representation from hex to decimal, to match the change in the QP framework. The version representation missmatch caused problems in parsing newly modified trace records, when the qspy.c implementation was inserted directly into the projects. 
 
 
-<HR>
-\section qspy_5_3_0 Version 5.3.0 Release date: Mar 31, 2014
-
+------------------------------------------------------
+@section qspy_5_3_0 Version 5.3.0, 2014-03-31
 Added new trace records to QSPY host application: QS_QEP_TRAN_HIST, QS_QEP_TRAN_EP, and QS_QEP_TRAN_XP. Changed labels for standard records from Q_ENTRY, Q_EXIT, Q_INIT to ENTRY, EXIT, INIT. 
 
 
-<HR>
-\section qspy_5_1_1 Version 5.1.1 Release date: Oct 15, 2013
-
+------------------------------------------------------
+@section qspy_5_1_1 Version 5.1.1, 2013-10-15
 Fixed the bug in the QSPY host application, which didn't handle
 correctly object/functions/signal names longer than 32 characters. The
 name limit has been raised to 64 characters and this version also
@@ -22,9 +34,8 @@ correctly truncates the names at the limit without printing any garbage
 characters.
 
 
-<HR>
-\section qspy_5_1_0a Version 5.1.0a Release date: Sep 18, 2013
-
+------------------------------------------------------
+@section qspy_5_1_0a Version 5.1.0a, 2013-09-18
 Modified QSPY utility to support changes in QP 5.1.x:
 
 -improved handling of target resets by adding an empty QS record
@@ -37,9 +48,8 @@ Modified QSPY utility to support changes in QP 5.1.x:
  object/function/signal, for which a dictionary record was received.  
 
 
-<HR>
-\section qspy_5_0_0a Version 5.0.0a Release date: Sep 08, 2013
-
+------------------------------------------------------
+@section qspy_5_0_0a Version 5.0.0a, 2013-09-08
 Modified QSPY utility to support changes in QP 5.0.x:
 
 -modified the standard trace records QS_QF_TICK, and QS_QF_TIMEEVT_*
@@ -53,9 +63,8 @@ Modified QSPY utility to support changes in QP 5.0.x:
 -added Find And Replace Text (FART) utility for Windows 
 
 
-<HR>
-\section qspy_4_5_02 Version 4.5.02 Release date: Jul 21, 2012
-
+------------------------------------------------------
+@section qspy_4_5_02 Version 4.5.02, 2012-07-21
 Re-designed the QSPY interface to support more flexible parsing
 of the trace records in desktop-based simulations (such as Windows
 or Qt). Users can provide a custom parsing callback function to
@@ -64,17 +73,15 @@ dictionaries (and other cleanup in the future) when the target
 resets.
 
 
-<HR>
-\section qspy_4_5_01 Version 4.5.01 Release date: Jun 25, 2012
-
+------------------------------------------------------
+@section qspy_4_5_01 Version 4.5.01, 2012-06-25
 Added the QS_USR_DICTIONARY() entry for storing dictionaries of
 the user trace records. Replaced all remaining sprintf() calls
 with snprintf().
 
 
-<HR>
-\section qspy_4_5_00 Version 4.5.00 Release date: May 26, 2012
-
+------------------------------------------------------
+@section qspy_4_5_00 Version 4.5.00, 2012-05-26
 Re-designed the implementation of the QSPY host application, so
 that it can be convenienty included as part of the QP library.
 This allows direct QS tracing output to the screen for QP applications
@@ -82,18 +89,16 @@ running on the desktop. The QSPY application has been converted from
 C++ to plain C for easier integration with QP/C.
 
 
-<HR>
-\section qspy_4_3_00 Version 4.3.00 Release date: Nov 03, 2011
-
+------------------------------------------------------
+@section qspy_4_3_00 Version 4.3.00, 2011-11-03
 This QSPY version mataches the changes to the critical section
 macros made in QP 4.3.00. The QS record names QS_QF_INT_LOCK and
 QS_QF_INT_UNLOCK have been replaced with QS_QF_CRIT_ENTRY and
 QS_QF_CRIT_EXIT, respectively.
 
 
-<HR>
-\section qspy_4_2_04 Version 4.2.04 Release date: Sep 27, 2011
-
+------------------------------------------------------
+@section qspy_4_2_04 Version 4.2.04, 2011-09-27
 This QSPY version fixes the bug of incorrect reporting function
 or object pointers for which the dictionary records are not
 provided and which are repeated in one format line (bug #3405904).
@@ -107,9 +112,8 @@ Queue(nFree=  5, nMin=  5)
 The Sndr= and Obj= are reported to be the same, but they were not.
 
 
-<HR>
-\section qspy_4_2_01 Version 4.2.01 Release date: Aug 01, 2011
-
+------------------------------------------------------
+@section qspy_4_2_01 Version 4.2.01, 2011-08-01
 This QSPY version adds generation of sequence diagrams as
 files to be processed by MscGen (www.mcternan.me.uk/mscgen/).
 This version adds the option -g<msc_file> to generate .msc
@@ -119,9 +123,8 @@ Also, this version of QSPY for Windows allows COM ports
 larger than COM9. 
 
 
-<HR>
-\section qspy_4_2_00 Version 4.2.00 Release date: Jul 13, 2011
-
+------------------------------------------------------
+@section qspy_4_2_00 Version 4.2.00, 2011-07-13
 This QSPY version matches the changes made to QS target code in
 QP/C/C++ 4.2.xx. These changes include sending the additinal byte
 of sender priority in trace records:
@@ -171,9 +174,8 @@ switch QSPY into the backwards-compatibility mode with the
 earlier versions of QP.
 
 
-<HR>
-\section qspy_4_1_06 Version 4.1.06 Release date: Feb 09, 2011
-
+------------------------------------------------------
+@section qspy_4_1_06 Version 4.1.06, 2011-02-09
 This is the intial standalone release of the QSPY host application.
 QSPY is still available in the QP/C and QP/C++ distributions, but
 other rapid prototyping platforms (such as mbed or Arduino) do not

@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- record parsing and encoding
 * Last updated for version 5.5.0
-* Last updated on  2015-08-14
+* Last updated on  2015-08-31
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -592,7 +592,6 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             case QS_I32_T: {
                 i32 = QSpyRecord_getInt32(me, 4);
                 SNPRINF_AT(ifmt[fmt >> 4], (int)i32);
-                QSPY_onPrintLn();
 
                 if (l_matFile != (FILE *)0) {
                     fprintf(l_matFile, ifmt[fmt >> 4], (int)i32);
@@ -1642,13 +1641,46 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QK_SCHEDULE: {
+        case QS_QVK_SCHEDULE: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINF_LINE("%010u QK_sche: "
-                       "prio=%2u, pin=%3u",
+                SNPRINF_LINE("%010u QVK_sche: "
+                       "prio=%2u, pprev=%3u",
+                       t, a, b);
+                QSPY_onPrintLn();
+
+                if (l_matFile != (FILE *)0) {
+                    fprintf(l_matFile, "%3d %10u %3u %3u\n",
+                            (int)me->rec, t, a, b);
+                }
+            }
+            break;
+        }
+        case QS_QVK_IDLE: {
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINF_LINE("%010u QVK_idle: "
+                       "pprev=%2u",
+                       t, a);
+                QSPY_onPrintLn();
+
+                if (l_matFile != (FILE *)0) {
+                    fprintf(l_matFile, "%3d %10u %3u\n",
+                            (int)me->rec, t, a);
+                }
+            }
+            break;
+        }
+        case QS_QK_RESUME: {
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, 1);
+            b = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINF_LINE("%010u QK_resume: "
+                       "prio=%2u, pprev=%3u",
                        t, a, b);
                 QSPY_onPrintLn();
 
@@ -1747,18 +1779,16 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             if (QSpyRecord_OK(me)) {
 
                 /* apply the target info... */
-                l_config.version = (uint16_t)b; /* version from the Target */
-
-                /* apply the sizes from the Target... */
+                l_config.version      = (uint16_t)(b & 0xFFFFU);
                 l_config.objPtrSize   = (uint8_t)(buf[3] & 0x0FU);
-                l_config.funPtrSize   = (uint8_t)(buf[3] >> 4);
+                l_config.funPtrSize   = (uint8_t)((buf[3] >> 4) & 0x0FU);
                 l_config.tstampSize   = (uint8_t)(buf[4] & 0x0FU);
                 l_config.sigSize      = (uint8_t)(buf[0] & 0x0FU);
-                l_config.evtSize      = (uint8_t)(buf[0] >> 4);
+                l_config.evtSize      = (uint8_t)((buf[0] >> 4) & 0x0FU);
                 l_config.queueCtrSize = (uint8_t)(buf[1] & 0x0FU);
-                l_config.poolCtrSize  = (uint8_t)(buf[2] >> 4);
+                l_config.poolCtrSize  = (uint8_t)((buf[2] >> 4) & 0x0FU);
                 l_config.poolBlkSize  = (uint8_t)(buf[2] & 0x0FU);
-                l_config.tevtCtrSize  = (uint8_t)(buf[1] >> 4);
+                l_config.tevtCtrSize  = (uint8_t)((buf[1] >> 4) & 0x0FU);
 
                 for (e = 0U; e < sizeof(l_config.tstamp); ++e) {
                     l_config.tstamp[e] = (uint8_t)buf[7U + e];
@@ -1789,11 +1819,20 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     /*TBD: close and re-open MATLAB file, MSC file, etc. */
                 }
                 else {
-                    s = QSPY_readDictionaries();
-                    if (s != 0) {
-                        SNPRINF_LINE("           Dictionaries read from %s",
-                                     s);
-                        QSPY_onPrintLn();
+                    FILE *dictFile = (FILE *)0;
+
+                    /* do we have dictionary name yet? */
+                    if (l_dictName[0] != '\0') {
+                        FOPEN_S(dictFile, l_dictName, "r");
+                        if (dictFile != (FILE *)0) {
+                            if (QSPY_readDict(dictFile) != QSPY_ERROR) {
+                                SNPRINF_LINE(
+                                    "           Dictionaries read from %s",
+                                    l_dictName);
+                                QSPY_onPrintLn();
+                            }
+                            fclose(dictFile);
+                        }
                     }
                 }
             }
@@ -2033,7 +2072,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
 }
 
 /*..........................................................................*/
-char const *QSPY_writeDictionaries(void) {
+char const *QSPY_writeDict(void) {
     FILE *dictFile = (FILE *)0;
 
     /* do we have dictionary name yet? */
@@ -2045,6 +2084,17 @@ char const *QSPY_writeDictionaries(void) {
     if (dictFile == (FILE *)0) {
         return (char *)0;
     }
+
+    fprintf(dictFile, "-v%03d\n", l_config.version);
+    fprintf(dictFile, "-T%01d\n", l_config.tstampSize);
+    fprintf(dictFile, "-O%01d\n", l_config.objPtrSize);
+    fprintf(dictFile, "-F%01d\n", l_config.funPtrSize);
+    fprintf(dictFile, "-S%01d\n", l_config.sigSize);
+    fprintf(dictFile, "-E%01d\n", l_config.evtSize);
+    fprintf(dictFile, "-Q%01d\n", l_config.queueCtrSize);
+    fprintf(dictFile, "-P%01d\n", l_config.poolCtrSize);
+    fprintf(dictFile, "-B%01d\n", l_config.poolBlkSize);
+    fprintf(dictFile, "-C%01d\n", l_config.tevtCtrSize);
 
     fprintf(dictFile, "Obj-Dic:\n");
     Dictionary_write(&l_objDict, dictFile);
@@ -2065,58 +2115,92 @@ char const *QSPY_writeDictionaries(void) {
     return l_dictName;
 }
 /*..........................................................................*/
-char const *QSPY_readDictionaries(void) {
-    FILE *dictFile = (FILE *)0;
-    char dictType[10];
+QSpyStatus QSPY_readDict(void *dictFile) {
+    char type[10];
 
-    /* do we have dictionary name yet? */
-    if (l_dictName[0] == '\0') {
-        goto error;
-    }
-
-    FOPEN_S(dictFile, l_dictName, "r");
-    if (dictFile == (FILE *)0) {
-        goto error;
-    }
-
-    while (fgets(dictType, sizeof(dictType), dictFile) != (char *)0) {
-        switch (dictType[0]) {
+    while (fgets(type, sizeof(type), (FILE *)dictFile) != (char *)0) {
+        switch (type[0]) {
+            case '-':
+                switch (type[1]) {
+                    case 'v':
+                        l_config.version = 100U*(type[2] - '0')
+                                           + 10U*(type[3] - '0')
+                                           + (type[4] - '0');
+                        printf("-v%03d\n", l_config.version);
+                        break;
+                    case 'T':
+                        l_config.tstampSize = (type[2] - '0');
+                        printf("-T%1d\n", l_config.tstampSize);
+                        break;
+                    case 'O':
+                        l_config.objPtrSize = (type[2] - '0');
+                        printf("-O%1d\n", l_config.tstampSize);
+                        break;
+                    case 'F':
+                        l_config.funPtrSize = (type[2] - '0');
+                        printf("-F%1d\n", l_config.objPtrSize);
+                        break;
+                    case 'S':
+                        l_config.sigSize = (type[2] - '0');
+                        printf("-S%1d\n", l_config.sigSize);
+                        break;
+                    case 'E':
+                        l_config.evtSize = (type[2] - '0');
+                        printf("-E%1d\n", l_config.evtSize);
+                        break;
+                    case 'Q':
+                        l_config.queueCtrSize = (type[2] - '0');
+                        printf("-Q%1d\n", l_config.queueCtrSize);
+                        break;
+                    case 'P':
+                        l_config.poolCtrSize = (type[2] - '0');
+                        printf("-P%1d\n", l_config.poolCtrSize);
+                        break;
+                    case 'B':
+                        l_config.poolBlkSize = (type[2] - '0');
+                        printf("-B%1d\n", l_config.poolBlkSize);
+                        break;
+                    case 'C':
+                        l_config.tevtCtrSize = (type[2] - '0');
+                        printf("-C%1d\n", l_config.tevtCtrSize);
+                        break;
+                    default:
+                        return QSPY_ERROR;
+                        break;
+                }
+                break;
             case 'O':
-               if (!Dictionary_read(&l_objDict, dictFile)) {
-                    goto error;
-               }
-               break;
+                if (!Dictionary_read(&l_objDict, (FILE *)dictFile)) {
+                    return QSPY_ERROR;
+                }
+                break;
             case 'F':
-               if (!Dictionary_read(&l_funDict, dictFile)) {
-                    goto error;
-               }
-               break;
+                if (!Dictionary_read(&l_funDict, (FILE *)dictFile)) {
+                    return QSPY_ERROR;
+                }
+                break;
             case 'U':
-               if (!Dictionary_read(&l_usrDict, dictFile)) {
-                    goto error;
-               }
-               break;
+                if (!Dictionary_read(&l_usrDict, (FILE *)dictFile)) {
+                    return QSPY_ERROR;
+                }
+                break;
             case 'S':
-               if (!SigDictionary_read(&l_sigDict, dictFile)) {
-                    goto error;
-               }
-               break;
+                if (!SigDictionary_read(&l_sigDict, (FILE *)dictFile)) {
+                    return QSPY_ERROR;
+                }
+                break;
             case 'M':
-               if (!Dictionary_read(&l_mscDict, dictFile)) {
-                    goto error;
-               }
-               break;
+                if (!Dictionary_read(&l_mscDict, (FILE *)dictFile)) {
+                    return QSPY_ERROR;
+                }
+                break;
+            default:
+                return QSPY_ERROR;
+                break;
         }
     }
 
-    fclose(dictFile);
-    return l_dictName;
-
-error:
-    if (dictFile != (FILE *)0) {
-        fclose(dictFile);
-    }
-    return (char *)0;
+    return QSPY_SUCCESS;
 }
 
 /****************************************************************************/

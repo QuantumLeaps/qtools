@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- Back-End connection point for the external Front-Ends
 * Last updated for version 5.5.0
-* Last updated on  2015-08-13
+* Last updated on  2015-09-16
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -50,18 +50,6 @@ typedef unsigned uint_t;
 #define Q_SPY 1
 #endif
 #include "qs_copy.h" /* copy of the target-resident QS interface */
-
-/* see also "packet IDs" in qspy.tcl script */
-enum {
-    ATTACH = 128,    /* attach to the QSPY Back-End */
-    DETACH,          /* detach from the QSPY Back-End */
-    SAVE_DIC,        /* save dictionaries to a file in QSPY */
-    SCREEN_OUT,      /* toggle screen output to a file in QSPY */
-    BIN_OUT,         /* toggle binary output to a file in QSPY */
-    MATLAB_OUT,      /* toggle Matlab output to a file in QSPY */
-    MSCGEN_OUT,      /* toggle MscGen output to a file in QSPY */
-    /* ... */
-};
 
 /*..........................................................................*/
 static uint8_t  l_buf[1024];   /* the output buffer [bytes] */

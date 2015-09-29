@@ -1,13 +1,18 @@
-/*****************************************************************************
+/**
+* @file
+* @brief Public QEP/C interface
+* @ingroup qep
+* @cond
+******************************************************************************
 * Product: QSPY -- Host API
 * Last updated for version 5.5.0
-* Last updated on  2015-08-18
+* Last updated on  2015-09-17
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, www.state-machine.com.
+* Copyright (C) Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -28,9 +33,11 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* Web:   www.state-machine.com
-* Email: info@state-machine.com
-*****************************************************************************/
+* http://www.state-machine.com
+* mailto:info@state-machine.com
+******************************************************************************
+* @endcond
+*/
 #ifndef qspy_h
 #define qspy_h
 
@@ -40,20 +47,34 @@
 extern "C" {
 #endif
 
-/* low-level facilities for configuring QSpy and parsing QS records ........*/
+/*! low-level facilities for configuring QSpy and parsing QS records ...*/
 typedef enum {
     QSPY_ERROR,
     QSPY_SUCCESS
 } QSpyStatus;
 
+/*! commands to QSPY; @sa "packet IDs" in qspy.tcl script */
+typedef enum {
+    ATTACH = 128,    /*!< attach to the QSPY Back-End */
+    DETACH,          /*!< detach from the QSPY Back-End */
+    SAVE_DIC,        /*!< save dictionaries to a file in QSPY */
+    SCREEN_OUT,      /*!< toggle screen output to a file in QSPY */
+    BIN_OUT,         /*!< toggle binary output to a file in QSPY */
+    MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
+    MSCGEN_OUT,      /*!< toggle MscGen output to a file in QSPY */
+    /* ... */
+} QSpyCommands;
+
+/*! QSPY record being processed */
 typedef struct {
-    uint8_t const *start;  /* start of the record */
-    uint8_t const *pos;    /* current position in the stream */
-    uint32_t tot_len;      /* total length of the record (including chksum) */
-    int32_t  len;          /* current length of the stream */
-    uint8_t  rec;          /* the record-ID (see enum QSpyRecords in qs.h) */
+    uint8_t const *start; /*!< start of the record */
+    uint8_t const *pos;   /*!< current position in the stream */
+    uint32_t tot_len;     /*!< total length of the record (including chksum) */
+    int32_t  len;         /*!< current length of the stream */
+    uint8_t  rec;         /*!< the record-ID (see enum QSpyRecords in qs.h) */
 } QSpyRecord;
 
+/*! QSPY configuration parameters. @sa QSPY_config() */
 typedef struct {
     uint16_t version;
     uint8_t objPtrSize;
@@ -106,8 +127,8 @@ QSpyConfig const *QSPY_getConfig(void);
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
 
 
-char const *QSPY_writeDictionaries(void);
-char const *QSPY_readDictionaries(void);
+char const *QSPY_writeDict(void);
+QSpyStatus QSPY_readDict(void *dictFile);
 bool QSPY_command(uint8_t cmdId); /* execute an internal QSPY command */
 
 uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,

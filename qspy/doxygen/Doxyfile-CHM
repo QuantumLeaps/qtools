@@ -106,12 +106,16 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = \
-    about.cc \
+    main.cc \
+    concepts.cc \
+    qspy.cc \
+    qspyview.cc \
     history.cc \
     ../include/qs_copy.h \
     ../include/qspy.h \
     ../qspyview/qspy.tcl \
-    ../qspyview/qspyview.tcl
+    ../qspyview/qspyview.tcl \
+    ../qspyview/default.tcl
 
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = \
