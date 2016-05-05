@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 5.5.0
-# Last updated on  2015-08-31
+# Last updated for version 5.6.4
+# Last updated on  2016-05-04
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -268,9 +268,9 @@ proc onGlbFilters {} {
         QS_QF_INT_ENABLE             QS_QF_ACTIVE_POST_ATTEMPT \
         QS_QF_EQUEUE_POST_ATTEMPT    QS_QF_MPOOL_GET_ATTEMPT   \
         QS_QF_RESERVED1              QS_QF_RESERVED0           \
-        QS_QK_MUTEX_LOCK             QS_QK_MUTEX_UNLOCK        \
-        QS_QVK_SCHEDULE              QS_QVK_IDLE               \
-        QS_QK_RESUME                 QS_QEP_TRAN_HIST          \
+        QS_SCHED_LOCK                QS_SCHED_UNLOCK           \
+        QS_SCHED_NEXT                QS_SCHED_IDLE             \
+        QS_SCHED_RESUME              QS_QEP_TRAN_HIST          \
         QS_QEP_TRAN_EP               QS_QEP_TRAN_XP            \
         QS_QEP_RESERVED1             QS_QEP_RESERVED0          \
         QS_SIG_DICT                  QS_OBJ_DICT               \

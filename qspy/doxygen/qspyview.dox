@@ -3,12 +3,12 @@
 @tableofcontents
 
 @section qspyview_about About QSpyView
-<p>Starting from @ref qspy_5_5_0 "version 5.5.0", the @ref qspy "QSPY host application" has been extended with a <strong>UDP socket</strong>, which is open for communication with various Front-Ends (GUI-based or "headless"). **QSpyView** is an example of such a Front-End. `QSpyView` is written in <a href="https://en.wikipedia.org/wiki/Tcl" target="_blank" class="extern">Tcl/Tk</a> and it runs on all desktop operating systems.
+<p>Starting from @ref qspy_5_5_0 "version 5.5.0", the @ref qspy "QSPY host application" has been extended with a  @subpage udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). **QSpyView** is an example of such a Front-End. `QSpyView` is written in <a href="https://en.wikipedia.org/wiki/Tcl" target="_blank" class="extern">Tcl/Tk</a> and it runs on all desktop operating systems (Windows, Linux, Mac).
 </p>
 
 @image html qspy2.gif "QSPY Back-End and QSpyView Front-End"
 
-`QSpyView` currently supports the following @subpage qspyview_ui "commands" (<strong>NOTE:</strong> `QSpyView` is @subpage qspyview_cust "extensible" with functionality specific to the project at hand, so it can provide many more features built on top of the basic functionality enumerated above.):
+`QSpyView` currently supports the following @subpage qspyview_ui "commands" (<strong>NOTE:</strong> `QSpyView` is @subpage qspyview_cust "extensible" with functionality specific to the project at hand, so it can provide many more features on top of the basic functionality enumerated below):
 
 - Set global QS filters inside the Target
 - Set local QS filters inside the Target
@@ -22,6 +22,28 @@
 
 @remark
 <strong>Why UDP?</strong> The communication between QSPY and QSpyView is based on UDP, because UDP is inherently packet-oriented (as opposed to TCP, which is stream-oriented) and preserves the <em>packet boundaries</em>.
+
+
+<div class="separate"></div>
+@subsection qspyview_comm QSpyView Communication Structure
+The sequence diagram below shows the general structure of `QSpyView`. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the Target data link (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qspy_protocol "Q-SPY Protocol". The `QSpyView` (Tcl/Tk script) attaches to the QSPY host application by means of the **UDP socket** that QSPY opens when the `-u` @ref qspy_command "command-line option" is selected. This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qspy_protocol "Q-SPY Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
+
+@image html qspy7.gif "Communication between Target, QSPY, and QSpyView"
+@n
+
+@note
+<span class="tag">A</span> The QSPY Back-End forwards **all** trace records produced by the Target to the UDP Socket, so that any attached Front-End (such as `QSpyView`) receives all this data.
+
+<ul class="tag">
+  <li><span class="tag">B</span> The QSPY Back-End relays all UDP packets with @ref udp "Record-ID" in the range `0..127` to the Target.
+  </li>
+
+  <li><span class="tag">C</span> UDP packets with  @ref udp "Record-ID" in the range `128..255` are not relayed to the Target, but instead are used for communication between the Front-End and the QSPY Back-End.
+  </li>
+</ul>
+
+@note
+The @ref udp "QSpyView Packets" describes the details of the main UDP packet types produced and accepted by QSpyView/QSPY.
 
 
 -------------------------------------------------------------------------------
@@ -38,45 +60,6 @@ On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/
 
 @note
 All the tools and instructions of adding UDP Sockets to Tcl are included in the Qtools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
-
-
--------------------------------------------------------------------------------
-@section qspyview_comm QSpyView Communication
-The sequence diagram below shows the general structure of `QSpyView`. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the Target data link (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qspy_protocol "Q-SPY Protocol". The `QSpyView` (Tcl/Tk script) attaches to the QSPY host application by means of the **UDP socket** that QSPY opens when the `-u` @ref qspy_command "command-line option" is selected. This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qspy_protocol "Q-SPY Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
-
-@image html qspy7.gif "Communication between Target, QSPY, and QSpyView"
-@n
-
-@attention
-<span class="tag">A</span> The QSPY Back-End forwards **all** trace records produced by the Target to the UDP Socket, so that any attached Front-End (such as `QSpyView`) receives all this data.
-
-<ul class="tag">
-  <li><span class="tag">B</span> The QSPY Back-End relays all UDP packets with @ref qspyview_packet "Record-ID" in the range `0..127` to the Target.
-  </li>
-
-  <li><span class="tag">C</span> UDP packets with  @ref qspyview_packet "Record-ID" in the range `128..255` are not relayed to the Target, but instead are used for communication between the Front-End and the QSPY Back-End.
-  </li>
-</ul>
-
-
-<div class="separate"></div>
-@subsection qspyview_packet UDP Socket Packet Structure
-To be able to @ref qspyview_cust "customize and extend QSpyView" to your specific projects, you need to understand the structure of the UDP packets exchanged between the QSPY Back-End and the `QSpyView` Front-End (<span style="color:blue"><strong>blue arrows</strong></span> in the sequence diagram above).
-
-@image html qspy8.gif "UDP packet structure"
-
-The UDP packets are **binary**, and consists of:
-
-- 1-byte sequence number, which increments by 1 for every packet and wraps naturally from 0xFF to 0. The sequence number allows `QSpyView` to detect any data discontinuities.
-
-- 1-byte Record-ID. The Record-IDs are divided into two categories and  <strong>128..255</strong>:
-    - Records to and from the Target have Record-IDs in the range <strong>0..127</strong>. Specifically, QS records originated from the Target are enumerated in ::QSpyRecords. Records destined to the Target are enumerated in ::QSpyRxRecords.
-    - Records to and from the QSPY Back-End have record-IDs in the range <strong>128..255</strong>. Specifically, records destined to QSPY are enumerated in ::QSpyCommands.
-
-- optional variable-length data.
-
-@note
-The Tcl <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary</a> command is ideal for working with QSPY packets.
 
 
 -------------------------------------------------------------------------------
@@ -113,16 +96,16 @@ In practice, the easiest way to launch `QSpyView` is to define a <strong>shortcu
 
 <div class="separate"></div>
 @subsection qspyview_attaching Attaching QSpyView to QSPY
-In contrast to TCP, which is stream-oriented, UDP is packet-oriented, so the only way to "attach" two ends of communication is to exchange packets. Consequently, immediately after `QSpyView` is launched, it tries to **attach** by sending the ::ATTACH packet to QSPY. If QSPY responds with the same ::ATTACH packet, `QSpyView` considers that it is "attached".
+In contrast to TCP, which is stream-oriented, UDP is packet-oriented, so the only way to "attach" two ends of communication is to exchange packets. Consequently, immediately after `QSpyView` is launched, it tries to **attach** by sending the @ref udp_ATTACH "ATTACH" packet to QSPY. If QSPY responds with the @ref udp_in_ATTACH "ATTACH" response, `QSpyView` considers that it is "attached".
 
-However, if the ::ATTACH packet does not arrive within a second or two (because perhaps QSPY is not running), `QSpyView` opens a modal dialog box that reminds you to run QSPY with the `-u` command-line option, as shown in the screen-shot below:
+However, if the @ref udp_in_ATTACH "ATTACH" response does not arrive within a second or two (because perhaps QSPY is not running), `QSpyView` opens a modal dialog box that reminds you to run QSPY with the `-u` command-line option, as shown in the screen-shot below:
 
 @image html qspyview_before.gif "Attach to QSPY dialog box"
 
-Depending how you start @ref qspy "QSPY", the dialog box might close automatically, which means that QSpyView has successfully **attached** to QSPY. However, if the dialog box does not close, you need to click the **OK** button to send ::ATTACH packet to QSPY, until `QSpyView` receives the ::ATTACH response from QSPY. If you can't "attach", you can click the **Cancel** button to close `QSpyView`.
+Depending how you start @ref qspy "QSPY", the dialog box might close automatically, which means that QSpyView has successfully **attached** to QSPY. However, if the dialog box does not close, you need to click the **OK** button to send @ref udp_ATTACH "ATTACH" packet to QSPY, until `QSpyView` receives the @ref udp_in_ATTACH "ATTACH" response from QSPY. If you can't "attach", you can click the **Cancel** button to close `QSpyView`.
 
 @note
-Because UDP works over networks, the QSPY Back-End can run on a <strong>different machine</strong> (e.g., a lab computer) that the the `QSpyView` Front-End (e.g., office computer). These two machines can even run different operating systems, for example Linux on the lab computer and Windows in the office, or vice versa. All you need to do is to provide the host-name parameter as the third command-line argument to the `qspyview.tcl` script (e.g., `wish qspyview.tcl dpp.tcl 192.168.1.101`).
+Because UDP works over networks, the QSPY Back-End can run on a <strong>different machine</strong> (e.g., a lab computer) that the the `QSpyView` Front-End (e.g., office computer). These two machines can even run different operating systems, for example Linux on the lab computer and Windows in the office, or vice versa. All you need to do is to provide the host-name parameter as the <em>third</em> command-line argument to the `qspyview.tcl` script (e.g., `wish qspyview.tcl dpp.tcl 192.168.1.101`).
 
 
 <div class="separate"></div>
@@ -138,6 +121,292 @@ If this happens, you can explicitly request the Target information by means of t
 @image html qspyview_known.gif "Target KNONW status (build time-stamp)"
 
 After the Target information is received, the `QSpyView` status bar shows the build time-stamp of the Target image.
+
+@next{udp}
+*/
+/*###########################################################################*/
+/**
+@page udp QSpyView UDP Interface
+
+@tableofcontents
+
+To be able to @ref qspyview_cust "customize and extend QSpyView" to your specific projects, you need to understand the structure of the UDP packets exchanged between the QSPY Back-End and the `QSpyView` Front-End (<span style="color:blue"><strong>blue arrows</strong></span> in the sequence diagram below). The UDP interface is implemented in the <span class="img file_tcl">qspy.tcl</span> script.
+
+
+@image html qspy7.gif "Communication between Target, QSPY, and QSpyView"
+@n
+
+@note
+For better readability, the <span class="img file_tcl">qspy.tcl</span> script uses a convention in which UDP packets to and from the Target (<span style="color:red"><strong>red arrows</strong></span>) are called **Records**, while the word **Packets** is used for communication to and from the QSPY Back-End (<span style="color:blue"><strong>blue arrows</strong></span>). For consistency, the following sections apply the same naming convention: Records for Target communication and Packets for QSPY communication.
+
+
+------------------------------------------------------------------------------
+@section udp_top General UDP Packet Structure
+
+@image html qspy8.gif "UDP packet structure"
+
+The UDP packets exchanged between the QSPY Back-End and the `QSpyView` Front-End are **binary**, and consists of:
+
+- 1-byte sequence number, which increments by 1 for every packet and wraps naturally from 0xFF to 0. The sequence number allows `QSpyView` to detect any data discontinuities.
+
+- 1-byte Record-ID. The Record-IDs are divided into two categories:
+    - Records to and from the Target have Record-IDs in the range <strong>0..127</strong>. Specifically, QS records originated from the Target are enumerated in ::QSpyRecords. Records destined to the Target are enumerated in ::QSpyRxRecords.
+    - Records to and from the QSPY Back-End have record-IDs in the range <strong>128..255</strong>. Specifically, records destined to QSPY are enumerated in ::QSpyCommands.
+
+- optional binary **Data Payload**. The various Data Payloads for different packets are described in the separate sections below.
+
+
+<div class="separate"></div>
+@subsection udp_sendPkt Programming Interface
+The <span class="img file_tcl">qspy.tcl</span> script provides the Tcl procedure `::qspy::sendPkt` for sending a UDP packet to the QSPY Back-End. The procedure takes one parameter `pkt`, which contains the Record-ID byte followed by the optional Data Payload. For example, here is how to send a packet to @ref udp_AO_FILTER for Active Object with priority 5:
+
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(AO_FILTER) 5]
+@endcode
+@n
+
+@note
+To understand the following detailed UDP packet descriptions, it is highly recommended to read the Tcl documentation for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern"><strong>binary Tcl command</strong></a>.
+
+
+------------------------------------------------------------------------------
+@section udp_Target Records to the Target
+
+<div class="separate"></div>
+@subsection udp_INFO  Query Target Info (INFO)
+This packet has Record-ID==INFO and has no Data Payload.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c $::qspy::QS_RX(INFO)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_COMMAND Execute a User-Defined Command in the Target (COMMAND)
+This packet has Record-ID==COMMAND and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|-------------
+Command-ID |    c          | command number
+Command-Par|    i          | command parameter
+
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cci $::qspy::QS_RX(COMMAND) 12 0x11223344]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_RESET  Reset the Target (RESET)
+This packet has Record-ID==RESET and has no Data Payload.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c $::qspy::QS_RX(RESET)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_TICK  Call QF_TICK_X() in the Target (TICK)
+
+Data item  | binary format | description
+-----------|---------------|-------------
+Tick-rate  |    c          | system tick rate number
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(TICK) 0]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_PEEK  Peek Target Memory (PEEK)
+This packet has Record-ID==PEEK and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Peek-addr  | Target-dependent@n Typically i | Address of the data in the Target
+Peek-length| c             | Number of bytes to peek
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)c \
+                $::qspy::QS_RX(PEEK) 0x20000123 16]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_POKE  Poke Target Memory (POKE)
+This packet has Record-ID==POKE and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Poke-addr  | Target-dependent@n Typically i | Address of the data in the Target
+Poke-length| c             | Number of bytes to poke (<= 8)
+Poke-data  | user-defined  | Binary data to poke to the Target (8 bytes maximum)
+
+@note
+The Poke-data part of the Data Payload must be formatted with the particular endianness of the Target and with any padding required for proper alignment of objects in the Target memory.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)cccs \
+        $::qspy::QS_RX(POKE) 0x20000123 0x11 0x22 0x1122]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_GLB_FILTER  Set Global Filters in the Target (GLB_FILTER)
+This packet has Record-ID==GLB_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Data Len   | c             | Number of bytes sent (currently 16)
+Filters    | b128          | 128 bits, each bit corresponding to Global Filter
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt \
+    [binary format ccb128 $::qspy::QS_RX(GLB_FILTER) 16 $theGlbFilter]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_LOC_FILTER  Set Local Filters in the Target (LOC_FILTER)
+This packet has Record-ID==LOC_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Local filter #| c          | The Number of the Local Filter
+Object-addr   | Target-dependent@n Typically i | Address of the object in the Target
+
+The Local filters are numbered as follows:
+
+0. State Machine Local Filter (SM)
+1. Active Object Local Filter (AO)
+2. Memory Pool Local Filter (MP)
+3. Event Queue Local Filter (EQ)
+4. Time Event Local Filter (TE)
+5. Application-Specific Local Filter (AP)
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc$::qspy::theFmt(objPtr) \
+                $::qspy::QS_RX(LOC_FILTER) 0 $theLocFilter(SM)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_AO_FILTER  Set Local AO Filter in the Target (AO_FILTER)
+This packet provides a shortcut for setting the Active Object Local Filter by providing just the unique priority of the AO.
+The packet has Record-ID==AO_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+AO prio    | c             | Priority of the AO to filter (0 to disable the AO filter)
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(AO_FILTER) 5]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_EVENT  Inject an Event to the Target (EVENT)
+This packet has Record-ID==EVENT and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+AO prio    | c             | Priority of the recipient AO (0 to publish the event)
+signal     | Target-dependent@n Typically s  | signal of the event
+parameters | user-defined  | Binary data corresponding to all event parameters
+
+The Event signal and parameters must be formatted with the particular endianness of the Target and with any padding required for proper alignment of objects in the Target memory.
+
+The event signal `sig` must be formatted according to the Target configuration (see <a href="http://www.state-machine.com/qpc/qep_8h.html#afdaa94c40e947b0340b4259eddce3561" target="_blank" class="extern">Q_SIGNAL_SIZE</a>)
+
+The parameters need to match exactly the event memory layout in your Target, including the endianness and any padding that the Target compiler might be using. (To test the right binary format and padding, you can use the @ref qspyview_events "Generate Event..." command).
+
+For example, let's assume that the parameters of your event are: a byte, followed by a 2-byte integer, followed by a 4-byte integer. Also, let's assume that your Target is little endian. From the @ref qspyview_events "Generate Event..." command you discover that to format this event correctly you need to use the following event parameters:
+
+Par # | format | data (example)
+------|--------|---------------
+par1: | c      | 0x11
+par2: | c      | 0x00
+par3: | s      | 0x1122
+par4: | i      | 0x11223344
+
+As you can see, you need to use "padding" (par2) after the first byte. You also use little endian encoding (`s`, `i`, format specification as opposed to `S`, `I`).
+
+With this information, you can generate the packet programmatically.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendEvent 7 5 [binary format ccsi 0x11 0x00 0x1122 0x11223344
+@endcode
+
+@note
+The qspy.tcl module provides specialized procedure `::qspy::sendEvent prio sig par` for injecting events to the Target.
+
+
+------------------------------------------------------------------------------
+@section udp_QSPY Packets to the QSPY Back-End
+
+
+<div class="separate"></div>
+@subsection udp_ATTACH  Attach to the QSPY Back-End (ATTACH)
+This packet has Record-ID==ATTACH and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_DETACH Detach from the QSPY Back-End (DETACH)
+This packet has Record-ID==DETACH and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_SAVE_DIC  Save Dictionaries to a File in QSPY (SAVE_DIC)
+This packet has Record-ID==SAVE_DIC and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_SCREEN_OUT Toggle Screen Output to a File in QSPY (SCREEN_OUT)
+This packet has Record-ID==SCREEN_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_BIN_OUT Toggle Binary Output to a File in QSPY (BIN_OUT)
+This packet has Record-ID==BIN_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_MATLAB_OUT Toggle MATLAB Output to a File in QSPY (MATLAB_OUT)
+This packet has Record-ID==MATLAB_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_MSCGEN_OUT Toggle MscGen Output to a File in QSPY (MSCGEN_OUT)
+This packet has Record-ID==MSCGEN_OUT and has no Data Payload.
+
+
+
+------------------------------------------------------------------------------
+@section udp_from Packets from the QSPY Back-End
+
+<div class="separate"></div>
+@subsection udp_from_ATTACH  Attach Response from the QSPY Back-End (ATTACH)
+This packet has Record-ID==ATTACH and has no Data Payload.
+
+@note
+This packet is handled internally by the <span class="img file_tcl">qspy.tcl</span> script (see the ::qspy::pkt128 procedure)
+
+<div class="separate"></div>
+@subsection udp_from_DETACH  Detach Request from the QSPY Back-End (DETACH)
+This packet has Record-ID==DETACH and has no Data Payload.
+
+@note
+This packet is handled internally by the <span class="img file_tcl">qspy.tcl</span> script (see the ::qspy::pkt129 procedure)
 
 @next{qspyview_ui}
 */

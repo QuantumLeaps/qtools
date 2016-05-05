@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- Customization example to extend the qspyview.tcl script
-# Last updated for version 5.5.0
-# Last updated on  2015-08-13
+# Last updated for version 5.6.4
+# Last updated on  2016-05-04
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -280,16 +280,16 @@ proc ::qspy::rec48 {} { ;# QS_QF_RESERVED1
 proc ::qspy::rec49 {} { ;# QS_QF_RESERVED0
 }
 
-# [50] QK/QV records
-proc ::qspy::rec50 {} { ;# QS_QK_MUTEX_LOCK
+# [50] built-in scheduler records
+proc ::qspy::rec50 {} { ;# QS_SCHED_LOCK
 }
-proc ::qspy::rec51 {} { ;# QS_QK_MUTEX_UNLOCK
+proc ::qspy::rec51 {} { ;# QS_SCHED_UNLOCK
 }
-proc ::qspy::rec52 {} { ;# QS_QVK_SCHEDULE
+proc ::qspy::rec52 {} { ;# QS_SCHED_NEXT
 }
-proc ::qspy::rec53 {} { ;# QS_QVK_IDLE
+proc ::qspy::rec53 {} { ;# QS_SCHED_IDLE
 }
-proc ::qspy::rec54 {} { ;# QS_QK_RESUME
+proc ::qspy::rec54 {} { ;# QS_SCHED_RESUME
 }
 
 # [55] Additional QEP records

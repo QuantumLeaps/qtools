@@ -2,6 +2,13 @@
 @page history Revision History
 
 
+@section qspy_5_6_4 Version 5.6.4, 2016-05-04
+Added <a target="_blank" class="extern" href="http://www.state-machine.com/products/index.html#QWIN">QWIN GUI</a> to the collection (sub-directory qwin_gui).
+
+Updated the QSPY software tracing host application for the QS trace record name changes introduced in QP 5.6.2.
+
+
+------------------------------------------------------
 @section qspy_5_5_0 Version 5.5.0, 2015-08-21
 Extended the QSPY software tracing host application for bi-directional
 communication with embedded targets (output and *input* into the

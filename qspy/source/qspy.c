@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- record parsing and encoding
-* Last updated for version 5.5.0
-* Last updated on  2015-08-31
+* Last updated for version 5.6.4
+* Last updated on  2016-05-04
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1618,11 +1618,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        /* QK records ......................................................*/
-        case QS_QK_MUTEX_LOCK:
-            if (s == 0) s = "QK_muxL";
-        case QS_QK_MUTEX_UNLOCK: {
-            if (s == 0) s = "QK_muxU";
+        /* built-in scheduler records ......................................*/
+        case QS_SCHED_LOCK:
+            if (s == 0) s = "MuxLOCK";
+        case QS_SCHED_UNLOCK: {
+            if (s == 0) s = "MuxUNLK";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
@@ -1641,12 +1641,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QVK_SCHEDULE: {
+        case QS_SCHED_NEXT: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINF_LINE("%010u QVK_sche: "
+                SNPRINF_LINE("%010u ScheNext: "
                        "prio=%2u, pprev=%3u",
                        t, a, b);
                 QSPY_onPrintLn();
@@ -1658,11 +1658,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QVK_IDLE: {
+        case QS_SCHED_IDLE: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINF_LINE("%010u QVK_idle: "
+                SNPRINF_LINE("%010u SchedIDLE: "
                        "pprev=%2u",
                        t, a);
                 QSPY_onPrintLn();
@@ -1674,12 +1674,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QK_RESUME: {
+        case QS_SCHED_RESUME: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINF_LINE("%010u QK_resume: "
+                SNPRINF_LINE("%010u SchedRES: "
                        "prio=%2u, pprev=%3u",
                        t, a, b);
                 QSPY_onPrintLn();

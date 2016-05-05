@@ -4,8 +4,8 @@
 * @ingroup qs
 * @cond
 ******************************************************************************
-* Last updated for version 5.5.0
-* Last updated on  2015-08-31
+* Last updated for version 5.6.2
+* Last updated on  2016-03-23
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -119,17 +119,17 @@ enum QSpyRecords {
     QS_QF_RESERVED1,
     QS_QF_RESERVED0,
 
-    /* [50] QK/QV records */
-    QS_QK_MUTEX_LOCK,     /*!< QK mutex was locked */
-    QS_QK_MUTEX_UNLOCK,   /*!< QK mutex was unlocked */
-    QS_QVK_SCHEDULE,      /*!< QK/QV scheduled a new task to execute */
-    QS_QVK_IDLE,          /*!< QK/QV became idle */
-    QS_QK_RESUME,         /*!< QK resumed previous task (not idle) */
+    /* [50] built-in scheduler records */
+    QS_SCHED_LOCK,        /*!< scheduler was locked */
+    QS_SCHED_UNLOCK,      /*!< scheduler was unlocked */
+    QS_SCHED_NEXT,        /*!< scheduler found next task to execute */
+    QS_SCHED_IDLE,        /*!< scheduler became idle */
+    QS_SCHED_RESUME,      /*!< scheduler resumed previous task (not idle) */
 
     /* [55] Additional QEP records */
-    QS_QEP_TRAN_HIST,     /*!< a transition to history was taken */
-    QS_QEP_TRAN_EP,   /*!< a transition to entry point into a submachine */
-    QS_QEP_TRAN_XP,   /*!< a transition to exit  point out of a submachine */
+    QS_QEP_TRAN_HIST,     /*!< a tran to history was taken */
+    QS_QEP_TRAN_EP,       /*!< a tran to entry point into a submachine */
+    QS_QEP_TRAN_XP,       /*!< a tran to exit  point out of a submachine */
     QS_QEP_RESERVED1,
     QS_QEP_RESERVED0,
 
@@ -184,12 +184,14 @@ enum QSpyRecords {
     #error "QS_TIME_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif
 
-#ifndef Q_ROM      /* provide the default if Q_ROM NOT defined */
-    #define Q_ROM
-#endif
-#ifndef Q_ROM_BYTE /* provide the default if Q_ROM_BYTE NOT defined */
-    #define Q_ROM_BYTE(rom_var_)   (rom_var_)
-#endif
+/*! access element at index @p i_ from the base pointer @p base_ */
+/**
+* @description
+* @note This macro encapsulates MISRA-C 2004 Rule 17.4(req) (pointer
+* arithmetic other than array indexing).
+*/
+#define QS_PTR_AT_(base_, i_) (base_[i_])
+
 
 /****************************************************************************/
 /* QS services. */
@@ -224,11 +226,6 @@ void QS_u32_(uint32_t d);
 /*! Output zero-terminated ASCII string element without format information */
 void QS_str_(char_t const *s);
 
-/*! Output zero-terminated ASCII string element allocated in ROM
-* without format information
-*/
-void QS_str_ROM_(char_t const Q_ROM *s);
-
 /* formatted data elements output ..........................................*/
 /*! Output uint8_t data element with format information */
 void QS_u8(uint8_t format, uint8_t d);
@@ -248,11 +245,6 @@ void QS_f64(uint8_t format, float64_t d);
 /*! Output zero-terminated ASCII string element with format information */
 void QS_str(char_t const *s);
 
-/*! Output zero-terminated ASCII string element allocated in ROM
-* with format information
-*/
-void QS_str_ROM(char_t const Q_ROM *s);
-
 /*! Output memory block of up to 255-bytes with format information */
 void QS_mem(uint8_t const *blk, uint8_t size);
 
@@ -266,19 +258,19 @@ void QS_mem(uint8_t const *blk, uint8_t size);
 
 /*! Output signal dictionary record */
 void QS_sig_dict(enum_t const sig, void const * const obj,
-                 char_t const Q_ROM *name);
+                 char_t const *name);
 
 /*! Output object dictionary record */
 void QS_obj_dict(void const * const obj,
-                 char_t const Q_ROM *name);
+                 char_t const *name);
 
 /*! Output function dictionary record */
 void QS_fun_dict(void (* const fun)(void),
-                 char_t const Q_ROM *name);
+                 char_t const *name);
 
 /*! Output user dictionary record */
 void QS_usr_dict(enum_t const rec,
-                 char_t const Q_ROM * const name);
+                 char_t const * const name);
 
 /* QS buffer access *********************************************************/
 /*! Byte-oriented interface to the QS data buffer. */
@@ -748,11 +740,6 @@ QSTimeCtr QS_onGetTime(void);
 /*! Internal QS macro to output a zero-terminated ASCII string element */
 #define QS_STR_(msg_)           (QS_str_((msg_)))
 
-/*! Internal QS macro to output a zero-terminated ASCII string allocated
-in ROM data element
-*/
-#define QS_STR_ROM_(msg_)       (QS_str_ROM_((msg_)))
-
 /* Macros for use in the client code .......................................*/
 
 /*! Enumerates data formats recognized by QS */
@@ -826,11 +813,6 @@ enum {
 
 /*! Output formatted zero-terminated ASCII string to the QS record */
 #define QS_STR(str_)            (QS_str((str_)))
-
-/*! Output formatted zero-terminated ASCII string from ROM
-* to the QS record
-*/
-#define QS_STR_ROM(str_)        (QS_str_ROM((str_)))
 
 /*! Output formatted memory block of up to 255 bytes to the QS record */
 #define QS_MEM(mem_, size_)     (QS_mem((mem_), (size_)))
@@ -931,7 +913,7 @@ enum {
     if (((QS_priv_.glbFilter[(uint8_t)QS_SIG_DICT >> 3] \
       & (uint8_t)(1U << ((uint8_t)QS_SIG_DICT & (uint8_t)7))) != (uint8_t)0))\
     { \
-        static char_t const Q_ROM sig_name_[] = #sig_; \
+        static char_t const sig_name_[] = #sig_; \
         QS_sig_dict((sig_), (obj_), &sig_name_[0]); \
     } \
 } while (0)
@@ -954,7 +936,7 @@ enum {
     if (((QS_priv_.glbFilter[(uint8_t)QS_OBJ_DICT >> 3] \
       & (uint8_t)(1U << ((uint8_t)QS_OBJ_DICT & (uint8_t)7))) != (uint8_t)0))\
     { \
-        static char_t const Q_ROM obj_name_[] = #obj_; \
+        static char_t const obj_name_[] = #obj_; \
         QS_obj_dict((obj_), &obj_name_[0]); \
     } \
 } while (0)
@@ -976,7 +958,7 @@ enum {
     if (((QS_priv_.glbFilter[(uint8_t)QS_FUN_DICT >> 3] \
       & (uint8_t)(1U << ((uint8_t)QS_FUN_DICT & (uint8_t)7))) != (uint8_t)0))\
     { \
-        static char_t const Q_ROM fun_name_[] = #fun_; \
+        static char_t const fun_name_[] = #fun_; \
         QS_fun_dict((void (*)(void))(fun_), &fun_name_[0]); \
     } \
 } while (0)
@@ -991,7 +973,7 @@ enum {
     if (((QS_priv_.glbFilter[(uint8_t)QS_USR_DICT >> 3] \
       & (uint8_t)(1U << ((uint8_t)QS_USR_DICT & (uint8_t)7))) != (uint8_t)0))\
     { \
-        static char_t const Q_ROM usr_name_[] = #rec_; \
+        static char_t const usr_name_[] = #rec_; \
         QS_usr_dict((rec_), &usr_name_[0]); \
     } \
 } while (0)
@@ -1006,7 +988,7 @@ enum {
     QS_BEGIN_NOCRIT_(QS_ASSERT_FAIL, (void *)0, (void *)0) \
         QS_TIME_(); \
         QS_U16_((uint16_t)(loc_)); \
-        QS_STR_ROM_(module_); \
+        QS_STR_(module_); \
     QS_END_NOCRIT_() \
     QS_onFlush(); \
     for (delay_ctr_ = (delay_); delay_ctr_ > (uint32_t)0; --delay_ctr_) {} \
@@ -1132,13 +1114,13 @@ extern QSrxPriv QS_rxPriv_;
 #define QS_RX_PUT(b_) do { \
     if (QS_rxPriv_.head != (QSCtr)0) { \
         if ((QS_rxPriv_.head - QS_rxPriv_.tail) != (QSCtr)1) { \
-            QS_rxPriv_.buf[QS_rxPriv_.head] = (uint8_t)(b_); \
+            QS_PTR_AT_(QS_rxPriv_.buf, QS_rxPriv_.head) = (uint8_t)(b_); \
             --QS_rxPriv_.head; \
         } \
     } \
     else { \
         if (QS_rxPriv_.tail != QS_rxPriv_.end) { \
-            QS_rxPriv_.buf[0] = (uint8_t)(b_); \
+            QS_PTR_AT_(QS_rxPriv_.buf, 0) = (uint8_t)(b_); \
             QS_rxPriv_.head = QS_rxPriv_.end; \
         } \
     } \
