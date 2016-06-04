@@ -5,8 +5,8 @@
 # @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 5.5.0
-# Last updated on  2015-08-11
+# Last updated for version 5.6.4
+# Last updated on  2016-05-27
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -41,7 +41,7 @@
 # Usage:
 # this script is to be sourced into applications, such as qspyview.tcl
 
-package provide qspy 5.5.0
+package provide qspy 5.6.4
 
 package require Tcl  8.4   ;# need at least Tcl 8.4
 package require udp        ;# need the UDP sockets for Tcl
@@ -63,6 +63,8 @@ namespace eval ::qspy {
 
     variable theTstamp     "Target: UNKNOWN"
 
+    variable thePkt          ;#< the current (most recent) packet/record
+
     variable theRxRecCnt   0 ;#< count of records received since attach
     variable theRxRecSeq   0 ;#< the last received record sequence num
     variable theErRecCnt   0 ;#< count of record errors since attach
@@ -73,8 +75,18 @@ namespace eval ::qspy {
     variable theTxPktSeq   0 ;#< the last trasmitted packet sequence num
     variable theErPktCnt   0 ;#< count of packet errors since attach
 
-    variable thePkt          ;#< the current (most recent) packet/record
     variable theFmt          ;#< array of formats recevied from QSPY
+    array set theFmt {
+        objPtr       4
+        funPtr       4
+        tstamp       4
+        sig          2
+        evtSize      2
+        queueCtr     1
+        poolCtr      2
+        poolBlk      2
+        tevtCtr      2
+    }
 
     ## array of packet IDs (to QSPY Back-End, see also be.c in QSPY)
     variable BE
@@ -91,23 +103,23 @@ namespace eval ::qspy {
     ## array of record IDs (to Target, see also enum QSpyRxRecords in qs.h)
     variable QS_RX
     array set QS_RX {
-        INFO           0
-        COMMAND        1
-        RESET          2
-        TICK           3
-        PEEK           4
-        POKE           5
-        RESERVED7      6
-        RESERVED6      7
-        RESERVED5      8
-        RESERVED4      9
-        GLB_FILTER    10
-        LOC_FILTER    11
-        AO_FILTER     12
-        RESERVED3     13
-        RESERVED2     14
-        RESERVED1     15
-        EVENT         16
+        INFO         0
+        COMMAND      1
+        RESET        2
+        TICK         3
+        PEEK         4
+        POKE         5
+        RESERVED7    6
+        RESERVED6    7
+        RESERVED5    8
+        RESERVED4    9
+        GLB_FILTER   10
+        LOC_FILTER   11
+        AO_FILTER    12
+        RESERVED3    13
+        RESERVED2    14
+        RESERVED1    15
+        EVENT        16
     }
 
 } ;# namespace

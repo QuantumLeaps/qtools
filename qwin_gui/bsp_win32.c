@@ -1,6 +1,8 @@
 /*****************************************************************************
 * Product: BSP for QWIN GUI demo
-* Last Update: 2016-05-03
+* Last updated for version 5.6.5
+* Last updated on  2016-06-04
+*
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -67,7 +69,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
     HWND hWnd;
     MSG  msg;
 
-    (void)hPrevInst; /* avoid compiler warning about unused parameter */
+    (void)hPrevInst; /* unused parameter */
 
     l_hInst   = hInst;   /* save the application instance */
     l_cmdLine = cmdLine; /* save the command line string */
@@ -107,7 +109,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
             * NOTE: must be done *before* the first drawing of the buttons,
             * so WM_INITDIALOG is too late.
             */
-            OwnerDrawnButton_init(&l_userBtn,
+            OwnerDrawnButton_init(&l_userBtn, IDC_USER,
                        LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_BTN_UP)),
                        LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_BTN_DWN)),
                        LoadCursor(NULL, IDC_HAND));
@@ -117,31 +119,25 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
         /* Perform initialization after all child windows have been created */
         case WM_INITDIALOG: {
             GraphicDisplay_init(&l_oled,
-                       BSP_SCREEN_WIDTH,  2U, /* scale horizontally by 2 */
-                       BSP_SCREEN_HEIGHT, 2U, /* scale vertically by 2 */
-                       GetDlgItem(hWnd, IDC_LCD), c_offColor);
+                       BSP_SCREEN_WIDTH,  BSP_SCREEN_HEIGHT,
+                       IDC_LCD, c_offColor);
 
             SegmentDisplay_init(&l_userLED,
                                 1U,   /* 1 "segment" (the LED itself) */
                                 2U);  /* 2 bitmaps (for LED OFF/ON states) */
-            SegmentDisplay_initSegment(&l_userLED,
-                 0U, GetDlgItem(hWnd, IDC_LED));
+            SegmentDisplay_initSegment(&l_userLED, 0U, IDC_LED);
             SegmentDisplay_initBitmap(&l_userLED,
-                 0U, LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_LED_OFF)));
+                0U, LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_LED_OFF)));
             SegmentDisplay_initBitmap(&l_userLED,
                  1U, LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_LED_ON)));
 
             SegmentDisplay_init(&l_scoreBoard,
                                 4U,   /* 4 "segments" (digits 0-3) */
                                 10U); /* 10 bitmaps (for 0-9 states) */
-            SegmentDisplay_initSegment(&l_scoreBoard,
-                 0U, GetDlgItem(hWnd, IDC_SEG0));
-            SegmentDisplay_initSegment(&l_scoreBoard,
-                 1U, GetDlgItem(hWnd, IDC_SEG1));
-            SegmentDisplay_initSegment(&l_scoreBoard,
-                 2U, GetDlgItem(hWnd, IDC_SEG2));
-            SegmentDisplay_initSegment(&l_scoreBoard,
-                 3U, GetDlgItem(hWnd, IDC_SEG3));
+            SegmentDisplay_initSegment(&l_scoreBoard, 0U, IDC_SEG0);
+            SegmentDisplay_initSegment(&l_scoreBoard, 1U, IDC_SEG1);
+            SegmentDisplay_initSegment(&l_scoreBoard, 2U, IDC_SEG2);
+            SegmentDisplay_initSegment(&l_scoreBoard, 3U, IDC_SEG3);
             SegmentDisplay_initBitmap(&l_scoreBoard,
                  0U, LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_SEG0)));
             SegmentDisplay_initBitmap(&l_scoreBoard,
@@ -172,7 +168,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
         }
 
         case WM_DESTROY: {
-            BSP_terminate(0);
+            PostQuitMessage(0);
             return 0;
         }
 
@@ -182,7 +178,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
             switch (wParam) {
                 case IDOK:
                 case IDCANCEL: {
-                    BSP_terminate(0);
+                    PostQuitMessage(0);
+
                     break;
                 }
             }

@@ -344,7 +344,7 @@ With this information, you can generate the packet programmatically.
 
 <strong>Code Example:</strong>
 @code
-::qspy::sendEvent 7 5 [binary format ccsi 0x11 0x00 0x1122 0x11223344
+::qspy::sendEvent 7 5 [binary format ccsi 0x11 0x00 0x1122 0x11223344]
 @endcode
 
 @note

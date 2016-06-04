@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Product: qclean utility
-// Last updated for version 5.5.0
-// Last updated on  2015-08-13
+// Last updated for version 5.6.5
+// Last updated on  2016-06-04
 //
 //                    Q u a n t u m     L e a P s
 //                    ---------------------------
@@ -28,8 +28,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Contact information:
-// Web:   www.state-machine.com
-// Email: info@state-machine.com
+// http://www.state-machine.com
+// mailto:info@state-machine.com
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <string.h>
@@ -223,7 +223,7 @@ void onMatchFound(char const *fname, unsigned flags) {
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
 
-    printf("qclean 5.5.0 (c) Quantum Leaps. www.state-machine.com\n");
+    printf("qclean 5.6.5 (c) Quantum Leaps. www.state-machine.com\n");
     if (argc > 1) {
         rootDir = argv[1];
     }

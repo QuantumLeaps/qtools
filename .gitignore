@@ -24,7 +24,7 @@
 *.avrsuo
 
 bin/
-include/
+/include/
 libexec/
 dbg/
 rel/

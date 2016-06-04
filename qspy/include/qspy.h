@@ -5,8 +5,8 @@
 * @cond
 ******************************************************************************
 * Product: QSPY -- Host API
-* Last updated for version 5.6.4
-* Last updated on  2016-05-04
+* Last updated for version 5.6.5
+* Last updated on  2016-06-04
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -41,7 +41,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "5.6.4"
+#define QSPY_VER "5.6.5"
 
 #ifdef __cplusplus
 extern "C" {
