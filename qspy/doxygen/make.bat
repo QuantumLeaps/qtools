@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QSPY script for generating Doxygen documentation
-:: Last Updated for Version: 5.6.4
-:: Date of the Last Update:  2016-05-04
+:: Last Updated for Version: 5.7.0
+:: Date of the Last Update:  2016-09-08
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -38,7 +38,7 @@ echo usage:
 echo make
 echo make -CHM
 
-set VERSION=5.6.4
+set VERSION=5.7.0
 
 set DOXHOME="C:\tools\doxygen\bin"
 

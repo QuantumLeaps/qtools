@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- PAL implementation for POSIX
-* Last updated for version 5.5.0
-* Last updated on  2015-08-18
+* Last updated for version 5.6.5
+* Last updated on  2016-07-22
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -101,7 +101,7 @@ static FILE *l_file = (FILE *)0;
 #define PAL_TOUT_MS 100
 
 /*==========================================================================*/
-/* Win32 serial communication with the Target */
+/* POSIX serial communication with the Target */
 QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     struct termios t;
     speed_t spd;

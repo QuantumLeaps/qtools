@@ -1,7 +1,7 @@
 /*****************************************************************************
 * Product: QSPY -- record parsing and encoding
-* Last updated for version 5.6.4
-* Last updated on  2016-05-04
+* Last updated for version 5.7.0
+* Last updated on  2016-09-08
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -528,10 +528,10 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         "%26"PRIu64" ", "%28"PRIu64" ", "%30"PRIu64" ", "%32"PRIu64" "
     };
     static char const *efmt[] = {
-        "%7.0Le ",   "%9.1Le ",   "%10.2Le ",  "%11.3Le ",
-        "%12.4Le ",  "%13.5Le ",  "%14.6Le ",  "%15.7Le ",
-        "%16.8Le ",  "%17.9Le ",  "%18.10Le ", "%19.11Le ",
-        "%20.12Le ", "%21.13Le ", "%22.14Le ", "%23.15Le ",
+        "%7.0e ",   "%9.1e ",   "%10.2e ",  "%11.3e ",
+        "%12.4e ",  "%13.5e ",  "%14.6e ",  "%15.7e ",
+        "%16.8e ",  "%17.9e ",  "%18.10e ", "%19.11e ",
+        "%20.12e ", "%21.13e ", "%22.14e ", "%23.15e ",
     };
 
     u32 = QSpyRecord_getUint32(me, l_config.tstampSize);

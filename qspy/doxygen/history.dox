@@ -1,7 +1,11 @@
 /**
 @page history Revision History
 
+@section qspy_5_7_0 Version 5.7.0, 2016-09-08
+Corrected QSPY software tracing host application to properly display floating point numbers in user-defined trace records (QS_F32() and QS_F64() macros). The problem was with incompatibilty between Microsoft VC++ and GCC floating-point format specifications. In the GCC software build (which produces the QSPY executable in the qtools\bin\ direcory), the MS-VC++ floating point format resulted in all zeros (e.g. 0.0000e+000).   
 
+
+------------------------------------------------------
 @section qspy_5_6_4 Version 5.6.4, 2016-05-04
 Added <a target="_blank" class="extern" href="http://www.state-machine.com/products/index.html#QWIN">QWIN GUI</a> to the collection (sub-directory qwin_gui).
 
