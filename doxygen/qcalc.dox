@@ -1,0 +1,97 @@
+/*! @page qcalc QCalc Programmer's Calculator
+
+@tableofcontents
+
+<p><strong>QCalc</strong> is a powerful, cross-platform calculator specifically designed for embedded systems programmers. The calculator accepts *whole expressions* in the @ref qcalc_expr "C-syntax" and displays results simultaneously in decimal, hexadecimal, and binary without the need to explicitly convert the result to these bases.
+</p>
+
+@image html qcalc.png "QCalc user interface"
+
+@note
+The calculator GUI provides a resizable *user input* filed, where you can type **complete C expressions**. You can also **copy-and-paste** expressions into and from the *input filed* to use them directly in **your C code**.
+
+
+------------------------------------------------------------------------------
+@section qcalc_usage QCalc Usage
+<strong>QCalc</strong> is included in the QTools Collection in the sub-directory <span class="img folder">qtools/bin/</span> and consists of a single file <b>qcalc.tcl</b>. To launch QCalc, you need to open this file with the <span class="img file_wish">wish</span> Tk interpreter.
+
+@note
+The <span class="img file_wish">wish</span> Tk interpreter is included in the QTools collection for Windows and is also pre-installed in most Linux distributions.
+
+
+You use QCalc by typing (or pasting) an expression in the *user input* field and pressing <span class="img key_ret">Enter</span> to evaluate the expression. You can conveniently edit any expression already inside the *user input* field, and you can @ref qcacl_hist "recall the previous expressions" by means of the <span class="img key_up">Up</span> and <span class="img key_down">Down</span> keys. You can also resize the QCalc window to see more or less of the *input field*.
+
+<div class="separate"></div>
+@subsection qcalc_win QCalc on Windows
+The <span class="img file_wish">wish</span> Tk interpreter is conveniently provided in the same <span class="img folder">qtools/bin/</span> directory as the <span class="img file_tcl">qcalc.tcl</span> script. The directory contains also a shortcut <span class="img file_wish">qcalc</span>, which you can copy to your desktop.
+
+@image html qcalc_lnk.png "Shortcut for launching QCalc on Windows"
+
+
+<div class="separate"></div>
+@subsection qcalc_linux QCalc on Linux
+Most Linux distributions contain the Tk interpreter, which you can use to launch QCalc. You can do this either from a terminal, by typing `wish $QTOOLS/qcalc.tcl &` or by creating a shortcut to `wish` with the command-line argument `$QTOOLS/qcalc.tcl`.
+
+@image html qcalc_linux.png "Calc on Linux"
+
+
+------------------------------------------------------------------------------
+@section qcalc_features QCalc Features
+
+@subsection qcalc_expr Expressions in C-Syntax
+The most important feature of QCalc is that it accepts expressions in the **C-syntax** -- with the same operands and precedence rules as in the C or C++ source code. Among others, the expressions can contain all bit-wise operators (`<<`, `>>`, `|`, `&`, `^`, `~`) as well as mixed decimal, **hexadecimal** and even @ref qcalc_bin "binary" constants. QCalc is also a powerful floating-point scientific calculator and supports all mathematical functions (`sin()`, `cos()`, `tan()`, `exp()`, `ln()`, ...). Some examples of acceptable expressions are:
+
+`((0xBEEF << 16) | 1280) & ~0xFF`<span class="img key_ret"></span> -- binary operators, mixed hex and decimal numbers@n
+`($1011 << 24) | (1280 >> 8) ^ 0xFFF0`<span class="img key_ret"></span> -- mixed @ref qcalc_bin "binary", dec and hex numbers@n
+`(1234 % 55) + 4321/33`<span class="img key_ret"></span> -- remainder, integer division@n
+`pow(sin($pi),2) + pow(cos($pi),2)`<span class="img key_ret"></span> -- scientific floating-point calculations, pi-constant@n
+`($0111 & $GPIO_EXTIPINSELL_EXTIPINSEL0_MASK) << ($GPIO_EXTIPINSELL_EXTIPINSEL1_SHIFT * 12)`<span class="img key_ret"></span> - @ref qcalc_var "user defined variables"@n
+
+@note
+QCalc internally uses the Tcl command <b>expr</b> to evaluate the expressions. Please refer to the documentation of the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/expr.htm" target="_blank" class="extern">Tcl <b>expr</b> command</a> for more details of supported syntax and features.
+
+
+<div class="separate"></div>
+@subsection qcalc_conv Automatic conversion to hexadecimal and binary
+If the result of expression evaluation is integer (as opposed to floating point), QCalc automatically displays the result in hexadecimal and binary formats (see QCalc GUI). For better readability the hex display shows a comma between the two 16-bit half-words (e.g., `0xDEAD,BEEF`). Similarly, the binary output shows a comma between the four 8-bit bytes (e.g., `0b11011110,10101101,10111110,11101111`).
+
+
+<div class="separate"></div>
+@subsection qcalc_bin Binary constants
+As the extension to the C-syntax, QCalc supports **binary numbers** in the range from 0-15 (0b0000-0b1111). These binary constants are represented as `$0000`, `$0001`, `$0010`,..., `$1110`, and `$1111` and can be mixed into expressions. Here are a few examples of such expressions:
+
+`($0110 << 14) & 0xDEADBEEF`<span class="img key_ret"></span>@n
+`($0010 | $1000) * 123`<span class="img key_ret"></span>@n
+
+
+<div class="separate"></div>
+@subsection qcalc_hist History of inputs
+QCalc remembers the history of up to 8 most recently entered expressions. You can recall and navigate the history of previously entered expressions by pressing the <span class="img key_up">Up</span> / <span class="img key_down">Down</span> keys.
+
+<div class="separate"></div>
+@subsection qcalc_ans The $ans variable
+QCalc stores the result of the last computation in the **$ans** variable (note the dollar sign `$` in front of the variable name). Here are some examples of expressions with the `$ans` variable:
+
+`1/$ans`<span class="img key_ret"></span> -- find the inverse of the last computation@n
+`log($ans)/log(2)`<span class="img key_ret"></span> -- find log-base-2 of the last computation@n
+
+<div class="separate"></div>
+@subsection qcalc_var User variables
+QCalc allows you also to define any number of your own **user variables**. To set a variable, you simply type the expression `=alpha` in the *user input* field. This will define the variable `alpha` and assign it the value of the last computation (`$ans`). Subsequently, you can use your `alpha` variable in expressions by typing <b>$</b>`alpha` (note the dollar sign `$` in front of the variable name). Here is example of defining and using variable `$GPIO_BASE`:
+
+`0xE000E000`<span class="img key_ret"></span> -- set some value into `$ans`@n
+`=GPIO_BASE`<span class="img key_ret"></span> -- define user variable `GPIO_BASE` and set it to `$ans`@n
+`$GPIO_BASE + 0x400`<span class="img key_ret"></span> -- use the variable `$GPIO_BASE` in an expression@n
+
+
+@note
+The names of user variables are case-sensitive.
+
+<div class="separate"></div>
+@subsection qcalc_error Error handling
+Expressions that you enter into QCalc might have all kinds of errors: syntax errors,  computation errors (e.g., division by zero), undefined variable errors, etc. In all these cases, QCalc responds with the `Error` message and the explanation of the error:
+
+@image html qcalc_err.png "QCalc reacting to a syntax error"
+
+@next{qfsgen}
+*/

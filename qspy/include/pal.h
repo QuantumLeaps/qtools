@@ -1,7 +1,11 @@
-/*****************************************************************************
-* Product: QSPY -- Platform Abstraction Layer (PAL)
-* Last updated for version 5.5.0
-* Last updated on  2015-08-16
+/**
+* @file
+* @brief Platform Abstraction Layer (PAL)
+* @ingroup qpspy
+* @cond
+******************************************************************************
+* Last updated for version 5.9.0
+* Last updated on  2017-04-04
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -28,9 +32,11 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http:://www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
-*****************************************************************************/
+******************************************************************************
+* @endcond
+*/
 #ifndef pal_h
 #define pal_h
 
@@ -58,6 +64,11 @@ typedef enum {
     QSPY_DONE_EVT,
     QSPY_ERROR_EVT
 } QSPYEvtType;
+
+#define QS_FRAME            ((uint8_t)0x7E)
+#define QS_ESC              ((uint8_t)0x7D)
+#define QS_GOOD_CHKSUM      ((uint8_t)0xFF)
+#define QS_ESC_XOR          ((uint8_t)0x20)
 
 /* The PAL "virtual table" contains operations that are dependent
 * on the choice of target connection. This connection is chosen
@@ -124,6 +135,4 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
 
 #endif /* _MSC_VER */
 
-
 #endif /* pal_h */
-

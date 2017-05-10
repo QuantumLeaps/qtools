@@ -1,13 +1,17 @@
-/*****************************************************************************
-* Product: QSPY -- Back-End connection point for the external Front-Ends
-* Last updated for version 5.5.0
-* Last updated on  2015-09-16
+/**
+* @file
+* @brief Back-End connection point for the external Front-Ends
+* @ingroup qpspy
+* @cond
+******************************************************************************
+* Last updated for version 5.9.0
+* Last updated on  2017-04-21
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, www.state-machine.com.
+* Copyright (C) Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -28,9 +32,11 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* Web:   www.state-machine.com
-* Email: info@state-machine.com
-*****************************************************************************/
+* https://state-machine.com
+* mailto:info@state-machine.com
+******************************************************************************
+* @endcond
+*/
 #include <string.h>  /* for size_t */
 #include <stdint.h>
 #include <stdbool.h>
@@ -45,6 +51,7 @@ typedef float    float32_t;
 typedef double   float64_t;
 typedef int      enum_t;
 typedef unsigned uint_t;
+typedef void     QEvt;
 
 #ifndef Q_SPY
 #define Q_SPY 1
@@ -52,11 +59,27 @@ typedef unsigned uint_t;
 #include "qs_copy.h" /* copy of the target-resident QS interface */
 
 /*..........................................................................*/
-static uint8_t  l_buf[1024];   /* the output buffer [bytes] */
-static uint8_t *l_pos;         /* current position in the output buffer */
-static uint8_t  l_rxBeSeq;     /* receive  Back-End  sequence number */
-static uint8_t  l_txBeSeq;     /* transmit Back-End sequence number */
-static uint8_t  l_attached;    /* attached status 0, 1, 2 */
+static uint8_t  l_buf[1024]; /* the output buffer [bytes] */
+static uint8_t *l_pos;       /* current position in the output buffer */
+static uint8_t  l_rxBeSeq;   /* receive  Back-End  sequence number */
+static uint8_t  l_txBeSeq;   /* transmit Back-End sequence number */
+static uint8_t  l_channels;  /* channels of the output (bitmask) */
+
+enum Channels {
+    BINARY_CH = (1 << 0),
+    TEXT_CH   = (1 << 1)
+};
+
+#define BIN_FORMAT "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BIN(byte_)  \
+  (byte_ & 0x80 ? '1' : '0'), \
+  (byte_ & 0x40 ? '1' : '0'), \
+  (byte_ & 0x20 ? '1' : '0'), \
+  (byte_ & 0x10 ? '1' : '0'), \
+  (byte_ & 0x08 ? '1' : '0'), \
+  (byte_ & 0x04 ? '1' : '0'), \
+  (byte_ & 0x02 ? '1' : '0'), \
+  (byte_ & 0x01 ? '1' : '0')
 
 /*..........................................................................*/
 #ifndef NDEBUG
@@ -67,7 +90,7 @@ void BE_onStartup(void) {
     l_pos      = &l_buf[0];
     l_rxBeSeq  = 0U;
     l_txBeSeq  = 0U;
-    l_attached = 0U;
+    l_channels = 0U;
 
 #ifndef NDEBUG
     FOPEN_S(l_testFile, "fromFE.bin", "wb");
@@ -75,8 +98,7 @@ void BE_onStartup(void) {
 }
 /*..........................................................................*/
 void BE_onCleanup(void) {
-    BE_initPkt(DETACH);
-    BE_sendPkt();
+    BE_sendPkt(QSPY_DETACH);
 #ifndef NDEBUG
     fclose(l_testFile);
 #endif
@@ -93,12 +115,14 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
     * change, as the packet-boundaries might not be preserved.
     */
 
-    /* check the continuity of the data from Front-End... */
-    if (l_attached > 0U) {
+    /* check the continuity of the data from the Front-End... */
+    if (l_channels != 0U) { /* is a Front-End attached? */
         ++l_rxBeSeq;
         if (buf[0] != l_rxBeSeq) {
-            printf("!Back-End: data discontinuity: seq=%u -> seq=%u\n",
-                   (unsigned)l_rxBeSeq, (unsigned)buf[0]);
+            SNPRINTF_LINE("   <F-END> ERROR    Data Discontinuity "
+                          "Seq=%u->%u",
+                          (unsigned)l_rxBeSeq, (unsigned)buf[0]);
+            QSPY_printError();
             l_rxBeSeq = buf[0];
         }
     }
@@ -112,8 +136,10 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
         len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
         if (len > 0U) {
             if ((*PAL_vtbl.send2Target)(qbuf, len) != QSPY_SUCCESS) {
-                 fprintf(stderr,
-                   "!Back-End: errors sending record to the Target\n");
+                SNPRINTF_LINE("   <COMMS> ERROR    Sedning Data "
+                              "to the Target Rec=%d,Len=%d",
+                              (int)buf[1], (int)len);
+                QSPY_printError();
             }
 #ifndef NDEBUG
             if (l_testFile != (FILE *)0) {
@@ -122,8 +148,9 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
 #endif
         }
         else {
-            fprintf(stderr,
-                   "!Back-End: Target packet too big\n");
+            SNPRINTF_LINE("   <COMMS> ERROR    Target packet too big Len=%d",
+                          (int)len);
+            QSPY_printError();
         }
     }
     else {
@@ -136,82 +163,131 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
 /*..........................................................................*/
 void BE_parseRecFromFE(QSpyRecord * const qrec) {
     switch (qrec->rec) {
-        case ATTACH: {   /* attach to the Front-End */
-            if (l_attached == 0U) {  /* just getting attached? */
-                printf(">Back-End: attached\n");
+        case QSPY_ATTACH: {   /* attach to the Front-End */
+            if (l_channels == 0U) { /* no Front-End attached yet? */
+                SNPRINTF_LINE("   <F-END> Attached Chan="BIN_FORMAT,
+                              BYTE_TO_BIN(qrec->start[2]));
+                QSPY_printInfo();
             }
 
+            l_channels = qrec->start[2];
             l_rxBeSeq  = qrec->start[0]; /* re-start the receive  sequence */
             l_txBeSeq  = 0U;             /* re-start the transmit sequence */
-            l_attached = 1U;
 
-            /* send the attach packet back to the Front-End */
-            BE_initPkt(ATTACH);
-            BE_sendPkt();
+            /* send the attach confirmation packet back to the Front-End */
+            BE_sendPkt(QSPY_ATTACH);
 
             break;
         }
-        case DETACH: {   /* detach from the Front-End */
+        case QSPY_DETACH: {   /* detach from the Front-End */
             PAL_detachFE();
-            l_attached = 0U;
-            printf(">Back-End: detached\n");
+            l_channels = 0U; /* detached from a Front-End */
+            SNPRINTF_LINE("   <F-END> Detached");
+            QSPY_printInfo();
             break;
         }
-        case SAVE_DIC: { /* save dictionaries collected so far */
+        case QSPY_SAVE_DICT: { /* save dictionaries collected so far */
             QSPY_command('d');
             break;
         }
-        case SCREEN_OUT: {
+        case QSPY_SCREEN_OUT: {
             QSPY_command('o');
             break;
         }
-        case BIN_OUT: {
+        case QSPY_BIN_OUT: {
             QSPY_command('s');
             break;
         }
-
-        case MATLAB_OUT: {
+        case QSPY_MATLAB_OUT: {
             QSPY_command('m');
             break;
         }
-        case MSCGEN_OUT: {
+        case QSPY_MSCGEN_OUT: {
             QSPY_command('g');
             break;
         }
 
+        case QSPY_SEND_EVENT: {
+            QSPY_sendEvt(qrec);
+            break;
+        }
+        case QSPY_SEND_LOC_FILTER:
+        case QSPY_SEND_CURR_OBJ: {
+            QSPY_sendObj(qrec);
+            break;
+        }
+        case QSPY_SEND_COMMAND: {
+            QSPY_sendCmd(qrec);
+            break;
+        }
+        case QSPY_SEND_TEST_PROBE: {
+            QSPY_sendTP(qrec);
+            break;
+        }
+
         default: {
-            fprintf(stderr, "!Back-End: unrecognized command %d\n",
-                            (int)qrec->rec);
+            SNPRINTF_LINE("   <F-END> ERROR    Unrecognized command Rec=%d",
+                          (int)qrec->rec);
+            QSPY_printError();
             break;
         }
     }
 }
 /*..........................................................................*/
 int BE_parseRecFromTarget(QSpyRecord * const qrec) {
-    if (l_attached == 1U) {
+    if ((l_channels & BINARY_CH) != 0) {
+        if (qrec->rec != QS_EMPTY) {
+            /* forward the Target binary record to the Front-End... */
+            PAL_send2FE(qrec->start, qrec->tot_len - 1U);
+        }
+    }
+    else if (l_channels != 0U) {
         if (qrec->rec == QS_TARGET_INFO) {
             /* forward the Target Info record to the Front-End... */
             PAL_send2FE(qrec->start, qrec->tot_len - 1U);
-            l_attached = 2U;
         }
-    }
-    else {
-        /* forward the Target record to the Front-End... */
-        PAL_send2FE(qrec->start, qrec->tot_len - 1U);
     }
     return 1; /* continue with the standard QSPY processing */
 }
 
 /*--------------------------------------------------------------------------*/
-void BE_initPkt(int pktId) {
-    l_pos = &l_buf[0];
-    ++l_txBeSeq;
-    *l_pos++ = l_txBeSeq;
-    *l_pos++ = (uint8_t)pktId;
+void BE_sendPkt(int pktId) {
+    if ((pktId >= 128) || ((l_channels & 1U) != 0)) {
+        l_pos = &l_buf[0];
+        ++l_txBeSeq;
+        *l_pos++ = l_txBeSeq;
+        *l_pos++ = (uint8_t)pktId;
+        PAL_send2FE(l_buf, (l_pos - &l_buf[0]));
+    }
 }
 /*..........................................................................*/
-void BE_sendPkt(void) {
-    PAL_send2FE(l_buf, (l_pos - &l_buf[0]));
+void BE_sendLine(void) {
+    /* global filter for permanently enabled QS records
+    * minus the records that generate time stamps
+    */
+    static uint8_t const glbFilter[32] = {
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0,
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
+
+    if ((l_channels & 2U) != 0) {
+        uint8_t rec = (uint8_t)QSPY_output.rec;
+
+        /* is this QS record not permanently blocked? */
+        if ((glbFilter[rec >> 3] & (1U << (rec & 7U))) == 0U) {
+            ++l_txBeSeq;
+
+            /* prepend the BE UDP packet header in front of the string */
+            QSPY_output.buf[QS_LINE_OFFSET - 3] = l_txBeSeq;
+            QSPY_output.buf[QS_LINE_OFFSET - 2] = QS_EMPTY;
+            QSPY_output.buf[QS_LINE_OFFSET - 1] = rec;
+
+            PAL_send2FE((uint8_t const *)&QSPY_output.buf[QS_LINE_OFFSET - 3],
+                        QSPY_output.len + 3);
+        }
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -220,18 +296,14 @@ void BE_putU8(uint8_t d) {
 }
 /*..........................................................................*/
 void BE_putU16(uint16_t d) {
-    *l_pos++ = (uint8_t)d;
-    d >>= 8;
+    *l_pos++ = (uint8_t)d; d >>= 8;
     *l_pos++ = (uint8_t)d;
 }
 /*..........................................................................*/
 void BE_putU32(uint16_t d) {
-    *l_pos++ = (uint8_t)d;
-    d >>= 8;
-    *l_pos++ = (uint8_t)d;
-    d >>= 8;
-    *l_pos++ = (uint8_t)d;
-    d >>= 8;
+    *l_pos++ = (uint8_t)d;  d >>= 8;
+    *l_pos++ = (uint8_t)d;  d >>= 8;
+    *l_pos++ = (uint8_t)d;  d >>= 8;
     *l_pos++ = (uint8_t)d;
 }
 /*..........................................................................*/

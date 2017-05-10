@@ -1,0 +1,8 @@
+changed EVENT
+changed COMMAND
+changed PEEK
+changed POKE
+added   FILL
+added   CURR_OBJ
+added   TEST_SETUP
+added   TEST_PROBE

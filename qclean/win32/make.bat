@@ -1,14 +1,14 @@
 @echo off
 :: ==========================================================================
 :: Product: qclean buld script for Win32 port with GNU (MinGW)
-:: Last Updated for Version: 5.5.0
-:: Date of the Last Update:  2015-08-13
+:: Last Updated for Version: 5.9.0
+:: Date of the Last Update:  2017-04-26
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
 ::                    innovating embedded systems
 ::
-:: Copyright (C) Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -29,7 +29,7 @@
 :: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: http://www.state-machine.com
+:: https://state-machine.com
 :: mailto:info@state-machine.com
 :: ==========================================================================
 setlocal
@@ -44,36 +44,33 @@ setlocal
 set CC=gcc
 set LINK=gcc
 
-rem ==========================================================================
-set QP_PRTDIR=.
-
+:: ==========================================================================
 if "%1"=="" (
     echo default selected
-    set BINDIR=%QP_PRTDIR%\rel
-    set CCFLAGS=-O2 -c -Wall -Weffc++ -Wextra
+    set BINDIR=rel
+    set CCFLAGS=-O2 -c -Wall -Wextra
 )
 if "%1"=="dbg" (
     echo dbg selected
-    set BINDIR=%QP_PRTDIR%\dbg
-    set CCFLAGS=-g -c -Wall -Weffc++ -Wextra 
+    set BINDIR=dbg
+    set CCFLAGS=-g -c -Wall -Wextra 
 )
 
 set LINKFLAGS=-static-libgcc
 
-rem QSPY ---------------------------------------------------------------------
 set SRCDIR=..\source
 set CCINC=-I..\include
 
 @echo on
-%CC% %CCFLAGS% %CCINC% -o%BINDIR%\main.o       %SRCDIR%\main.cpp
-%CC% %CCFLAGS% %CCINC% -o%BINDIR%\filesearch.o filesearch.cpp
+%CC% %CCFLAGS% %CCINC% -o%BINDIR%\main.o       %SRCDIR%\main.c
+%CC% %CCFLAGS% %CCINC% -o%BINDIR%\getopt.o     %SRCDIR%\getopt.c
+%CC% %CCFLAGS% %CCINC% -o%BINDIR%\filesearch.o filesearch.c
 
-%LINK% %LINKFLAGS% -o %BINDIR%\qclean.exe %BINDIR%\main.o %BINDIR%\filesearch.o
+%LINK% %LINKFLAGS% -o %BINDIR%\qclean.exe %BINDIR%\main.o %BINDIR%\getopt.o %BINDIR%\filesearch.o
 
 @echo off
 erase %BINDIR%\*.o
 
 :end
-
 
 endlocal

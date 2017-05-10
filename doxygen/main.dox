@@ -1,0 +1,52 @@
+/*! @mainpage About QTools
+
+@image html qtools_banner.jpg
+
+@section qtools_about What is it?
+QTools is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux, and macOS. The QTools Collection contains the following tools developed by <a href="https://state-machine.com/">Quantum Leaps</a>:
+
+- @ref qpspy  "QP/Spy software tracing and testing system"
+- @ref qwin   "QWin GUI toolkit for prototyping embedded systems on Windows in C or C++"
+- @ref qclean "QClean utility for cleaning the white space in the source code"
+- @ref qfsgen "QFSGen utility for building ROM-based file systems"
+- @ref qcalc  "QCalc C programmer's calculator"
+
+
+------------------------------------------------------------------------------
+@section qtools_win QTools on Windows
+The QTools Collection for Windows contains additionally the following open-source, third-party tools:
+
+- GNU-make for Windows (version 3.82)
+- GNU C/C++ toolset for Windows (MinGW version 4.5.2)
+- TCL/TK for Windows (version 8.4) with UDP sockets extension
+- AVRDUDE for Windows (version 6.1)
+
+Additionally, QTools for Windows contains the following PC-Lint option files various compilers (in sub-directory `lint`):
+
+- `co-gnu-arm.*` (PC-Lint option files for GNU-ARM)
+- `co-iar-arm.*` (PC-Lint option files for IAR-ARM)
+
+
+------------------------------------------------------------------------------
+@section qtools_licensing Licensing QTools
+Most tools included in the QTools Collection are distributed under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version. The text of GPL version 2 is included in the
+file GPLv2.txt in the root directory of the QTools distribution.
+
+The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE AGREEMENT, included in the file TCL_LICENSE.txt in the root directory of the QTools distribution.
+
+
+------------------------------------------------------------------------------
+@section qtools_help How to get help?
+
+Please post any **technical questions** to the <a class="extern" target="_blank" href="http://sourceforge.net/p/qpc/discussion/668726"><strong>Free Support Forum</strong></a> hosted on SourceForge.net. Posts to this forum benefit the whole community and are typically answered the same day.
+
+Direct **Commercial Support** is available to the commercial licensees. Every commercial license includes one year of Technical Support for the licensed software. The support term can be extended annually.
+
+Training and consulting services are also available from Quantum Leaps. Please refer to the <a class="extern" target="_blank" href="https://state-machine.com/support/">Support web-page</a> for more information.
+
+@image html logo_ql_TM.jpg
+
+Copyright &copy; 2002-2017 Quantum Leaps, LLC. All Rights Reserved.@n
+
+@next{start}
+*/

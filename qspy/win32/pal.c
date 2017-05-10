@@ -1,7 +1,11 @@
-/*****************************************************************************
-* Product: QSPY -- PAL implementation for Win32
-* Last updated for version 5.5.0
-* Last updated on  2015-08-18
+/**
+* @file
+* @brief QSPY PAL implementation for Win32
+* @ingroup qpspy
+* @cond
+******************************************************************************
+* Last updated for version 5.9.0
+* Last updated on  2017-05-09
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -28,11 +32,13 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http:://www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
-*****************************************************************************/
-#include <string.h>  /* for size_t */
-#include <stdlib.h>  /* for system() */
+******************************************************************************
+* @endcond
+*/
+#include <string.h>   /* for size_t */
+#include <stdlib.h>   /* for system() */
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -42,9 +48,9 @@
 #include <windows.h>  /* for Windows serial communication facilities */
 #include <winsock2.h> /* for Windows network facilities */
 
-#include "qspy.h"   /* QSPY data parser */
-#include "be.h"     /* Back-End interface */
-#include "pal.h"    /* Platform Abstraction Layer */
+#include "qspy.h"     /* QSPY data parser */
+#include "be.h"       /* Back-End interface */
+#include "pal.h"      /* Platform Abstraction Layer */
 
 /*..........................................................................*/
 PAL_VtblType PAL_vtbl;   /* global PAL virtual table */
@@ -80,7 +86,7 @@ static SOCKET l_clientSock = INVALID_SOCKET;
 
 static FILE *l_file = (FILE *)0;
 
-/* PAL timeout determines how long to wait for an event */
+/* PAL timeout determines how long to wait for an event [ms] */
 #define PAL_TOUT_MS 100
 
 /*==========================================================================*/
@@ -106,8 +112,9 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
                        NULL);
 
     if (l_serHNDL == INVALID_HANDLE_VALUE) {
-        fprintf(stderr, "*** PAL: Error by opening COM port: %s at %d\n",
-               comName, baudRate);
+        SNPRINTF_LINE("   <COMMS> ERROR    Opening COM Port=%s,Baud=%d",
+                      comName, baudRate);
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -117,21 +124,27 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         baudRate);
     dcb.DCBlength = sizeof(DCB);
     if (!GetCommState(l_serHNDL, &dcb)) {
-        fprintf(stderr, "*** PAL: Error retreiving COM port settings\n");
+        SNPRINTF_LINE("   <COMMS> ERROR    Getting COM port settings");
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
-    /* dill in the DCB... */
+    /* drill in the DCB... */
     dcb.fAbortOnError = 0U; /* don't abort on error */
     if (!BuildCommDCB(comSettings, &dcb)) {
-        fprintf(stderr, "*** PAL: Error parsing COM port settings\n");
+        SNPRINTF_LINE("   <COMMS> ERROR    Parsing COM port settings");
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     if (!SetCommState(l_serHNDL, &dcb)) {
-        fprintf(stderr, "*** PAL: Error setting up the COM port\n");
+        SNPRINTF_LINE("   <COMMS> ERROR    Setting up the COM port");
+        QSPY_printError();
         return QSPY_ERROR;
     }
+
+    QSPY_reset();   /* reset the QSPY parser to start over cleanly */
+    QSPY_txReset(); /* reset the QSPY transmitter */
 
     /* setup the serial port buffers... */
     SetupComm(l_serHNDL,
@@ -212,8 +225,9 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
         COMSTAT comstat;
         DWORD errors;
 
-        fprintf(stderr, "*** PAL: Reading COM port failed; LastError=%d\n",
-                WSAGetLastError());
+        SNPRINTF_LINE("   <COMMS> ERROR    Reading COM port failed Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         ClearCommError(l_serHNDL, &errors, &comstat);
 
         *pBytes = 0;
@@ -235,8 +249,9 @@ static QSpyStatus ser_send2Target(unsigned char *buf, size_t nBytes) {
         }
     }
     else {
-        fprintf(stderr, "*** PAL: Writing to COM port failed; LastError=%d\n",
-                WSAGetLastError());
+        SNPRINTF_LINE("   <COMMS> ERROR    Writing to COM port Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 }
@@ -248,6 +263,8 @@ static void ser_cleanup(void) {
 
 /*==========================================================================*/
 /* Win32 TCP/IP communication with the Target */
+
+static struct sockaddr_in l_clientAddr;
 
 /*..........................................................................*/
 QSpyStatus PAL_openTargetTcp(int portNum) {
@@ -268,16 +285,18 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
     static WSADATA wsaData;
     int wsaErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaErr == SOCKET_ERROR) {
-        fprintf(stderr, "*** PAL: Windows Sockets cannot be initialized.\n"
-            "The library reported error 0x%08X", wsaErr);
+        SNPRINTF_LINE("   <COMMS> ERROR    Init Windows Sockets Err=%d",
+                      wsaErr);
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* create TCP socket */
     l_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (l_serverSock == INVALID_SOCKET){
-        fprintf(stderr, "*** PAL: Server socket cannot be created.\n"
-               "Windows socket error 0x%08X", WSAGetLastError());
+        SNPRINTF_LINE("   <COMMS> ERROR    Server socket create Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -293,22 +312,25 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
     if (bind(l_serverSock, (struct sockaddr *)&local, sizeof(local))
         == SOCKET_ERROR)
     {
-        fprintf(stderr, "*** PAL: Error binding server socket.\n");
+        SNPRINTF_LINE("   <COMMS> ERROR    Binding server socket Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     if (listen(l_serverSock, 1) == SOCKET_ERROR) {
-        fprintf(stderr, "*** PAL: Server socket listen failed.\n"
-               "Windows socket error 0x%08X.",
-               WSAGetLastError());
+        SNPRINTF_LINE("   <COMMS> ERROR    Server socket listen Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* put the socket into NON-BLOCKING mode... */
     sockmode = 1UL;  /* NON-BLOCKING socket */
     if (ioctlsocket(l_serverSock, FIONBIO, &sockmode) == SOCKET_ERROR) {
-        fprintf(stderr,
-                "*** PAL: Error to put TCP socket into non-blocking mode\n");
+        SNPRINTF_LINE("   <COMMS> ERROR    Server socket non-blocking Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -324,7 +346,7 @@ static void tcp_cleanup(void) {
 /*..........................................................................*/
 static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
-    struct timeval delay;
+    static struct timeval const timeout = {(long)0, (long)(PAL_TOUT_MS*1000)};
     fd_set readSet;
     int status;
     int nrec;
@@ -347,28 +369,26 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
         FD_ZERO(&readSet);
         FD_SET(l_serverSock, &readSet);
 
-        /* selective blocking... */
-        delay.tv_sec  = 0U;
-        delay.tv_usec = PAL_TOUT_MS * 1000U;
-        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &delay);
+        /* selective, timed blocking... */
+        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
 
         if (status == SOCKET_ERROR) {
-            fprintf(stderr, "*** PAL: Server socket select failed.\n"
-                   "Windows socket error 0x%08X", WSAGetLastError());
+            SNPRINTF_LINE("   <COMMS> ERROR    Server socket select Err=%d",
+                          WSAGetLastError());
+            QSPY_printError();
             return QSPY_ERROR_EVT;
         }
-
-        if (FD_ISSET(l_serverSock, &readSet)) {
-            struct sockaddr_in fromAddr;
-            int fromLen = (int)sizeof(fromAddr);
-            u_long sockmode;
+        else if (FD_ISSET(l_serverSock, &readSet)) {
+            int fromLen = (int)sizeof(l_clientAddr);
+            ULONG sockmode;
+            //BOOL  sockopt_bool;
 
             l_clientSock = accept(l_serverSock,
-                                 (struct sockaddr *)&fromAddr, &fromLen);
+                                 (struct sockaddr *)&l_clientAddr, &fromLen);
             if (l_clientSock == INVALID_SOCKET) {
-                fprintf(stderr,
-                        "*** PAL: Socket accept failed; error 0x%08X\n",
-                        WSAGetLastError());
+                SNPRINTF_LINE("   <COMMS> ERROR    Socket accept Err=%d",
+                              WSAGetLastError());
+                QSPY_printError();
                 return QSPY_ERROR_EVT;
             }
 
@@ -377,44 +397,60 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
             if (ioctlsocket(l_clientSock, FIONBIO, &sockmode)
                 == SOCKET_ERROR)
             {
-                fprintf(stderr,
-                        "*** PAL: Cannot put socket into non-blocking mode, "
-                        "error 0x%08X\n", WSAGetLastError());
+                SNPRINTF_LINE("   <COMMS> ERROR    Client socket non-blocking"
+                              " Err=%d", WSAGetLastError());
+                QSPY_printError();
                 return QSPY_ERROR_EVT;
             }
-            printf("*** PAL: Accepted target connection from %s, port %d\n",
-                   inet_ntoa(fromAddr.sin_addr),
-                   (int)ntohs(fromAddr.sin_port));
+
+            /* disable the Nagle algorithm (good for small messages) */
+            //sockopt_bool = TRUE;
+            //setsockopt(l_clientSock, IPPROTO_TCP, TCP_NODELAY,
+            //           (const char *)&sockopt_bool, sizeof(sockopt_bool));
+
+            QSPY_reset();   /* reset the QSPY parser to start over cleanly */
+            QSPY_txReset(); /* reset the QSPY transmitter */
+
+            SNPRINTF_LINE("   <COMMS> TCP-IP   Connected to Host=%s,Port=%d",
+                          inet_ntoa(l_clientAddr.sin_addr),
+                          (int)ntohs(l_clientAddr.sin_port));
+            QSPY_printInfo();
         }
     }
     else { /* client is connected... */
         FD_ZERO(&readSet);
         FD_SET(l_clientSock, &readSet);
 
-        /* selective blocking... */
-        delay.tv_sec  = 0U;
-        delay.tv_usec = PAL_TOUT_MS * 1000U;
-        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &delay);
+        /* selective, timed blocking... */
+        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
 
         if (status == SOCKET_ERROR) {
-            fprintf(stderr, "*** PAL: Client socket select error 0x%08X\n",
-                    WSAGetLastError());
+            SNPRINTF_LINE("   <COMMS> ERROR    Client socket select Err=%d",
+                          WSAGetLastError());
+            QSPY_printError();
             return QSPY_ERROR_EVT;
-        }
-
-        if (FD_ISSET(l_clientSock, &readSet)) {
+        } else if (FD_ISSET(l_clientSock, &readSet)) {
             nrec = recv(l_clientSock, (char *)buf, (int)(*pBytes), 0);
             /* socket error or the client hang up... */
             if (nrec == SOCKET_ERROR) {
-                fprintf(stderr, "*** PAL: Client socket error 0x%08X. "
-                                "Hanging up and waiting for new client...\n",
-                        WSAGetLastError());
+                SNPRINTF_LINE("   <COMMS> ERROR    Client socket Err=%d",
+                              WSAGetLastError());
+                QSPY_printError();
                 /* go back to waiting for a client */
                 closesocket(l_clientSock);
                 l_clientSock = INVALID_SOCKET;
             }
             else if (nrec <= 0) { /* the client hang up */
-                printf("Client hang up. Waiting for new client...\n");
+                SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
+                              "Host=%s,Port=%d",
+                              inet_ntoa(l_clientAddr.sin_addr),
+                              (int)ntohs(l_clientAddr.sin_port));
+                QSPY_printInfo();
+
+                SNPRINTF_LINE(
+                "----------------------------------------------------------");
+                QSPY_printInfo();
+
                 /* go back to waiting for a client */
                 closesocket(l_clientSock);
                 l_clientSock = INVALID_SOCKET;
@@ -430,13 +466,14 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
 }
 /*..........................................................................*/
 static QSpyStatus tcp_send2Target(unsigned char *buf, size_t nBytes) {
-    if (l_clientSock != INVALID_SOCKET) {
-        if (send(l_clientSock, (char *)buf, (int)nBytes, 0) == SOCKET_ERROR) {
-            fprintf(stderr,
-                "*** PAL: Writing to TCP socket failed; LastError=%d\n",
-                WSAGetLastError());
-            return QSPY_ERROR;
-        }
+    if (l_clientSock == INVALID_SOCKET) {
+        return QSPY_ERROR;
+    }
+    if (send(l_clientSock, (char *)buf, (int)nBytes, 0) == SOCKET_ERROR) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Writing to TCP socket Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
+        return QSPY_ERROR;
     }
     return QSPY_SUCCESS;
 }
@@ -451,11 +488,16 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
 
     FOPEN_S(l_file, fName, "rb"); /* open for reading binary */
     if (l_file != (FILE *)0) {
-        printf("\nFile %s opened, hit any key to quit...\n\n", fName);
+        QSPY_reset();   /* reset the QSPY parser to start over cleanly */
+        QSPY_txReset(); /* reset the QSPY transmitter */
+
+        SNPRINTF_LINE("   <COMMS> File     Opened File=%s", fName);
+        QSPY_printInfo();
         return QSPY_SUCCESS;
     }
     else {
-        fprintf(stderr, "*** PAL: file %s not found\n", fName);
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot find File=%s", fName);
+        QSPY_printError();
         return QSPY_ERROR;
     }
 }
@@ -511,16 +553,17 @@ QSpyStatus PAL_openBE(int portNum) {
     static WSADATA wsaData;
     int wsaErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaErr == SOCKET_ERROR) {
-        fprintf(stderr, "*** PAL: Windows Sockets cannot be initialized.\n"
-               "The library reported error 0x%08X", wsaErr);
+        SNPRINTF_LINE("   <F-END> ERROR    Windows Sockets Init Err=%d",
+                      wsaErr);
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     l_beSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); /* UDP socket */
     if (l_beSock == INVALID_SOCKET){
-        fprintf(stderr, "*** PAL: Back-End socket cannot be created.\n"
-               "Windows socket error 0x%08X.",
-               WSAGetLastError());
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket create Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -536,15 +579,18 @@ QSpyStatus PAL_openBE(int portNum) {
     if (bind(l_beSock, (struct sockaddr *)&local, sizeof(local))
         == SOCKET_ERROR)
     {
-        fprintf(stderr, "*** PAL: Error by binding Back-End socket.\n");
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket binding Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* put the socket into NON-BLOCKING mode... */
     sockmode = 1UL;  /* NON-BLOCKING socket */
     if (ioctlsocket(l_beSock, FIONBIO, &sockmode) == SOCKET_ERROR) {
-        fprintf(stderr,
-                "*** PAL: Error to make Back-End socket non-blocking\n");
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket non-blocking Err=%d",
+                      WSAGetLastError());
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -570,9 +616,9 @@ void PAL_closeBE(void) {
             if (select(0, (fd_set *)0, &writeSet, (fd_set *)0, &delay)
                 == SOCKET_ERROR)
             {
-                fprintf(stderr,
-                        "*** PAL: Back-End socket select error 0x%08X\n",
+                SNPRINTF_LINE("   <F-END> ERROR    UDP socket select Err=%d",
                         WSAGetLastError());
+                QSPY_printError();
             }
         }
 
@@ -589,9 +635,9 @@ void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
         {
             PAL_detachFE(); /* detach the Front-End */
 
-            fprintf(stderr,
-                "*** PAL: Writing to Back-End socket failed; LastError=%d\n",
-                WSAGetLastError());
+            SNPRINTF_LINE("   <F-END> ERROR    UDP socket failed Err=%d",
+                          WSAGetLastError());
+            QSPY_printError();
         }
     }
 }
@@ -628,8 +674,9 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
         if (status != WSAEWOULDBLOCK) {
             PAL_detachFE(); /* detach from the Front-End */
 
-            fprintf(stderr, "*** PAL: recvfrom from Back-End socket failed\n"
-                   "Windows socket error 0x%08X", status);
+            SNPRINTF_LINE("   <F-END> ERROR    UDP socket failed Err=%d",
+                          status);
+            QSPY_printError();
             return QSPY_ERROR_EVT;
         }
     }
@@ -638,9 +685,16 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
 
 /*..........................................................................*/
 static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes) {
-    if (_kbhit()) {
-        buf[0]  = (unsigned char)_getch();  /* the key pressed */
-        *pBytes = 1;         /* number of bytes in the buffer */
+    int ch = 0;
+    while (_kbhit()) {
+        ch = _getch();
+        if ((ch == 0x00) || (ch == 0xE0)) {
+            ch = _getch();
+        }
+    }
+    if (ch != 0) {
+        buf[0]  = (unsigned char)ch;
+        *pBytes = 1; /* number of bytes in the buffer */
         return QSPY_KEYBOARD_EVT;
     }
     return QSPY_NO_EVT;

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 5.5.0
-# Last updated on  2015-07-21
+# Last updated for version 5.9.0
+# Last updated on  2017-05-09
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# http://www.state-machine.com
+# https://state-machine.com
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
@@ -79,6 +79,7 @@ C_SRCS := \
 	getopt.c \
 	be.c \
 	pal.c \
+	qspy_tx.c \
 	qspy.c
 
 # C++ source files...

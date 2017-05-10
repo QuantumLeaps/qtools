@@ -1,7 +1,11 @@
-/*****************************************************************************
-* Product: QSPY -- main entry point
-* Last updated for version 5.5.0
-* Last updated on  2015-09-18
+/**
+* @file
+* @brief main for QSPY host utility
+* @ingroup qpspy
+* @cond
+******************************************************************************
+* Last updated for version 5.9.0
+* Last updated on  2017-05-10
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -28,9 +32,11 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http:://www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
-*****************************************************************************/
+******************************************************************************
+* @endcond
+*/
 #include <stdint.h>
 #include <stddef.h>
 
@@ -57,7 +63,8 @@ typedef enum {
 } TargetLink;
 
 static TargetLink l_link = NO_LINK;
-static bool  l_quiet   = false;
+static int   l_quiet     = -1;
+static int   l_quiet_ctr = 0;
 static FILE *l_outFile = (FILE *)0;
 static FILE *l_savFile = (FILE *)0;
 static FILE *l_matFile = (FILE *)0;
@@ -79,8 +86,8 @@ static int   l_tcpPort  = 6601;
 static int   l_baudRate = 115200;
 
 static char const l_introStr[] =
-    "QSPY host application %s\n"
-    "Copyright (c) Quantum Leaps, state-machine.com\n"
+    "QSPY host utility %s\n"
+    "Copyright (c) 2005-2017 Quantum Leaps (state-machine.com)\n"
     "Time Stamp: %s\n";
 
 static char const l_helpStr[] =
@@ -90,9 +97,9 @@ static char const l_helpStr[] =
     "                  (key)\n"
     "---------------------------------------------------------------\n"
     "-h                        help (show this message)\n"
-    "-q                (key-q) quiet mode (no QS data output)\n"
+    "-q[num]           (key-q) quiet mode (no QS data output)\n"
     "-u[UDP_port]      7701    UDP socket with optional port\n"
-    "-v<QS_version>    5.5     compatibility with QS version\n"
+    "-v<QS_version>    5.9     compatibility with QS version\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
@@ -124,7 +131,7 @@ static char const l_kbdHelpStr[] =
     "Keyboard shortcuts:\n"
     "KEY(s)            ACTION\n"
     "-----------------------------------------------------------------\n"
-    "<Esc>             Exit QSPY\n"
+    "<Esc>/x/X         Exit QSPY\n"
     "  h               display keyboard help and QSPY status\n"
     "  c               clear the screen\n"
     "  q               toggle quiet mode (no Target data from QS)\n"
@@ -200,7 +207,7 @@ int main(int argc, char *argv[]) {
     }
     /* cleanup .............................................................*/
     cleanup();
-    printf("\nDone.\n");
+    printf("\nQSPY Done\n");
     return status;
 }
 
@@ -226,7 +233,7 @@ static void cleanup(void) {
 
 /*..........................................................................*/
 void Q_onAssert(char const * const file, int line) {
-    fprintf(stderr, "********** ASSERTION failed in file %s line %d\n",
+    printf("   <ERROR> QSPY ASSERTION failed in File=%s,Line=%d\n",
                     file, line);
     cleanup();
     exit(-1);
@@ -234,24 +241,40 @@ void Q_onAssert(char const * const file, int line) {
 
 /*..........................................................................*/
 void QSPY_onPrintLn(void) {
-    if (!l_quiet) {
+    if ((l_quiet < 0) || (QSPY_output.rec == 0)) {
         fputs(QSPY_line, stdout);
         fputc('\n', stdout);
     }
+    else if (l_quiet > 0) {
+        if (l_quiet_ctr == 0U) {
+            l_quiet_ctr = l_quiet;
+            if (l_quiet_ctr < 99) {
+                fputc('\n', stdout);
+                fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+                fputc('\n', stdout);
+            }
+        }
+        else {
+            fputc('.', stdout);
+        }
+        --l_quiet_ctr;
+    }
     if (l_outFile != (FILE *)0) {
-        fputs(QSPY_line, l_outFile);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
         fputc('\n', l_outFile);
     }
+    if (QSPY_output.rec != 0) {
+        BE_sendLine();
+    }
 }
-
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hqu::v:osmgc:b:t::p:f:d:T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:osmgc:b:t::p:f:d:T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
-    uint16_t version     = 550U;
+    uint16_t version     = 590U;
     uint8_t tstampSize   = 4U;
     uint8_t objPtrSize   = 4U;
     uint8_t funPtrSize   = 4U;
@@ -261,7 +284,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     uint8_t poolCtrSize  = 2U;
     uint8_t poolBlkSize  = 2U;
     uint8_t tevtCtrSize  = 2U;
-    int   optChar;
+    int     optChar;
 
     STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
     STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
@@ -282,7 +305,12 @@ static QSpyStatus configure(int argc, char *argv[]) {
     while ((optChar = getopt(argc, argv, getoptStr)) != -1) {
         switch (optChar) {
             case 'q': { /* quiet mode */
-                l_quiet = true;
+                if (optarg != NULL) { /* is optional argument provided? */
+                    l_quiet = (int)strtoul(optarg, NULL, 10);
+                }
+                else { /* apply the default */
+                    l_quiet = 0;
+                }
                 break;
             }
             case 'u': { /* UDP control port */
@@ -489,28 +517,28 @@ static QSpyStatus configure(int argc, char *argv[]) {
             fprintf(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
         }
         else {
-            fprintf(stderr, "Cannot open the file %s\n", l_outFileName);
+            printf("   <USER-> Cannot open File=%s\n", l_outFileName);
             return QSPY_ERROR;
         }
     }
     if (l_savFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_savFile, l_savFileName, "wb"); /* open for writing binary */
         if (l_savFile == (FILE *)0) {
-            fprintf(stderr, "Cannot open the file %s\n", l_savFileName);
+            printf("   <USER-> Cannot open File=%s\n", l_savFileName);
             return QSPY_ERROR;
         }
     }
     if (l_matFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_matFile, l_matFileName, "w");
         if (l_matFile == (FILE *)0) {
-            fprintf(stderr, "Cannot open the file %s\n", l_matFileName);
+            printf("   <USER-> Cannot open File=%s\n", l_matFileName);
             return QSPY_ERROR;
         }
     }
     if (l_mscFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_mscFile, l_mscFileName, "w");
         if (l_mscFile == (FILE *)0) {
-            fprintf(stderr, "Cannot open the file %s\n", l_mscFileName);
+            printf("   <USER-> Cannot open File=%s\n", l_mscFileName);
             return QSPY_ERROR;
         }
     }
@@ -529,17 +557,18 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 (l_bePort != 0)
                     ? &BE_parseRecFromTarget
                     : (QSPY_CustParseFun)0);
+    QSPY_configTxReset(&QSPY_txReset);
 
     /* NOTE: dictionaries must be read AFTER configuring QSPY */
     if (l_dicFileName[0] != '\0') {
         FOPEN_S(l_dicFile, l_dicFileName, "r");
         if (l_dicFile == (FILE *)0) {
-            fprintf(stderr, "Cannot open the file %s\n", l_dicFileName);
+            printf("   <USER-> Cannot open File=%s\n", l_dicFileName);
             return QSPY_ERROR;
         }
         if (QSPY_readDict(l_dicFile) != QSPY_ERROR) {
-            printf(
-                "           Dictionaries read from %s\n", l_dicFileName);
+            printf("   <USER-> Dictionaries read from File=%s\n",
+                   l_dicFileName);
         }
         fclose(l_dicFile);
     }
@@ -551,15 +580,22 @@ bool QSPY_command(uint8_t cmdId) {
     size_t nBytes;
     char const *str;
     bool isRunning = true;
+    QSpyStatus stat;
 
     switch (cmdId) {
         default:
-            printf("Unrecognized keyboard command %c", (char)cmdId);
+            printf("   <USER-> Unrecognized keyboard Command=%c",
+                   (char)cmdId);
             /* intentionally fall-through... */
 
         case 'h':  /* keyboard help */
             printf("\n%s\n", l_kbdHelpStr);
-            printf("Quiet Mode    [q]: %s\n", l_quiet ? "ON" : "OFF");
+            if (l_quiet < 0) {
+                printf("Quiet Mode    [q]: OFF\n");
+            }
+            else {
+                printf("Quiet Mode    [q]: %d\n", l_quiet);
+            }
             printf("Screen Output [o]: %s\n", l_outFileName);
             printf("Binary Output [s]: %s\n", l_savFileName);
             printf("Matlab Output [m]: %s\n", l_matFileName);
@@ -569,32 +605,39 @@ bool QSPY_command(uint8_t cmdId) {
 
         case 'r':  /* send RESET command to the Target */
             nBytes = QSPY_encodeResetCmd(l_buf, sizeof(l_buf));
-            (void)(*PAL_vtbl.send2Target)(l_buf, nBytes);
+            stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
+            printf("   <USER-> Sending RESET to the Target Stat=%s\n",
+                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 't':  /* send TICK[0] command to the Target */
             nBytes = QSPY_encodeTickCmd(l_buf, sizeof(l_buf), 0U);
-            (void)(*PAL_vtbl.send2Target)(l_buf, nBytes);
+            stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
+            printf("   <USER-> Sending TICK-0 to the Target Stat=%s\n",
+                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'u':  /* send TICK[1] command to the Target */
             nBytes = QSPY_encodeTickCmd(l_buf, sizeof(l_buf), 1U);
-            (void)(*PAL_vtbl.send2Target)(l_buf, nBytes);
+            stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
+            printf("   <USER-> Sending TICK-1 to the Target Stat=%s\n",
+                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'i':  /* send INFO request command to the Target */
             nBytes = QSPY_encodeInfoCmd(l_buf, sizeof(l_buf));
-            (void)(*PAL_vtbl.send2Target)(l_buf, nBytes);
+            stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
+            printf("   <USER-> Sending INFO to the Target Stat=%s\n",
+                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'd':  /* save Dictionaries to a file */
             str = QSPY_writeDict();
             if (str != (char *)0) {
-                printf("********** Dictionaries written to: %s\n",
-                       str);
+                printf("   <USER-> Dictionaries written to File=%s\n", str);
             }
             else {
-                printf("********* Dictionaries NOT saved\n");
+                printf("   <USER-> Dictionaries NOT saved\n");
             }
             break;
 
@@ -603,8 +646,15 @@ bool QSPY_command(uint8_t cmdId) {
             break;
 
         case 'q':  /* quiet */
-            l_quiet = !l_quiet;
-            printf("Quiet Mode    [q]: %s\n", l_quiet ? "ON" : "OFF");
+            if (l_quiet < 0) {
+                l_quiet = l_quiet_ctr;
+                printf("   <USER-> Quiet Mode [q] Mode=%d\n", l_quiet);
+            }
+            else {
+                l_quiet_ctr = l_quiet;
+                l_quiet = -1;
+                printf("   <USER-> Quiet Mode [q] Mode=OFF\n");
+            }
             break;
 
         case 'o':  /* output file open/close toggle */
@@ -622,13 +672,12 @@ bool QSPY_command(uint8_t cmdId) {
                             l_tstampStr);
                 }
                 else {
-                    fprintf(stderr,
-                         "Cannot open the file %s for writing\n",
-                         l_outFileName);
+                    printf("   <USER-> Cannot open File=%s for writing\n",
+                           l_outFileName);
                     STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
                 }
             }
-            printf("Screen Output [o]: %s\n", l_outFileName);
+            printf("   <USER-> Screen Output [o] File=%s\n", l_outFileName);
             break;
 
         case 'b':
@@ -643,16 +692,16 @@ bool QSPY_command(uint8_t cmdId) {
                            "qspy%s.bin", tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
                 if (l_savFile == (FILE *)0) {
-                    fprintf(stderr,
-                         "Cannot open the file %s for writing\n",
-                         l_savFileName);
+                    printf("   <USER-> Cannot open File=%s for writing\n",
+                           l_savFileName);
                     STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
                 }
             }
-            printf("Binary Output [s]: %s\n", l_savFileName);
+            printf("   <USER-> Binary Output [s] File=%s\n",
+                   l_savFileName);
             break;
 
-        case 'm':  /* save Matlab file open/close toggle*/
+        case 'm':  /* save Matlab file open/close toggle */
             if (l_matFile != (FILE *)0) {
                 QSPY_configMatFile((void *)0); /* close the Matlab file */
                 l_matFile = (FILE *)0;
@@ -666,13 +715,13 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMatFile(l_matFile);
                 }
                 else {
-                    fprintf(stderr,
-                         "Cannot open the file %s for writing\n",
-                         l_matFileName);
+                    printf("   <USER-> Cannot open File=%s for writing\n",
+                           l_matFileName);
                     STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
                 }
             }
-            printf("Matlab Output [m]: %s\n", l_matFileName);
+            printf("   <USER-> Matlab Output [m] File=%s\n",
+                   l_matFileName);
             break;
 
         case 'g':  /* save MscGen file open/close toggle*/
@@ -689,21 +738,31 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMscFile(l_mscFile);
                 }
                 else {
-                    fprintf(stderr,
-                         "Cannot open the file %s for writing\n",
-                         l_mscFileName);
+                    printf("   <USER-> Cannot open File=%s for writing\n",
+                           l_mscFileName);
                     STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
                 }
             }
-            printf("MscGen Output [g]: %s\n", l_mscFileName);
+            printf("   <USER-> MscGen Output [g] File=%s\n",
+                   l_mscFileName);
             break;
 
+        case 'x':
+        case 'X':
         case '\033': /* Esc */
             isRunning = false; /* terminate the event loop */
             break;
     }
 
     return isRunning;
+}
+/*..........................................................................*/
+void QSPY_printInfo(void) {
+    QSPY_output.rec = 0; /* don't send this info to the Front-End */
+    if (l_quiet > 0) {
+        fputc('\n', stdout);
+    }
+    QSPY_onPrintLn();
 }
 /*..........................................................................*/
 static char const *tstampStr(void) {

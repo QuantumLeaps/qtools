@@ -1,7 +1,11 @@
-/*****************************************************************************
-* Product: QSPY -- Back-End connection point for the external Front-Ends
-* Last updated for version 5.5.0
-* Last updated on  2015-07-20
+/**
+* @file
+* @brief Back-End connection point for the external Front-Ends
+* @ingroup qpspy
+* @cond
+******************************************************************************
+* Last updated for version 5.9.0
+* Last updated on  2017-04-21
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -28,9 +32,11 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http:://www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
-*****************************************************************************/
+******************************************************************************
+* @endcond
+*/
 #ifndef be_h
 #define be_h
 
@@ -40,13 +46,13 @@ extern "C" {
 
 void BE_parse(unsigned char *buf, size_t nBytes);
 void BE_parseRecFromFE    (QSpyRecord * const qrec);
-int  BE_parseRecFromTarget(QSpyRecord * const qrec); /* see QSPY_CustParseFun */
+int  BE_parseRecFromTarget(QSpyRecord * const qrec); /*see QSPY_CustParseFun*/
 
 void BE_onStartup(void);
 void BE_onCleanup(void);
 
-void BE_initPkt(int pktId); /* initialize a packet to the Front-End */
-void BE_sendPkt(void);      /* send the packet to the Front-End */
+void BE_sendPkt(int pktId); /* send the packet to the Front-End */
+void BE_sendLine(void);     /* send the QSPY parsed line to the Front-End */
 
 void BE_putU8(uint8_t d);
 void BE_putU16(uint16_t d);

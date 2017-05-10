@@ -1,0 +1,162 @@
+/*! @page qs QS Target Component
+
+@tableofcontents
+
+<p>The target-resident component of the QP/Spy&trade; tracing system is called **QS**. The purpose of QS is to provide facilities for **instrumenting** the target code so that it will produce interesting real-time trace from code execution. In this sense it is similar to peppering the code with `printf` statements. However, the main difference between QS and `printf` is *where* the data **formatting** and **sending** is done. When you use `printf`s, the data formatting and sending occur in the time-critical paths through your embedded code. In contrast, the QS target-resident component inserts raw binary data into the QS ring buffer, so all the time-consuming formatting is removed from the Target system and is done *after* the fact in the Host. Additionally, in QS, data logging and sending to the Host are separated so that the target system can typically perform the transmission outside of the time-critical path, for example in the *idle processing* of the target CPU.
+</p>
+
+The QS target component consists of the QS ring buffer, the QS filters, as well as the instrumentation added to the QP framework and the application, as shown in figure below. Additionally, the QS target component contains the receive-channel (QS-RX) with its own receive buffer, which can receive data from the QSPY host component.
+
+@anchor fig_struct
+@image html qspy5.gif "Structure of the QP/Spy software tracing system"
+
+A nice byproduct of removing the data formatting from the Target is a natural **data compression**. For example, formatted output of a single byte takes two hexadecimal digits(and 3 decimal digits), so avoiding the formatting gives at least a factor of two in data density. On top of this natural compression, QS uses such techniques as data dictionaries, and compressed format information, which in practice result in compression factor of 4-5 compared to the expanded human-readable format.
+
+@note
+The QP/C and QP/C++ frameworks already contain the QS instrumentation (the so called @ref qs_pre "predefined QS records"). This means that a lot of information from the execution of the target system is produced even without adding any instrumentation to the application-level code. Additionally, you can add your own @ref qs_app "application-specific" trace records, which the QSPY host-resident component can parse without any additional work on your part.
+
+@attention
+The QS instrumentation is designed such that it is active only in the *Spy build configuration* (when the external macro #Q_SPY is defined) and is **inactive** otherwise. This means that you don't need to comment-out or remove the instrumentation in the Debug or Release build configurations, but rather you can **leave** the instrumentation in your code for its future development, testing, profiling and maintenance.
+
+
+-------------------------------------------------------------------------------
+@section qs_filters QS Filters
+Obviously, QS cannot eliminate completely the overhead of software tracing. But with the fine-granularity <strong>filters</strong> available in QS, you can make this impact as small as necessary. For greatest flexibility, QS uses two complementary levels of filters: **Global Filters** and **Local Filters** described below. Combination of such two complementary filtering criteria results in very selective tracing capabilities.
+
+@note
+The Global and Local filters are initialized in the Target. Subsequently, if the QS receive channel is enabled (QS-RX), the filters can be changed from the @ref qutest "QUTest" or @ref qspyview "QSpyView" front-ends at **runtime**.
+
+
+<div class="separate"></div>
+@subsection qs_global Global Filters
+The Global Filters are based on trace record type. This filter allows you to disable or enable each individual trace record type, such as entry to a state, exit from a state, state transition, event posting, event publishing, time event expiration, and over 60 other standard and application-specific event types (see ::QSpyRecords). This level works globally for all state machines and event publications in the entire system.
+
+@note
+The QS global filter cannot disable a special class of QS records, which are called **non-maskable**. These non-maskable records include: @ref qs_dict "dictionary records", target-information records, QS-RX status responses, and the Target assertion record.
+
+
+<div class="separate"></div>
+@subsection qs_local Local Filters
+The Local Filters are component-specific. You can setup a filter to trace only a specific state machine object, only a specific active object, only a specific time event, etc. The following table summarizes the specific objects you can filter on:
+
+<center>
+Object@n Type | Example | Applies to QS Records
+--------------|---------|----------------------
+State@n Machine | QS_FILTER_SM_OBJ(&l_qhsmTst); | #QS_QEP_STATE_ENTRY,@n #QS_QEP_STATE_EXIT,@n #QS_QEP_STATE_INIT,@n #QS_QEP_INIT_TRAN,@n #QS_QEP_INTERN_TRAN,@n #QS_QEP_TRAN,@n #QS_QEP_IGNORED,@n #QS_QEP_TRAN_HIST,@n #QS_QEP_TRAN_EP,@n #QS_QEP_TRAN_XP
+Active@n Object | QS_FILTER_AO_OBJ(&l_philo[3]); | #QS_QF_ACTIVE_ADD,@n #QS_QF_ACTIVE_REMOVE,@n #QS_QF_ACTIVE_SUBSCRIBE,@n #QS_QF_ACTIVE_UNSUBSCRIBE,@n #QS_QF_ACTIVE_POST_FIFO, @n #QS_QF_ACTIVE_POST_LIFO,@n #QS_QF_ACTIVE_GET, @n #QS_QF_ACTIVE_GET_LAST
+Memory@n Pool | QS_FILTER_MP_OBJ(l_medPoolSto); | #QS_QF_MPOOL_INIT,@n #QS_QF_MPOOL_GET,@n #QS_QF_MPOOL_PUT
+Event@n Queue | QS_FILTER_EQ_OBJ(l_philQueueSto[0]); | #QS_QF_EQUEUE_INIT,@n #QS_QF_EQUEUE_POST_FIFO,@n #QS_QF_EQUEUE_POST_LIFO,@n #QS_QF_EQUEUE_GET,@n #QS_QF_EQUEUE_GET_LAST
+Time@n Event  | QS_FILTER_TE_OBJ(&l_philo[0] timeEvt); | #QS_QF_TICK,@n #QS_QF_TIMEEVT_ARM,@n #QS_QF_TIMEEVT_AUTO_DISARM,@n #QS_QF_TIMEEVT_DISARM_ATTEMPT,@n #QS_QF_TIMEEVT_DISARM,@n #QS_QF_TIMEEVT_REARM,@n #QS_QF_TIMEEVT_POST
+Generic@n Application@n Object | QS_FILTER_AP_OBJ(&myAppObj); | Application-specific records@n starting with #QS_USER
+</center>
+
+@note
+Local filters can be disabled by setting them to `NULL`. For example, if you wish to receive data from **all** state machine objects, you should set the State Machine local filter to NULL ( QS_FILTER_SM_OBJ((void*)0 ).
+
+
+-------------------------------------------------------------------------------
+@section qs_curr Current Objects
+QS maintains a set of **Current Objects**, to which it applies commands received through the QS-RX channel. For example, the event-post operation is applied to the current Active Object, while the peek/poke/fill operations are applied to the current Application Object. QS maintains the following Current Objects:
+- State Machine object
+- Active Object object
+- Memory Pool object
+- Event Queue object
+- Time Event object
+
+@note
+Current Objects can be set only by sending commands to the @ref qs_rx "QS-RX receive channel".
+
+
+-------------------------------------------------------------------------------
+@section qs_dict QS Dictionaries
+By the time you compile and load your application image to the Target, the symbolic names of various objects, function names, and event signal names are stripped from the code. Therefore, if you want to have the symbolic information available to the @ref qspy "QSPY host-resident component", you need to supply it somehow to the software tracing system.
+
+The QS Target-resident component provides special **dictionary trace records** designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records:
+
+- object dictionary ( QS_OBJ_DICTIONARY() )
+- function dictionary  ( QS_FUN_DICTIONARY() )
+- signal dictionary  ( QS_SIG_DICTIONARY() )
+- user dictionary  ( QS_USR_DICTIONARY() )
+
+The dictionary trace records are typically generated during the system initialization and this is the only time when they are sent to the QSPY host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
+
+@code
+void QS_onInitTests(void) {
+    /* global filter */
+    QS_FILTER_ON(QS_ALL_RECORDS); /* enable all maskable filters */
+
+    /* dictionaries... */
+    QS_OBJ_DICTIONARY(buffer);
+    QS_FUN_DICTIONARY(&myFun);
+
+    QS_USR_DICTIONARY(ON_TEST_SETUP);
+    QS_USR_DICTIONARY(ON_TEST_TEARDOWN);
+    QS_USR_DICTIONARY(COMMAND_X);
+}
+@endcode
+
+@note
+The dictionary trace records are not absolutely required to generate the human-readable output, in the same way as the symbolic information in the object files is not absolutely required to debug your code. However, in both cases, the availability of the symbolic information greatly improves the productivity in working with the software trace or the debugger.
+
+
+-------------------------------------------------------------------------------
+@section qs_tstamp Target Time-Stamps
+Most QS trace records produced by QS are **time-stamped** with high-resolution. QS provides an efficient API for obtaining platform-specific timestamp information. Given the right timer-counter resource in you Target system, you can provide QS with as precise timestamp information as required. The size of the timestamp is configurable to be 1, 2, or 4 bytes.
+
+@note
+The QS **timestamps** are used differently in the @ref qutest "QUTest&trade;" unit testing. In that case the timestamps are used to count the QS records produced.
+
+
+-------------------------------------------------------------------------------
+@section qs_pre Predefined QS Trace Records
+
+
+-------------------------------------------------------------------------------
+@section qs_app Application-Specific QS Trace Records
+The application-specific QS records allow you to generate tracing information from the application-level code. You can think of the application-specific records as an
+equivalent to `printf()` but with much less overhead. The following code snippet shows an example of an application-specific QS record.
+
+@code
+QS_BEGIN(MY_QS_RECORD, myObjectPointer) /* trace record begin */
+    QS_STR("Hello"); /* string data element */
+    QS_U8(3, n); /* uint8_t data, 3-decimal digits format */
+    . . . /* QS data */
+    QS_MEM(buf, sizeof(buf)); /* memory block of a given size */
+QS_END() /* trace record end */
+@endcode
+
+In most cases, the application-specific records are enclosed with the QS_BEGIN() / QS_END() pair of macros. This pair of macros disables interrupts at the beginning and
+enables at the end of each record. Occasionally you would want to generate trace data from within already established critical sections or ISRs. In such rare occasions, you would use the macros QS_BEGIN_NOCRIT() / QS_END_NOCRIT() to avoid nesting of critical sections.
+
+The record-begin macro QS_BEGIN() takes two arguments. The first argument (e.g., `MY_QS_RECORD`) is the enumerated record type, which is used in the @ref qs_global "global filter" and is part of the each record header.
+
+@attention
+The application-specific record types cannot start from zero but rather must be offset by at least the value #QS_USER to avoid overlap with the predefined QS records already instrumented into the QP components. The second argument (e.g., `myObjectPointer`) is used for the local filter, which allows you to selectively log only specific application-level objects. The code snippet shows an example of an application-specific trace record, including the use of the second parameter of the QS_BEGIN() macro.
+
+@note
+If you do not want to use the local filter for a given application-specific trace record, you can use NULL as the second argument to the macros QS_BEGIN() or QS_BEGIN_NOCRIT(). That way, the trace record will always be produced, regardless of the setting of the application-specific local filter.
+
+
+-------------------------------------------------------------------------------
+@section qs_rx QS-RX Receive-Channel
+The QS target component contains the receive-channel (QS-RX), which can receive data from the @ref qspy "QSPY" host application. The QS-RX channel provides the following services:
+- Remotely reset of the Target
+- Request target information (version, all sizes of objects, build time-stamp)
+- Execute a user-defined command inside the Target with arguments supplied from QSPY
+- Inject an arbitrary event to the Target (dispatch, post or publish)
+- Set @ref qs_global "global QS filters" inside the Target
+- Set @ref qs_local "local QS filters" inside the Target
+- Set @ref qs_curr "current QS object" inside the Target
+- Peek data inside the Target and send to QSPY
+- Poke data (supplied from QSPY) into the Target
+- Fill specified memory area in the Target with bit pattern supplied from QSPY
+- Execute clock tick inside the Target
+- Execute test setup inside the Target
+- Execute test teardown inside the Target
+- Store a @ref qutest_tp "Test Probe" supplied from QSPY inside the Target
+
+@note
+The QS-RX channel is the backbone for interacting with the target system and implemeting such features as @ref qutest "Unit Testing" and @ref qspyview "Visualization/Monitoring" of the target system.
+
+@next{qspy}
+*/

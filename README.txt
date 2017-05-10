@@ -46,9 +46,7 @@ Additionally, Qtools for Windows contains the following open-source,
 
 10. TCL/TK for Windows (version 8.4) with UDP sockets extension
 
-11. Find And Replace Text (FART) for Windows
-
-12. AVRDUDE for Windows (version 6.1)
+11. AVRDUDE for Windows (version 6.1)
 
 
 Additionally, Qtools for Windows contains the following PC-Lint option
@@ -160,9 +158,6 @@ The file and diff utilities source (source/fileutils-3.16-src.zip)
 has been taken from:
 http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
 
-The fart utility has been taken from:
-http://sourceforge.net/projects/fart-it/
-
 The AVRDUDE utility has been taken from:
 http://download.savannah.gnu.org/releases/avrdude/
 
@@ -172,5 +167,5 @@ http://www.mcternan.me.uk/mscgen/
 
 Contact information:
 ====================
-http://www.state-machine.com
+https://state-machine.com
 mailto:info@state-machine.com
