@@ -1,6 +1,6 @@
 About this Directory
 ====================
-This directory contains the Tcl/Tk scripts that implement the "quest"
+This directory contains the Tcl/Tk scripts that implement the "qutest"
 unit testing and "qspyview" GUI front-ends for the QSPY software tracing
 "back-end" utility.
 
@@ -76,4 +76,4 @@ More Information
 More information about the QS/QSPY software tracing system is available
 online at:
 
-https://state-machine.com/qspy/
+https://state-machine.com/qtools/qspy.html

@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-05-01
+* Last updated on  2017-05-12
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1153,6 +1153,12 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
                   uint32_t param2, uint32_t param3);
 
 #ifdef Q_UTEST
+    /*! callback to reset the tests (called once for all tests) */
+    void QS_onResetTests(void);
+
+    /*! callback to run the tests (called once for all tests) */
+    void QS_onRunTests(void);
+
     /*! callback to setup a unit test inside the Target */
     void QS_onTestSetup(void);
 
@@ -1161,12 +1167,6 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
 
     /*! callback to "massage" the test event, if neccessary */
     void QS_onTestEvt(QEvt *e);
-
-    /*! callback to initialize tests (called once for all tests) */
-    void QS_onInitTests(void);
-
-    /*! callback to run unit tests (called once for all tests) */
-    void QS_onRunTests(void);
 
     /*! QS internal function to get the Test-Probe for a given API */
     uint32_t QS_getTestProbe_(void (* const api)(void));
@@ -1182,15 +1182,11 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
     /*! QS macro to apply a Test-Probe */
     #define QS_TEST_PROBE_ID(id_, code_) \
         if (qs_tp_ == (uint32_t)(id_)) { code_ }
-
 #else
     /* dummy definitions when not building for QUTEST */
     #define QS_TEST_PROBE_DEF(fun_)
     #define QS_TEST_PROBE(code_)
     #define QS_TEST_PROBE_ID(id_, code_)
-
 #endif /* Q_UTEST */
 
 #endif /* qs_h  */
-
-

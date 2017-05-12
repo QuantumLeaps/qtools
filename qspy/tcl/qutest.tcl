@@ -14,7 +14,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
 # Last updated for version 5.9.0
-# Last updated on  2017-04-10
+# Last updated on  2017-05-12
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -60,42 +60,8 @@ source $HOME/qspy.tcl
 set VERSION 5.9.0
 
 namespace eval ::qutest {
-    ## safe interpreter to run user tests
-    variable theTestRunner [interp create -safe]
-
-    # test DSL ---------------------------------------------------------------
-    # The following set of aliases added to the test-runner forms a small
-    # Domain Specific Language (DSL) for writing QUTEST tests
-    #
-    $theTestRunner alias test        ::qutest::test
-    $theTestRunner alias end         ::qutest::end
-    $theTestRunner alias expect      ::qutest::expect
-    $theTestRunner alias command     ::qutest::command
-    $theTestRunner alias peek        ::qutest::peek
-    $theTestRunner alias poke        ::qutest::poke
-    $theTestRunner alias fill        ::qutest::fill
-    $theTestRunner alias glb_filter  ::qutest::glb_filter
-    $theTestRunner alias loc_filter  ::qutest::loc_filter
-    $theTestRunner alias current_obj ::qutest::current_obj
-    $theTestRunner alias probe       ::qutest::probe
-    $theTestRunner alias tick        ::qutest::tick
-    $theTestRunner alias dispatch    ::qutest::dispatch
-    $theTestRunner alias init        ::qutest::init
-    $theTestRunner alias puts        puts
-
+    variable theStartMs 0
     variable TIMEOUT_MS 500 ;#< timeout [ms] for waiting on the QSPY response
-
-    variable theGroupCount 0
-    variable theTestCount  0
-    variable theSkipCount  0
-    variable theErrCount   0
-    variable theNextMatch  ""
-    variable theTestSkip   0
-    variable theEvtLoop    1
-    variable theAfterId    0
-    variable theCurrState  ""
-    variable theStartMs    0
-    variable theTestMs     0
 
     #.........................................................................
     ## @brief start a new test
@@ -108,7 +74,6 @@ namespace eval ::qutest {
     proc test {name args} {
         variable theTestCount
         variable theSkipCount
-        variable theTimestamp
         variable theErrCount
         variable theTestRunner
         variable theCurrState
@@ -138,34 +103,23 @@ namespace eval ::qutest {
             PRE -
             TEST {
                 if {$theCurrState != {PRE}} { ;# any tests executed so far?
-                    variable ::qspy::theHaveTarget
-                    if {$::qspy::theHaveTarget} {
-                        variable ::qspy::QS_RX
-                        ::qspy::sendPkt \
-                            [binary format c $::qspy::QS_RX(TEST_TEARDOWN)]
-                        expect "           Trg-Ack  QS_RX_TEST_TEARDOWN"
-                    }
-                    call_teardown
+                    call_on_teardown
                     test_passed
                 }
 
                 incr theTestCount
-                set theTimestamp 0
                 if {$skip} {
                     puts "$name : SKIPPED"
                     incr theSkipCount
                     tran SKIP
                 } elseif {$reset} {
-                    if [reset] {  ;# NO timeout?
-                        tran TEST
-                    } else {  ;# timeout
+                    tran TEST  ;# to execute 'reset' in the TEST state
+                    if {[reset] == 0} {  ;# timeout?
                         variable theNextMatch
-
                         puts -nonewline "$name : "
                         test_failed
                         puts "Expected: \"$theNextMatch\""
                         puts "Timed-out"
-
                         tran FAIL
                     }
                 }
@@ -178,8 +132,6 @@ namespace eval ::qutest {
                 }
 
                 incr theTestCount
-                set theTimestamp 0
-
                 if {$skip} {
                     tran SKIP
                 } else {
@@ -188,15 +140,12 @@ namespace eval ::qutest {
                     }
 
                     if {$reset} {
-                        if [reset] {  ;# NO timeout?
-                            tran TEST
-                        } else {  ;# timeout
+                        tran TEST  ;# to execute 'reset' in the TEST state
+                        if {[reset] == 0} {  ;# timeout?
                             variable theNextMatch
-
                             test_failed
                             puts "Expected: \"$theNextMatch\""
                             puts "Timed-out"
-
                             tran FAIL
                         }
                     }
@@ -219,10 +168,7 @@ namespace eval ::qutest {
 
             variable ::qspy::theHaveTarget
             if {$::qspy::theHaveTarget} {
-                variable ::qspy::QS_RX
-                ::qspy::sendPkt [binary format c $::qspy::QS_RX(TEST_SETUP)]
-                expect "           Trg-Ack  QS_RX_TEST_SETUP"
-                call_setup
+                call_on_setup
             } else {
                 test_failed
                 if {$reset == 0} {
@@ -238,8 +184,6 @@ namespace eval ::qutest {
     ## @brief specifies the end of tests
     proc end {} {
         variable theTestCount
-        variable theTestRunner
-
         variable theCurrState
         switch $theCurrState {
             PRE {
@@ -249,14 +193,7 @@ namespace eval ::qutest {
                 # did the timeout occur? (all expected QSPY output arrived?)
                 if {[wait4input] == 0} {
                     if {$theTestCount > 0} { ;# any tests executed?
-                        variable ::qspy::theHaveTarget
-                        if {$::qspy::theHaveTarget} {
-                            variable ::qspy::QS_RX
-                            ::qspy::sendPkt \
-                               [binary format c $::qspy::QS_RX(TEST_TEARDOWN)]
-                            expect "           Trg-Ack  QS_RX_TEST_TEARDOWN"
-                        }
-                        call_teardown
+                        call_on_teardown
                         test_passed
                     }
                 }
@@ -764,11 +701,45 @@ namespace eval ::qutest {
     #.........................................................................
     ## @brief internal proc to run a test-group specified in a given test file
     proc run {test_file} {
+        ## safe interpreter to run user tests
+        variable theTestRunner [interp create -safe]
+
+        # test DSL ---------------------------------------------------------------
+        # The following set of aliases added to the test-runner forms a small
+        # Domain Specific Language (DSL) for writing QUTEST tests
+        #
+        $theTestRunner alias test        ::qutest::test
+        $theTestRunner alias end         ::qutest::end
+        $theTestRunner alias expect      ::qutest::expect
+        $theTestRunner alias command     ::qutest::command
+        $theTestRunner alias peek        ::qutest::peek
+        $theTestRunner alias poke        ::qutest::poke
+        $theTestRunner alias fill        ::qutest::fill
+        $theTestRunner alias glb_filter  ::qutest::glb_filter
+        $theTestRunner alias loc_filter  ::qutest::loc_filter
+        $theTestRunner alias current_obj ::qutest::current_obj
+        $theTestRunner alias probe       ::qutest::probe
+        $theTestRunner alias tick        ::qutest::tick
+        $theTestRunner alias dispatch    ::qutest::dispatch
+        $theTestRunner alias init        ::qutest::init
+        $theTestRunner alias puts        puts
+
+        variable theGroupCount 0
+        variable theTestCount  0
+        variable theSkipCount  0
+        variable theErrCount   0
+        variable theNextMatch  ""
+        variable theTestSkip   0
+        variable theEvtLoop    1
+        variable theAfterId    0
+        variable theCurrState  ""
+        variable theTestMs     0
+
         set fid [open $test_file r]
         set test_script [read $fid]
         close $fid
 
-        variable theTimestamp  0
+        variable theTimestamp 0
         variable theGroupCount
         incr theGroupCount
         tran PRE
@@ -776,7 +747,10 @@ namespace eval ::qutest {
         puts "----------------------------------------------"
         puts "Group: $test_file"
         variable theTestRunner
+
         $theTestRunner eval $test_script
+
+        interp delete $theTestRunner
     }
     #.........................................................................
     ## @brief internal proc to cleanup in case of an error
@@ -850,8 +824,8 @@ namespace eval ::qutest {
             exit -3
         }
 
-        variable theStartMs    [clock clicks -milliseconds]
-        variable theTestMs     $theStartMs
+        variable theStartMs [clock clicks -milliseconds]
+        variable theTestMs  $theStartMs
     }
     #.........................................................................
     ## @brief internal proc for stopping QUTEST and disconnecting from QSPY
@@ -931,6 +905,7 @@ namespace eval ::qutest {
 
         if {$::qspy::theHaveTarget} {  ;# NO timeout?
             after cancel $id
+            call_on_reset
             return 1 ;# reset done
         } else {
             return 0 ;# reset NOT done (timeout)
@@ -960,15 +935,17 @@ namespace eval ::qutest {
         incr theErrCount
     }
     #.........................................................................
-    ## @brief internal proc for calling the 'setup' proc (if defined)
-    proc call_setup {} {
+    ## @brief internal proc for calling the 'on_reset' proc (if defined)
+    proc call_on_reset {} {
+        variable theTimestamp 0
+
         variable theTestRunner
-        ;# try to execute the setup proc
-        if {[catch {$theTestRunner eval {setup}} msg]} {
-            if [string equal $msg {invalid command name "setup"}] {
-                ;# "setup" not defined, not a problem
+        ;# try to execute the on_reset proc
+        if {[catch {$theTestRunner eval {on_reset}} msg]} {
+            if [string equal $msg {invalid command name "on_reset"}] {
+                ;# "on_reset" not defined, not a problem
             } else {
-                ;# "setup" defined, but has errors
+                ;# "on_reset" defined, but has errors
                 variable theErrCount
                 incr theErrCount
                 cleanup
@@ -978,21 +955,53 @@ namespace eval ::qutest {
         }
     }
     #.........................................................................
-    ## @brief internal proc for calling the 'teardown' proc (if defined)
-    proc call_teardown {} {
+    ## @brief internal proc for calling the 'on_setup' proc (if defined)
+    proc call_on_setup {} {
+        variable theTimestamp 0
+
+        variable ::qspy::QS_RX
+        ::qspy::sendPkt [binary format c $::qspy::QS_RX(TEST_SETUP)]
+        expect "           Trg-Ack  QS_RX_TEST_SETUP"
+
         variable theTestRunner
-        ;# try to execute the teardown proc
-        if {[catch {$theTestRunner eval {teardown}} msg]} {
-            if [string equal $msg \
-               {invalid command name "teardown"}] {
-                ;# "teardown" not defined, not a problem
+        ;# try to execute the on_setup proc
+        if {[catch {$theTestRunner eval {on_setup}} msg]} {
+            if [string equal $msg {invalid command name "on_setup"}] {
+                ;# "on_setup" not defined, not a problem
             } else {
-                ;# "teardown" defined, but has errors
+                ;# "on_setup" defined, but has errors
                 variable theErrCount
                 incr theErrCount
                 cleanup
                 global errorInfo
                 error "The stack trace:\n$errorInfo"
+            }
+        }
+    }
+    #.........................................................................
+    ## @brief internal proc for calling the 'on_teardown' proc (if defined)
+    proc call_on_teardown {} {
+        variable ::qspy::theHaveTarget
+        if {$::qspy::theHaveTarget} {
+            variable ::qspy::QS_RX
+            ::qspy::sendPkt \
+                [binary format c $::qspy::QS_RX(TEST_TEARDOWN)]
+            expect "           Trg-Ack  QS_RX_TEST_TEARDOWN"
+
+            variable theTestRunner
+            ;# try to execute the on_teardown proc
+            if {[catch {$theTestRunner eval {on_teardown}} msg]} {
+                if [string equal $msg \
+                   {invalid command name "on_teardown"}] {
+                    ;# "on_teardown" not defined, not a problem
+                } else {
+                    ;# "on_teardown" defined, but has errors
+                    variable theErrCount
+                    incr theErrCount
+                    cleanup
+                    global errorInfo
+                    error "The stack trace:\n$errorInfo"
+                }
             }
         }
     }

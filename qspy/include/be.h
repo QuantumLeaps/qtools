@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-04-21
+* Last updated on  2017-05-12
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -56,7 +56,7 @@ void BE_sendLine(void);     /* send the QSPY parsed line to the Front-End */
 
 void BE_putU8(uint8_t d);
 void BE_putU16(uint16_t d);
-void BE_putU32(uint16_t d);
+void BE_putU32(uint32_t d);
 void BE_putStr(char const *str);
 void BE_putMem(uint8_t const *mem, uint8_t size);
 

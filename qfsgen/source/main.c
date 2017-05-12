@@ -254,9 +254,10 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
                     fvar);
     fprintf(l_file, "        %s,\x0A",      l_prevFile);
     fprintf(l_file, "        data_%s,\x0A", fvar);
-    fprintf(l_file, "        data_%s + %d,\x0A", fvar, strlen(fvar) + 2);
+    fprintf(l_file, "        data_%s + %d,\x0A",
+                    fvar, (int)(strlen(fvar) + 2));
     fprintf(l_file, "        sizeof(data_%s) - %d\x0A",
-                    fvar, strlen(fvar) + 2);
+                    fvar, (int)(strlen(fvar) + 2));
     fprintf(l_file, "    }\x0A};\x0A\x0A");
     sprintf(l_prevFile, "file_%s", fvar);
 }

@@ -48,6 +48,10 @@
 
 #include "qfsgen.h"
 
+/*..........................................................................*/
+char const dir_separator = '\\'; /* platform-dependent directory separator */
+
+/*..........................................................................*/
 void filesearch(char const *dname) {
     struct dirent *dent;
     DIR *dir;

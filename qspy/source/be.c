@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-04-21
+* Last updated on  2017-05-12
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -300,7 +300,7 @@ void BE_putU16(uint16_t d) {
     *l_pos++ = (uint8_t)d;
 }
 /*..........................................................................*/
-void BE_putU32(uint16_t d) {
+void BE_putU32(uint32_t d) {
     *l_pos++ = (uint8_t)d;  d >>= 8;
     *l_pos++ = (uint8_t)d;  d >>= 8;
     *l_pos++ = (uint8_t)d;  d >>= 8;
