@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-05-12
+* Last updated on  2017-05-15
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1104,7 +1104,7 @@ enum QSpyRxRecords {
     QS_RX_LOC_FILTER,     /*!< set local  filters in the Target */
     QS_RX_AO_FILTER,      /*!< set local AO filter in the Target */
     QS_RX_CURR_OBJ,       /*!< set the "current-object" in the Target */
-    QS_RX_RESERVED2,      /*!< reserved for future use */
+    QS_RX_TEST_CONTINUE,  /*!< continue a test after QS_TEST_WAIT() */
     QS_RX_RESERVED1,      /*!< reserved for future use */
     QS_RX_EVENT           /*!< inject an event to the Target */
 };
@@ -1122,6 +1122,7 @@ typedef struct {
     QSCtr     end;        /*!< offset of the end of the ring buffer */
     QSCtr     head;       /*!< offset to where next byte will be inserted */
     QSCtr     tail;       /*!< offset of where next byte will be extracted */
+    bool      inTestLoop; /*!< QUTest event loop is running */
 } QSrxPriv;
 
 extern QSrxPriv QS_rxPriv_;
@@ -1153,17 +1154,14 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
                   uint32_t param2, uint32_t param3);
 
 #ifdef Q_UTEST
-    /*! callback to reset the tests (called once for all tests) */
-    void QS_onResetTests(void);
-
-    /*! callback to run the tests (called once for all tests) */
-    void QS_onRunTests(void);
-
     /*! callback to setup a unit test inside the Target */
     void QS_onTestSetup(void);
 
     /*! callback to teardown after a unit test inside the Target */
     void QS_onTestTeardown(void);
+
+    /*! callback to run the test loop */
+    void QS_onTestLoop(void);
 
     /*! callback to "massage" the test event, if neccessary */
     void QS_onTestEvt(QEvt *e);
@@ -1182,11 +1180,16 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
     /*! QS macro to apply a Test-Probe */
     #define QS_TEST_PROBE_ID(id_, code_) \
         if (qs_tp_ == (uint32_t)(id_)) { code_ }
+
+    /*! QS macro to break the flow of control for a test event loop */
+    #define QS_TEST_WAIT()    (QS_onTestLoop())
+
 #else
     /* dummy definitions when not building for QUTEST */
     #define QS_TEST_PROBE_DEF(fun_)
     #define QS_TEST_PROBE(code_)
     #define QS_TEST_PROBE_ID(id_, code_)
+    #define QS_TEST_WAIT()  ((void)0)
 #endif /* Q_UTEST */
 
 #endif /* qs_h  */

@@ -10,7 +10,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
 # Last updated for version 5.9.0
-# Last updated on  2017-04-14
+# Last updated on  2017-05-14
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -118,7 +118,7 @@ namespace eval ::qspy {
         LOC_FILTER       11
         AO_FILTER        12
         CURR_OBJ         13
-        RESERVED2        14
+        CONTINUE         14
         RESERVED1        15
         EVENT            16
     }
@@ -423,4 +423,3 @@ proc ::qspy::rec64 {} {
         eval {recINFO}  ;# call the record procedure (don't catch errors)
     }
 }
-

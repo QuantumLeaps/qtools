@@ -8,13 +8,13 @@
 # user tests. This script also implements a console-based ("headless")
 # front-end to the QSPY back-and for running such user tests.
 # @usage
-# tclsh qutest.tcl [host_exe] [host] [port] [local_port]
+# tclsh qutest.tcl [test-files] [host_exe] [host] [port] [local_port]
 
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
 # Last updated for version 5.9.0
-# Last updated on  2017-05-12
+# Last updated on  2017-05-14
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -60,7 +60,6 @@ source $HOME/qspy.tcl
 set VERSION 5.9.0
 
 namespace eval ::qutest {
-    variable theStartMs 0
     variable TIMEOUT_MS 500 ;#< timeout [ms] for waiting on the QSPY response
 
     #.........................................................................
@@ -77,7 +76,8 @@ namespace eval ::qutest {
         variable theErrCount
         variable theTestRunner
         variable theCurrState
-        variable theTestMs [clock clicks -milliseconds]
+        variable theTestMs
+        set theTestMs [clock clicks -milliseconds]
 
         #puts "test $name"
 
@@ -112,15 +112,18 @@ namespace eval ::qutest {
                     puts "$name : SKIPPED"
                     incr theSkipCount
                     tran SKIP
-                } elseif {$reset} {
-                    tran TEST  ;# to execute 'reset' in the TEST state
-                    if {[reset] == 0} {  ;# timeout?
-                        variable theNextMatch
-                        puts -nonewline "$name : "
-                        test_failed
-                        puts "Expected: \"$theNextMatch\""
-                        puts "Timed-out"
-                        tran FAIL
+                } else {
+                    puts -nonewline "$name : "
+                    flush stdout
+                    if {$reset} {
+                        tran TEST  ;# to execute 'reset' in the TEST state
+                        if {[reset] == 0} {  ;# timeout?
+                            variable theNextMatch
+                            test_failed
+                            puts "Expected: \"$theNextMatch\""
+                            puts "Timed-out"
+                            tran FAIL
+                        }
                     }
                 }
             }
@@ -140,6 +143,8 @@ namespace eval ::qutest {
                     }
 
                     if {$reset} {
+                        puts -nonewline "$name : "
+                        flush stdout
                         tran TEST  ;# to execute 'reset' in the TEST state
                         if {[reset] == 0} {  ;# timeout?
                             variable theNextMatch
@@ -149,6 +154,8 @@ namespace eval ::qutest {
                             tran FAIL
                         }
                     }
+                    puts -nonewline "$name : "
+                    flush stdout
                     tran TEST
                 }
             }
@@ -163,9 +170,6 @@ namespace eval ::qutest {
 
         ;# (re)entering the TEST state?
         if {$theCurrState == "TEST"} {
-            puts -nonewline "$name : "
-            flush stdout
-
             variable ::qspy::theHaveTarget
             if {$::qspy::theHaveTarget} {
                 call_on_setup
@@ -611,6 +615,18 @@ namespace eval ::qutest {
         }
     }
     #.........................................................................
+    ## @brief sends the CONTINUE packet to the Target to continue a test
+    #
+    proc continue {} {
+        variable ::qspy::theHaveTarget
+        if {$::qspy::theHaveTarget} {
+            variable ::qspy::QS_RX
+            ::qspy::sendPkt \
+                [binary format c $::qspy::QS_RX(CONTINUE)]
+            expect "           Trg-Ack  QS_RX_TEST_CONTINUE"
+        }
+    }
+    #.........................................................................
     ## @brief trigger system clock tick in the Target
     proc tick {{rate 0}} {
         variable theCurrState
@@ -704,7 +720,7 @@ namespace eval ::qutest {
         ## safe interpreter to run user tests
         variable theTestRunner [interp create -safe]
 
-        # test DSL ---------------------------------------------------------------
+        # test DSL -----------------------------------------------------------
         # The following set of aliases added to the test-runner forms a small
         # Domain Specific Language (DSL) for writing QUTEST tests
         #
@@ -719,15 +735,12 @@ namespace eval ::qutest {
         $theTestRunner alias loc_filter  ::qutest::loc_filter
         $theTestRunner alias current_obj ::qutest::current_obj
         $theTestRunner alias probe       ::qutest::probe
+        $theTestRunner alias continue    ::qutest::continue
         $theTestRunner alias tick        ::qutest::tick
         $theTestRunner alias dispatch    ::qutest::dispatch
         $theTestRunner alias init        ::qutest::init
         $theTestRunner alias puts        puts
 
-        variable theGroupCount 0
-        variable theTestCount  0
-        variable theSkipCount  0
-        variable theErrCount   0
         variable theNextMatch  ""
         variable theTestSkip   0
         variable theEvtLoop    1
@@ -744,8 +757,9 @@ namespace eval ::qutest {
         incr theGroupCount
         tran PRE
 
+        variable theCurrGroup  $test_file
         puts "----------------------------------------------"
-        puts "Group: $test_file"
+        puts "Group: $theCurrGroup"
         variable theTestRunner
 
         $theTestRunner eval $test_script
@@ -781,17 +795,22 @@ namespace eval ::qutest {
         #
         global ::argc ::argv
         variable theHostExe ""
-        if {$::argc > 0} {  ;# argv(0) -- host_exe
-            set theHostExe [lindex $::argv 0]
+        if {$::argc > 0} {  ;# argv(0) -- test-files
+            set test_files [glob -nocomplain [lindex $::argv 0]]
+        } else {
+            set test_files [glob -nocomplain *.tcl] ;# default *.tcl
         }
-        if {$::argc > 1} {  ;# argv(1) -- host running QSPY
-            set qspy_host [lindex $::argv 1]
+        if {$::argc > 1} {  ;# argv(1) -- host_exe
+            set theHostExe [lindex $::argv 1]
         }
-        if {$::argc > 2} {  ;# argv(2) -- QSPY port
-            set qspy_port [lindex $::argv 2]
+        if {$::argc > 2} {  ;# argv(2) -- host running QSPY
+            set qspy_host [lindex $::argv 2]
         }
-        if {$::argc > 3} {  ;# argv(3) -- local port
-            set local_port [lindex $::argv 3]
+        if {$::argc > 3} {  ;# argv(3) -- QSPY port
+            set qspy_port [lindex $::argv 3]
+        }
+        if {$::argc > 4} {  ;# argv(4) -- local port
+            set local_port [lindex $::argv 4]
         }
 
         global VERSION
@@ -817,15 +836,23 @@ namespace eval ::qutest {
         if {$::qspy::theIsAttached} { ;# NO time out?
             after cancel $id
             puts "OK"
-
         } else { ;# timeout
             ::qspy::detach ;# detach from QSPY
             puts "FAILED!"
             exit -3
         }
 
+        variable theGroupCount 0
+        variable theTestCount  0
+        variable theSkipCount  0
+        variable theErrCount   0
+        variable theCurrGroup  ""
+        variable theCurrState  "PRE"
         variable theStartMs [clock clicks -milliseconds]
         variable theTestMs  $theStartMs
+        variable theTargetTstamp ""
+
+        return $test_files
     }
     #.........................................................................
     ## @brief internal proc for stopping QUTEST and disconnecting from QSPY
@@ -837,16 +864,21 @@ namespace eval ::qutest {
         variable theTestCount
         variable theSkipCount
         variable theErrCount
+        variable theCurrGroup
         variable theCurrState
         variable theStartMs
+        variable theTargetTstamp
 
         switch $theCurrState {
             PRE -
             TEST -
             SKIP -
             FAIL {
-                global argv
-                puts "'end' command missing in [lindex $argv 0]"
+                if {$theCurrGroup != ""} {
+                    puts "'end' command missing in $theCurrGroup"
+                } else {
+                   puts "No test scripts found"
+                }
                 incr theErrCount
             }
             END -
@@ -864,11 +896,12 @@ namespace eval ::qutest {
               ([expr ([clock clicks -milliseconds] - $theStartMs)*0.001]s)"
         variable TIMEOUT_MS
         after $TIMEOUT_MS
+
         if {$theErrCount} {
-            puts "FAIL!"
+            puts "FAIL! ($theTargetTstamp)"
             exit -1
         } else {
-            puts "OK"
+            puts "OK ($theTargetTstamp)"
         }
     }
     #.........................................................................
@@ -1062,7 +1095,6 @@ proc ::qspy::rec0 {} {
 
     #puts $line
 
-
     variable ::qutest::theCurrState
     switch $::qutest::theCurrState {
         PRE {
@@ -1123,6 +1155,11 @@ proc ::qspy::pkt128 {} {
 #.............................................................................
 ## @brief handler for the RESET confirmation coming from the Target
 proc ::qspy::recRESET {} {
+    variable ::qutest::theTargetTstamp
+    if {$::qutest::theTargetTstamp == ""} {
+        variable theTstamp
+        set ::qutest::theTargetTstamp $theTstamp
+    }
 }
 #.............................................................................
 ## @brief handler for the INFO confirmation coming from the Target
@@ -1132,9 +1169,8 @@ proc ::qspy::recINFO {} {
 #=============================================================================
 set theClockMs [clock clicks -milliseconds]
 
-::qutest::start
+set test_files [::qutest::start]
 
-set test_files [glob -nocomplain *.tcl]
 foreach test $test_files {
     if {[catch {::qutest::run $test} msg]} {
         ::qutest::test_failed

@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-05-09
+* Last updated on  2017-05-14
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -249,7 +249,7 @@ static char const *  l_qs_rx_rec[] = {
     "QS_RX_LOC_FILTER",
     "QS_RX_AO_FILTER",
     "QS_RX_CURR_OBJ",
-    "QS_RX_RESERVED2",
+    "QS_RX_TEST_CONTINUE",
     "QS_RX_RESERVED1",
     "QS_RX_EVENT"
 };
