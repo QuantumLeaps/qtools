@@ -14,7 +14,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
 # Last updated for version 5.9.0
-# Last updated on  2017-04-14
+# Last updated on  2017-04-16
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -316,11 +316,11 @@ proc onGlbFilters {} {
         QS_SCHED_NEXT                QS_SCHED_IDLE             \
         QS_SCHED_RESUME              QS_QEP_TRAN_HIST          \
         QS_QEP_TRAN_EP               QS_QEP_TRAN_XP            \
-        QS_QEP_RESERVED1             QS_QEP_RESERVED0          \
+        QS_TEST_PAUSED               QS_TEST_PROBE_GET         \
         QS_SIG_DICT                  QS_OBJ_DICT               \
         QS_FUN_DICT                  QS_USR_DICT               \
         QS_TARGET_INFO               QS_TARGET_DONE            \
-        QS_RX_STATUS                 QS_TEST_PROBE_GET         \
+        QS_RX_STATUS                 QS_MSC_RESERVED1          \
         QS_PEEK_DATA                 QS_ASSERT_FAIL            \
     ]
     global theGlbFilter

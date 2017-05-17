@@ -14,7 +14,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
 # Last updated for version 5.9.0
-# Last updated on  2017-05-14
+# Last updated on  2017-05-17
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -74,25 +74,21 @@ namespace eval ::qutest {
         variable theTestCount
         variable theSkipCount
         variable theErrCount
-        variable theTestRunner
         variable theCurrState
+        variable theNeedReset
         variable theTestMs
         set theTestMs [clock clicks -milliseconds]
 
         #puts "test $name"
 
         ;# parse and validate the test options
-        set reset 1
-        set skip  0
+        set opt_reset 1
+        set opt_skip  0
         foreach opt $args {
             if {$opt == "-noreset"} {
-                if {$theCurrState == {PRE}} {
-                    cleanup
-                    error "First test cannot have '-noreset'"
-                }
-                set reset 0
+                set opt_reset 0
             } elseif {$opt == "skip"} {
-                set skip 1
+                set opt_skip 1
             } else {
                 cleanup
                 error "Incorrect test option '$opt'"
@@ -106,45 +102,41 @@ namespace eval ::qutest {
                     call_on_teardown
                     test_passed
                 }
-
                 incr theTestCount
-                if {$skip} {
+                if {$opt_skip} {
                     puts "$name : SKIPPED"
                     incr theSkipCount
                     tran SKIP
                 } else {
                     puts -nonewline "$name : "
                     flush stdout
-                    if {$reset} {
+                    if {$opt_reset} {
                         tran TEST  ;# to execute 'reset' in the TEST state
-                        if {[reset] == 0} {  ;# timeout?
+                        if {[reset] == 0} {  ;# reset timed out?
                             variable theNextMatch
                             test_failed
                             puts "Expected: \"$theNextMatch\""
                             puts "Timed-out"
                             tran FAIL
                         }
+                    } elseif {$theNeedReset} {
+                        cleanup
+                        error "Test option '-noreset' incorrect for this test"
                     }
                 }
+                set theNeedReset 0
             }
             FAIL -
             SKIP {
-                if {$theCurrState == {SKIP}} {
-                    puts "$name : SKIPPED"
-                    incr theSkipCount
-                }
-
                 incr theTestCount
-                if {$skip} {
+                if {$opt_skip} {
                     tran SKIP
                 } else {
                     ;# wait until timeout
                     while {[wait4input]} {
                     }
 
-                    if {$reset} {
-                        puts -nonewline "$name : "
-                        flush stdout
+                    if {$opt_reset} {
                         tran TEST  ;# to execute 'reset' in the TEST state
                         if {[reset] == 0} {  ;# timeout?
                             variable theNextMatch
@@ -153,11 +145,15 @@ namespace eval ::qutest {
                             puts "Timed-out"
                             tran FAIL
                         }
+                    } elseif {$theNeedReset} {
+                        cleanup
+                        error "Test option '-noreset' incorrect for this test"
                     }
                     puts -nonewline "$name : "
                     flush stdout
                     tran TEST
                 }
+                set theNeedReset 0
             }
             END -
             DONE {
@@ -175,7 +171,7 @@ namespace eval ::qutest {
                 call_on_setup
             } else {
                 test_failed
-                if {$reset == 0} {
+                if {$opt_reset == 0} {
                     puts "NOTE: test should reset the Target (no -noreset)"
                 } else {
                     puts "NOTE: lost Target connection"
@@ -274,6 +270,11 @@ namespace eval ::qutest {
                 assert 0
             }
         }
+    }
+    #.........................................................................
+    ## @brief defines expectation for a Test Pause
+    proc expect_pause {} {
+        expect "           TstPause"
     }
     #.........................................................................
     ## @brief executes a given command in the Target
@@ -463,7 +464,7 @@ namespace eval ::qutest {
                         break ;# no point in continuing
                     } elseif {$filter == {SM}} { ;# state machines
                         set filter0 [expr $filter0 | 0x000003FE]
-                        set filter1 [expr $filter1 | 0x0F800000]
+                        set filter1 [expr $filter1 | 0x03800000]
                     } elseif {$filter == {AO}} { ;# active objects
                         set filter0 [expr $filter0 | 0x0003FC00]
                         set filter2 [expr $filter2 | 0x00002000]
@@ -618,13 +619,10 @@ namespace eval ::qutest {
     ## @brief sends the CONTINUE packet to the Target to continue a test
     #
     proc continue {} {
-        variable ::qspy::theHaveTarget
-        if {$::qspy::theHaveTarget} {
-            variable ::qspy::QS_RX
-            ::qspy::sendPkt \
-                [binary format c $::qspy::QS_RX(CONTINUE)]
-            expect "           Trg-Ack  QS_RX_TEST_CONTINUE"
-        }
+        variable ::qspy::QS_RX
+        ::qspy::sendPkt \
+            [binary format c $::qspy::QS_RX(CONTINUE)]
+        expect "           Trg-Ack  QS_RX_TEST_CONTINUE"
     }
     #.........................................................................
     ## @brief trigger system clock tick in the Target
@@ -710,7 +708,7 @@ namespace eval ::qutest {
     ## @brief internal proc for taking transition in the QUTEST state machine
     proc tran {state} {
         variable theCurrState
-        #puts "Tran $theCurrState->$state"
+        #puts "tran($theCurrState->$state)"
         set theCurrState $state
     }
 
@@ -724,28 +722,29 @@ namespace eval ::qutest {
         # The following set of aliases added to the test-runner forms a small
         # Domain Specific Language (DSL) for writing QUTEST tests
         #
-        $theTestRunner alias test        ::qutest::test
-        $theTestRunner alias end         ::qutest::end
-        $theTestRunner alias expect      ::qutest::expect
-        $theTestRunner alias command     ::qutest::command
-        $theTestRunner alias peek        ::qutest::peek
-        $theTestRunner alias poke        ::qutest::poke
-        $theTestRunner alias fill        ::qutest::fill
-        $theTestRunner alias glb_filter  ::qutest::glb_filter
-        $theTestRunner alias loc_filter  ::qutest::loc_filter
-        $theTestRunner alias current_obj ::qutest::current_obj
-        $theTestRunner alias probe       ::qutest::probe
-        $theTestRunner alias continue    ::qutest::continue
-        $theTestRunner alias tick        ::qutest::tick
-        $theTestRunner alias dispatch    ::qutest::dispatch
-        $theTestRunner alias init        ::qutest::init
-        $theTestRunner alias puts        puts
+        $theTestRunner alias test         ::qutest::test
+        $theTestRunner alias end          ::qutest::end
+        $theTestRunner alias expect       ::qutest::expect
+        $theTestRunner alias expect_pause ::qutest::expect_pause
+        $theTestRunner alias command      ::qutest::command
+        $theTestRunner alias peek         ::qutest::peek
+        $theTestRunner alias poke         ::qutest::poke
+        $theTestRunner alias fill         ::qutest::fill
+        $theTestRunner alias glb_filter   ::qutest::glb_filter
+        $theTestRunner alias loc_filter   ::qutest::loc_filter
+        $theTestRunner alias current_obj  ::qutest::current_obj
+        $theTestRunner alias probe        ::qutest::probe
+        $theTestRunner alias continue     ::qutest::continue
+        $theTestRunner alias tick         ::qutest::tick
+        $theTestRunner alias dispatch     ::qutest::dispatch
+        $theTestRunner alias init         ::qutest::init
+        $theTestRunner alias puts         puts
 
         variable theNextMatch  ""
         variable theTestSkip   0
+        variable theNeedReset  1
         variable theEvtLoop    1
         variable theAfterId    0
-        variable theCurrState  ""
         variable theTestMs     0
 
         set fid [open $test_file r]
@@ -890,7 +889,11 @@ namespace eval ::qutest {
             }
         }
 
-        puts "=============================================="
+        if {$theTargetTstamp != ""} {
+            puts "=========== $theTargetTstamp ============"
+        } else {
+            puts "=============================================="
+        }
         puts "$theGroupCount Groups $theTestCount Tests\
               $theErrCount Failures $theSkipCount Skipped\
               ([expr ([clock clicks -milliseconds] - $theStartMs)*0.001]s)"
@@ -898,10 +901,10 @@ namespace eval ::qutest {
         after $TIMEOUT_MS
 
         if {$theErrCount} {
-            puts "FAIL! ($theTargetTstamp)"
+            puts "FAIL!"
             exit -1
         } else {
-            puts "OK ($theTargetTstamp)"
+            puts "OK"
         }
     }
     #.........................................................................
@@ -913,36 +916,38 @@ namespace eval ::qutest {
         variable TIMEOUT_MS
 
         if {$theHostExe != ""} {  ;# running a host executable?
-            if {$theHaveTarget} {
-                set ::qspy::theHaveTarget 0
-
+            if {$::qspy::theHaveTarget} {
                 ;# send RESET packet to stop and exit the host executable
+                set ::qspy::theHaveTarget 0
                 ::qspy::sendPkt [binary format c $::qspy::QS_RX(RESET)]
+
                 ;# let the Target executable finish
-                after $TIMEOUT_MS
+                set id [after $TIMEOUT_MS {set ::qspy::theHaveTarget 0}]
+                vwait ::qspy::theHaveTarget ;#<<<<<<< wait until have Target
+                if {$::qspy::theHaveTarget} {  ;# NO timeout?
+                    after cancel $id
+                }
             }
+
             ;# lauch a new instance of the host executable
             exec $theHostExe &
 
-        } else { ;# real Target
-            if {$::qspy::theHaveTarget == 0} { ;# don't have Target yet?
-                ;# wait until the real Target comes online
-                after $TIMEOUT_MS
-            }
+        } else {    ;# running on real Target
             set ::qspy::theHaveTarget 0
             ::qspy::sendPkt [binary format c $::qspy::QS_RX(RESET)]
         }
 
-        set id [after $TIMEOUT_MS {set ::qspy::theHaveTarget 0}]
-        vwait ::qspy::theHaveTarget ;#<<<<<<< wait until have Target
-
-        if {$::qspy::theHaveTarget} {  ;# NO timeout?
-            after cancel $id
-            call_on_reset
-            return 1 ;# reset done
-        } else {
-            return 0 ;# reset NOT done (timeout)
+        if {$::qspy::theHaveTarget == 0} {  ;# don't have Target?
+            set id [after $TIMEOUT_MS {set ::qspy::theHaveTarget 0}]
+            vwait ::qspy::theHaveTarget ;#<<<<<<< wait until have Target
+            if {$::qspy::theHaveTarget} {  ;# NO timeout?
+                after cancel $id
+            } else {
+                return 0 ;# reset NOT done (timeout)
+            }
         }
+        call_on_reset
+        return 1 ;# reset done
     }
     #.........................................................................
     ## @brief internal assertion
@@ -970,10 +975,11 @@ namespace eval ::qutest {
     #.........................................................................
     ## @brief internal proc for calling the 'on_reset' proc (if defined)
     proc call_on_reset {} {
-        variable theTimestamp 0
+        variable theTimestamp
+        set theTimestamp 0
 
-        variable theTestRunner
         ;# try to execute the on_reset proc
+        variable theTestRunner
         if {[catch {$theTestRunner eval {on_reset}} msg]} {
             if [string equal $msg {invalid command name "on_reset"}] {
                 ;# "on_reset" not defined, not a problem
@@ -1108,7 +1114,7 @@ proc ::qspy::rec0 {} {
                 ::qutest::test_failed
                 puts "Unexpected: \"$line\""
                 ::qutest::tran FAIL
-            } elseif [string match $theNextMatch $line] {
+            } elseif {[string match $theNextMatch $line]} {
                 set theNextMatch "" ;# invalidate the next match
             } else {
                 ::qutest::test_failed
@@ -1135,13 +1141,8 @@ proc ::qspy::rec0 {} {
     }
 
     if {$recId == 69} { ;# QS_ASSERT_FAIL
-        variable ::qspy::theHaveTarget
-        set ::qspy::theHaveTarget 0
-
-        variable ::qutest::theHostExe
-        if {$::qutest::theHostExe == ""} { ;# NOT a host executable?
-            vwait ::qspy::theHaveTarget ;#<<<<< wait until have Target again
-        }
+        variable ::qutest::theNeedReset
+        set ::qutest::theNeedReset 1
     }
 
     ::qutest::wait4input cancel

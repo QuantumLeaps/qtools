@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-05-14
+* Last updated on  2017-05-16
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -215,10 +215,10 @@ static char const *  l_qs_rec[] = {
     "QS_QEP_TRAN_HIST",
     "QS_QEP_TRAN_EP",
     "QS_QEP_TRAN_XP",
-    "QS_QEP_RESERVED1",
-    "QS_QEP_RESERVED0",
 
-    /* [60] Miscellaneous QS records */
+    /* [58] Miscellaneous QS records (not maskable) */
+    "QS_TEST_PAUSED",
+    "QS_TEST_PROBE_GET",
     "QS_SIG_DICT",
     "QS_OBJ_DICT",
     "QS_FUN_DICT",
@@ -226,7 +226,7 @@ static char const *  l_qs_rec[] = {
     "QS_TARGET_INFO",
     "QS_TARGET_DONE",
     "QS_RX_STATUS",
-    "QS_TEST_PROBE_GET",
+    "QS_MSC_RESERVED1",
     "QS_PEEK_DATA",
     "QS_ASSERT_FAIL"
 
@@ -1652,6 +1652,26 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
 
         /* Miscallaneous QS records ........................................*/
+        case QS_TEST_PAUSED: {
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("           TstPause");
+                QSPY_onPrintLn();
+            }
+            break;
+        }
+
+        case QS_TEST_PROBE_GET: {
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            q = QSpyRecord_getUint64(me, l_config.funPtrSize);
+            a = QSpyRecord_getUint32(me, 4U);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u TstProbe Fun=%s,Data=%d",
+                              t, Dictionary_get(&l_funDict, q, (char *)0), a);
+                QSPY_onPrintLn();
+            }
+            break;
+        }
+
         case QS_SIG_DICT: {
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
@@ -1674,6 +1694,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
         case QS_OBJ_DICT: {
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
             s = QSpyRecord_getStr(me);
@@ -1693,6 +1714,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
         case QS_FUN_DICT: {
             p = QSpyRecord_getUint64(me, l_config.funPtrSize);
             s = QSpyRecord_getStr(me);
@@ -1861,17 +1883,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_TEST_PROBE_GET: {
-            t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            q = QSpyRecord_getUint64(me, l_config.funPtrSize);
-            a = QSpyRecord_getUint32(me, 4U);
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u TstProbe Fun=%s,Data=%d",
-                              t, Dictionary_get(&l_funDict, q, (char *)0), a);
-                QSPY_onPrintLn();
-            }
-            break;
-        }
+
         case QS_PEEK_DATA: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 2);  /* offset */
@@ -1910,6 +1922,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
         case QS_ASSERT_FAIL: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 2);

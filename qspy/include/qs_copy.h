@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 5.9.0
-* Last updated on  2017-05-15
+* Last updated on  2017-05-16
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -130,10 +130,10 @@ enum QSpyRecords {
     QS_QEP_TRAN_HIST,     /*!< a tran to history was taken */
     QS_QEP_TRAN_EP,       /*!< a tran to entry point into a submachine */
     QS_QEP_TRAN_XP,       /*!< a tran to exit  point out of a submachine */
-    QS_QEP_RESERVED1,
-    QS_QEP_RESERVED0,
 
-    /* [60] Miscellaneous QS records (not maskable) */
+    /* [58] Miscellaneous QS records (not maskable) */
+    QS_TEST_PAUSED,       /*!< test has been paused */
+    QS_TEST_PROBE_GET,    /*!< reports that Test-Probe has been used */
     QS_SIG_DICT,          /*!< signal dictionary entry */
     QS_OBJ_DICT,          /*!< object dictionary entry */
     QS_FUN_DICT,          /*!< function dictionary entry */
@@ -141,7 +141,7 @@ enum QSpyRecords {
     QS_TARGET_INFO,       /*!< reports the Target information */
     QS_TARGET_DONE,       /*!< reports completion of a user callback */
     QS_RX_STATUS,         /*!< reports QS data receive status */
-    QS_TEST_PROBE_GET,    /*!< reports that Test-Probe has been used */
+    QS_MSC_RESERVED1,
     QS_PEEK_DATA,         /*!< reports the data from the PEEK query */
     QS_ASSERT_FAIL,       /*!< assertion failed in the code */
 
@@ -557,10 +557,10 @@ QSTimeCtr QS_onGetTime(void);
 #define QS_END_NOCRIT() } \
     QS_END_NOCRIT_()
 
-#ifndef QS_END_REC
+#ifndef QS_REC_DONE
     /*! macro to hook up user code when a QS record is produced */
-    #define QS_END_REC()        ((void)0)
-#endif /* QS_END_REC */
+    #define QS_REC_DONE() ((void)0)
+#endif /* QS_REC_DONE */
 
 /* QS-specific critical section *********************************************/
 #ifdef QS_CRIT_ENTRY /* separate QS critical section defined? */
@@ -568,12 +568,12 @@ QSTimeCtr QS_onGetTime(void);
 #ifndef QS_CRIT_STAT_TYPE
     #define QS_CRIT_STAT_
     #define QS_CRIT_ENTRY_()    QS_CRIT_ENTRY(dummy)
-    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(dummy); QS_END_REC()
+    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(dummy); QS_REC_DONE()
 #else
     #define QS_CRIT_STAT_       QS_CRIT_STAT_TYPE critStat_;
     #define QS_CRIT_ENTRY_()    QS_CRIT_ENTRY(critStat_)
-    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(critStat_); QS_END_REC()
-#endif
+    #define QS_CRIT_EXIT_()     QS_CRIT_EXIT(critStat_); QS_REC_DONE()
+#endif /* QS_CRIT_STAT_TYPE */
 
 #else /* separate QS critical section not defined--use the QF definition */
 
@@ -613,12 +613,12 @@ QSTimeCtr QS_onGetTime(void);
     * Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
     * @sa #QF_CRIT_EXIT
     */
-    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(dummy); QS_END_REC()
+    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(dummy); QS_REC_DONE()
 
 #else  /* simple unconditional interrupt disabling used */
     #define QS_CRIT_STAT_       QF_CRIT_STAT_TYPE critStat_;
     #define QS_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
-    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_); QS_END_REC()
+    #define QS_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_); QS_REC_DONE()
 #endif /* simple unconditional interrupt disabling used */
 
 #endif /* separate QS critical section not defined */
@@ -1104,7 +1104,7 @@ enum QSpyRxRecords {
     QS_RX_LOC_FILTER,     /*!< set local  filters in the Target */
     QS_RX_AO_FILTER,      /*!< set local AO filter in the Target */
     QS_RX_CURR_OBJ,       /*!< set the "current-object" in the Target */
-    QS_RX_TEST_CONTINUE,  /*!< continue a test after QS_TEST_WAIT() */
+    QS_RX_TEST_CONTINUE,  /*!< continue a test after QS_TEST_PAUSE() */
     QS_RX_RESERVED1,      /*!< reserved for future use */
     QS_RX_EVENT           /*!< inject an event to the Target */
 };
@@ -1181,15 +1181,19 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
     #define QS_TEST_PROBE_ID(id_, code_) \
         if (qs_tp_ == (uint32_t)(id_)) { code_ }
 
-    /*! QS macro to break the flow of control for a test event loop */
-    #define QS_TEST_WAIT()    (QS_onTestLoop())
+    /*! QS macro to pause test execution and enter the test event loop */
+    #define QS_TEST_PAUSE() do { \
+        QS_beginRec((uint_fast8_t)QS_TEST_PAUSED); \
+        QS_endRec(); \
+        QS_onTestLoop(); \
+    } while (0)
 
 #else
     /* dummy definitions when not building for QUTEST */
     #define QS_TEST_PROBE_DEF(fun_)
     #define QS_TEST_PROBE(code_)
     #define QS_TEST_PROBE_ID(id_, code_)
-    #define QS_TEST_WAIT()  ((void)0)
+    #define QS_TEST_PAUSE()  ((void)0)
 #endif /* Q_UTEST */
 
 #endif /* qs_h  */
