@@ -167,6 +167,7 @@ namespace eval ::qspy {
 # @param[in] host name or IP address of the host running QSPY back-end
 # @param[in] port UDP port number at which QSPY back-end is listening
 # @param[in] local_port local UDP port at which to open connection to QSPY
+# @param[in] channels QSPY data channels (binary or/and text) to connect to
 #
 # @returns true if the connection has been established or false if any
 # errors have occurred.

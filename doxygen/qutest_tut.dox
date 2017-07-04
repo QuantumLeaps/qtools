@@ -1,0 +1,601 @@
+/*! @page qutest_tut QUTest&trade; Tutorial
+
+<p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first couple of examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests described in the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. Later examples in this Tutorial show how to test <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">hierarchical state machines</a> and <a href="https://state-machine.com/doc/concepts#Active" target="_blank" class="extern">active objects</a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
+</p>
+
+As mentioned in the Section @ref qutest_struct "QUTest&trade; Structure", testing with QUTest&trade; always involves two components: (1) a **test fixture** code written in C (or C++) that runs on the Target and (2) **test script**(s) that run on the host. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
+
+@note
+This Tutorial assumes that you run on Windows and that both QTools&trade; and QP&trade;/C framework have been installed in the default location (<span class="img folder">`C:\qp`</span> on Windows) and also that the `QTOOLS` environment variable has been defined and that the @c \%QTOOLS\%\\bin directory has been added to the `PATH`. Please refer to the @ref install "QTools Installation" section for more information about downloading and installing QTools&trade;.
+
+
+This Tutorial consists of the following lessons:
+
+- @subpage qutest_tut_Sprintf
+- @subpage qutest_tut_LedDriver
+- @subpage qutest_tut_Mock
+- @subpage qutest_tut_HSM
+- @subpage qutest_tut_AO
+
+@next{qutest_tut_Sprintf}
+*/
+
+/*###########################################################################*/
+/*! @page qutest_tut_Sprintf Sprintf Example
+
+@tableofcontents
+
+@htmlonly
+<img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
+@endhtmlonly
+
+<p>This example is an adaptation of the tests described in Chapter 1 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests the `sprintf()` function from the C standard library, which means that you don't need to write the code that you will be testing (<b>C</b>ode <b>U</b>nder <b>T</b>est -- **CUT**).
+</p>
+
+@note
+This simple example runs QUTest tests on the host (Windows in this case). Other examples in this Tutorial will also show how to run QUTest on embedded Targets.
+
+
+------------------------------------------------------------------------------
+@section qutest_sprintf-run Running the Test
+The complete code for the Sprintf example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>. To run the Sprintf tests (on Windows), open a command prompt and type:
+
+@verbatim
+qspy -u -t
+@endverbatim
+
+This will start the @ref qspy "QSPY" host application with the UDP socket (`-u` @ref qspy_command "option") and TCP/IP connection to the Target (`-t` @ref qspy_command "option").
+
+Next, open another command prompt window and type:
+
+@verbatim
+cd C:\qp\qpc\examples\qutest\TDDbook_Sprintf
+make
+@endverbatim
+
+This will build the @ref qutest_sprintf-fixture "Sprintf test fixture" as a Windows executable and then it will run the @ref qutest_sprintf-script "Sprintf test script". The screen shot below shows the output produced in these two command-prompt windows.
+
+@image html test_sprintf.png "QUTest sprintf() test run"
+
+
+------------------------------------------------------------------------------
+@section qutest_sprintf-fixture Test Fixture
+The job of a *test fixture* is to exercise the **CUT** (the `sprintf()` function in this case) and report the results back to the QSPY host application. Note that a *test fixture* in QUTest&trade; is **not** supposed to perform and checking whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-script "test script"(s).
+
+@remark
+Coming up with a "good" *test fixture* requires some practice, but when you study the examples in this Tutorial, you will see examples of flexible *test fixtures* that allow you to to run a wide variety of tests on them.
+
+
+The following listing shows the complete *test fixture* for the `sprintf()` tests (file <span class="img file_c">`test_Sprintf.c`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@code
+ [1] #include "qpc.h"    /* QUTest interface */
+ [2] #include <stdio.h>  /* CUT interface */
+
+ [3] Q_DEFINE_THIS_FILE
+
+     /*--------------------------------------------------------------------------*/
+ [4] static char format[20];
+ [5] static char output[100];
+ [6] static char string[20];
+
+     enum {
+ [7]    SPRINTF_CALL = QS_USER,
+     };
+
+     /*--------------------------------------------------------------------------*/
+ [8] int main() {
+ [9]     QF_init();  /* initialize the framework and the underlying RT kernel */
+[10]     Q_ALLEGE(QS_INIT((void *)0)); /* initialize QS tracing system */
+
+[11]     /* dictionaries... */
+         QS_OBJ_DICTIONARY(format);
+         QS_OBJ_DICTIONARY(output);
+         QS_OBJ_DICTIONARY(string);
+         QS_USR_DICTIONARY(SPRINTF_CALL);
+
+[12]     return QF_run(); /* run the tests */
+     }
+     /*--------------------------------------------------------------------------*/
+[13] void QS_onTestSetup(void) {
+     }
+     /*..........................................................................*/
+[14] void QS_onTestTeardown(void) {
+     }
+
+     /*..........................................................................*/
+[15] void QS_onCommand(uint8_t cmdId,
+                       uint32_t param1, uint32_t param2, uint32_t param3)
+     {
+         switch (cmdId) {
+[16]         case 0: {   /* call the CUT and report results */
+[17]             int ret = sprintf(&output[8],
+                                   format, param1, string, param2, param3);
+[18]             QS_BEGIN(SPRINTF_CALL, (void *)0) /* user-specific record */
+[19]                 QS_U8(3, (uint8_t)ret);  /* return value */
+[20]                     QS_STR(&output[8]);      /* produced string */
+[21]             QS_END()
+                 break;
+             }
+             default:
+                 break;
+         }
+     }
+     /*..........................................................................*/
+     /* callback function to "massage" the injected QP events (not used here) */
+[22] void QS_onTestEvt(QEvt *e) {
+         (void)e;
+     }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. You need to include this header file in all QUTest test fixtures.
+  </li>
+  <li><span class="tag">2</span> You also need to include the interface to the CUT, which is `<stdio.h>` in case of the `sprintf()` CUT.
+  </li>
+  <li><span class="tag">3</span> The macro `Q_DEFINE_THIS_FILE` is needed for <a href="https://state-machine.com/qpc/qassert_8h.html" class="extern"><b>QP/C-style assertions</b></a> (they have nothing to do with "test assertions"). Here a QP/C assertion is used to guard against failure in the initialization of the @ref qs "QS" target-resident component.
+  </li>
+  <li><span class="tag">4</span> The static (local) `char` array `format[]` will be used to provide the format string to the `sprintf()` CUT.
+  </li>
+  <li><span class="tag">5</span> The static (local) `char` array `output[]` will be used to provide the output buffer to the `sprintf()` CUT.
+  </li>
+  <li><span class="tag">6</span> The static (local) `char` array `string[]` will be used to provide a string parameter to the `sprintf()` CUT.
+  </li>
+  <li><span class="tag">7</span> The enumeration `SPRINTF_CALL` will be used for an @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT in the Target. <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  </li>
+  <li><span class="tag">8</span> A QUTest *test fixture* code needs the `main()` function. This `main()` function can be in a separate file, but in this simple example it is placed in `test_Sprintf.c`. Either way, the `main()` function has the usual structure of a QP/C application (and in fact in the more advanced tests it can be *the same* function as used by the actual QP/C application). But here, it contains the bare minimum function calls, as described below.
+  </li>
+  <li><span class="tag">9</span> The `main()` function must start with calling `QF_init()` to initialize the QP framework.
+  </li>
+  <li><span class="tag">10</span> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fail if the QS initialization fails. (In which case continuationon of the test makes no sense).
+  </li>
+  <li><span class="tag">11</span> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-script "test scripts" need to know about. (NOTE: you need to do this, so that the test scripts can refer to the objects by the same symbolic names as the *test fixture*).
+  </li>
+  <li><span class="tag">12</span> Finally, at the end of `main()` you need to call `QF_run()` to run the tests.
+  </li>
+  <li><span class="tag">13</span> The callback function `QS_onTestSetup()` allows you to include code that will be run at the beginning of each test. Here this simple `sprintf()` CUT does not need any setup, but you still need to provide (an empty) implementation to satisfy the linker.
+  </li>
+  <li><span class="tag">14</span> The callback function `QS_onTestTeardown()` allows you to include code that will be run at the end of each test. Here this simple `sprintf()` CUT does not need any teardown, but you still need to provide (an empty) implementation to satisfy the linker.
+  </li>
+  <li><span class="tag">15</span> The callback function `QS_onCommand()` allows you to remotely execute commands inside the Target. Here is where you execute the `sprintf()` CUT and report results back to QSPY.
+  </li>
+  <li><span class="tag">16</span> The command 0 (with `cmdId==0`) will be used to call the `sprintf()` CUT. (NOTE: You can use other `cmdId`s to call other pieces of CUT or to provide different variants of calling the same CUT, as you see fit. Much of the art of writing *test fixtures* lies in constructing flexible remote commands that exercise your CUT).
+  </li>
+  <li><span class="tag">17</span> The `sprintf()` CUT is called and the return value is saved in the `ret` automatic variable. Note that the `sprintf()` output buffer (first argument) is not just the `output` array, but rather `&output[8]`, which will allow you to study buffer underflow (altering of the memory preceeding the buffer). Also note the other parameters of the call to the `sprintf()` CUT, such as the `format` string and the `string` argument. These details will be important to construct the @ref qutest_sprintf-script "test script"s.
+  </li>
+  <li><span class="tag">18</span> The `QS_BEGIN()` macro starts the @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT to the Target.
+  </li>
+  <li><span class="tag">19</span> The `QS_U8()` macro sends a byte (`uint8_t`) to the Target. Here you output the return value from `sprintf()`, which is supposed to be the number of formatted arguments.
+  </li>
+  <li><span class="tag">20</span> The `QS_STR()` macro sends a zero-terminated string (`char` array) to the Target. Here you send the output buffer (please note the same offset of 8 as in the call to the  `sprintf()` CUT in line [17]).
+  </li>
+  <li><span class="tag">21</span> The `QS_END()` macro termiates the @ref qs_app "application-specific" trace record.
+  </li>
+  <li><span class="tag">22</span> The `QS_onTestEvt()` callback function is not used in this test, but needs to be provided to satisfy the linker.
+  </li>
+</ul>
+
+
+------------------------------------------------------------------------------
+@section qutest_sprintf-script Test Script
+A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the **expectations** of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@note
+The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `SprintfTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
+
+@code
+ [1] # QUTEST test script corresponding to the test_Sprintf.c test fixture.
+     # This example corresponds to SprintfTest.c from Chapter 2 "Test-Driving
+     # Tools and Conventions" of the book: "Test-Driven Development for Embedded
+     # Systems" by James W. Grenning
+
+     # tests...
+
+     #----------
+ [2] test "No format operations"
+ [3] glb_filter UA
+ [4] current_obj AP format
+ [5] poke 0 1 "Hello World!\0"
+ [6] command 0
+ [7] expect "0000000001 SPRINTF_CALL  12 Hello World!"
+ [8] expect "0000000002 Trg-Done QS_RX_COMMAND"
+
+     #----------
+ [9] test "Insert decimal" -noreset
+[10] current_obj AP format
+[11] poke 0 1 "dec=%d\0"
+[12] command 0 1234
+[13] expect "0000000001 SPRINTF_CALL   8 dec=1234"
+[14] expect "0000000002 Trg-Done QS_RX_COMMAND"
+
+     #----------
+[15] test "Insert decimal and string" -noreset
+[16] current_obj AP format
+[17] poke 0 1 "dec=%d, str=%s\0"
+[18] current_obj AP string
+[19] poke 0 1 "Hello\0"
+[20] current_obj AP output
+[21] fill 0 1 100 0xAA
+[22] command 0 4321
+[23] expect "0000000001 SPRINTF_CALL  19 dec=4321, str=Hello"
+[24] expect "0000000002 Trg-Done QS_RX_COMMAND"
+
+     #----------
+[25] test "Overflow/underflow" -noreset
+[26] current_obj AP output
+[27] peek 26 1 4
+[28] expect "%timestamp Trg-Peek Offs=26,Size=1,Num=4,Data=<??,00,AA,AA>"
+[29] peek 0 1 10
+[30] expect "%timestamp Trg-Peek Offs=0,Size=1,Num=10,Data=<AA,AA,AA,AA,AA,AA,AA,AA,??,??>"
+
+     # the end
+[31] end
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> Lines starting with a pund sign ('#') or empty lines are comments which are ignored by QUTest.
+  </li>
+</ul>
+
+<div class="separate"></div>
+<strong>Test: "No format operations"</strong> checks that `sprintf()` handles a format spec with no format opearations:
+<ul class="tag">
+  <li><span class="tag">2</span> The **test** command starts a test and gives it a name (in double quotes). The name of test will be displayed as the test is executed and should be a quick reminder about the objective of this test. This test command also @ref qutest_reset "resets the Target", which brings the Target into a well-defined initial state and produces the @ref qs_dict "QS dictionary records" (see @ref qutest_sprintf-fixture "test-fixture"[11])
+  </li>
+  <li><span class="tag">3</span> The **glb_filter** command sets the @ref qs_global "QS Global Filters" in the Target. Here the global filter allows all User trace records (UA). You need this filter open to see the application-specific trace records, such as `SPRINTF_CALL` (see @ref qutest_sprintf-fixture "test-fixture"[7]).
+  </li>
+  <li><span class="tag">4</span> The **current_obj** command sets the @ref qs_curr "QS Current Object" in the Target. The `AP` argument means that the "Application" object will be set. This "Application Current Object" will be used in subsequent poke() command.
+  </li>
+  <li><span class="tag">5</span> The **poke** command pokes the specified "Application Current Object" starting with the specified offset (here 0) with the data elements of size 1 (the second argument) with the data provided in the third argument ("Hello World!\0") into the previously established Application Current Object `format` (see @ref qutest_sprintf-fixture "test-fixture"[4]).
+  </li>
+  <li><span class="tag">6</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the commandId (see @ref qutest_sprintf-fixture "test-fixture"[16])
+  </li>
+  <li><span class="tag">7</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `command 0` command. <b>NOTE:</b> that the expected string starts with a number `0000000001`, which is the @ref qs_tstamp "Target Time-Stamp". In QUTest, the @ref qutest_tstamp "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost.
+  </li>
+  <li><span class="tag">8</span> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
+  </li>
+</ul>
+
+<div class="separate"></div>
+<strong>Test: "Insert decimal"</strong> challenges `sprintf()` to format a string with @c \%s :
+<ul class="tag">
+  <li><span class="tag">9</span> The **test** command starts a next test "Insert decimal". This test does **not** reset the Target (argument @ref qutest_reset "-noreset")
+  </li>
+  <li><span class="tag">10</span> The **current_obj** command sets again the @ref qs_curr "QS Current Object" in the Target.
+  </li>
+  <li><span class="tag">11</span> The **poke** command pokes the specified "Application Current Object" starting with the specified offset (here 0) with the data provided in the second argument. Here you poke a zero-terminated string "dec=%d\0" into the previously established Application Current Object `format`.
+  </li>
+  <li><span class="tag">12</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the commandId. The second argument (`1234`) corresponds to `param1` in the @ref qutest_sprintf-fixture "test-fixture"[16].
+  </li>
+  <li><span class="tag">13</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `command 0 1234` command.
+  </li>
+  <li><span class="tag">14</span> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
+  </li>
+</ul>
+
+<div class="separate"></div>
+<strong>Test: "Insert decimal and string"</strong> challenges `sprintf()` to format both a string with @c \%s and a decimal with @c \%d:
+<ul class="tag">
+  <li><span class="tag">15</span> The **test** command starts a next test "Insert decimal and string". This test does **not** reset the Target (argument @ref qutest_reset "-noreset")
+  </li>
+  <li><span class="tag">16</span> The **current_obj** command sets again the @ref qs_curr "QS Current Object" in the Target.
+  </li>
+  <li><span class="tag">17</span> The **poke** command pokes the specified "Application Current Object" (now `format`) starting with the specified offset (here `0`) with the data provided in the second argument. Here you poke a zero-terminated string "dec=%d, str=%s\0" into the previously established Application Current Object `format`.
+  </li>
+  <li><span class="tag">18</span> The **current_obj** command changes the @ref qs_curr "QS Current Object" in the Target to `string`.
+  </li>
+  <li><span class="tag">19</span> The **poke** command pokes the specified "Application Current Object" (now `string`) starting with the specified offset (here `0`) with the data provided in the second argument. Here you poke a zero-terminated string "Hello\0" into the previously established Application Current Object `string`.
+  </li>
+  <li><span class="tag">20</span> The **current_obj** command changes the @ref qs_curr "QS Current Object" in the Target to `output`.
+  </li>
+  <li><span class="tag">21</span> The **fill** command fills the specified "Application Current Object" (now `output`) starting with the specified offset (here `0`) with the elements of size `1` (second argument), number of elements `100` (third argument) and the fill-data `0xAA` (forth argument).
+  </li>
+  <li><span class="tag">22</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the commandId. The second argument (`4321`) corresponds to `param1` in the @ref qutest_sprintf-fixture "test-fixture"[16].
+  </li>
+  <li><span class="tag">23</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `command 0 4321` command.
+  </li>
+  <li><span class="tag">24</span> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
+  </li>
+</ul>
+
+
+<div class="separate"></div>
+<strong>Test: "Overflow/underflow"</strong> checks whether `sprintf()` modifies its output buffer before the produced formatted output (underflow) or after the produced formatted output (overflow). Any such underflow/overflow would be a security problem, as it would open the door to the "buffer overrun" attacks:
+<ul class="tag">
+  <li><span class="tag">25</span> The **test** command starts a next test "Overflow/underflow". This test does **not** reset the Target (argument @ref qutest_reset "-noreset")
+  </li>
+  <li><span class="tag">26</span> The **current_obj** command sets again the @ref qs_curr "QS Current Object" in the Target.
+  </li>
+  <li><span class="tag">27</span> The **peek** command reads data from the specified "Application Current Object" (now `output`) starting with the specified offset (here `26`) with the data elements of size provided in the second argument (here `1`) and the number of such elements provided in the third argument (here `4`). Here you are reading bytes (elements size 1) at the end of the formatted output generated in the previouis test. You do this to check for any overflow of the `output` buffer.
+  </li>
+  <li><span class="tag">28</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `peek 26 1 4` command. <b>NOTE1:</b> this expectation demonstrates the use of the @ref qutest_tstamp "\%timestamp variable" instead of hard-coded number like `0000000001`. <b>NOTE2:</b> this expectation demonstrates also two "don't care" characters in the expected string (<b>'?'</b>). On the other hand, the expected values at the end of the `output` buffer are the zero-termination of the string (`'00'`) and two bytes `'AA,AA'` pre-filed in the previous test (step [21]).
+  </li>
+  <li><span class="tag">29</span> Another **peek** command reads the bytes (elements size 1) at the beginning of the formatted output generated in the previouis test. . You do this to check for any underflow of the `output` buffer.
+  </li>
+  <li><span class="tag">30</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `peek 0 1 10` command. Again, this expectation uses the @ref qutest_tstamp "\%timestamp variable" and "don't care" characters <b>'?'</b>.
+  </li>
+  <li><span class="tag">31</span> Every test script must end with the **end** command. This signals to the `qutest.tcl` test runner to output the test statistics. (<b>NOTE:</b> a test script without an `end` will generate error).
+  </li>
+</ul>
+
+@note
+Even though a *test script* uses Tcl under the hood, you don't need to know Tcl to write effective tests. The actual set of commands that you use and need to know about forms a small "Domain Specific Language" (DSL) for unit testing, which just happens to be implemented with Tcl as a command interpreter.
+
+
+@remark
+As an exercise you should modify the Sprintf *test script* to inject some errors and observe how the tests can fail.
+
+@next{qutest_tut_LedDriver}
+*/
+
+/*##########################################################################*/
+/*! @page qutest_tut_LedDriver LedDriver Example
+
+@tableofcontents
+
+@htmlonly
+<img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
+@endhtmlonly
+
+<p>This example is an adaptation of the tests described in Chapters 2 and 3 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip. In **CUT** for this example is located in the files <span class="img file_h">`test_LedDriver.h`</span> and <span class="img file_c">`test_LedDriver.c`</span> in the same directory as the rest of this test.
+</p>
+
+
+------------------------------------------------------------------------------
+@section qutest_leddriver-run Running the Test
+The complete code for the LedDriver example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_LedDriver`</span>. To run the LedDriver tests (on Windows), open a command prompt and type:
+
+@verbatim
+qspy -u -t
+@endverbatim
+
+This will start the @ref qspy "QSPY" host application with the UDP socket (`-u` @ref qspy_command "option") and TCP/IP connection to the Target (`-t` @ref qspy_command "option").
+
+Next, open another command prompt window and type:
+
+@verbatim
+cd C:\qp\qpc\examples\qutest\TDDbook_LedDriver
+make
+@endverbatim
+
+This will build the @ref qutest_sprintf-fixture "LedDriver test fixture" as a Windows executable and then it will run the @ref qutest_leddriver-script "LedDriver test script". The screen shot below shows the output produced in these two command-prompt windows.
+
+@image html test_leddriver.png "QUTest LedDriver test run"
+
+
+------------------------------------------------------------------------------
+@section qutest_leddriver-fixture Test Fixture
+The following listing shows the test fixture for the LedDriver tests (file <span class="img file_c">`test_LedDriver.c`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with [xx] labels).
+
+@code
+ [1] #include "qpc.h"       /* QUTest interface */
+ [2] #include "LedDriver.h" /* CUT */
+
+     Q_DEFINE_THIS_FILE
+
+     /*--------------------------------------------------------------------------*/
+ [3] static uint16_t virtualLeds;
+
+     enum {
+ [4]     LEDDRIVER_CREATE  = QS_USER,
+         LEDDRIVER_DESTROY,
+         LEDDRIVER_TURNON,
+         LEDDRIVER_TURNOFF,
+         LEDDRIVER_TURNALLON,
+         LEDDRIVER_TURNALLOFF,
+         LEDDRIVER_ISON,
+         LEDDRIVER_ISOFF,
+     };
+
+     /*--------------------------------------------------------------------------*/
+ [5] int main() {
+         QF_init();  /* initialize the framework and the underlying RT kernel */
+         Q_ALLEGE(QS_INIT((void *)0)); /* initialize QS tracing system */
+
+         /* filter setup */
+ [6]     QS_FILTER_ON(QS_UA_RECORDS); /* UA==user-all */
+
+         /* dictionaries... */
+ [7]     QS_OBJ_DICTIONARY(&virtualLeds);
+ [8]     QS_USR_DICTIONARY(LEDDRIVER_CREATE);
+         QS_USR_DICTIONARY(LEDDRIVER_DESTROY);
+         QS_USR_DICTIONARY(LEDDRIVER_TURNON);
+         QS_USR_DICTIONARY(LEDDRIVER_TURNOFF);
+         QS_USR_DICTIONARY(LEDDRIVER_TURNALLON);
+         QS_USR_DICTIONARY(LEDDRIVER_TURNALLOFF);
+         QS_USR_DICTIONARY(LEDDRIVER_ISON);
+         QS_USR_DICTIONARY(LEDDRIVER_ISOFF);
+
+         return QF_run(); /* run the tests */
+     }
+
+     /*--------------------------------------------------------------------------*/
+     void QS_onTestSetup(void) {
+ [9]    LedDriver_Create(&virtualLeds);
+     }
+     /*..........................................................................*/
+     void QS_onTestTeardown(void) {
+ [10]   LedDriver_Destroy();
+     }
+     /*..........................................................................*/
+     void QS_onCommand(uint8_t cmdId,
+                       uint32_t param1, uint32_t param2, uint32_t param3)
+     {
+         (void)param2;
+         (void)param3;
+         BOOL ret;
+
+         switch (cmdId) {
+ [11]        case LEDDRIVER_CREATE: {
+ [12]            LedDriver_Create(&virtualLeds);
+ [13]            QS_BEGIN(LEDDRIVER_CREATE, (void *)0) /* user-specific record */
+ [14]                QS_U32_HEX(4, (uint32_t)virtualLeds);
+                 QS_END()
+                 break;
+             }
+             case LEDDRIVER_DESTROY: {
+                 LedDriver_Destroy();
+                 QS_BEGIN(LEDDRIVER_DESTROY, (void *)0) /* user-specific record */
+                    QS_U32_HEX(4, (uint32_t)virtualLeds);
+                 QS_END()
+                 break;
+             }
+             case LEDDRIVER_TURNON: {
+                 LedDriver_TurnOn((int)param1);
+                 QS_BEGIN(LEDDRIVER_TURNON, (void *)0) /* user-specific record */
+                    QS_U32_HEX(4, (uint32_t)virtualLeds);
+                 QS_END()
+                 break;
+             }
+             case LEDDRIVER_TURNOFF: {
+                 LedDriver_TurnOff((int)param1);
+                 QS_BEGIN(LEDDRIVER_TURNOFF, (void *)0)
+                    QS_U32_HEX(4, (uint32_t)virtualLeds);
+                 QS_END()
+                 break;
+             }
+             ~ ~ ~
+             default:
+                 break;
+         }
+     }
+     /*..........................................................................*/
+     /*! callback function to "massage" the injected QP events (not used here) */
+     void QS_onTestEvt(QEvt *e) {
+         (void)e;
+     }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. You need to include this header file in all QUTest test fixtures.
+  </li>
+  <li><span class="tag">2</span> The `"LedDriver.h"` header file includes CUT interface.
+  </li>
+  <li><span class="tag">3</span> The `virtualLeds` static variable is used in the `LedDriver` CUT.
+  </li>
+  <li><span class="tag">4</span> The enumerated constants `LEDDRIVER_xxx` will be used for @ref qs_app "application-specific trace records" that will report results of calling the various functions of the LedDriver CUT in the Target. <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  </li>
+  <li><span class="tag">5</span> This simple *test fixture* again directly contains the main() function. This function contains the bare minimum function calls, as described below.
+  </li>
+  <li><span class="tag">6</span> The QS_FILTER_ON(QS_UA_RECORDS) macro opens up the @ref qs_global "QS Global Filter" for all user (i.e., application-specific) records (the `QS_UA_RECORDS` group). This is an alternative to issuing the command `"glb_filter UA"` from the *test script*. (<b>NOTE:</b> QUTest starts with all @ref qs_global "QS Global Filter" disabled).
+  </li>
+  <li><span class="tag">7</span> The macro QS_OBJ_DICTIONARY(&virtualLeds) generates an object-dictionary entry for the `virtualLeds` variable.
+  </li>
+  <li><span class="tag">8</span> The macros QS_USR_DICTIONARY() generate user-dictionary entries for all application-specific (user) trace records enumerated in step [4].
+  </li>
+  <li><span class="tag">9</span> The callback function `QS_onTestSetup()` is used here to create the LedDRiver before every test. (<b>NOTE:</b> The `QS_onTestSetup()` callback is called for every **test** command in the *test script*).
+  </li>
+  <li><span class="tag">10</span> The callback function `QS_onTestTeardown()` is used here to destroy the LedDRiver after every test. (<b>NOTE:</b> The `QS_onTestTeardown()` callback is called for every **test** command in the *test script*).
+  </li>
+  <li><span class="tag">11</span> The `QS_onCommand()` callback is used to call the CUT, whereas each function of the driver is called in the different `case` of the switch. Please note that here the `cmdId`s are the same as the application-specific trace records enumerated in step [4]. This will allow the *test script* to use symbolic names for commands, instead of hard-coded numerical values.
+  </li>
+  <li><span class="tag">12</span> For example, the `case LEDDRIVER_CREATE` calls the `LedDriver_Destroy()` function from the CUT</li>
+  <li><span class="tag">13</span> Subsequently, the application-specific trace record `LEDDRIVER_CREATE` is generated.
+  <li><span class="tag">14</span> This trace record outputs the value of `virtualLeds` produced by the call to the CUT. Similar strategy is used in all remaining `case` statements in the `QS_onCommand()` callback function.
+</ul>
+
+------------------------------------------------------------------------------
+@section qutest_leddriver-script Test Script
+The following listing shows the *test script* for the LedDriver tests (file <span class="img file_tcl">`test_LedDriver.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@note
+The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `LedDriverTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
+
+@code
+     # QUTEST test script corresponding to the test_LedDriver.c test fixture.
+     # This example corresponds to LedDriver.c from Chapters 3 & 4 "Starting
+     # a C Module" & "Testing Your Way to Done" of the book: "Test-Driven
+     # Development for Embedded Systems" by James W. Grenning
+
+     # tests...
+
+     #----------
+ [1] test "LEDs off after Create"
+ [2] command LEDDRIVER_CREATE
+ [3] expect "%timestamp LEDDRIVER_CREATE 0x0000"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Turn on LED(1)" -noreset
+     command LEDDRIVER_TURNON 1
+     expect "%timestamp LEDDRIVER_TURNON 0x0001"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Turn off LED(1)" -noreset
+     command LEDDRIVER_TURNOFF 1
+     expect "%timestamp LEDDRIVER_TURNOFF 0x0000"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Turn on multiple LEDs" -noreset
+     command LEDDRIVER_TURNON 9
+     expect "%timestamp LEDDRIVER_TURNON 0x0100"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+     command LEDDRIVER_TURNON 8
+     expect "%timestamp LEDDRIVER_TURNON 0x0180"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     ~ ~ ~
+
+     #----------
+     test "LED memory is not readable" -noreset
+     current_obj AP virtualLeds
+     poke 0 2 [binary format s 0xFFFF]
+     peek 0 2 1
+     expect "%timestamp Trg-Peek Offs=0,Size=2,Num=1,Data=<FFFF>"
+     command LEDDRIVER_TURNON 8
+     expect "%timestamp LEDDRIVER_TURNON 0x0080"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     # the end
+     end
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The **test** command starts the first test of the group. The first test command must @ref qutest_reset "reset the Target", which brings the Target into a well-defined initial state and produces the QS dictionary records (see @ref qutest_leddriver-fixture "test-fixture"[5]).
+  </li>
+  <li><span class="tag">2</span> This **command** illustrates the use of a symbolic name for the `cmdId` paramter. The symbolic name `LEDDRIVER_CREATE` comes from the @ref qs_dict "user dictionary" produced in @ref qutest_leddriver-fixture "test-fixture"[8].
+  </li>
+  <li><span class="tag">3</span> The **expect** command corresponds to the @ref qs_app "user-record" `LEDDRIVER_CREATE` generated in @ref qutest_leddriver-fixture "test-fixture"[13]. Note that the value of the `virtualLeds` variable sent in this user-record is formatted in hex, which corresponds to the macro `QS_U32_HEX()` in @ref qutest_leddriver-fixture "test-fixture"[14].
+  </li>
+</ul>
+
+@note
+As you can see, the QUTest&trade; environment enables you to write *test scritps* entirely in terms of the symbols used in the *test fixture*. (You could use hex addesses, if you wished, but this is obviously not recommended.) The key is to generate appropriate @ref @ref qs_dict "QS dictionaries" from the *test fixture*.
+
+@next{qutest_tut_Mock}
+*/
+
+/*###########################################################################*/
+/*! @page qutest_tut_Mock Mocking Example
+
+@tableofcontents
+
+@htmlonly
+<img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
+@endhtmlonly
+
+This example is an adaptation of the Flash-memory tests described in Chapter 10 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip.
+
+@next{qutest_tut_HSM}
+*/
+
+/*###########################################################################*/
+/*! @page qutest_tut_HSM Hierarchical State Machine Example
+
+@tableofcontents
+
+
+@next{qutest_tut_AO}
+*/
+
+/*###########################################################################*/
+/*! @page qutest_tut_AO Active Object Example
+
+@tableofcontents
+
+
+@next{qutest_ref}
+*/
+

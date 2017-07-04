@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-16
+* Last updated for version 5.9.3
+* Last updated on  2017-06-30
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1151,7 +1151,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u %s Obj=%s,Evt<Sig=%s,Pool=%u,Ref=%u>,"
-                       "Que<Used=%u>",
+                       "Que<Free=%u>",
                        t,
                        s,
                        Dictionary_get(&l_objDict, p, (char *)0),

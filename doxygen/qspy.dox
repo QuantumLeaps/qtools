@@ -3,14 +3,13 @@
 @tableofcontents
 
 @section qspy_about About QSPY
-<p>As described in the @ref qspy_system "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a plain console application without a GUI, because its main purpose is to provide the parsing of the @ref qspy_protocol "QP/Spy Data Protocol" and displaying the data in a simple @ref qspy_text "human-readable format". QSPY can also export the data in various other formats, such as
-format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and format suitable for generating message sequence diagrams with @ref qspy_mscgen "MscGen". Additionally, QSPY can also save the symbolic information about the Target objects in form of @ref qspy_dict "QSPY dictionaries".
+<p>As described in the @ref qspy_system "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a simple console application without a GUI, because its main purpose is to provide the parsing of the @ref qpspy_proto "QP/Spy Data Protocol" and displaying the data in a simple @ref qspy_text "human-readable format". QSPY can also export the data in various other formats, such as format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and format suitable for generating message sequence diagrams with @ref qspy_mscgen "MscGen". Additionally, QSPY can also save the symbolic information about the Target objects in form of @ref qspy_dict "QSPY dictionaries". An example of a @ref qpspy_exa "QSPY session" is shown in the Introduction to QP/Spy.
 </p>
 
-Starting with version 5.5.0, QSPY can serve a "Back-End" for attaching various **GUI-based** or head-less "Front-Ends" (such as the @ref qspyview "QSpyView Front-End").
+Starting with @ref qtools_5_5_0 "version 5.5.0", QSPY supports extensible @ref qspy_udp "UDP-socket" connection, which allows it to serve as a <em>"Back-End"</em> for attaching various "Front-Ends" (such as the @ref qutest "QUTest" Front-End and @ref qspyview "QSpyView" Front-End).
 
-@note
-The fact that QSPY is a simple console application allows it to be "platform-neutral". QSPY is written in portable C with ports to Windows and Linux provided. QSPY is also designed to be adaptable to various target-host communication links. Out of the box, the QSPY host application supports serial (RS232), TCP/IP, and file communication links. Adding other communication links is straightforward, because the data link is accessed only through a generic Platform Abstraction Layer (PAL).
+@remark
+QSPY is written in portable C with ports to Windows and POSIX (Linux, macOS) provided. QSPY is also designed to be adaptable to various target-host communication links. Out of the box, the QSPY host application supports serial (RS232), TCP/IP, and file communication links. Adding other communication links is straightforward, because the data link is accessed only through a generic Platform Abstraction Layer (PAL).
 
 
 -------------------------------------------------------------------------------
@@ -251,10 +250,6 @@ mismatched trace records and will start generating the following errors:@n
 The name after `Rec=` indicates the <a href="qs__copy_8h.html#acdb495c1e5524b5d95aaff82c47f6db5"><strong>Record ID</strong></a> of the trace record that failed to be parsed.
 
 
-@attention
-Starting with @ref qspy_5_5_0 "version 5.5.0", the QSPY host application is much less vulnerable to mismatch the target configuration, because the target-resident QS component sends the configuration information in the Reset packet. The only situation when the mismatch can still occur is when QSPY is attached to a running embedded Target without ever seeing the initial Reset packet.
-
-
 -------------------------------------------------------------------------------
 @section qspy_keyboard QSPY Keyboard Commands
 Starting from version 5.5.0, QSPY accepts keyboard input. The following table shows the currently supported key-strokes:
@@ -262,19 +257,19 @@ Starting from version 5.5.0, QSPY accepts keyboard input. The following table sh
 
 Key | Action
 ----|---------
-&lt;Esc&gt; | Exit QSPY
-h           | display keyboard help and QSPY status
-c           | clear the screen
-q           | toggle quite mode (no Target output to the screen</TD>
-r           | send RESET command to the Target
-i           | send the INFO request to the Target (see also @ref qspy_dict)
-t           | send TIKC[0] command to the Target
-u           | send TICK[1] command to the Target
-d           | save @ref qspy_dict "QP/Spy Dictionaries" to a file
-o           | toggle @ref qspy_text "QSPY Human-Readable Output" to a file (open/close)
-s/b         | toggle binary file output (open/close)
-m           | toggle @ref qspy_matlab "MATLAB Output" to a file (open/close)
-g           | toggle @ref qspy_mscgen "MscGen Output" to a file (open/close)
+`&lt;Esc&gt;` | Exit QSPY
+`h`     | display keyboard help and QSPY status
+`c`     | clear the screen
+`q`     | toggle quite mode (no Target output to the screen</TD>
+`r`     | send RESET command to the Target
+`i`     | send the INFO request to the Target (see also @ref qspy_dict)
+`t`     | send TIKC[0] command to the Target
+`u`     | send TICK[1] command to the Target
+`d`     | save @ref qspy_dict "QP/Spy Dictionaries" to a file
+`o`     | toggle @ref qspy_text "QSPY Human-Readable Output" to a file (open/close)
+`s`/`b` | toggle binary file output (open/close)
+`m`     | toggle @ref qspy_matlab "MATLAB Output" to a file (open/close)
+`g`     | toggle @ref qspy_mscgen "MscGen Output" to a file (open/close)
 
 
 @note
@@ -291,16 +286,26 @@ QSPY saves all files into the <strong>current directory</strong> from which `qsp
 
 QSPY uses a very simple naming convention to assign file names. All names start with `qspy<time-stamp>`, where the  time-stamp format is: `YYMMDD_hhmmss`, where `YY` is 2-digit year, `MM` is a 2-digit month, `DD` is a 2-digit day of the month, `hh` is a 2-digit hour, `mm` is a 2-digit minute, and `ss` is a 2-digit second. The time-stamp is accurate to a one second, so its virtually impossible to have name conflicts for files generated on the same machine. The various types of files are distinguished by the following extensions:
 
-Extension |  Example |  Comment
-----------|----------|-----------
-`.txt` | `qspy150914_132234.txt` | @subpage qspy_text "text (screen) output"
-`.dic` | `qspy150901_101203.dic` | @subpage qspy_dict "dictionary output"
-`.qs`  | `qspy150914_132234.qs`  | raw binary output (@ref qspy_protocol "QP/Spy protocol")
-`.mat` | `qspy150914_132234.mat` | @subpage qspy_matlab "MATLAB output"
-`.msc` | `qspy150914_132234.msg` | @subpage qspy_mscgen "MscGen output"
+Command-Line@n Option | Keyboard@n Option| File@n Extension |  Example |  Comment
+:-------------------:|:-----------------:|:----------------:|----------|----------
+`-o`                | `o`            | `.txt`    | `qspy150914_132234.txt`| @ref qspy_text "text (screen) output"
+`-s`                | `s`            | `.qs`     | `qspy150914_132234.qs`  | @ref qpspy_proto "raw binary output"
+`-d`                | `d`            | `.dic`    | `qspy150901_101203.dic` | @ref qspy_dict "dictionary output"
+`-m`                | `m`            | `.mat`    | `qspy150914_132234.mat` | @ref qspy_matlab "MATLAB output"
+`-g`                | `g`            | `.msc`    | `qspy150914_132234.msg` | @ref qspy_mscgen "MscGen output"
 
 @note
 All files except the dictionary output are time-stamped with the <strong>local</strong> time of the Host. The **dictionary** output is time-stamped with the build-time of the Target image.
+
+
+------------------------------------------------------------------------------
+The following sub-sections explain the following QSPY features:
+
+- @subpage qspy_text "text (screen) output"
+- @subpage qspy_dict "dictionary output"
+- @subpage qspy_udp  "UDP socket interface"
+- @subpage qspy_matlab "MATLAB output"
+- @subpage qspy_mscgen "MscGen output"
 
 @next{qspy_text}
 */
@@ -310,19 +315,24 @@ All files except the dictionary output are time-stamped with the <strong>local</
 
 @tableofcontents
 
-<p>QSPY provides a simple consolidated, human-readable textual output to the screen. The readability of this output depends strongly on the availability of the <em>symbolic information</em> about the various objects in the Target code, called @ref qspy_dict "dictionaries". If the "dictionaries" are not available, QSPY can output only the hexadecimal values of various object addresses and event signals. However, if QSPY has acquired the "dictionaries" from the Target, or has @ref qspy_dict_read "read them from a file", it can apply the symbolic information to output the provided identifiers for objects, signals, and states.
+<p>QSPY provides a simple consolidated, human-readable textual output to the screen. The readability of this output depends strongly on the availability of the <em>symbolic information</em> about the various objects in the Target code, called @ref qspy_dict "dictionaries". If the "dictionaries" are not available, QSPY can output only the hexadecimal values of various object addresses and event signals. However, if QSPY has acquired the @ref qs_dict "dictionaries" from the Target, or has @ref qspy_dict_read "read them from a file", it can apply the symbolic information to output the provided identifiers for objects, signals, and states.
 </p>
+
+@note
+In the process of adapting QSPY for supporting @ref qutest "QUTest Unit Testing", the QSPY human-redable output has been changed to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textuall output with the expected output.
 
 
 -------------------------------------------------------------------------------
 @section qspy_text_exa Screen Output Example
-For example, the following listing shows the QSPY text output when the "dictionaries" **are** available:
+For example, the following listing shows the QSPY text output when the @ref qs_dict "dictionaries" **are** available:
 
 @verbatim
-QSPY host application 5.5.0
-Copyright (c) Quantum Leaps, state-machine.com
-Time Stamp: 150914_131608
--v550
+C:\qp\qpc\examples\arm-cm\dpp_efm32-slstk3401a\qxk\gnu>qspy -cCOM6
+QSPY host utility 5.9.0
+Copyright (c) 2005-2017 Quantum Leaps (state-machine.com)
+Time Stamp: 170519_115355
+-cCOM6
+-v590
 -T4
 -O4
 -F4
@@ -333,262 +343,365 @@ Time Stamp: 150914_131608
 -B2
 -C2
 
-********** TARGET: QP-Ver: 550, build tstamp:150831_144229
-           Obj-Dic: 0000000000004018->QS_RX
-           Obj-Dic: 0000000000003B18->l_SysTick_Handler
-           Obj-Dic: 0000000000003B19->l_GPIOPortA_IRQHandler
-           Usr-Dic: 00000046        ->PHILO_STAT
-. . . . . .
-           Fun-Dic: 0000000000000A79->Philo_initial
-           Fun-Dic: 0000000000000D01->Philo_thinking
-           Fun-Dic: 0000000000000C99->Philo_hungry
-           Fun-Dic: 0000000000000C45->Philo_eating
-           Sig-Dic: 0000000A,Obj=0000000020000D60->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000D60->TIMEOUT_SIG
-. . . . . .
-0000500000 PHILO_STAT: 0 thinking
-0000500000 PHILO_STAT: 1 thinking
-0000500000 PHILO_STAT: 2 thinking
-0000500000 PHILO_STAT: 3 thinking
-0000500000 PHILO_STAT: 4 thinking
-           INIT : Obj=l_table Source=NULL Target=Table_serving
-           ENTRY: Obj=l_table State=Table_serving
-0000500000 ==>Init: Obj=l_table New=Table_serving
-0001000995 Disp==>: Obj=l_table Sig=SERVE_SIG Active=Table_serving
-0001001751 Ignored: Obj=l_table Sig=SERVE_SIG Active=Table_serving
-0025500773 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_thinking
-           ENTRY: Obj=l_philo[4] State=Philo_hungry
-0025502307 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
-0025503277 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
-0025503983 PHILO_STAT: 4 hungry
-0025505703 PHILO_STAT: 4 eating
-0025506279 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
-0025507211 Disp==>: Obj=l_philo[4] Sig=EAT_SIG Active=Philo_hungry
-           ENTRY: Obj=l_philo[4] State=Philo_eating
-0025508581 ==>Tran: Obj=l_philo[4] Sig=EAT_SIG Source=Philo_hungry New=Philo_eating
-0025509563 Disp==>: Obj=l_philo[3] Sig=EAT_SIG Active=Philo_thinking
-0025510253 Intern : Obj=l_philo[3] Sig=EAT_SIG Source=Philo_thinking
+########## Trg-RST  QP-Ver=590,Build=170519_093948
+           Obj-Dict 0x000055A6->QS_RX
+           Obj-Dict 0x000051F2->l_SysTick_Handler
+           Obj-Dict 0x000051F1->l_GPIO_EVEN_IRQHandler
+           Usr-Dict 00000070->PHILO_STAT
+           Usr-Dict 00000071->PAUSED_STAT
+           Usr-Dict 00000072->COMMAND_STAT
+           Obj-Dict 0x20000D40->smlPoolSto
+           Obj-Dict 0x20000DB4->tableQueueSto
+. . . . .
+           Obj-Dict 0x200012F8->l_philo<4>
+           Obj-Dict 0x20001328->l_philo<4>.timeEvt
+           Fun-Dict 0x00000B8D->Philo_initial
+           Fun-Dict 0x00000DD5->Philo_thinking
+. . . . .
+           Sig-Dict 00000010,Obj=0x200011F8->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x200011F8->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<0>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<0>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<0>,State=Philo_thinking
+           Sig-Dict 00000010,Obj=0x20001238->HUNGRY_SIG
+. . . . .
+===RTC===> St-Init  Obj=l_philo<4>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<4>,State=Philo_thinking
+           Obj-Dict 0x2000133C->l_table
+           Fun-Dict 0x00001B05->QHsm_top
+. . . . .
+           Sig-Dict 00000010,Obj=0x2000133C->HUNGRY_SIG
+0000190000 PHILO_STAT 0 thinking
+0000190000 PHILO_STAT 1 thinking
+0000190000 PHILO_STAT 2 thinking
+0000190000 PHILO_STAT 3 thinking
+0000190000 PHILO_STAT 4 thinking
+===RTC===> St-Init  Obj=l_table,State=QHsm_top->Table_serving
+===RTC===> St-Entry Obj=l_table,State=Table_serving
+0000190000 Init===> Obj=l_table,State=Table_serving
+0000380805 Disp===> Obj=l_table,Sig=SERVE_SIG,State=Table_serving
+0000381523 =>Ignore Obj=l_table,Sig=SERVE_SIG,State=Table_serving
+0009691003 Disp===> Obj=l_philo<4>,Sig=TIMEOUT_SIG,State=Philo_thinking
+===RTC===> St-Exit  Obj=l_philo<4>,State=Philo_thinking
+0009692721 Disp===> Obj=l_table,Sig=HUNGRY_SIG,State=Table_serving
+0009693389 PHILO_STAT 4 hungry
+0009695383 PHILO_STAT 4 eating
+0009695932 =>Intern Obj=l_table,Sig=HUNGRY_SIG,State=Table_serving
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_hungry
+0009697188 ===>Tran Obj=l_philo<4>,Sig=TIMEOUT_SIG,State=Philo_thinking->Philo_hungry
+0009698052 Disp===> Obj=l_philo<4>,Sig=EAT_SIG,State=Philo_hungry
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_eating
+0009699697 ===>Tran Obj=l_philo<4>,Sig=EAT_SIG,State=Philo_hungry->Philo_eating
+0009700602 Disp===> Obj=l_philo<3>,Sig=EAT_SIG,State=Philo_thinking
+0009701247 =>Intern Obj=l_philo<3>,Sig=EAT_SIG,State=Philo_thinking
 . . . . . .
 @endverbatim
 
 The QS trace log shown in the listing above contains quite detailed information, because most QS records are enabled (are not blocked in the @ref "QS filters"). The following bullet items highlight the most interesting parts of the trace and illustrate how you can interpret the trace data:
 
-- The QS output starts with the QSPY application version number, the date and time of the run (Time Stamp), and all the options explicitly provided to the QSPY host application.
+- The QS output starts with the QSPY application version number, the date and time of the run (run time-stamp), and all the options explicitly provided to the QSPY host application.
 
 - The first trace records in the log are typically @ref qspy_dict "dictionary trace records" that provide a mapping between addresses of various objects in memory and their symbolic names.
 
-- After the dictionaries, you see the active object initialization. For example, the `INIT` record indicates that the top-most initial transition in the active object `l_table` has been taken. After this, the `ENTRY` record informs you that the state `Table_serving` has been entered, and finally the record `==>Init` tells you that the top-most initial transition sequence has completed. This trace record has a high-resolution **time-stamp** (the first 8-digit number) generated by the Target. The time units used by this time-stamp depend on the specific hardware timer used in the Target, but typically it is sub-microsecond.
+- After the dictionaries, you see the active object initialization. For example, the `===RTC===> St-Init` record indicates that the top-most initial transition in the active object `l_table` has been taken. After this, the `===RTC===> St-Entry` record informs you that the state `Table_serving` has been entered, and finally the record `==>Init` tells you that the top-most initial transition sequence has completed. This trace record has a high-resolution @qs_tstamp "time-stamp" (the first 10-digit number) generated by the Target. The time units used by this time-stamp depend on the specific hardware timer used in the Target, but typically it is sub-microsecond.
 
-- After this you see that at the time-stamp `0001000995` an event was dispatched (`Disp==>` record) to `l_table`, but it was subsequently `Ignored`, while `l_table` was in the state `Table_serving`.
+- After this you see that at the time-stamp `0000380805` an event was dispatched (`Disp===>` record) to `l_table`, but it was subsequently `Ignored`, while `l_table` was in the state `Table_serving`.
 
 
 -------------------------------------------------------------------------------
-@section qspy_text_table Standard Trace Records
-The following table summarizes the text output format used for all standard QS trace records (see ::•QSpyRecords).
+@section qspy_pre Predefined Trace Records
+The following table summarizes the text output format used for all predefined QS trace records (see ::QSpyRecords).
 
-<TABLE SUMMARY="QEP Records" cellSpacing=4 cellPadding=1 border=0 width="95%">
+@note
+To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY human-redable output has been changed at @ref qtools_5_9_0 "version 5.9.0" to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textuall output with the expected output.
+
+
+<TABLE SUMMARY="QEP Records" cellSpacing=4 cellPadding=1 border=0 width="99%">
 
   <TR bgColor="#f0f0c0">
-      <TD colspan="4"><strong>QEP Trace Records</strong></TD>
+      <TD colspan="4"><strong>State Machine Trace Records (QEP)</strong></TD>
   </TR>
 
   <TR bgColor="#c8cedc">
     <TD><B>Rec.@n Num.</B></TD>
     <TD><B>Rec.@n Enum.</B></TD>
-    <TD><B>QSPY@n Abbrev.@n</B></TD>
+    <TD><B>Start of record</B></TD>
     <TD><B>Comment</B></TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>1</TD>
     <TD>#QS_QEP_STATE_ENTRY</TD>
-    <TD>Q_ENTRY</TD>
+    <TD>`===RTC===> St-Entry`</TD>
     <TD>a state was entered</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#c0c0c0">
     <TD>2</TD>
     <TD>#QS_QEP_STATE_EXIT</TD>
-    <TD>Q_EXIT</TD>
+    <TD>`===RTC===> St-Exit`</TD>
     <TD>a state was exited</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>3</TD>
     <TD>#QS_QEP_STATE_INIT</TD>
-    <TD>Q_INIT</TD>
-    <TD>an intial transition was taken in a state</TD>
+    <TD>`<timestamp> St-Init`</TD>
+    <TD>an initial transition was taken in a state</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#c0c0c0">
     <TD>4</TD>
     <TD>#QS_QEP_INIT_TRAN</TD>
-    <TD>==>Init</TD>
+    <TD>`<timestamp> Init===>`</TD>
     <TD>the top-most initial transition was taken</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>5</TD>
     <TD>#QS_QEP_INTERN_TRAN</TD>
-    <TD>Intern</TD>
+    <TD>`<timestamp> =>Intern`</TD>
     <TD>an internal transition was taken</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#c0c0c0">
     <TD>6</TD>
     <TD>#QS_QEP_TRAN</TD>
-    <TD>==>Tran</TD>
+    <TD>`<timestamp> ===>Tran `</TD>
     <TD>a regular transition was taken</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>7</TD>
     <TD>#QS_QEP_IGNORED</TD>
-    <TD>Ignored</TD>
+    <TD>`<timestamp> =>Ignore`</TD>
     <TD>an event was ignored (silently discarded)</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#c0c0c0">
     <TD>8</TD>
     <TD>#QS_QEP_DISPATCH</TD>
-    <TD>Disp==></TD>
+    <TD>`<timestamp> Disp===>`</TD>
     <TD>an event was dispatched (begin of RTC step)</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>9</TD>
     <TD>#QS_QEP_UNHANDLED</TD>
-    <TD>==>UnHd</TD>
+    <TD>`===RTC===> St-Unhnd`</TD>
     <TD>a guard prevented handling of an event</TD>
   </TR>
 
+  <TR bgColor="#c0c0c0">
+    <TD>55</TD>
+    <TD>#QS_QEP_TRAN_HIST</TD>
+    <TD>`===RTC===> St-Hist`</TD>
+    <TD>an a transition to history was taken </TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>56</TD>
+    <TD>#QS_QEP_TRAN_EP</TD>
+    <TD>`===RTC===> St-EP`</TD>
+    <TD>an a transition to entry point into a submachine </TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>57</TD>
+    <TD>#QS_QEP_TRAN_XP</TD>
+    <TD>`===RTC===> St-XP`</TD>
+    <TD>an a transition to exit  point out of a submachine </TD>
+  </TR>
+
   <TR bgColor="#f0f0c0">
-      <TD colspan="4"><strong>QF Trace Records</strong></TD>
+      <TD colspan="4"><strong>Active Object Trace Records</strong></TD>
   </TR>
 
   <TR bgColor="#c8cedc">
     <TD><B>Rec.@n Num.</B></TD>
     <TD><B>Rec.@n Enum.</B></TD>
-    <TD><B>QSPY@n Abbrev.@n</B></TD>
+    <TD><B>Start of record</B></TD>
     <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>10</TD>
     <TD>#QS_QF_ACTIVE_ADD</TD>
-    <TD>ADD</TD>
+    <TD>`<timestamp> AO-Add`</TD>
     <TD>an AO has been added to QF (started)</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>11</TD>
     <TD>#QS_QF_ACTIVE_REMOVE</TD>
-    <TD>REM</TD>
+    <TD>`<timestamp> AO-Remov`</TD>
     <TD>an AO has been removed from QF (stopped)</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>12</TD>
     <TD>#QS_QF_ACTIVE_SUBSCRIBE</TD>
-    <TD>SUB</TD>
+    <TD>`<timestamp> AO-Subsc`</TD>
     <TD>an AO subscribed to an event</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>13</TD>
     <TD>#QS_QF_ACTIVE_UNSUBSCRIBE</TD>
-    <TD>USUB</TD>
+    <TD>`<timestamp> AO-Unsub`</TD>
     <TD>an AO unsubscribed to an event</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>14</TD>
     <TD>#QS_QF_ACTIVE_POST_FIFO</TD>
-    <TD>AO.FIFO</TD>
+    <TD>`<timestamp> AO-Post`</TD>
     <TD>an event was posted (FIFO) directly to AO</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>15</TD>
     <TD>#QS_QF_ACTIVE_POST_LIFO</TD>
-    <TD>AO.LIFO</TD>
+    <TD>`<timestamp> AO-LIFO`</TD>
     <TD>an event was posted (LIFO) directly to AO</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>16</TD>
     <TD>#QS_QF_ACTIVE_GET</TD>
-    <TD>AO.GET</TD>
+    <TD>`<timestamp> AO-Get`</TD>
     <TD>AO got an event and its queue is still not empty</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>17</TD>
     <TD>#QS_QF_ACTIVE_GET_LAST</TD>
-    <TD>AO.GETL</TD>
+    <TD>`<timestamp> AO-GetL`</TD>
     <TD>AO got an event and its queue is empty</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>45</TD>
+    <TD>#QS_QF_ACTIVE_POST_ATTEMPT</TD>
+    <TD>`<timestamp> AO-PostA`</TD>
+    <TD>attempt to post an evt to AO failed</TD>
+  </TR>
+
+  <TR bgColor="#f0f0c0">
+      <TD colspan="4"><strong>Raw Event Queue Trace Records</strong></TD>
+  </TR>
+
+  <TR bgColor="#c8cedc">
+    <TD><B>Rec.@n Num.</B></TD>
+    <TD><B>Rec.@n Enum.</B></TD>
+    <TD><B>Start of record</B></TD>
+    <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>18</TD>
     <TD>#QS_QF_EQUEUE_INIT</TD>
-    <TD>EQ.INIT</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EQ-Init`</TD>
     <TD>an event queue was initialized</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>19</TD>
     <TD>#QS_QF_EQUEUE_POST_FIFO</TD>
-    <TD>EQ.FIFO</TD>
+    <TD>`<timestamp> EQ-Post`</TD>
     <TD>an event was posted (FIFO) to a raw queue</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>20</TD>
     <TD>#QS_QF_EQUEUE_POST_LIFO</TD>
-    <TD>EQ.LIFO</TD>
+    <TD>`<timestamp> EQ-LIFO`</TD>
     <TD>an event was posted (LIFO) to a raw queue</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>21</TD>
     <TD>#QS_QF_EQUEUE_GET</TD>
-    <TD>EQ.GET</TD>
+    <TD>`<timestamp> EQ-Get`</TD>
     <TD>get an event and queue still not empty</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>22</TD>
     <TD>#QS_QF_EQUEUE_GET_LAST</TD>
-    <TD>EQ.GETL</TD>
+    <TD>`<timestamp> EQ-GetL`</TD>
     <TD>get the last event from the queue</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>46</TD>
+    <TD>#QS_QF_EQUEUE_POST_ATTEMPT</TD>
+    <TD>`<timestamp> EQ-PostA`</TD>
+    <TD>attempt to post an evt to QEQueue failed</TD>
+  </TR>
+
+  <TR bgColor="#f0f0c0">
+      <TD colspan="4"><strong>Raw Memory Pool Trace Records</strong></TD>
+  </TR>
+
+  <TR bgColor="#c8cedc">
+    <TD><B>Rec.@n Num.</B></TD>
+    <TD><B>Rec.@n Enum.</B></TD>
+    <TD><B>Start of record</B></TD>
+    <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>23</TD>
     <TD>#QS_QF_MPOOL_INIT</TD>
-    <TD>MP.INIT</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP-Init`</TD>
     <TD>a memory pool was initialized</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>24</TD>
     <TD>#QS_QF_MPOOL_GET</TD>
-    <TD>MP.GET</TD>
+    <TD>`<timestamp> MP-Get`</TD>
     <TD>a memory block was removed from a memory pool</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
+    <TD>24</TD>
+    <TD>#QS_QF_MPOOL_GET_ATTEMPT</TD>
+    <TD>`<timestamp> MP-GetA`</TD>
+    <TD>a memory block was removed from a memory pool</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
     <TD>25</TD>
     <TD>#QS_QF_MPOOL_PUT</TD>
-    <TD>MP.PUT</TD>
+    <TD>`<timestamp> MP-Put`</TD>
     <TD>a memory block was returned to a memory pool</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>47</TD>
+    <TD>#QS_QF_MPOOL_GET_ATTEMPT</TD>
+    <TD>`<timestamp> MP-GetA`</TD>
+    <TD>attempt to get a memory block failed </TD>
+  </TR>
+
+  <TR bgColor="#f0f0c0">
+      <TD colspan="4"><strong>Event Management (QF)</strong></TD>
+  </TR>
+
+  <TR bgColor="#c8cedc">
+    <TD><B>Rec.@n Num.</B></TD>
+    <TD><B>Rec.@n Enum.</B></TD>
+    <TD><B>Start of record</B></TD>
+    <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>26</TD>
     <TD>#QS_QF_PUBLISH</TD>
-    <TD>PUBLISH</TD>
+    <TD>`<timestamp> QF-Pub`</TD>
     <TD>an event was published</TD>
   </TR>
 
@@ -602,182 +715,168 @@ The following table summarizes the text output format used for all standard QS t
   <TR bgColor="#f0f0f0">
     <TD>28</TD>
     <TD>#QS_QF_NEW</TD>
-    <TD>NEW</TD>
+    <TD>`<timestamp> QF-New`</TD>
     <TD>new event creation</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>29</TD>
     <TD>#QS_QF_GC_ATTEMPT</TD>
-    <TD>GC-ATT</TD>
+    <TD>`<timestamp> QF-gcA`</TD>
     <TD>garbage collection attempt</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>30</TD>
     <TD>#QS_QF_GC</TD>
-    <TD>GC</TD>
+    <TD>`<timestamp> QF-gc`</TD>
     <TD>garbage collection performed</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>31</TD>
     <TD>#QS_QF_TICK</TD>
-    <TD>TICK</TD>
-    <TD>QF_tick() was called</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tick`</TD>
+    <TD>QF system clock tick processing was called</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>39</TD>
+    <TD>#QS_QF_CRIT_ENTRY</TD>
+    <TD>`<timestamp> QF-CritE`</TD>
+    <TD>critical section was entered</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>40</TD>
+    <TD>#QS_QF_CRIT_EXIT</TD>
+    <TD>`<timestamp> QF-CritX`</TD>
+    <TD>critical section was exited</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>41</TD>
+    <TD>#QS_QF_ISR_ENTRY</TD>
+    <TD>`<timestamp> QF-IsrE`</TD>
+    <TD>an ISR was entered</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>42</TD>
+    <TD>#QS_QF_ISR_EXIT</TD>
+    <TD>`<timestamp> QF-IsrX`</TD>
+    <TD>an ISR was exited</TD>
+  </TR>
+
+  <TR bgColor="#f0f0c0">
+      <TD colspan="4"><strong>Time Events (TE)</strong></TD>
+  </TR>
+
+  <TR bgColor="#c8cedc">
+    <TD><B>Rec.@n Num.</B></TD>
+    <TD><B>Rec.@n Enum.</B></TD>
+    <TD><B>Start of record</B></TD>
+    <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>32</TD>
     <TD>#QS_QF_TIMEEVT_ARM</TD>
-    <TD>TE.ARM</TD>
+    <TD>`<timestamp> TE-Arm`</TD>
     <TD>a time event was armed</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>33</TD>
     <TD>#QS_QF_TIMEEVT_AUTO_DISARM</TD>
-    <TD>TE.ADRM</TD>
+    <TD>`<timestamp> TE-ADis`</TD>
     <TD>a time event expired and was disarmed</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>34</TD>
     <TD>#QS_QF_TIMEEVT_DISARM_ATTEMPT</TD>
-    <TD>TE.DATT</TD>
+    <TD>`<timestamp> TE-DisA`</TD>
     <TD>attempt to disarmed a disarmed tevent</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>35</TD>
     <TD>#QS_QF_TIMEEVT_DISARM</TD>
-    <TD>TE.DARM</TD>
+    <TD>`<timestamp> TE-Dis`</TD>
     <TD>true disarming of an armed time event</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>36</TD>
     <TD>#QS_QF_TIMEEVT_REARM</TD>
-    <TD>TE.RARM</TD>
+    <TD>`<timestamp> TE-Rarm`</TD>
     <TD>rearming of a time event</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>37</TD>
     <TD>#QS_QF_TIMEEVT_POST</TD>
-    <TD>TE.POST</TD>
+    <TD>`<timestamp> TE-Post`</TD>
     <TD>a time event posted itself directly to an AO</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>38</TD>
     <TD>#QS_QF_TIMEEVT_CTR</TD>
-    <TD>TE.CTR</TD>
+    <TD>`<timestamp> TE-Ctr`</TD>
     <TD>a time event counter was requested </TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
-    <TD>39</TD>
-    <TD>#QS_QF_INT_DISABLE</TD>
-    <TD>QF_intL</TD>
-    <TD>interrupts were disabled</TD>
-  </TR>
-
-  <TR bgColor="#f0f0f0">
-    <TD>40</TD>
-    <TD>#QS_QF_INT_ENABLE</TD>
-    <TD>QF_intU</TD>
-    <TD>interrupts were enabled</TD>
-  </TR>
-
-  <TR bgColor="#c0c0c0">
-    <TD>42</TD>
-    <TD>#QS_QF_ISR_ENTRY</TD>
-    <TD>QF_isrE</TD>
-    <TD>an ISR was entered</TD>
-  </TR>
-
-  <TR bgColor="#f0f0f0">
-    <TD>43</TD>
-    <TD>#QS_QF_ISR_EXIT</TD>
-    <TD>QF_isrX</TD>
-    <TD>an ISR was exited</TD>
-  </TR>
-
   <TR bgColor="#f0f0c0">
-      <TD colspan="4"><strong>QK/QV Trace Records</strong>      </TD>
+      <TD colspan="4"><strong>Scheduler Trace Records</strong></TD>
   </TR>
 
   <TR bgColor="#c8cedc">
     <TD><B>Rec.@n Num.</B></TD>
     <TD><B>Rec.@n Enum.</B></TD>
-    <TD><B>QSPY@n Abbrev.@n</B></TD>
+    <TD><B>Start of record</B></TD>
     <TD><B>Comment</B></TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>50</TD>
-    <TD>#QS_QK_MUTEX_LOCK</TD>
-    <TD>QK_muxL</TD>
-    <TD>the QK mutex was locked</TD>
+    <TD>#QS_SCHED_LOCK</TD>
+    <TD>`<timestamp> Sch-Lock`</TD>
+    <TD>scheduler was locked</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>51</TD>
-    <TD>#QS_QK_MUTEX_UNLOCK</TD>
-    <TD>QK_muxU</TD>
-    <TD>the QK mutex was unlocked</TD>
+    <TD>#QS_SCHED_UNLOCK</TD>
+    <TD>`<timestamp> Sch-Unlk`</TD>
+    <TD>scheduler was unlocked</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>52</TD>
-    <TD>#QS_QVK_SCHEDULE</TD>
-    <TD>QVK_sche</TD>
-    <TD>the QV/QK scheduled a new task to execute</TD>
+    <TD>#QS_SCHED_NEXT</TD>
+    <TD>`<timestamp> Sch-Next`</TD>
+    <TD>scheduler found next task to execute</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>53</TD>
-    <TD>#QS_QVK_IDLE</TD>
-    <TD>QVK_idle</TD>
-    <TD>QK/QV became idle</TD>
+    <TD>#QS_SCHED_IDLE</TD>
+    <TD>`<timestamp> Sch-Idle`</TD>
+    <TD>scheduler became idle</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>54</TD>
-    <TD>#QS_QK_RESUME</TD>
-    <TD>QK_res</TD>
-    <TD>QK resumed previous task (not idle)</TD>
-  </TR>
-
-  <TR bgColor="#f0f0c0">
-      <TD colspan="4"><strong>Additional QEP Trace Records</strong></TD>
-  </TR>
-
-  <TR bgColor="#c0c0c0">
-    <TD>55</TD>
-    <TD>#QS_QEP_TRAN_HIST</TD>
-    <TD>QS.HIST</TD>
-    <TD>a transition to history was taken</TD>
-  </TR>
-
-  <TR bgColor="#f0f0f0">
-    <TD>56</TD>
-    <TD>#QS_QEP_TRAN_EP</TD>
-    <TD>QS.EP</TD>
-    <TD>a transition to entry point into a submachine</TD>
-  </TR>
-
-  <TR bgColor="#c0c0c0">
-    <TD>57</TD>
-    <TD>#QS_QEP_TRAN_XP</TD>
-    <TD>QS.XP</TD>
-    <TD>a transition to exit point into a submachine</TD>
+    <TD>#QS_SCHED_RESUME</TD>
+    <TD>`<timestamp> Sch-Rsme`</TD>
+    <TD>scheduler resumed previous task (not idle)</TD>
   </TR>
 
   <TR bgColor="#f07070">
       <TD colspan="4"><strong>Miscellaneous Trace Records@n
-      NOT MASKABLE WITH THE GLOBAL FILTER!
+      NOT MASKABLE WITH THE @ref qs_global "QS GLOBAL FILTER"!
       </strong>
       </TD>
   </TR>
@@ -785,47 +884,75 @@ The following table summarizes the text output format used for all standard QS t
   <TR bgColor="#c8cedc">
     <TD><B>Rec.@n Num.</B></TD>
     <TD><B>Rec.@n Enum.</B></TD>
-    <TD><B>QSPY@n Abbrev.</B></TD>
+    <TD><B>Start of record</B></TD>
     <TD><B>Comment</B></TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>58</TD>
+    <TD>#QS_TEST_PAUSED</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TstPause`</TD>
+    <TD>test has been paused</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>59</TD>
+    <TD>#QS_TEST_PROBE_GET</TD>
+    <TD>`<timestamp> TstProbe`</TD>
+    <TD>reports that Test-Probe has been used</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>60</TD>
     <TD>#QS_SIG_DICTIONARY</TD>
-    <TD>Sig Dic</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sig-Dict`</TD>
     <TD>signal dictionary entry</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>61</TD>
     <TD>#QS_OBJ_DICTIONARY</TD>
-    <TD>Obj Dic</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Obj-Dict`</TD>
     <TD>object dictionary entry</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>62</TD>
     <TD>#QS_FUN_DICTIONARY</TD>
-    <TD>Fun Dic</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fun-Dict`</TD>
     <TD>function dictionary entry</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>63</TD>
     <TD>#QS_USR_DICTIONARY</TD>
-    <TD>Usr Dic</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Usr-Dict`</TD>
     <TD>User record dictionary entry</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
     <TD>64</TD>
     <TD>#QS_TARGET_INFO</TD>
-    <TD>Info</TD>
+    <TD>`########## Trg-Info`</TD>
     <TD>reports the Target information</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>65</TD>
+    <TD>#QS_TARGET_DONE</TD>
+    <TD>`<timestamp> Trg-Done`</TD>
+    <TD>reports completion of a user callback</TD>
+  </TR>
+
+  <TR bgColor="#f0f0f0">
+    <TD>66</TD>
+    <TD>#QS_RX_STATUS</TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Ack`</TD>
+    <TD>reports QS data receive status</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
+    <TD>66</TD>
     <TD>RESERVED</TD>
     <TD></TD>
     <TD></TD>
@@ -833,29 +960,15 @@ The following table summarizes the text output format used for all standard QS t
 
   <TR bgColor="#f0f0f0">
     <TD>66</TD>
-    <TD>#QS_RX_STATUS</TD>
-    <TD></TD>
-    <TD>reports QS data receive status</TD>
-  </TR>
-
-  <TR bgColor="#c0c0c0">
-    <TD>66</TD>
-    <TD>#QS_TEST_STATUS</TD>
-    <TD></TD>
-    <TD>reports test status</TD>
-  </TR>
-
-  <TR bgColor="#f0f0f0">
-    <TD>66</TD>
     <TD>#QS_PEEK_DATA</TD>
-    <TD></TD>
+    <TD>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Peek`</TD>
     <TD>reports the data from the PEEK query</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>67</TD>
     <TD>#QS_ASSERT_FAIL</TD>
-    <TD>!ASSERT</TD>
+    <TD>`<timestamp> =ASSERT=`</TD>
     <TD>Assertion fired</TD>
   </TR>
 
@@ -865,9 +978,9 @@ The following table summarizes the text output format used for all standard QS t
 
   <TR bgColor="#f0f0f0">
     <TD>70</TD>
-    <TD>#QS_USER</TD>
-    <TD>UserXXX</TD>
-    <TD>the first record available for user QS records</TD>
+    <TD>#QS_USER + xxx</TD>
+    <TD>`<timestamp> USER+xxx`</TD>
+    <TD>@ref qs_app "application-specific" (user) QS records</TD>
   </TR>
 </TABLE>
 
@@ -882,51 +995,70 @@ The following table summarizes the text output format used for all standard QS t
 @section qspy_dict_about About QSPY Dictionaries
 By the time you compile and load your application image to the Target, the symbolic names of various objects, function names, and event signal names are stripped from the code. Therefore, if you want to have the symbolic information available to the QSPY host-resident component, you need to supply it somehow to the software tracing system.
 
-The QS Target-resident component provides special **dictionary trace records** designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records: object dictionary, function dictionary,  signal dictionary, and user dictionary.
+The QS Target-resident component provides special @ref qs_dict "dictionary trace records" designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records:
 
-The dictionary trace records are not absolutely required to generate the human-readable output, in the same way as the symbolic information in the object files is not absolutely required to debug code. However, in both cases, the availability of the symbolic information greatly improves the productivity in working with the software trace or the debugger. For example, the following listing shows an example of the QSPY text output when the "dictionaries" are **not** available:
+- object dictionary -- for identifying objects (HSMs, AOs, Time events, etc)
+- function dictionary -- for identifying functions (state-handlers)
+- signal dictionary -- for identifying event signals
+- user dictionary -- for identifying @ref qs_app "application-specific" (user) records
 
+@note
+QSPY does not absolutely require the presence of dictionary trace records to generate the human-readable output, in the same way as the symbolic information in the object files is not absolutely required to debug code. However, in both cases, the availability of the symbolic information greatly improves the readability of the disassembly code shown in the debugger.
+
+
+For instance, the following listing shows an example of the QSPY text output when the "dictionaries" are **not** available. (<b>NOTE:</b> dictionaries might not be available because (1) the Target does not produce @ref qs_dict "dictionary trace records" for all relevant objects or (2) the Target does produce all dictionaries, but QSPY has never seen them, because it was attached to the Target after the dictionaries have been transmitted):
+@n
 @verbatim
-********** Data discontinuity: seq=1 -> seq=73
-0148066147 Disp==>: Obj=20000E14 Sig=0000000B,Obj=20000E14 Active=00000D01
-           ENTRY: Obj=20000E14 State=00000C99
-0148067681 ==>Tran: Obj=20000E14 Sig=0000000B,Obj=20000E14 Source=00000D01 New=00000C99
-0148068651 Disp==>: Obj=20000E90 Sig=0000000A,Obj=20000E90 Active=00001145
-0148069357 User70: 3 hungry
-0148069955 Intern : Obj=20000E90 Sig=0000000A,Obj=20000E90 Source=00001145
-0181066185 Disp==>: Obj=20000D60 Sig=0000000B,Obj=20000D60 Active=00000D01
-           ENTRY: Obj=20000D60 State=00000C99
-0181067719 ==>Tran: Obj=20000D60 Sig=0000000B,Obj=20000D60 Source=00000D01 New=00000C99
-0181068689 Disp==>: Obj=20000E90 Sig=0000000A,Obj=20000E90 Active=00001145
-0181069395 User70: 0 hungry
-0181069999 Intern : Obj=20000E90 Sig=0000000A,Obj=20000E90 Source=00001145
-0185066099 Disp==>: Obj=20000E50 Sig=0000000B,Obj=20000E50 Active=00000C45
-           EXIT : Obj=20000E50 State=00000C45
-           ENTRY: Obj=20000E50 State=00000D01
-0185068413 ==>Tran: Obj=20000E50 Sig=0000000B,Obj=20000E50 Source=00000C45 New=00000D01
+. . . . . .
+0009692721 Disp===> Obj=0x2000133C,Sig=00000010,Obj=0x2000133C,State=0x000010C5
+0009693389 USER+000 4 hungry
+0009695383 USER+000 4 eating
+0009695932 =>Intern Obj=0x2000133C,Sig=00000010,Obj=0x2000133C,State=0x000010C5
+===RTC===> St-Entry Obj=0x200012F8,State=0x00000D49
+0009697188 ===>Tran Obj=0x200012F8,Sig=00000011,Obj=0x200012F8,State=0x00000DD5->0x00000D49
+0009698052 Disp===> Obj=0x200012F8,Sig=00000004,Obj=0x200012F8,State=0x00000D49
+===RTC===> St-Entry Obj=0x200012F8,State=0x00000CA9
+0009699697 ===>Tran Obj=0x200012F8,Sig=00000004,Obj=0x200012F8,State=0x00000D49->0x00000CA9
+0009700602 Disp===> Obj=0x200012B8,Sig=00000004,Obj=0x200012B8,State=0x00000DD5
+0009701247 =>Intern Obj=0x200012B8,Sig=00000004,Obj=0x200012B8,State=0x00000DD5
+0009702038 Disp===> Obj=0x20001278,Sig=00000004,Obj=0x20001278,State=0x00000DD5
+0009702677 =>Intern Obj=0x20001278,Sig=00000004,Obj=0x20001278,State=0x00000DD5
+0009703468 Disp===> Obj=0x20001238,Sig=00000004,Obj=0x20001238,State=0x00000DD5
+0009704107 =>Intern Obj=0x20001238,Sig=00000004,Obj=0x20001238,State=0x00000DD5
+0009704899 Disp===> Obj=0x200011F8,Sig=00000004,Obj=0x200011F8,State=0x00000DD5
+0009705538 =>Intern Obj=0x200011F8,Sig=00000004,Obj=0x200011F8,State=0x00000DD5
+0015961105 Disp===> Obj=0x200011F8,Sig=00000011,Obj=0x200011F8,State=0x00000DD5
+===RTC===> St-Exit  Obj=0x200011F8,State=0x00000DD5
+0015962823 Disp===> Obj=0x2000133C,Sig=00000010,Obj=0x2000133C,State=0x000010C5
+0015963491 USER+000 0 hungry
 . . . . . .
 @endverbatim
 
 And here is the exact same trace data when the "dictionaries" **are** available:
 
 @verbatim
-********** Data discontinuity: seq=1 -> seq=73
-0148066147 Disp==>: Obj=l_philo[3] Sig=TIMEOUT_SIG Active=Philo_thinking
-           ENTRY: Obj=l_philo[3] State=Philo_hungry
-0148067681 ==>Tran: Obj=l_philo[3] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
-0148068651 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
-0148069357 PHILO_STAT: 3 hungry
-0148069955 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
-0181066185 Disp==>: Obj=l_philo[0] Sig=TIMEOUT_SIG Active=Philo_thinking
-           ENTRY: Obj=l_philo[0] State=Philo_hungry
-0181067719 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Philo_hungry
-0181068689 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
-0181069395 PHILO_STAT: 0 hungry
-0181069999 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
-0185066099 Disp==>: Obj=l_philo[4] Sig=TIMEOUT_SIG Active=Philo_eating
-           EXIT : Obj=l_philo[4] State=Philo_eating
-           ENTRY: Obj=l_philo[4] State=Philo_thinking
-0185068413 ==>Tran: Obj=l_philo[4] Sig=TIMEOUT_SIG Source=Philo_eating New=Philo_thinking
+. . . . . .
+0009692721 Disp===> Obj=l_table,Sig=HUNGRY_SIG,State=Table_serving
+0009693389 PHILO_STAT 4 hungry
+0009695383 PHILO_STAT 4 eating
+0009695932 =>Intern Obj=l_table,Sig=HUNGRY_SIG,State=Table_serving
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_hungry
+0009697188 ===>Tran Obj=l_philo<4>,Sig=TIMEOUT_SIG,State=Philo_thinking->Philo_hungry
+0009698052 Disp===> Obj=l_philo<4>,Sig=EAT_SIG,State=Philo_hungry
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_eating
+0009699697 ===>Tran Obj=l_philo<4>,Sig=EAT_SIG,State=Philo_hungry->Philo_eating
+0009700602 Disp===> Obj=l_philo<3>,Sig=EAT_SIG,State=Philo_thinking
+0009701247 =>Intern Obj=l_philo<3>,Sig=EAT_SIG,State=Philo_thinking
+0009702038 Disp===> Obj=l_philo<2>,Sig=EAT_SIG,State=Philo_thinking
+0009702677 =>Intern Obj=l_philo<2>,Sig=EAT_SIG,State=Philo_thinking
+0009703468 Disp===> Obj=l_philo<1>,Sig=EAT_SIG,State=Philo_thinking
+0009704107 =>Intern Obj=l_philo<1>,Sig=EAT_SIG,State=Philo_thinking
+0009704899 Disp===> Obj=l_philo<0>,Sig=EAT_SIG,State=Philo_thinking
+0009705538 =>Intern Obj=l_philo<0>,Sig=EAT_SIG,State=Philo_thinking
+0015961105 Disp===> Obj=l_philo<0>,Sig=TIMEOUT_SIG,State=Philo_thinking
+===RTC===> St-Exit  Obj=l_philo<0>,State=Philo_thinking
+0015962823 Disp===> Obj=l_table,Sig=HUNGRY_SIG,State=Table_serving
+0015963491 PHILO_STAT 0 hungry
 . . . . . .
 @endverbatim
 
@@ -940,16 +1072,16 @@ The QS Target-resident component generates the dictionary trace records during t
 - Manually reset the Target while QSPY is running (e.g., press a Reset button on the Target board)
 - Send the @ref qspy_keyboard "RESET command" to the Target from QSPY while it is running
 
-Either way, the dictionary records should be produced and acquired by the Target. The following listing shows the dictionary records sent by the DPP example application running on the EK-TM4C123GXL board:
+Either way, the dictionary records should be produced and acquired by the Target. The following listing shows the dictionary records sent by the DPP example application running on the EFM32-SLSTK3401A board:
 
 @verbatim
-C:\qp\qtools\qspy\doxygen>qspy -u -cCOM4
-QSPY host application 5.5.0
-Copyright (c) Quantum Leaps, state-machine.com
-Time Stamp: 150918_113919
--u7701
--cCOM4
--v550
+C:\qp\qpc\examples\arm-cm\dpp_efm32-slstk3401a\qxk\gnu>qspy -cCOM6
+QSPY host utility 5.9.0
+Copyright (c) 2005-2017 Quantum Leaps (state-machine.com)
+Time Stamp: 170519_120317
+-fqspy170519_120217.bin
+   <COMMS> File     Opened File=qspy170519_120217.bin
+-v590
 -T4
 -O4
 -F4
@@ -960,70 +1092,71 @@ Time Stamp: 150918_113919
 -B2
 -C2
 
-********** TARGET: QP-Ver: 550, build tstamp:150831_144229
-           Obj-Dic: 0000000000004018->QS_RX
-           Obj-Dic: 0000000000003B18->l_SysTick_Handler
-           Obj-Dic: 0000000000003B19->l_GPIOPortA_IRQHandler
-           Usr-Dic: 00000046        ->PHILO_STAT
-           Usr-Dic: 00000047        ->COMMAND_STAT
-           Obj-Dic: 0000000020000D10->smlPoolSto
-           Obj-Dic: 0000000020000CFC->tableQueueSto
-           Obj-Dic: 0000000020000C74->philoQueueSto[0]
-           Obj-Dic: 0000000020000C88->philoQueueSto[1]
-           Obj-Dic: 0000000020000C9C->philoQueueSto[2]
-           Obj-Dic: 0000000020000CB0->philoQueueSto[3]
-           Obj-Dic: 0000000020000CC4->philoQueueSto[4]
-           Obj-Dic: 0000000020000D60->l_philo[0]
-           Obj-Dic: 0000000020000D8C->l_philo[0].timeEvt
-           Obj-Dic: 0000000020000D9C->l_philo[1]
-           Obj-Dic: 0000000020000DC8->l_philo[1].timeEvt
-           Obj-Dic: 0000000020000DD8->l_philo[2]
-           Obj-Dic: 0000000020000E04->l_philo[2].timeEvt
-           Obj-Dic: 0000000020000E14->l_philo[3]
-           Obj-Dic: 0000000020000E40->l_philo[3].timeEvt
-           Obj-Dic: 0000000020000E50->l_philo[4]
-           Obj-Dic: 0000000020000E7C->l_philo[4].timeEvt
-           Fun-Dic: 0000000000000A79->Philo_initial
-           Fun-Dic: 0000000000000D01->Philo_thinking
-           Fun-Dic: 0000000000000C99->Philo_hungry
-           Fun-Dic: 0000000000000C45->Philo_eating
-           Sig-Dic: 0000000A,Obj=0000000020000D60->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000D60->TIMEOUT_SIG
-           INIT : Obj=l_philo[0] Source=NULL Target=Philo_thinking
-           ENTRY: Obj=l_philo[0] State=Philo_thinking
-0000500000 ==>Init: Obj=l_philo[0] New=Philo_thinking
-           Sig-Dic: 0000000A,Obj=0000000020000D9C->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000D9C->TIMEOUT_SIG
-           INIT : Obj=l_philo[1] Source=NULL Target=Philo_thinking
-           ENTRY: Obj=l_philo[1] State=Philo_thinking
-0000500000 ==>Init: Obj=l_philo[1] New=Philo_thinking
-           Sig-Dic: 0000000A,Obj=0000000020000DD8->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000DD8->TIMEOUT_SIG
-           INIT : Obj=l_philo[2] Source=NULL Target=Philo_thinking
-           ENTRY: Obj=l_philo[2] State=Philo_thinking
-0000500000 ==>Init: Obj=l_philo[2] New=Philo_thinking
-           Sig-Dic: 0000000A,Obj=0000000020000E14->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000E14->TIMEOUT_SIG
-           INIT : Obj=l_philo[3] Source=NULL Target=Philo_thinking
-           ENTRY: Obj=l_philo[3] State=Philo_thinking
-0000500000 ==>Init: Obj=l_philo[3] New=Philo_thinking
-           Sig-Dic: 0000000A,Obj=0000000020000E50->HUNGRY_SIG
-           Sig-Dic: 0000000B,Obj=0000000020000E50->TIMEOUT_SIG
-           INIT : Obj=l_philo[4] Source=NULL Target=Philo_thinking
-           ENTRY: Obj=l_philo[4] State=Philo_thinking
-0000500000 ==>Init: Obj=l_philo[4] New=Philo_thinking
-           Obj-Dic: 0000000020000E90->l_table
-           Fun-Dic: 00000000000017A5->QHsm_top
-           Fun-Dic: 0000000000000E6D->Table_initial
-           Fun-Dic: 0000000000001355->Table_active
-           Fun-Dic: 0000000000001145->Table_serving
-           Fun-Dic: 0000000000000FFD->Table_paused
-           Sig-Dic: 00000005,Obj=0000000000000000->DONE_SIG
-           Sig-Dic: 00000004,Obj=0000000000000000->EAT_SIG
-           Sig-Dic: 00000006,Obj=0000000000000000->PAUSE_SIG
-           Sig-Dic: 00000007,Obj=0000000000000000->SERVE_SIG
-           Sig-Dic: 00000008,Obj=0000000000000000->TERMINATE_SIG
-           Sig-Dic: 0000000A,Obj=0000000020000E90->HUNGRY_SIG
+########## Trg-RST  QP-Ver=590,Build=170519_093948
+           Obj-Dict 0x000055A6->QS_RX
+           Obj-Dict 0x000051F2->l_SysTick_Handler
+           Obj-Dict 0x000051F1->l_GPIO_EVEN_IRQHandler
+           Usr-Dict 00000070->PHILO_STAT
+           Usr-Dict 00000071->PAUSED_STAT
+           Usr-Dict 00000072->COMMAND_STAT
+           Obj-Dict 0x20000D40->smlPoolSto
+           Obj-Dict 0x20000DB4->tableQueueSto
+           Obj-Dict 0x20000CDC->philoQueueSto<0>
+           Obj-Dict 0x20000CF0->philoQueueSto<1>
+           Obj-Dict 0x20000D04->philoQueueSto<2>
+           Obj-Dict 0x20000D18->philoQueueSto<3>
+           Obj-Dict 0x20000D2C->philoQueueSto<4>
+           Obj-Dict 0x200011F8->l_philo<0>
+           Obj-Dict 0x20001228->l_philo<0>.timeEvt
+           Obj-Dict 0x20001238->l_philo<1>
+           Obj-Dict 0x20001268->l_philo<1>.timeEvt
+           Obj-Dict 0x20001278->l_philo<2>
+           Obj-Dict 0x200012A8->l_philo<2>.timeEvt
+           Obj-Dict 0x200012B8->l_philo<3>
+           Obj-Dict 0x200012E8->l_philo<3>.timeEvt
+           Obj-Dict 0x200012F8->l_philo<4>
+           Obj-Dict 0x20001328->l_philo<4>.timeEvt
+           Fun-Dict 0x00000B8D->Philo_initial
+           Fun-Dict 0x00000DD5->Philo_thinking
+           Fun-Dict 0x00000D49->Philo_hungry
+           Fun-Dict 0x00000CA9->Philo_eating
+           Sig-Dict 00000010,Obj=0x200011F8->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x200011F8->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<0>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<0>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<0>,State=Philo_thinking
+           Sig-Dict 00000010,Obj=0x20001238->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x20001238->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<1>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<1>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<1>,State=Philo_thinking
+           Sig-Dict 00000010,Obj=0x20001278->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x20001278->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<2>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<2>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<2>,State=Philo_thinking
+           Sig-Dict 00000010,Obj=0x200012B8->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x200012B8->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<3>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<3>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<3>,State=Philo_thinking
+           Sig-Dict 00000010,Obj=0x200012F8->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x200012F8->TIMEOUT_SIG
+===RTC===> St-Init  Obj=l_philo<4>,State=0x00001B05->Philo_thinking
+===RTC===> St-Entry Obj=l_philo<4>,State=Philo_thinking
+0000190000 Init===> Obj=l_philo<4>,State=Philo_thinking
+           Obj-Dict 0x2000133C->l_table
+           Fun-Dict 0x00001B05->QHsm_top
+           Fun-Dict 0x00000E9D->Table_initial
+           Fun-Dict 0x00001099->Table_active
+           Fun-Dict 0x000010C5->Table_serving
+           Fun-Dict 0x00000FB1->Table_paused
+           Sig-Dict 00000005,Obj=0x00000000->DONE_SIG
+           Sig-Dict 00000004,Obj=0x00000000->EAT_SIG
+           Sig-Dict 00000006,Obj=0x00000000->PAUSE_SIG
+           Sig-Dict 00000007,Obj=0x00000000->SERVE_SIG
+           Sig-Dict 00000008,Obj=0x00000000->TEST_SIG
+           Sig-Dict 00000010,Obj=0x2000133C->HUNGRY_SIG
 @endverbatim
 
 Once QSPY acquires the dictionaries, it keeps them in the memory and applies them to display the data in symbolic form (rather than hex addresses).
@@ -1123,6 +1256,305 @@ The dictionary file saved in previous QSPY sessions can be used in two ways:
 - you can specify the dictionary file in the `-d` @ref qspy_command "command-line option" to QSPY. In this case QSPY reads the dictionaries before processing any trace records from the Target. (**NOTE:** in this case you don't need to provide any of the upper-case command-line options, because they are read from the dictionary file.) For example: command line: `qspy -dqspy150831_144229.dic` will attempt to read the dictionaries from the specified file.
 
 - you can query the Target information (by means of the `i` @ref qspy_keyboard "keyboard command" or from QSpyView menu "Commands->Query Target Info"). When the Target replies and provides its build-time-stamp, QSPY looks for the corresponding dictionary file in the current directory and if such a file is found, QSPY reads the dictionaries from it. (**NOTE:** this option requires that the Target implements the QS receive channel, QS-RX, so that it can receive commands from QSPY).
+
+@next{qspy_udp}
+*/
+/*##########################################################################*/
+/**
+@page qspy_udp QSPY UDP Interface
+
+@tableofcontents
+
+<p>This section describes the structure of the UDP packets exchanged between the QSPY Back-End and the various front-ends, such as @ref qutest "QUTest" and @ref qspyview "QSpyView"  (<span style="color:blue"><strong>blue arrows</strong></span> in the sequence diagram below). The UDP interface is implemented in the <span class="img file_tcl">qspy.tcl</span> script.
+</p>
+
+@image html qspy_comm.gif "Communication between Target, QSPY, and QSpyView"
+@n
+
+@note
+For better readability, the <span class="img file_tcl">qspy.tcl</span> script uses a convention in which UDP packets to and from the Target (<span style="color:red"><strong>red arrows</strong></span>) are called **Records**, while the word **Packets** is used for communication to and from the QSPY Back-End (<span style="color:blue"><strong>blue arrows</strong></span>). For consistency, the following sections apply the same naming convention: Records for Target communication and Packets for QSPY communication.
+
+
+------------------------------------------------------------------------------
+@section udp_top General UDP Packet Structure
+
+@image html qspy_udp.gif "UDP packet structure"
+
+The UDP packets exchanged between the QSPY Back-End and the `QSpyView` Front-End consists of:
+
+- 1-byte **Sequence-No**, which increments by 1 for every packet and wraps naturally from 0xFF to 0. The sequence number allows `QSpyView` to detect any data discontinuities.
+
+- 1-byte **Record-ID**. The Record-IDs are divided into two categories:
+    - Records to and from the Target have Record-IDs in the range <strong>0..127</strong>. Specifically, QS records originated from the Target are enumerated in ::QSpyRecords. Records destined to the Target are enumerated in ::QSpyRxRecords.
+    - Records to and from the QSPY Back-End have record-IDs in the range <strong>128..255</strong>. Specifically, records destined to QSPY are enumerated in ::QSpyCommands.
+
+- optional **Data Payload**, which can be either text or binary, depending on the @ref udp_channel "UDP Channel" to which the front-end attaches. The various Data Payloads for different packets are described in the separate sections below.
+
+
+<div class="separate"></div>
+@subsection udp_channel UDP Data Channels
+The QSPY UDP socket supports two "channels":
+- **binary channel** (channel 1), in which the *Data Payload* is sent in binary, but after removing @ref qspy_transparent "escaping" and checksum;
+- **text channel** (channel 2), in which the *Data Payload* is sent in the @ref qspy_text "QSPY Textual Format";
+
+A Front-End can choose the "data channels" when "attaching" to the QSPY host application (see qspy::attach()). The data channels are not exclusive, meaning that a front-end can "attach" simultaneously to both binary and text channels. In this case, the front-end would receive each packet as both binary and text formats.
+
+@remark
+The binary-channel (1) is used by the @ref qspyview "QSpyView" GUI front-end, while the text-channel (2) is used by the @ref qutest "QUTest" Unit Testing front-end.
+
+
+<div class="separate"></div>
+@subsection udp_sendPkt Programming Interface
+The <span class="img file_tcl">qspy.tcl</span> script provides the Tcl procedure `::qspy::sendPkt` for sending a UDP packet to the QSPY Back-End. The procedure takes one parameter `pkt`, which contains the Record-ID byte followed by the optional Data Payload. For example, here is how to send a packet to @ref udp_AO_FILTER for Active Object with priority 5:
+
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(AO_FILTER) 5]
+@endcode
+
+
+------------------------------------------------------------------------------
+@section udp_Target Records to the Target
+
+@note
+To understand the following detailed UDP packet descriptions, it is highly recommended to read the Tcl documentation for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern"><strong>binary Tcl command</strong></a>.
+
+
+
+<div class="separate"></div>
+@subsection udp_INFO  Query Target Info (INFO)
+This packet has Record-ID==INFO and has no Data Payload.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c $::qspy::QS_RX(INFO)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_COMMAND Execute a User-Defined Command in the Target (COMMAND)
+This packet has Record-ID==COMMAND and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|-------------
+Command-ID |    c          | command number
+Command-Par|    i          | command parameter
+
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cci $::qspy::QS_RX(COMMAND) 12 0x11223344]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_RESET  Reset the Target (RESET)
+This packet has Record-ID==RESET and has no Data Payload.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c $::qspy::QS_RX(RESET)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_TICK  Call QF_TICK_X() in the Target (TICK)
+
+Data item  | binary format | description
+-----------|---------------|-------------
+Tick-rate  |    c          | system tick rate number
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(TICK) 0]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_PEEK  Peek Target Memory (PEEK)
+This packet has Record-ID==PEEK and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Peek-addr  | Target-dependent@n Typically i | Address of the data in the Target
+Peek-length| c             | Number of bytes to peek
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)c \
+                $::qspy::QS_RX(PEEK) 0x20000123 16]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_POKE  Poke Target Memory (POKE)
+This packet has Record-ID==POKE and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Poke-addr  | Target-dependent@n Typically i | Address of the data in the Target
+Poke-length| c             | Number of bytes to poke (<= 8)
+Poke-data  | user-defined  | Binary data to poke to the Target (8 bytes maximum)
+
+@note
+The Poke-data part of the Data Payload must be formatted with the particular endianness of the Target and with any padding required for proper alignment of objects in the Target memory.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)cccs \
+        $::qspy::QS_RX(POKE) 0x20000123 0x11 0x22 0x1122]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_GLB_FILTER  Set Global Filters in the Target (GLB_FILTER)
+This packet has Record-ID==GLB_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Data Len   | c             | Number of bytes sent (currently 16)
+Filters    | b128          | 128 bits, each bit corresponding to Global Filter
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt \
+    [binary format ccb128 $::qspy::QS_RX(GLB_FILTER) 16 $theGlbFilter]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_LOC_FILTER  Set Local Filters in the Target (LOC_FILTER)
+This packet has Record-ID==LOC_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+Local filter #| c          | The Number of the Local Filter
+Object-addr   | Target-dependent@n Typically i | Address of the object in the Target
+
+The Local filters are numbered as follows:
+
+0. State Machine Local Filter (SM)
+1. Active Object Local Filter (AO)
+2. Memory Pool Local Filter (MP)
+3. Event Queue Local Filter (EQ)
+4. Time Event Local Filter (TE)
+5. Application-Specific Local Filter (AP)
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc$::qspy::theFmt(objPtr) \
+                $::qspy::QS_RX(LOC_FILTER) 0 $theLocFilter(SM)]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_AO_FILTER  Set Local AO Filter in the Target (AO_FILTER)
+This packet provides a shortcut for setting the Active Object Local Filter by providing just the unique priority of the AO.
+The packet has Record-ID==AO_FILTER and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+AO prio    | c             | Priority of the AO to filter (0 to disable the AO filter)
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc $::qspy::QS_RX(AO_FILTER) 5]
+@endcode
+
+
+<div class="separate"></div>
+@subsection udp_EVENT  Inject an Event to the Target (EVENT)
+This packet has Record-ID==EVENT and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|--------------
+AO prio    | c             | Priority of the recipient AO (0 to publish the event)
+signal     | Target-dependent@n Typically s  | signal of the event
+parameters | user-defined  | Binary data corresponding to all event parameters
+
+The Event signal and parameters must be formatted with the particular endianness of the Target and with any padding required for proper alignment of objects in the Target memory.
+
+The event signal `sig` must be formatted according to the Target configuration (see <a href="https://www.state-machine.com/qpc/qep_8h.html#afdaa94c40e947b0340b4259eddce3561" target="_blank" class="extern">Q_SIGNAL_SIZE</a>)
+
+The parameters need to match exactly the event memory layout in your Target, including the endianness and any padding that the Target compiler might be using. (To test the right binary format and padding, you can use the @ref qspyview_events "Generate Event..." command).
+
+For example, let's assume that the parameters of your event are: a byte, followed by a 2-byte integer, followed by a 4-byte integer. Also, let's assume that your Target is little endian. From the @ref qspyview_events "Generate Event..." command you discover that to format this event correctly you need to use the following event parameters:
+
+Par # | format | data (example)
+------|--------|---------------
+par1: | c      | 0x11
+par2: | c      | 0x00
+par3: | s      | 0x1122
+par4: | i      | 0x11223344
+
+As you can see, you need to use "padding" (par2) after the first byte. You also use little endian encoding (`s`, `i`, format specification as opposed to `S`, `I`).
+
+With this information, you can generate the packet programmatically.
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendEvent 7 5 [binary format ccsi 0x11 0x00 0x1122 0x11223344]
+@endcode
+
+@note
+The qspy.tcl module provides specialized procedure `::qspy::sendEvent prio sig par` for injecting events to the Target.
+
+
+------------------------------------------------------------------------------
+@section udp_QSPY Packets to the QSPY Back-End
+
+
+<div class="separate"></div>
+@subsection udp_ATTACH  Attach to the QSPY Back-End (ATTACH)
+This packet has Record-ID==ATTACH and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_DETACH Detach from the QSPY Back-End (DETACH)
+This packet has Record-ID==DETACH and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_SAVE_DIC  Save Dictionaries to a File in QSPY (SAVE_DIC)
+This packet has Record-ID==SAVE_DIC and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_SCREEN_OUT Toggle Screen Output to a File in QSPY (SCREEN_OUT)
+This packet has Record-ID==SCREEN_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_BIN_OUT Toggle Binary Output to a File in QSPY (BIN_OUT)
+This packet has Record-ID==BIN_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_MATLAB_OUT Toggle MATLAB Output to a File in QSPY (MATLAB_OUT)
+This packet has Record-ID==MATLAB_OUT and has no Data Payload.
+
+
+<div class="separate"></div>
+@subsection udp_MSCGEN_OUT Toggle MscGen Output to a File in QSPY (MSCGEN_OUT)
+This packet has Record-ID==MSCGEN_OUT and has no Data Payload.
+
+
+
+------------------------------------------------------------------------------
+@section udp_from Packets from the QSPY Back-End
+
+<div class="separate"></div>
+@subsection udp_from_ATTACH  Attach Response from the QSPY Back-End (ATTACH)
+This packet has Record-ID==ATTACH and has no Data Payload.
+
+@note
+This packet is handled internally by the <span class="img file_tcl">qspy.tcl</span> script (see the ::qspy::pkt128 procedure)
+
+<div class="separate"></div>
+@subsection udp_from_DETACH  Detach Request from the QSPY Back-End (DETACH)
+This packet has Record-ID==DETACH and has no Data Payload.
+
+@note
+This packet is handled internally by the <span class="img file_tcl">qspy.tcl</span> script (see the ::qspy::pkt129 procedure)
 
 @next{qspy_matlab}
 */
@@ -2279,5 +2711,5 @@ The following screen shot shows a sequence diagram generated from the Dining Phi
 @note
 The numbers proceeding the signal names in the diagram are the Target time-stamps.
 
-@next{qspyview}
+@next{qutest}
 */

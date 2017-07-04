@@ -2,73 +2,80 @@
 
 @tableofcontents
 
-@section qtools_install Downloading and Installing QTools&trade;
+@section install Downloading and Installing QTools&trade;
+The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="https://sourceforge.net/projects/qpc/files/Qtools">SourceForge</a> as well as from <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools">GitHub</a>. The QTools&trade; download is provided as a Windows EXE (for Windows) or as a ZIP file for POSIX (Linux). The EXE installer is recommended, because it is <b>digitally signed by Quantum Leaps</b> and provides an uninstaller. Either way, uninstalling QTools is easy and requires only deleting the `qtools` directory from your disk.
 
-The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="http://sourceforge.net/projects/qpc/files/Qtools">SourceForge.net</a>. The QTools download is provided as a platform-independent ZIP or as a Windows EXE. The EXE installer is recommended, because it is <b>digitally signed by Quantum Leaps</b> and provides an uninstaller. Uninstalling QTools is easy and requires only deleting the `qtools` directory from your disk.
-
-@image html qtools_install.png "QTools installer on Windows (contains QSPY)"
+@image html qtools_install.png "QTools installer on Windows"
 
 @note
-It is recommended to install QTools into a directory that has <strong>no spaces or special characters</strong> in the name (e.g., "Program Files" or "Program Files (x86)" are poor choices).
+It is recommended to install QTools into the <strong>C:\\qp</strong> directory, or at least a directory that has <strong>no spaces or special characters</strong> in the name (e.g., "Program Files" or "Program Files (x86)" are poor choices).
+
 
 <div class="separate"></div>
-@subsection path Setting PATH
-To use the QTools, it is highly recommended to add the `<qtools>\bin` directory to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (default are `C:\qp\qtools` on Windows and `~/qp/qtools` on Linux).
+@subsection qtools_path Setting PATH
+To use the QTools&trade;, it is highly recommended to add the `<qtools>\bin` directory to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (default are `C:\qp\qtools` on Windows and `~/qp/qtools` on Linux).
 
 @note
 Adding `<qtools>\bin` to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>\bin` directory.
 
 
 <div class="separate"></div>
-@subsection env Setting QTOOLS Environment Variable
-To use the QTools source code (such as parts of the QSPY) in builds of the QP applications, it is highly recommended to define the environment variable `QTOOLS` to point to the installation directory of QTools&trade;.
+@subsection qtools_env Setting QTOOLS Environment Variable
+To use certain QTools utilities, such as @ref qutest "QUTest" or @ref qspyview "QSpyView", it is highly recommended to define the environment variable `QTOOLS` to point to the @ref files "installation directory" of QTools&trade;.
+
+@note
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
 
 
 ------------------------------------------------------------------------------
-@section qtools_files Directories and Files
-The following annotated directory tree in the standard <strong>QTools</strong> distribution lists the top-level directories and files:
+@section files Directories and Files
+The following annotated directory tree in the standard <strong>QTools&trade;</strong> distribution lists the top-level directories and files:
 
 <ul class="tag">
-  <li><span class="img folder">qtools</span></li>
+  <li><span class="img folder">`qtools`</span></li>
   <ul class="tag">
-    <li><span class="img folder">bin</span> &mdash; binaries (executables and libraries)</li>
+    <li><span class="img folder">`bin`</span> &mdash; binaries (executables and libraries)</li>
     <ul class="tag">
-      <li><span class="img file">qspy.exe</span> &mdash; @ref qspy "QSPY executable"</li>
-      <li><span class="img file_tcl">tclsh.exe</span> &mdash; Tcl interpreter</li>
-      <li><span class="img file_wish">wish.exe</span> &mdash; Tk interpreter</li>
-      <li><span class="img file">qcalc.tcl</span> &mdash; @ref qcalc</li>
-      <li><span class="img file">mscgen.exe</span> &mdash; MscGen utility</li>
-      <li>. . .</li>
+      <li><span class="img file">`qspy.exe`</span> &mdash; @ref qspy "QSPY executable"</li>
+      <li><span class="img file">`qclean.exe`</span> &mdash; @ref qclean</li>
+      <li><span class="img file">`qfsgen.exe`</span> &mdash; @ref qfsgen</li>
+      <li><span class="img file_tcl">`qcalc.tcl`</span> &mdash; @ref qcalc</li>
+      <li><span class="img file_tcl">`tclsh.exe`</span> &mdash; Tcl interpreter</li>
+      <li><span class="img file_wish">`wish.exe`</span> &mdash; Tk interpreter</li>
+      <li><span class="img file">`make.exe`</span> &mdash; make utility</li>
+      <li><span class="img file">`gcc.exe`</span> &mdash; MinGW C compiler</li>
+      <li><span class="img file">`g++.exe`</span> &mdash; MinGW C++ compiler</li>
+      <li><span class="img file">`rm.exe`</span> &mdash; rm (remove) utility</li>
+      <li>~ ~ ~</li>
     </ul>
+    <li><span class="img folder">`gnu_arm-eabi`</span> &mdash; GNU ARM-EABI toolset (GCC 6.2.0)</li>
     <li><span class="img folder">qspy</span> &mdash; @ref qspy "QSPY tool" for software tracing and testing</li>
     <ul class="tag">
-      <li><span class="img folder">include</span> &mdash; QSPY includes</li>
-      <li><span class="img folder">source</span> &mdash; QSPY sources</li>
-      <li><span class="img folder">posix</span> &mdash; QSPY port to POSIX (Linux, macOS)</li>
-      <li><span class="img folder">win32</span> &mdash; QSPY port to Windows</li>
-      <li><span class="img folder">tcludp</span> &mdash; UDP extension to standard Tcl (needed for POSIX)</li>
-      <li><span class="img folder">tcl</span> &mdash; Tcl/Tk scripts (@ref qutest "QUTest" and @ref qspyview "QSpyView")</li>
+      <li><span class="img folder">`include`</span> &mdash; QSPY includes</li>
+      <li><span class="img folder">`source`</span> &mdash; QSPY sources</li>
+      <li><span class="img folder">`posix`</span> &mdash; QSPY port to POSIX (Linux, macOS)</li>
+      <li><span class="img folder">`win32`</span> &mdash; QSPY port to Windows</li>
+      <li><span class="img folder">`tcludp`</span> &mdash; UDP extension to standard Tcl (needed for POSIX)</li>
+      <li><span class="img folder">`tcl`</span> &mdash; Tcl/Tk scripts (@ref qutest "QUTest" and @ref qspyview "QSpyView")</li>
       <ul class="tag">
-        <li><span class="img folder">img</span> &mdash; images used by `qspyview.tcl`</li>
-        <li><span class="img file_tcl">qspy.tcl</span> &mdash; Tcl script for UDP communication with the QSPY Back-End (usable for both GUI-based and head-less scripts)</li>
-        <li><span class="img file_tcl">qutest.tcl</span> &mdash; Main @ref qutest "QUTest&trade; Tcl script"</li>
-        <li><span class="img file_wish">qspyview.tcl</span> &mdash; Main @ref qspyview "QSpyView&trade; Tcl/Tk script"</li>
-        <li><span class="img file_wish">default.tcl</span> &mdash; the default customization of the  @ref qspyview "QSpyView&trade; Tcl/Tk script"</li>
+        <li><span class="img folder">`img`</span> &mdash; images used by `qspyview.tcl`</li>
+        <li><span class="img file_tcl">`qspy.tcl`</span> &mdash; Tcl script for UDP communication with the QSPY Back-End (usable for both GUI-based and head-less scripts)</li>
+        <li><span class="img file_tcl">`qutest.tcl`</span> &mdash; Main @ref qutest "QUTest&trade; Tcl script"</li>
+        <li><span class="img file_wish">`qspyview.tcl`</span> &mdash; Main @ref qspyview "QSpyView&trade; Tcl/Tk script"</li>
+        <li><span class="img file_wish">`default.tcl`</span> &mdash; the default customization of the  @ref qspyview "QSpyView&trade; Tcl/Tk script"</li>
       </ul>
-      <li><span class="img folder">matlab</span> &mdash; @ref qspy_matlab "QSPY MATLAB Support"</li>
+      <li><span class="img folder">`matlab`</span> &mdash; @ref qspy_matlab "QSPY MATLAB Support"</li>
       <ul class="tag">
-        <li><span class="img file">qspy.m</span> &mdash; MATLAB script to analyze QSPY output</li>
-        <li><span class="img file">dpp.m</span> &mdash; MATLAB script to analyze DPP example</li>
+        <li><span class="img file">`qspy.m`</span> &mdash; MATLAB script to analyze QSPY output</li>
+        <li><span class="img file">`dpp.m`</span> &mdash; MATLAB script to analyze DPP example</li>
       </ul>
-      <li><span class="img folder">mscgen</span> &mdash; @ref qspy_mscgen "QSPY MscGen Support"</li>
+      <li><span class="img folder">`mscgen`</span> &mdash; @ref qspy_mscgen "QSPY MscGen Support"</li>
       <ul class="tag">
-        <li><span class="img file">dpp.msc</span> &mdash; MscGen output from DPP example</li>
-        <li><span class="img file">dpp.svg</span> &mdash; Message Sequence Chart generated by MscGen</li>
+        <li><span class="img file">`dpp.msc`</span> &mdash; MscGen output from DPP example</li>
+        <li><span class="img file">`dpp.svg`</span> &mdash; Message Sequence Chart generated by MscGen</li>
       </ul>
     </ul>
-    <li><span class="img folder">qwin</span> &mdash; @ref qwin</li>
-    <li><span class="img folder">qclean</span> &mdash; @ref qclean</li>
-    <li><span class="img folder">qfsgen</span> &mdash; @ref qfsgen</li>
+    <li><span class="img folder">`qwin`</span> &mdash; @ref qwin</li>
   </ul>
 </ul>
 

@@ -1,12 +1,22 @@
-/*! @page qpspy QP/Spy&trade; Tracing and Testing
+/*! @page qpspy QP/Spy&trade; Software Tracing
 
 @image html qspy_banner.jpg
 
-@section ab_about What is it?
-<strong>QP/Spy&trade;</strong> is a @ref concepts "software tracing and testing system" specifically designed for embedded systems, such as single chip microcontrollers. The job of QP/Spy is to capture information about an embedded code's execution and send it to the host computer with minimal impact on the real-time performance of the embedded code. QP/Spy can also send commands and data *to the embedded target*, which serves as the basis for <span class="highlight">@ref ab_utest "Unit Testing"</span> and for <span class="highlight">@ref ab_visual "Visualization"</span> subsystems of the QP/Spy system.
+<p>In any real-life project, getting the code written, compiled, and successfully linked is only the first step. The system still needs to be tested, validated, and tuned for best performance and resource consumption. A single-step debugger is frequently not helpful because it stops the system and exactly hinders seeing **live interactions** within the application. Clogging up high-performance code with `printf` statements is usually too intrusive and simply unworkable in most embedded systems, which typically don't have adequate screens to print to. So the questions are: How can you monitor the behavior of a running real-time system without degrading the system itself? How can you discover and document elusive, intermittent bugs that are caused by subtle interactions among concurrent components? How do you design and execute repeatable #ref qutest "unit tests" and **integration tests** of your system? How do you ensure that a system runs reliably for long periods of time and achieves optimal performance?
+</p>
 
+Techniques based on **software tracing** can answer many of these questions. Software tracing is a method for obtaining diagnostic information in a live environment without the need to stop the application to get the system feedback. Software tracing always involves some form of a target system instrumentation to log interesting discrete events for subsequent retrieval from the system and analysis.
+
+
+------------------------------------------------------------------------------
+@section ab_about What is it?
+
+<strong>QP/Spy&trade;</strong> is a @ref concepts "software tracing and testing system" specifically designed for embedded systems, such as single chip microcontrollers. The job of QP/Spy is to capture information about an embedded code's execution and send it to the host computer with minimal impact on the real-time performance of the embedded code. QP/Spy can also send commands and data *to the embedded target*, which serves as the basis for @ref qutest "Unit Testing" and for @ref qspyview "Visualization" subsystems of the QP/Spy system.
+
+@anchor qpspy_framework
 @note
-A software tracing and testing system like QP/Spy&trade; is a very valuable tool in the embedded developer's arsenal, because it provides **visibility** into live embedded software running at *full speed* without significantly degrading the application itself.
+Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://state-machine.com/products/#QP">QP active object frameworks</a>. Due to the inversion of a control, a reactive framework controls almost all interesting interactions in the system, so an instrumented event-driven framework can provide much more comprehensive and detailed information than any traditional RTOS.
+
 
 
 ------------------------------------------------------------------------------
@@ -16,85 +26,9 @@ In a nutshell, working with QP/Spy&trade; is similar to peppering the code with 
 @note
 The main difference between the QP/Spy&trade; tracing system and peppering the code with `printf` statements is *where* the data **formatting** and **sending** is done. When you use `printfs`, the data formatting and sending occur in the *time-critical* paths through the embedded code. In contrast, the QP/Spy system produces *raw binary data*, so all the time-consuming formatting is removed from the embedded system and is done after the fact in the host computer. Additionally, in QP/Spy, data logging and sending to the host are separated so that the embedded system can typically perform the transmission outside of the time-critical path, for example in the idle processing of the embedded CPU. Finally, the code size of the @ref qs "target-resident component" in QP/Spy is merely a few hundred bytes, which contrasts with several kilobytes of code required by a full-blown `printf` formatter.
 
+The picture below shows a typical setup for software tracing. The embedded Target system is executing instrumented code, which logs the trace data into a RAM buffer inside the Target. From that buffer the trace data is sent over a data link to a Host computer, which stores, displays, and analyzes the information. This configuration means that a software tracing always requires two components: a "Target resident component" for generating and sending the trace data (@ref qs "QS" in QP/Spy&trade;), and a "Host resident component" to receive, decompress, visualize, and analyze the data (@ref qspy "QSPY" in QP/SPy&trade;).
 
 @image html qspy1.gif "Typical setup for software tracing with  QP/Spy&trade;"
-
-As shown in the figure above, QP/Spy&trade; consist of the target-resident component called @ref qs "QS" and a host-resident component called @ref qspy "QSPY". QS is a special instrumentation built into the <a href="https://www.state-machine.com/qpc" target="_blank" class="extern">QP/C</a> and <a href="https://www.state-machine.com/qpcpp" target="_blank" class="extern">QP/C++</a> active object frameworks. The target-resident QS produces naturally-compressed, raw binary data and sends it to the host-resident QSPY console application (available for Windows, Linux, or macOS hosts). The job of QSPY is to receive, decompress, and validate the trace data, as well as to show the information in a human-readable format. QSPY can also store the data in several formats compatible with such tools as @qspy_matlab "MATLAB/GNU-Octave" and @ref qspy_mscgen "MsgGen" for post-analysis and visualization.
-
-QP/Spy&trade; is easily adaptable to various target-host communication links. Out of the box, the QP/Spy supports serial ports (including virtual COM ports over USB), TCP/IP, and file communication links. Adding other communication links is straightforward, because the data link is accessed only through a generic Platform Abstraction Layer (PAL).
-
-
-------------------------------------------------------------------------------
-@section ab_utest Unit Testing
-QP/Spy&trade; includes a powerful **Unit Testing Framework** called @ref qutest "QUTest&trade;" (pronounced '_cutest_'), which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://state-machine.com/products/#QP" target="_blank" class="extern">QP applications</a>, which is a highly recommended best-practice.
-
-@note
-@htmlonly
-<img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
-@endhtmlonly
-Even though QUTest&trade; has been primarily designed for testing of <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">QP state machines</a>, it can also be used to test **any embedded C or C++ code**. To demonstrate this capability, the QUTest&trade; comes with several examples of testing embedded code from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. These tests include examples of such techniques as using <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a> and <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a> with QUTest&trade;.@n@n@n
-
-
-@image html qutest_ex.png "Example of a QUTest&trade; session on an embedded board (EFM32-SLSTK)"
-
-
-<strong>What's Special About QUTest&trade;?</strong>@n
-Unlike other existing unit testing frameworks for embedded systems, such as <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> or <a href="http://cpputest.github.io/" target="_blank" class="extern">CppUTest</a>, QUTest&trade; is **not based on** <a href="https://en.wikipedia.org/wiki/XUnit" target="_blank" class="extern"><strong>xUnit</strong></a> that was originally designed to run tests on host computers. Instead, QUTest&trade; is geared towards testing on deeply embedded targets. Specifically, QUTest&trade; separates the *execution* of the CUT (Code Under Test) from *checking* of the "test assertions". The embedded target is concerned only with running the CUT and producing a software trace with the lightweight QP/Spy&trade;, but it does *not* check the "test assertions".
-
-Checking the "test assertions" against the expectations is performed on the host computer by means of *test scripts*. This approach is more intuitive for embedded developers and actually simplifies the development of all sorts of <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>, including <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a>, without breaking encapsulation of the CUT.
-
-@note
-Even though QUTest&trade; is particularly suitable for running tests on deeply embedded targets, it also fully supports running *the same* tests on the host computers. In fact, running the tests as much as possible on the host and thus avoiding the target-hardware bottleneck is the highly recommended best-practice of embedded TDD. QUTest&trade; supports **fully-automated** unit testing, both on the embedded target and on the host computer.
-
-
-------------------------------------------------------------------------------
-@section ab_visual Visualization and Monitoring
-
-QP/Spy&trade; includes a powerful **Visualization and Monitoring** facility called @ref qspyview "QSpyView&trade;", which allows embedded developers to rapidly create _virtual Graphical User Interfaces_ to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QSpyView&trade; can visualize the tracing data produced by QP/Spy&trade; and can also **send** various commands to the target.
-
-@note
-A visualization and monitoring system like QSpyView&trade; can be used in all stages of development, manufacturing, and after the deployment, for in-field servicing of embedded devices.
-
-
-@image html qspyview_ex.png "Example of a QSpyView&trade; session on an embedded board (EFM32-SLSTK)"
-
-As you can see in the figure above, a QSpyView&trade; user interface consists of the text box with extensible menus plus a customizable canvas that can display the QP/Spy&trade; data in an attractive graphical format, such as animations, graphs, etc. and can contain controls, such as buttons, sliders, etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QSpyView&trade; provides only a skeleton, which is then **customized** by user-supplied scripts.
-
-<strong>What's Special About QSpyView&trade;?</strong>@n
-The GUIs created with QSpyView&trade; are naturally platform-neutral and run without any changes on Windows, Linux, or macOS.
-
-
-------------------------------------------------------------------------------
-The following sections explain the concepts and components of QP/Spy&trade;:
-- @subpage qpspy_intro
-- @subpage qs
-- @subpage qspy
-- @subpage qutest
-- @subpage qspyview
-
-@next{qpspy_intro}
-*/
-
-/****************************************************************************/
-/*! @page qpspy_intro QP/Spy&trade; Concepts and Structure
-
-@tableofcontents
-
-<p>In any real-life project, getting the code written, compiled, and successfully linked is only the first step. The system still needs to be tested, validated, and tuned for best performance and resource consumption. A single-step debugger is frequently not helpful because it stops the system and exactly hinders seeing **live interactions** within the application. Clogging up high-performance code with `printf` statements is usually too intrusive and simply unworkable in most embedded systems, which typically don't have adequate screens to print to. So the questions are: How can you monitor the behavior of a running real-time system without degrading the system itself? How can you discover and document elusive, intermittent bugs that are caused by subtle interactions among concurrent components? How do you design and execute repeatable unit and integration <strong>tests</strong> of your system? How do you ensure that a system runs reliably for long periods of time and achieves optimal performance?
-</p>
-
-Techniques based on **software tracing** can answer many of these questions. Software tracing is a method for obtaining diagnostic information in a live environment without the need to stop the application to get the system feedback. Software tracing always involves some form of a target system instrumentation to log interesting discrete events for subsequent retrieval from the system and analysis.
-
-@anchor qpspy_framework
-@note
-Due to the inversion of a control, software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://www.state-machine.com/qp">QP active object frameworks</a>. An instrumented event-driven framework can provide much more comprehensive and detailed information than any traditional RTOS.
-
-
--------------------------------------------------------------------------------
-@section qpspy_struct QP/Spy&trade; Structure
-The picture below shows a typical setup for software tracing. The embedded Target system is executing instrumented code, which logs the trace data into a RAM buffer inside the Target. From that buffer the trace data is sent over a data link to a Host computer, which stores, displays, and analyzes the information. This configuration means that a software tracing always requires two components: a @ref qs "Target resident component" for generating and sending the trace data, and a @ref qspy "Host resident component" to receive, decompress, visualize, and analyze the data.
-
-@image html qspy4.gif "Typical setup for collecting software trace data"
 
 @note
 Software tracing instrumentation logs interesting discrete events that occur in the target system. These discrete events will be called **trace records**, to avoid confusing them with the application-level <em>events</em>.
@@ -115,9 +49,36 @@ However, perhaps the most important characteristic of a flexible software tracin
 Finally, the tracing facility must allow consolidating data from all parts of the system, including concurrently executing threads and interrupts. This means that the instrumentation facilities must be *reentrant* (i.e., both thread-safe and interrupt-safe). Also, to be able to correlate all this data, most tracing systems provide precise @ref qs_tstamp "time-stamping" of the trace records.
 
 
--------------------------------------------------------------------------------
-@section qpspy_protocol QP/Spy Data Protocol
-One of the greatest strengths of the QP/Spy tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but has many the elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The protocol has provisions for detecting transmission errors and allows for instantaneous re-synchronization after any error, such as data dropouts due to RAM buffer overruns.
+<div class="separate"></div>
+@subsection qpspy_rx Bi-Directional Connection to the Target
+While traditional software tracing systems support only uni-directional output of trace data from the embedded Target to a Host computer, QP/Spy supports bi-directional communication to the target as well. This capability allows users to send commands and data to the Target and form the basis for @ref qutest "Unit Testing" and @ref qspyview "Visualization and Monitoring" of the embedded Target.
+
+<div class="separate"></div>
+@subsection qpspy_udp UDP Socket Extension
+The QP/Spy system provides a  @ref qspy_udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). Currently, the UDP connection point is used by the  @ref qutest "QUTest" headless (console-based) front-end and GUI-based @ref qspyview "QSpyView" front-end.
+
+
+<div class="separate"></div>
+@subsection qpspy_exa QP/Spy Session Example
+To give you a better idea how QP/Spy works, the listing below shows an example output from a QP/Spy session. The left-hand side shows the raw, @ref qpspy_proto "binary output" generated by the target-resident component (@ref qs "QS"). The right-hand side shows the @ref qspy_text "human-readable format" generated from the same data by the host-resident component (@ref aspy "QSPY"). The compression ratio between the binary and textual outputs in this data sample is about 3.7.
+
+@image html qpspy_exa.png "Example of the QP/Spy output"
+
+------------------------------------------------------------------------------
+The following sections explain the concepts and components of QP/Spy&trade;:
+- @subpage qpspy_proto
+- @subpage qs
+- @subpage qspy
+
+@next{qpspy_proto}
+*/
+/****************************************************************************/
+/*! @page qpspy_proto QP/Spy&trade; Data Protocol
+
+@tableofcontents
+
+<p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but has many the elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The protocol has provisions for detecting transmission errors and allows for instantaneous re-synchronization after any error, such as data dropouts due to RAM buffer overruns.
+</p>
 
 The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any error to minimize data loss.
 
@@ -125,29 +86,30 @@ The QP/Spy protocol has been specifically designed to simplify the data manageme
 
 The QS protocol transmits each trace record in an HDLC-like frame. The upper part of the figure above shows the serial data stream transmitted from the target containing frames of different lengths. The bottom part of the figure above shows the details of a single frame:
 
-1. Each frame starts with the Frame Sequence Number byte. The target QS component increments the Frame Sequence Number for every frame inserted into the circular buffer. The Sequence Number naturally rolls-over from 255 to 0. The Frame Sequence Number allows the QSPY host component to detect any data discontinuities.
+1. Each frame starts with the Frame **Sequence-No** byte. The target QS component increments the Frame Sequence Number for every frame inserted into the circular buffer. The Sequence Number naturally rolls-over from 255 to 0. The Frame Sequence Number allows the QSPY host component to detect any data discontinuities.
 
-2. Following the Fame Sequence Number is the Record ID byte, which is one of the predefined QS records, or an application-specific record.
+2. Following the Fame Sequence Number is the **Record-ID** byte, which is one of the predefined QS records, or an application-specific record.
 
-3. Following the Record ID is zero or more Data bytes.
+3. Following the Record-ID is zero or more **Data** bytes.
 
-4. Following the data is the Checksum. The Checksum is computed over the Fame Sequence Number, the Record ID, and all the Data bytes. The next section gives the detailed Checksum computation formula.
+4. Following the data is the **Checksum**. The Checksum is computed over the Fame Sequence Number, the Record ID, and all the Data bytes. The next section gives the detailed Checksum computation formula.
 
-5. Following the Checksum is the HDLC Flag, which delimits the frame. The HDLC flag is the `01111110` binary string (`0x7E` hexadecimal). Please note that the QP/Spy protocol uses only one HDLC Flag at the end of each frame an no HDLC Flag at the beginning of a frame. In other words, only one Flag is inserted between frames.
+5. Following the Checksum is the **HDLC Flag**, which delimits the frame. The HDLC flag is the `01111110` binary string (`0x7E` hexadecimal). Please note that the QP/Spy protocol uses only one HDLC Flag at the end of each frame an no HDLC Flag at the beginning of a frame. In other words, only one Flag is inserted between frames.
 
 The QS target component performs the HDLC-like framing described above at the time the bytes are inserted into the circular trace buffer. This means that the data in the buffer is already cleanly divided into frames and can be transmitted in any chunks, typically not aligned with the frame boundaries.
 
-<div class="separate"></div>
-@subsection qspy_transparent Transparency
+
+------------------------------------------------------------------------------
+@section qspy_transparent Transparency
 One of the most important characteristics of HDLC-type protocols is establishing very easily identifiable frames in the serial data stream. Any receiver of such a protocol can instantaneously synchronize to the frame boundary by simply finding the Flag byte. This is because the special Flag byte can never occur within the content of a frame. To avoid confusing unintentional Flag bytes that can naturally occur in the data stream with an intentionally sent Flag, HDLC uses a technique known as transparency (a.k.a. byte-stuffing or escaping) to make the Flag bytes transparent during the transmission. Whenever the transmitter encounters a Flag byte in the data, it inserts a two-byte escape sequence to the output stream. The first byte is the Escape byte, defined as binary `01111101` (hexadecimal `0x7D`). The second byte is the original byte XOR-ed with `0x20`.
 
 Of course, now the Escape byte itself must also be transparent to avoid interpreting an unintentional Escape byte as the two-byte escape sequence. The procedure of escaping the Escape byte is identical to that of escaping the Flag byte.
 
-The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Fame Sequence Number, the Record ID, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
+The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Fame Sequence Number, the Record-ID, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
 
 An example may make this clearer. Suppose that the following trace record needs to be inserted to the trace buffer (the transparent bytes are shown in bold):
 
-     Record ID = 0x7D, Record Data = 0x7D 0x08 0x01
+     Record-ID = 0x7D, Record Data = 0x7D 0x08 0x01
 
 Assuming that the current Fame Sequence Number is, say `0x7E`, the Checksum will be computed over the following bytes:
 
@@ -157,16 +119,16 @@ and the actual frame inserted into the QS trace buffer will be as follows:
 
      0x7D 0x5E 0x7D 0x5D 0x7D 0x5D 0x08 0x01 0x7D 0x5E 0x7E
 
-Obviously, this is a degenerated example, where the Frame Sequence Number, the Record ID, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
+Obviously, this is a degenerated example, where the Frame Sequence Number, the Record-ID, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
 
 
-<div class="separate"></div>
-@subsection qpspy_endianness Endianness
+------------------------------------------------------------------------------
+@section qpspy_endianness Endianness
 In addition to the HDLC-like framing, the QS transmission protocol specifies the endianness of the data to be <strong>little-endian</strong>. All multi-byte data elements, such as 16-, 32-, or 64-bit integers, pointers, and floating point numbers are inserted into the QS trace buffer in the little-endian byte order (least-significant byte first). The QS data inserting macros place the data in the trace buffer in a platform-neutral manner, meaning that the data is inserted into the buffer in the little-endian order regardless of the endianness of the CPU. Also, the data-inserting macros copy the data to the buffer one byte at a time, thus avoiding any potential data misalignment problems. Many embedded CPUs, such as ARM, require certain alignment of 16-, 32-, or 64-bit quantities.
 
 
-<div class="separate"></div>
-@subsection qpspy_last_is_best Last-is-Best Data Policy
+------------------------------------------------------------------------------
+@section qpspy_last_is_best Last-is-Best Data Policy
 The QS Trace Buffers (transmit QS buffer and receive QS-RX buffer) store only complete HDLC frames, which is the pivotal point in the design of the QS target component and has two important consequences.
 
 First, the use of HDLC frames in the buffers enables the <strong>last is best</strong> tracing policy. The QS transmission protocol maintains both the Frame Sequence Number and the Checksum over each trace record, which means that any data corruption caused by overrunning the old data with the new data can be always reliably detected. Therefore, the new trace data is simply inserted into the circular trace buffers, regardless if it perhaps overwrites the old data that hasn't been sent out yet, or is in the process of being sent. The burden of detection any data corruption is placed on the QSPY host component. When you start missing the frames (which the host component easily detects by discontinuities in the Frame Sequence Number), you have several options. Your can apply some additional filtering, increase the size of the buffer, or improve the data transfer throughput.

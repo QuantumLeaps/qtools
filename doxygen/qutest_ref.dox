@@ -1,0 +1,23 @@
+/*! @page qutest_ref QUTest&trade; Reference
+
+@tableofcontents
+
+------------------------------------------------------------------------------
+@section qutest_reset QUTest&trade; Target Reset
+
+
+------------------------------------------------------------------------------
+@section qutest_tstamp QUTest&trade; Time-Stamps
+The @ref qs_tstamp "QS Target Time-Stamps" in QUTest&trade; are used differently than in regular software tracing of embedded targets. In QUTest, the @ref qutest_timestamp "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost.
+
+
+------------------------------------------------------------------------------
+@section qutest_expect QUTest&trade; Expectations
+
+
+------------------------------------------------------------------------------
+@section qutest_probe QUTest&trade; Test Probes
+
+
+@next{qspyview}
+*/

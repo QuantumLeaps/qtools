@@ -23,7 +23,10 @@
 *.tar.gz
 *.avrsuo
 
-bin/
+bin/*.exe
+bin/*.dll
+bin/*.conf
+gnu_arm-eabi/
 /include/
 libexec/
 dbg/

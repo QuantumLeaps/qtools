@@ -1,11 +1,13 @@
-/*! @mainpage About QTools
+/*! @mainpage About QTools&trade;
 
 @image html qtools_banner.jpg
 
 @section qtools_about What is it?
-QTools is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux, and macOS. The QTools Collection contains the following tools developed by <a href="https://state-machine.com/">Quantum Leaps</a>:
+QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://state-machine.com/">Quantum Leaps</a>:
 
-- @ref qpspy  "QP/Spy software tracing and testing system"
+- @ref qpspy  "QP/Spy software tracing and testing for embedded systems", which includes:
+  + @ref qutest   "QUTest&trade; Unit Testing Harness"
+  + @ref qspyview "QSpyView&trade; Visualization &amp; Monitoring"
 - @ref qwin   "QWin GUI toolkit for prototyping embedded systems on Windows in C or C++"
 - @ref qclean "QClean utility for cleaning the white space in the source code"
 - @ref qfsgen "QFSGen utility for building ROM-based file systems"
@@ -13,26 +15,89 @@ QTools is a collection of open source tools for embedded software development on
 
 
 ------------------------------------------------------------------------------
-@section qtools_win QTools on Windows
+@section qtools_win QTools&trade; on Windows
 The QTools Collection for Windows contains additionally the following open-source, third-party tools:
 
 - GNU-make for Windows (version 3.82)
 - GNU C/C++ toolset for Windows (MinGW version 4.5.2)
-- TCL/TK for Windows (version 8.4) with UDP sockets extension
+- GNU C/C++ toolset for ARM-EABI (GCC version 6.2.0)
+- TCL/TK for Windows (version 8.4) with **UDP sockets extension**
+- ResEdit utility (version 1.6.6-x64)
 - AVRDUDE for Windows (version 6.1)
 
-Additionally, QTools for Windows contains the following PC-Lint option files various compilers (in sub-directory `lint`):
+Additionally, QTools&trade; for Windows contains the following PC-Lint option files various compilers (in sub-directory `lint`):
 
 - `co-gnu-arm.*` (PC-Lint option files for GNU-ARM)
 - `co-iar-arm.*` (PC-Lint option files for IAR-ARM)
 
 
 ------------------------------------------------------------------------------
-@section qtools_licensing Licensing QTools
-Most tools included in the QTools Collection are distributed under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version. The text of GPL version 2 is included in the
+@section qtools_licensing Licensing QTools&trade;
+Most tools included in the QTools&trade; collection are distributed under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version. The text of GPL version 2 is included in the
 file GPLv2.txt in the root directory of the QTools distribution.
 
 The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE AGREEMENT, included in the file TCL_LICENSE.txt in the root directory of the QTools distribution.
+
+
+------------------------------------------------------------------------------
+@section qtools_source Source Code
+In compliance with GPL, this distribution contains the source code for
+the utilities contributed by Quantum Leaps in the <qtools>\source\
+subdirectory, except for the QSPY source code, which is provided in the
+<qtools>\qspy\source directory. All tools with names starting with 'q'
+have been developed and are copyrighted by Quantum Leaps.
+
+
+<div class="separate"></div>
+@subsection qtools_mingw The MinGW C and C++ compilers for Windows
+Have been taken from the MinGW project at SourceForge.net:
+
+https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+
+The installer `mingw-get-inst-20110211.exe` has been used and after the
+installation, the files have been pruned to reduce the size of the
+distribution. Please refer to the MinGW project for the source code.
+
+<div class="separate"></div>
+@subsection qtools_gnu-arm The GNU-ARM (EABI) compilers for Windows
+Have been takend from:
+
+http://gnutoolchains.com/arm-eabi/
+
+The installer arm-eabi-gcc6.2.0-r3.exe has been used and after the
+installation, the libraries for Cortex-A and Cortex-R5 have been pruned
+to reduce the size of the distribution. Please refer to the GnuToolchains
+project for the source code.
+
+
+<div class="separate"></div>
+@subsection qtools_make The GNU make executable for Windows
+Has been taken from the MinGW project at SourceForge.net:
+
+https://sourceforge.net/projects/mingw/files/MinGW/make/
+make-3.82-mingw32/make-3.82-5-mingw32-bin.tar.lzma
+
+The GNU make source (make-3.82-src.zip) has been taken from:
+https://sourceforge.net/projects/mingw/files/MinGW/make/
+make-3.82-mingw32/make-3.82-5-mingw32-src.tar.lzma
+
+The "GNU Make" manual (make.pdf) has been copied from the GNU make
+project at:
+
+http://www.gnu.org/software/make
+
+
+<div class="separate"></div>
+@subsection qtools_util The file and diff utilities
+Have been taken from the UnixUtils project at SourceForge.net:
+
+http://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
+
+
+The file and diff utilities source (source/fileutils-3.16-src.zip) has
+been taken from:
+
+http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
 
 
 ------------------------------------------------------------------------------

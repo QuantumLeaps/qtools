@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "QTools"
-PROJECT_NUMBER         = "5.9.0"
+PROJECT_NUMBER         = "5.9.3"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -115,6 +115,8 @@ INPUT                  = \
     qs.dox \
     qspy.dox \
     qutest.dox \
+    qutest_tut.dox \
+    qutest_ref.dox \
     qspyview.dox \
     qwin.dox \
     qclean.dox \

@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "QP/Spy"
-PROJECT_NUMBER         = "5.9.0"
+PROJECT_NUMBER         = "5.9.3"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -108,22 +108,33 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = \
-    main.dox \
-    start.dox \
-    concepts.dox \
-    qs.dox \
-    qspy.dox \
-    qutest.dox \
-    qspyview.dox \
-    history.dox \
-    macros.h \
-    ../include/qs_copy.h \
-    ../include/qspy.h \
-    ../tcl/qspy.tcl \
-    ../tcl/qutest.tcl \
-    ../tcl/qspyview.tcl \
-    ../tcl/default.tcl
+INPUT                  = \
+    main.dox \
+    start.dox \
+    qpspy.dox \
+    qs.dox \
+    qspy.dox \
+    qutest.dox \
+    qutest_tut.dox \
+    qutest_ref.dox \
+    qspyview.dox \
+    qwin.dox \
+    qclean.dox \
+    qcalc.dox \
+    qfsgen.dox \
+    history.dox \
+    modules.dox \
+    macros.h \
+    ../qspy/include/qs_copy.h \
+    ../qspy/include/qspy.h \
+    ../qspy/tcl/qspy.tcl \
+    ../qspy/tcl/qutest.tcl \
+    ../qspy/tcl/qspyview.tcl \
+    ../qspy/tcl/default.tcl \
+    ../qwin/qwin_gui.h \
+    ../qwin/qwin_gui.c \
+    ../qclean/source/main.cpp \
+    ../qfsgen/source/main.cpp
 
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = \
