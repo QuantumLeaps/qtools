@@ -1,44 +1,53 @@
-//*****************************************************************************
-//
-// lm3s_cmsis.h - CMSIS header file for Luminary Micro LM3S Stellaris
-//                microcontroller.s
-//
-// This file is based on CMSIS specification 1.02 (02. Feb. 2009)
-//
-// Copyright (c) 2009 Luminary Micro, Inc.  All rights reserved.
-// Software License Agreement
-//
-// Luminary Micro, Inc. (LMI) is supplying this software for use solely and
-// exclusively on LMI's microcontroller products.
-//
-// The software is owned by LMI and/or its suppliers, and is protected under
-// applicable copyright laws.  All rights are reserved.  You may not combine
-// this software with "viral" open-source software in order to form a larger
-// program.  Any use in violation of the foregoing restrictions may subject
-// the user to criminal sanctions under applicable laws, as well as to civil
-// liability for the breach of the terms and conditions of this license.
-//
-// THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
-// OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
-// LMI SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
-// CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
-//
-// This is part of revision 32 of the Stellaris CMSIS Package.
-//
-//*****************************************************************************
+/*************************************************************************//**
+ * @file     LM3S811.h
+ * @brief    CMSIS Cortex-M# Core Device System File for Device LM3S811
+ * @version  CMSIS v4.00
+ * @date     07 March 2015
+ *
+ * @note     Created from the CMSIS template for the specified device
+ *           Quantum Leaps, www.state-machine.com
+ *
+ ****************************************************************************/
+/* Copyright (c) 2012 ARM LIMITED
+ *
+ * All rights reserved.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ * - Neither the name of ARM nor the names of its contributors may be used
+ *   to endorse or promote products derived from this software without
+ *   specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ ---------------------------------------------------------------------------*/
+#ifndef __LM3S811_H
+#define __LM3S811_H
 
-#ifndef __LM3S_CMSIS_H__
-#define __LM3S_CMSIS_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * ============================================================================
  * ---------- Interrupt Number Definition -------------------------------------
  * ============================================================================
  */
-typedef enum IRQn
-{
-/******  Cortex-M3 Processor Exceptions Numbers ******************************/
+typedef enum IRQn {
+    /******  Cortex-M3 Processor Exceptions Numbers **************************/
     NonMaskableInt_IRQn     = -14,  /*!< 2 Non Maskable Interrupt            */
     MemoryManagement_IRQn   = -12,  /*!< 4 Cortex-M3 Memory Management Int   */
     BusFault_IRQn           = -11,  /*!< 5 Cortex-M3 Bus Fault Interrupt     */
@@ -48,7 +57,7 @@ typedef enum IRQn
     PendSV_IRQn             = -2,   /*!< 14 Cortex-M3 Pend SV Interrupt      */
     SysTick_IRQn            = -1,   /*!< 15 Cortex-M3 System Tick Interrupt  */
 
-/******  LM3S Specific Interrupt Numbers *************************************/
+    /******  LM3S811 Specific Interrupt Numbers ******************************/
     GPIOPortA_IRQn          =  0,   /*!<  GPIO Port A                        */
     GPIOPortB_IRQn          =  1,   /*!<  GPIO Port B                        */
     GPIOPortC_IRQn          =  2,   /*!<  GPIO Port C                        */
@@ -58,11 +67,11 @@ typedef enum IRQn
     UART1_IRQn              =  6,   /*!<  UART1                              */
     SSI0_IRQn               =  7,   /*!<  SSI0                               */
     I2C0_IRQn               =  8,   /*!<  I2C0                               */
-    PWMFault_IRQn           =  9,   /*!<  PWM Fault                          */
+    Reserved1               =  9,   /*!<  PWM Fault                          */
     PWMGen0_IRQn            = 10,   /*!<  PWM Generator 0                    */
     PWMGen1_IRQn            = 11,   /*!<  PWM Generator 1                    */
     PWMGen2_IRQn            = 12,   /*!<  PWM Generator 2                    */
-    QEI0_IRQn               = 13,   /*!<  Quadrature Encoder 0               */
+    Reserved2               = 13,   /*!<  Quadrature Encoder 0               */
     ADCSeq0_IRQn            = 14,   /*!<  ADC Sequence 0                     */
     ADCSeq1_IRQn            = 15,   /*!<  ADC Sequence 1                     */
     ADCSeq2_IRQn            = 16,   /*!<  ADC Sequence 2                     */
@@ -75,28 +84,10 @@ typedef enum IRQn
     Timer2A_IRQn            = 23,   /*!<  Timer 2A                           */
     Timer2B_IRQn            = 24,   /*!<  Timer 2B                           */
     Comp0_IRQn              = 25,   /*!<  Comp 0                             */
-    Comp1_IRQn              = 26,   /*!<  Comp 1                             */
-    Comp2_IRQn              = 27,   /*!<  Comp 2                             */
+    Reserved3               = 26,   /*!<  Comp 1                             */
+    Reserved4               = 27,   /*!<  Comp 2                             */
     SysCtrl_IRQn            = 28,   /*!<  System Control                     */
     FlashCtrl_IRQn          = 29,   /*!<  Flash Control                      */
-    GPIOPortF_IRQn          = 30,   /*!<  GPIO Port F                        */
-    GPIOPortG_IRQn          = 31,   /*!<  GPIO Port G                        */
-    GPIOPortH_IRQn          = 32,   /*!<  GPIO Port H                        */
-    USART2_IRQn             = 33,   /*!<  UART2 Rx and Tx                    */
-    SSI1_IRQn               = 34,   /*!<  SSI1 Rx and Tx                     */
-    Timer3A_IRQn            = 35,   /*!<  Timer 3 subtimer A                 */
-    Timer3B_IRQn            = 36,   /*!<  Timer 3 subtimer B                 */
-    I2C1_IRQn               = 37,   /*!<  I2C1 Master and Slave              */
-    QEI1_IRQn               = 38,   /*!<  Quadrature Encoder 1               */
-    CAN0_IRQn               = 39,   /*!<  CAN0                               */
-    CAN1_IRQn               = 40,   /*!<  CAN1                               */
-    CAN2_IRQn               = 41,   /*!<  CAN2                               */
-    Ethernet_IRQn           = 42,   /*!<  Ethernet                           */
-    Hibernate_IRQn          = 43,   /*!<  Hibernate                          */
-    USB0_IRQn               = 44,   /*!<  USB0                               */
-    PWMGen3_IRQn            = 45,   /*!<  PWM Generator 3                    */
-    uDMA_IRQn               = 46,   /*!<  uDMA Software Transfer             */
-    uDMAErr_IRQn            = 47    /*!<  uDMA Error                         */
 } IRQn_Type;
 
 
@@ -113,17 +104,7 @@ typedef enum IRQn
 
 
 #include "core_cm3.h"          /* Cortex-M3 processor and core periphs  */
-#include "system_lm3s.h"       /* LM3S Stellaris system init            */
-
-
-/**
- * @brief  Setup the initial configuration of the microcontroller
- * @param  none
- * @return none
- *
- * Initialize the system clocking according to the user configuration.
- */
-extern void SystemInit (void);
+#include "system_LM3S811.h"    /*!< LM3S811 System   */
 
 
 /*****************************************************************************/
@@ -983,4 +964,8 @@ typedef struct
 
 #define WDT                 ((WDT_Type *)WATCHDOG_BASE)
 
-#endif  /* __LM3_CMSIS_H__ */
+#ifdef __cplusplus
+}
+#endif
+
+#endif  /* __LM3S811_H */

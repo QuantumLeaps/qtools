@@ -35,7 +35,7 @@
 //
 //*****************************************************************************
 
-#include "lm3s_cmsis.h"
+#include "LM3S811.h"
 #include "display96x16x1.h"
 
 //*****************************************************************************
@@ -83,7 +83,7 @@
 // the top row in the LSB and the bottom row in the MSB.
 //
 //*****************************************************************************
-static const unsigned char g_pucFont[95][5] =
+static uint8_t const g_pucFont[95][5] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x00 }, // " "
     { 0x00, 0x00, 0x4f, 0x00, 0x00 }, // !
@@ -191,7 +191,7 @@ static const unsigned char g_pucFont[95][5] =
 //
 //*****************************************************************************
 #ifndef RIT_ONLY
-static const unsigned char g_pucOSRAMInit[] =
+static uint8_t const g_pucOSRAMInit[] =
 {
     //
     // Turn off the panel
@@ -297,7 +297,7 @@ static const unsigned char g_pucOSRAMInit[] =
 //
 //*****************************************************************************
 #ifndef OSRAM_ONLY
-static const unsigned char g_pucRITInit[] =
+static uint8_t const g_pucRITInit[] =
 {
     //New Display display
 
@@ -395,21 +395,21 @@ static const unsigned char g_pucRITInit[] =
 //
 //*****************************************************************************
 #ifndef RIT_ONLY
-static const unsigned char g_pucOSRAMRow1[] =
+static uint8_t const g_pucOSRAMRow1[] =
 {
     0xb0, 0x80, 0x04, 0x80, 0x12, 0x40
 };
-static const unsigned char g_pucOSRAMRow2[] =
+static uint8_t const g_pucOSRAMRow2[] =
 {
     0xb1, 0x80, 0x04, 0x80, 0x12, 0x40
 };
 #endif
 #ifndef OSRAM_ONLY
-static const unsigned char g_pucRITRow1[] =
+static uint8_t const g_pucRITRow1[] =
 {
     0xb0, 0x80, 0x04, 0x80, 0x10, 0x40
 };
-static const unsigned char g_pucRITRow2[] =
+static uint8_t const g_pucRITRow2[] =
 {
     0xb1, 0x80, 0x04, 0x80, 0x10, 0x40
 };
@@ -462,8 +462,8 @@ static const unsigned char g_pucRITRow2[] =
 // variables to store the number of non-displayed columns and a flag indicating
 // which display is in use.
 //
-static unsigned char g_ucDisplayIsRIT;
-static unsigned char g_ucColumnAdjust;
+static uint8_t g_ucDisplayIsRIT;
+static uint8_t g_ucColumnAdjust;
 #endif
 #endif
 
@@ -475,13 +475,29 @@ static unsigned char g_ucColumnAdjust;
 static unsigned long g_ulDelay;
 
 //*****************************************************************************
-static void
-SysCtlDelay(unsigned long ulCount)
-{
-    __asm("    subs    r0, #1\n"
-          "    bne.n   SysCtlDelay\n"
+#if defined ( __CC_ARM )
+static void __asm SysCtlDelay(unsigned long ulCount) {
+SysCtlDelay_loop
+    SUBS r0,#1
+    BNE  SysCtlDelay_loop
+    BX   lr
+}
+#elif defined ( __ICCARM__ )
+static void SysCtlDelay(uint32_t ulCount) {
+    __asm("SysCtlDelay_loop: \n\t"
+          "    subs    r0,#1 \n\t"
+          "    bne.n   SysCtlDelay_loop \n\t"
           "    bx      lr");
 }
+#elif defined ( __GNUC__ )
+__attribute__ ((naked))
+static void SysCtlDelay(uint32_t ulCount) {
+    __asm volatile ("1: \n\t"
+          "    subs    r0, #1 \n\t"
+          "    bne.n   1b \n\t"
+          "    bx      lr");
+}
+#endif
 
 //*****************************************************************************
 //
@@ -501,7 +517,7 @@ SysCtlDelay(unsigned long ulCount)
 //
 //*****************************************************************************
 static void
-Display96x16x1WriteFirst(unsigned char ucChar)
+Display96x16x1WriteFirst(uint8_t ucChar)
 {
     //
     // Set the slave address.
@@ -538,7 +554,7 @@ Display96x16x1WriteFirst(unsigned char ucChar)
 //
 //*****************************************************************************
 static void
-Display96x16x1WriteByte(unsigned char ucChar)
+Display96x16x1WriteByte(uint8_t ucChar)
 {
     //
     // Wait until the current byte has been transferred.
@@ -580,7 +596,7 @@ Display96x16x1WriteByte(unsigned char ucChar)
 //
 //*****************************************************************************
 static void
-Display96x16x1WriteArray(const unsigned char *pucBuffer, unsigned long ulCount)
+Display96x16x1WriteArray(uint8_t const *pucBuffer, uint32_t ulCount)
 {
     //
     // Loop while there are more bytes left to be transferred.
@@ -630,7 +646,7 @@ Display96x16x1WriteArray(const unsigned char *pucBuffer, unsigned long ulCount)
 //
 //*****************************************************************************
 static void
-Display96x16x1WriteFinal(unsigned char ucChar)
+Display96x16x1WriteFinal(uint8_t ucChar)
 {
     //
     // Wait until the current byte has been transferred.
@@ -680,7 +696,7 @@ Display96x16x1WriteFinal(unsigned char ucChar)
 void
 Display96x16x1Clear(void)
 {
-    unsigned long ulIdx;
+    uint32_t ulIdx;
 
     //
     // Move the display cursor to the first column of the first row.
@@ -739,7 +755,7 @@ Display96x16x1Clear(void)
 //
 //*****************************************************************************
 void
-Display96x16x1StringDraw(const char *pcStr, unsigned long ulX, unsigned long ulY)
+Display96x16x1StringDraw(const char *pcStr, uint32_t ulX, uint32_t ulY)
 {
 
     //
@@ -878,9 +894,9 @@ Display96x16x1StringDraw(const char *pcStr, unsigned long ulX, unsigned long ulY
 //
 //*****************************************************************************
 void
-Display96x16x1ImageDraw(const unsigned char *pucImage, unsigned long ulX,
-                      unsigned long ulY, unsigned long ulWidth,
-                      unsigned long ulHeight)
+Display96x16x1ImageDraw(const uint8_t *pucImage, uint32_t ulX,
+                      uint32_t ulY, uint32_t ulWidth,
+                      uint32_t ulHeight)
 {
     //
     // The first few columns of the LCD buffer are not displayed, so increment
@@ -933,9 +949,9 @@ Display96x16x1ImageDraw(const unsigned char *pucImage, unsigned long ulX,
 //
 //*****************************************************************************
 void
-Display96x16x1Init(unsigned char bFast)
+Display96x16x1Init(uint8_t bFast)
 {
-    unsigned long ulTmp;
+    uint32_t ulTmp;
 
     //
     // Enable the I2C and GPIO port B blocks as they are needed by this driver.
@@ -998,7 +1014,7 @@ Display96x16x1Init(unsigned char bFast)
     else {
         ulTmp = 100000;
     }
-    I2C0_MASTER->MTPR = ((SystemFrequency + (2 * 10 * ulTmp) - 1)
+    I2C0_MASTER->MTPR = ((SystemCoreClock + (2 * 10 * ulTmp) - 1)
                           / (2 * 10 * ulTmp)) - 1;
 
     //
@@ -1098,7 +1114,7 @@ Display96x16x1Init(unsigned char bFast)
 void
 Display96x16x1DisplayOn(void)
 {
-    unsigned long ulIdx;
+    uint32_t ulIdx;
 
     //
     // Re-initialize the display controller.  Loop through the initialization

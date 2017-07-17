@@ -2,6 +2,7 @@
 
 @image html qutest_banner.jpg
 
+@section qutest_about About QUTest&trade;
 <p><strong>QUTest&trade;</strong> (pronounced '_cutest_') is a **unit testing harness**, which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://state-machine.com/products/#QP" target="_blank" class="extern">QP/C/C++ applications</a>, which is a highly recommended best-practice.
 </p>
 
@@ -21,17 +22,19 @@ Even though QUTest&trade; has been primarily designed for testing of <a href="ht
 @subsection qutest_special What's Special about QUTest&trade;?
 Unlike other existing unit testing harnesses for embedded systems (e.g., <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> or <a href="http://cpputest.github.io/" target="_blank" class="extern">CppUTest</a>) QUTest&trade; is **not based on** <a href="https://en.wikipedia.org/wiki/XUnit" target="_blank" class="extern"><strong>xUnit</strong></a>, which was originally designed to run tests on host computers. Instead, QUTest&trade; is geared towards unit testing of **deeply embedded systems**. Here is a list of QUTest&trade; unique features, specifically designed for this purpose:
 
-- QUTest&trade; separates the *execution* of the CUT (Code Under Test) from *checking* of the "test assertions". The embedded target is concerned only with running a *test fixture* that exercises the CUT and produces QP/Spy&trade; trace, but it does *not* check the "test assertions". Checking the "test assertions" against the expectations is performed on the host computer by means of *test scripts*. This approach is more intuitive for embedded developers and actually simplifies the development of all sorts of <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>, including <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a>, *without breaking encapsulation* of the CUT.
+- QUTest&trade; separates the *execution* of the CUT (Code Under Test) from *checking* of the "test assertions". The embedded target is concerned only with running a <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixture</b></a> that exercises the CUT and produces QP/Spy&trade; trace, but it does *not* check the "test assertions". Checking the "test assertions" against the expectations is performed on the host computer by means of *test scripts*. This approach is more intuitive for embedded developers and actually simplifies the development of all sorts of <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>, including <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a>, *without breaking encapsulation* of the CUT.
 
 - QUTest&trade; is a unique test harness on the embedded market that supports **scripting**. QUTest *test scripts* run on the Host, which skips compilation and uploading the code to the Target and thus shortens the TDD micro-cycle.
 
-- QUTest&trade; supports **resetting the Target** for each individual test, if needed. This goes far beyond providing test `setup()` and `teardown()` functions that other test fixtures offer (and of course QUTest supports as well). Clean reset of the Target avoids erroneous tests that implicitly rely on side effects from previously executed code. This is particularly important important for embedded systems and for state machines, so that each test can start from a known initial condition.
+- QUTest&trade; supports **resetting the Target** for each individual test, if needed. This goes far beyond providing test `setup()` and `teardown()` functions that other test fixtures offer (and of course QUTest supports as well). Clean reset of the Target avoids erroneous tests that implicitly rely on side effects from previously executed code. This is particularly important for embedded systems and for state machines, so that each test can start from a known reset condition.
 
-- QUTest&trade; *test fixtures* that run on the Target **do not require dynamic memory** allocation (`malloc()/free()` in C or `new/delete` in C++). This means that you don't need to commit any of your precious embedded RAM to the heap (set the heap size to zero) and you don't need to link the heap management code. Avoiding dynamic memory allocation is one of the best practices of real-time embedded programming, which you don't need to compromise to run QUTest.
+- QUTest&trade; supports **testing Design by Contract** (assertions in C or C++, not to be confused with "test assertions") in the CUT. This is a carefully designed, unique feature of QUTest not available in other test harnesses. A successful test of DbC might actually mean breaking an assertion in the Target code.
 
-- QUTest&trade; *test fixtures* that run on the Target **do not require non-local jumps** (`setjmp()()/longjmp()` in C or `throw/catch` in C++), which are needed by other test harnesses to discontinue failing tests. QUTest&trade; *test fixtrues* do not need to discontinue failing tests, because they don't check "testing assertions". A failing test just waits for target reset commanded by a *test script*.
+- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> that run on the Target **do not require dynamic memory** allocation (`malloc()/free()` in C or `new/delete` in C++). This means that you don't need to commit any of your precious embedded RAM to the heap (you can set the heap size to zero) and you don't need to link the heap management code. Avoiding dynamic memory allocation is one of the best practices of real-time embedded programming, which you don't need to compromise to run QUTest.
 
-- QUTest&trade; *test fixtures* can be based on the actual **application code**. For example you can reuse the same `main()` function in a *test fixture* and in your final application. This means that you can either grow your *test fixture* into a final application through TDD, or you can more easily add unit tests to an existing application.
+- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> that run on the Target **do not require non-local jumps** (`setjmp()()/longjmp()` in C or `throw/catch` in C++), which are needed by other test harnesses to discontinue failing tests. QUTest&trade; *test fixtrues* do not need to discontinue failing tests, because they don't check "testing assertions", so a test fixture does not "know" if it is failing or passing. Should a test fixture crash on the Target, it simply waits for the target reset commanded by a *test script*.
+
+- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> can be based on the actual **application code**. For example you can reuse the same `main()` function in a *test fixture* and in your final application. This means that you can either grow your *test fixture* into a final application through TDD, or you can more easily add unit tests to an existing application.
 
 @note
 Even though QUTest&trade; is particularly suitable for running tests on deeply embedded targets, it also fully supports running *the same* tests on your @ref qutest_host "host computer". In fact, running the tests as much as possible on the host and thus avoiding the target-hardware bottleneck is the highly recommended best-practice of embedded TDD. QUTest&trade; supports **fully-automated** unit testing, both on the embedded target and on the host computer.
@@ -39,7 +42,7 @@ Even though QUTest&trade; is particularly suitable for running tests on deeply e
 
 -------------------------------------------------------------------------------
 @section qutest_install Installing QUTest&trade; and Tcl
-QUTest&trade; is bundled with QSPY and is installed automatically when you @ref install "install QTools". Specifically, `QUTest` consists of the <span class="img file_tcl">qspy.tcl</span> and <span class="img file_tcl">qutest.tcl</span> Tcl scripts located in the @ref qspy_files "qtools/qspy/tcl" folder.
+QUTest&trade; is bundled with QSPY and is installed automatically when you @ref install "install QTools". Specifically, `QUTest` consists of the <span class="img file_tcl">qspy.tcl</span> and <span class="img file_tcl">qutest.tcl</span> Tcl scripts located in the @ref qspy_files <span class="img folder">qtools/qspy/tcl</span> folder.
 
 @attention
 Even though QUTest&trade; is implemented in <a href="http://www.tcl.tk/man/tcl8.4/" target="_blank" class="extern">Tcl (Tool Command Language)</a>, you don't need to know Tcl to write effective tests with QUTest&trade;. The @ref qutest_tut "actual tests" that you will write utilize a small, carefully designed set of commands that form a small <a href="https://en.wikipedia.org/wiki/Domain-specific_language" target="_blank" class="extern">DSL (Domain Specific Language)</a> for unit testing. The Tcl interpreter just happened to be an effective vehicle to implement this "Unit Testing DSL".
@@ -55,6 +58,36 @@ On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/
 
 @note
 In order to communicate with the QSPY back-end, QUTest requires the Tcl interpreter extended with **UDP Sockets**. Istructions of adding UDP Sockets to Tcl are included in the QTools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
+
+
+-------------------------------------------------------------------------------
+@section qutest_run Running QUTest&trade;
+From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should connect to the Target system of your choice. You can also use the `-t` to open a TCP/IP socket for connecting host executables as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:
+
+@verbatim
+qspy -u -t
+@endverbatim
+
+Second, because QUTest&trade; is implemented as a Tcl script, it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QSpyView`).
+
+Once QSPY is running, you can run QUTest from a Windows command-prompt by typing:
+
+@verbatim
+tclsh %QTOOLS%\qspy\tcl\qutest.tcl
+@endverbatim
+
+This would launch `qutest` in the current directory and look for test scripts (`*.tcl` files) to execute them as tests.
+
+@attention
+Typically, the <span class="img file_tcl">qutest.tcl</span> script is started from a `Makefile`, which also builds the code under test (CUT) and loads it into the Target. The following @subpage qutest_tut "QUTest&trade; Tutorial" introduces QUTest&trade; concepts while the @subpage qutest_ref "QUTest&trade; Reference" goes into more detail.
+
+
+<div class="separate"></div>
+@subsection qutest_exa QUTest&trade; Examples
+The QUTest&trade; examples are co-located with the QP frameworks to which they pertain.
+
+- QUTest&trade; examples for the <a href="https://state-machine.com/qpc" target="_blank" class="extern"><strong>QP/C framework</strong></a> are located in the QP/C installation directory, in the sub-directory <span class="img folder">`qpc\examples\qutest`</span>.
+- QUTest&trade; examples for the <a href="https://state-machine.com/qpcpp" target="_blank" class="extern"><strong>QP/C++ framework</strong></a> are located in the QP/C++ installation directory, in the sub-directory <span class="img folder">`qpcpp\examples\qutest`</span>
 
 
 ------------------------------------------------------------------------------
@@ -94,37 +127,6 @@ As you can see, the QUTest structure separates test execution from checking the 
 The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the QSPY host application via a TCP/IP socket (QSPY started with the `-t` @ref qspy_command "command-line option"). In this case all QUTest&trade; components executes on the host computer.
 
 @image html qspy_host.gif "QUTest with Host Executable"
-
-
--------------------------------------------------------------------------------
-@section qutest_run Running QUTest&trade;
-From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should connect to the Target system of your choice. You can also use the `-t` to open a TCP/IP socket for connecting host executables as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:
-
-@verbatim
-qspy -u -t
-@endverbatim
-
-Second, because QUTest&trade; is implemented as a Tcl script, it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QSpyView`).
-
-Once QSPY is running, you can run QUTest from a Windows command-prompt by typing:
-
-@verbatim
-tclsh %QTOOLS%\qspy\tcl\qutest.tcl
-@endverbatim
-
-This would launch `qutest` in the current directory and look for test scripts (`*.tcl` files) to execute them as tests.
-
-@attention
-Typically, the `qutest.tcl` script is started from a `Makefile`, which also builds the code under test (CUT) and loads it into the Target. The following @subpage qutest_tut "QUTest&trade; Tutorial" introduces QUTest&trade concepts while the @subpage qutest_ref "QUTest&trade; Reference" goes into more detail.
-
-
-<div class="separate"></div>
-@subsection qutest_exa QUTest&trade; Examples
-The QUTest&trade; examples are co-located with the QP frameworks to which they pertain.
-
-- QUTest&trade; examples for the <a href="https://state-machine.com/qpc" target="_blank" class="extern"><strong>QP/C framework</strong></a> are located in the QP/C installation directory, in the sub-directory <span class="img folder">`qpc\examples\qutest`</span>.
-- QUTest&trade; examples for the <a href="https://state-machine.com/qpcpp" target="_blank" class="extern"><strong>QP/C++ framework</strong></a> are located in the QP/C++ installation directory, in the sub-directory <span class="img folder">`qpcpp\examples\qutest`</span>
-
 
 @next{qutest_tut}
 */

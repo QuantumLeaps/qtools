@@ -26,20 +26,28 @@
 #ifndef __DISPLAY96X16X1_H__
 #define __DISPLAY96X16X1_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //*****************************************************************************
 //
 // Prototypes for the driver APIs.
 //
 //*****************************************************************************
 extern void Display96x16x1Clear(void);
-extern void Display96x16x1StringDraw(const char *pcStr, unsigned long ulX,
-                                   unsigned long ulY);
-extern void Display96x16x1ImageDraw(const unsigned char *pucImage,
-                                  unsigned long ulX, unsigned long ulY,
-                                  unsigned long ulWidth,
-                                  unsigned long ulHeight);
-extern void Display96x16x1Init(unsigned char bFast);
+extern void Display96x16x1StringDraw(char const *pcStr, uint32_t ulX,
+                                   uint32_t ulY);
+extern void Display96x16x1ImageDraw(uint8_t const *pucImage,
+                                  uint32_t ulX, uint32_t ulY,
+                                  uint32_t ulWidth,
+                                  uint32_t ulHeight);
+extern void Display96x16x1Init(uint8_t bFast);
 extern void Display96x16x1DisplayOn(void);
 extern void Display96x16x1DisplayOff(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __DISPLAY96X16X1_H__

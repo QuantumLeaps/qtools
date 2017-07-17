@@ -3,7 +3,8 @@
 @tableofcontents
 
 @section qspyview_about About QSpyView&trade;
-QSpyView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create _virtual Graphical User Interfaces_ to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QSpyView&trade; can visualize the tracing data produced by QP/Spy&trade; and can also **send** various commands to the embedded target.
+<p>QSpyView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create _virtual Graphical User Interfaces_ to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QSpyView&trade; can visualize the tracing data produced by QP/Spy&trade; and can also **send** various commands to the embedded target.
+</p>
 
 @note
 A visualization and monitoring system like QSpyView&trade; can be used in all stages of development, manufacturing, and after the deployment, for in-field servicing of embedded devices.
@@ -13,10 +14,9 @@ A visualization and monitoring system like QSpyView&trade; can be used in all st
 
 As you can see in the figure above, a QSpyView&trade; user interface consists of the text box with extensible menus plus a customizable canvas that can display the QP/Spy&trade; data in an attractive graphical format, such as animations, graphs, etc. and can contain controls, such as buttons, sliders, etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QSpyView&trade; provides only a skeleton, which is then **customized** by user-supplied scripts.
 
-<strong>What's Special About QSpyView&trade;?</strong>@n
+<div class="separate"></div>
+@subsection qspyview_special What's Special About QSpyView&trade;?
 The GUIs created with QSpyView&trade; are naturally platform-neutral and run without any changes on Windows, Linux, or macOS.
-
-
 
 QSpyView&trade; currently supports the following @subpage qspyview_ui "commands" (<strong>NOTE:</strong> QSpyView&trade; is @subpage qspyview_cust "extensible" with functionality specific to the project at hand, so it can provide many more features on top of the basic functionality enumerated below):
 

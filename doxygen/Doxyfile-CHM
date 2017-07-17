@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "QP/Spy"
+PROJECT_NAME           = "QTools"
 PROJECT_NUMBER         = "5.9.3"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
@@ -134,7 +134,9 @@ INPUT                  = \
     ../qwin/qwin_gui.h \
     ../qwin/qwin_gui.c \
     ../qclean/source/main.cpp \
-    ../qfsgen/source/main.cpp
+    ../qfsgen/source/main.cpp \
+    ../../doxygen/glossary.dox
+
 
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = \
@@ -185,10 +187,10 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = tmp
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = ../../../html/header.html
-HTML_FOOTER            = ../../../html/footer.html
+HTML_HEADER            = ../../doxygen/header.html
+HTML_FOOTER            = ../../doxygen/footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ../../../html/ql.css
+HTML_EXTRA_STYLESHEET  = ../../doxygen/ql.css
 HTML_EXTRA_FILES       =
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
@@ -202,7 +204,7 @@ DOCSET_BUNDLE_ID       = com.state-machine.doc
 DOCSET_PUBLISHER_ID    = com.state-machine.doc
 DOCSET_PUBLISHER_NAME  = Quantum Leaps
 GENERATE_HTMLHELP      = YES
-CHM_FILE               = ../../../../html/qspy.chm
+CHM_FILE               = ../../../doxygen/qtools.chm
 HHC_LOCATION           =
 GENERATE_CHI           = NO
 CHM_INDEX_ENCODING     =
@@ -210,14 +212,14 @@ BINARY_TOC             = NO
 TOC_EXPAND             = NO
 GENERATE_QHP           = NO
 QCH_FILE               =
-QHP_NAMESPACE          = com.state-machine.qp
+QHP_NAMESPACE          = com.state-machine.qtools
 QHP_VIRTUAL_FOLDER     = doc
 QHP_CUST_FILTER_NAME   =
 QHP_CUST_FILTER_ATTRS  =
 QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 GENERATE_ECLIPSEHELP   = NO
-ECLIPSE_DOC_ID         = com.state-machine.qp
+ECLIPSE_DOC_ID         = com.state-machine.qtools
 DISABLE_INDEX          = YES
 GENERATE_TREEVIEW      = YES
 ENUM_VALUES_PER_LINE   = 4

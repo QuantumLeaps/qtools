@@ -41,7 +41,7 @@ Additionally, the provided code shows how to handle input sources:
 
 ------------------------------------------------------------------------------
 @section qwin_doc QWin&trade; Documentation
-QWin&trade; GUI Prototyping Toolkit is described in the Application Note: <a href="https://state-machine.com/doc/AN_QWIN-GUI.pdf" target="_blank" class="extern"><b>Application Note: QWIN GUI Kit for Prototyping Embedded Systems on Windows</b></a>.
+QWin&trade; GUI Prototyping Toolkit is described in the Application Note: <a href="https://state-machine.com/doc/AN_QWin-GUI.pdf" target="_blank" class="extern"><b>Application Note: QWIN GUI Kit for Prototyping Embedded Systems on Windows</b></a>.
 
 @image html qwin.png "Application Note: QWIN GUI Kit for Prototyping Embedded Systems on Windows"
 

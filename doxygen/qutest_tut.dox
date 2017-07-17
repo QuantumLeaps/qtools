@@ -38,7 +38,7 @@ This simple example runs QUTest tests on the host (Windows in this case). Other 
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-run Running the Test
-The complete code for the Sprintf example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>. To run the Sprintf tests (on Windows), open a command prompt and type:
+The complete code for the Sprintf example is provided in the QP/C framework, directory <span class="img folder">C:\qp\qpc\examples\qutest\TDDbook_Sprintf</span>. To run the Sprintf tests (on Windows), open a command prompt and type:
 
 @verbatim
 qspy -u -t
@@ -60,7 +60,7 @@ This will build the @ref qutest_sprintf-fixture "Sprintf test fixture" as a Wind
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-fixture Test Fixture
-The job of a *test fixture* is to exercise the **CUT** (the `sprintf()` function in this case) and report the results back to the QSPY host application. Note that a *test fixture* in QUTest&trade; is **not** supposed to perform and checking whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-script "test script"(s).
+The job of a <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixture</b></a> is to exercise the <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (the `sprintf()` function in this case) and report the results back to the QSPY host application. Note that a *test fixture* in QUTest&trade; is **not** supposed to perform and checking whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-script "test script"(s).
 
 @remark
 Coming up with a "good" *test fixture* requires some practice, but when you study the examples in this Tutorial, you will see examples of flexible *test fixtures* that allow you to to run a wide variety of tests on them.
@@ -133,7 +133,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </li>
   <li><span class="tag">2</span> You also need to include the interface to the CUT, which is `<stdio.h>` in case of the `sprintf()` CUT.
   </li>
-  <li><span class="tag">3</span> The macro `Q_DEFINE_THIS_FILE` is needed for <a href="https://state-machine.com/qpc/qassert_8h.html" class="extern"><b>QP/C-style assertions</b></a> (they have nothing to do with "test assertions"). Here a QP/C assertion is used to guard against failure in the initialization of the @ref qs "QS" target-resident component.
+  <li><span class="tag">3</span> The macro `Q_DEFINE_THIS_FILE` is needed for <a href="https://state-machine.com/glossary#assertion" class="extern"><b>DbC assertions</b></a> (they have nothing to do with <a href="https://state-machine.com/glossary#test_assertion" class="extern">test assertions</a>). Here a <a href="https://state-machine.com/glossary#assertion" class="extern">DbC assertion</a> is used to guard against failure in the initialization of the @ref qs "QS" target-resident component.
   </li>
   <li><span class="tag">4</span> The static (local) `char` array `format[]` will be used to provide the format string to the `sprintf()` CUT.
   </li>
@@ -141,15 +141,17 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </li>
   <li><span class="tag">6</span> The static (local) `char` array `string[]` will be used to provide a string parameter to the `sprintf()` CUT.
   </li>
-  <li><span class="tag">7</span> The enumeration `SPRINTF_CALL` will be used for an @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT in the Target. <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  <li><span class="tag">7</span> The enumeration `SPRINTF_CALL` will be used for an @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT in the Target.
+> <b>NOTE:</b> that the enumeration is offset by #QS_USER.
   </li>
   <li><span class="tag">8</span> A QUTest *test fixture* code needs the `main()` function. This `main()` function can be in a separate file, but in this simple example it is placed in `test_Sprintf.c`. Either way, the `main()` function has the usual structure of a QP/C application (and in fact in the more advanced tests it can be *the same* function as used by the actual QP/C application). But here, it contains the bare minimum function calls, as described below.
   </li>
   <li><span class="tag">9</span> The `main()` function must start with calling `QF_init()` to initialize the QP framework.
   </li>
-  <li><span class="tag">10</span> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fail if the QS initialization fails. (In which case continuationon of the test makes no sense).
+  <li><span class="tag">10</span> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails. (In which case continuationon of the test makes no sense).
   </li>
-  <li><span class="tag">11</span> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-script "test scripts" need to know about. (NOTE: you need to do this, so that the test scripts can refer to the objects by the same symbolic names as the *test fixture*).
+  <li><span class="tag">11</span> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-script "test scripts" need to know about.
+> <b>NOTE:</b> you need to do this, so that the test scripts can refer to the objects by the same symbolic names as the *test fixture*.
   </li>
   <li><span class="tag">12</span> Finally, at the end of `main()` you need to call `QF_run()` to run the tests.
   </li>
@@ -159,9 +161,11 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </li>
   <li><span class="tag">15</span> The callback function `QS_onCommand()` allows you to remotely execute commands inside the Target. Here is where you execute the `sprintf()` CUT and report results back to QSPY.
   </li>
-  <li><span class="tag">16</span> The command 0 (with `cmdId==0`) will be used to call the `sprintf()` CUT. (NOTE: You can use other `cmdId`s to call other pieces of CUT or to provide different variants of calling the same CUT, as you see fit. Much of the art of writing *test fixtures* lies in constructing flexible remote commands that exercise your CUT).
+  <li><span class="tag">16</span> The command with `cmdId==0` will be used to call the `sprintf()` CUT.
+> <b>NOTE:</b> You can use other `cmdId`s to call other pieces of CUT or to provide different variants of calling the same CUT, as you see fit. Much of the art of writing *test fixtures* lies in constructing flexible remote commands that exercise your CUT.
   </li>
-  <li><span class="tag">17</span> The `sprintf()` CUT is called and the return value is saved in the `ret` automatic variable. Note that the `sprintf()` output buffer (first argument) is not just the `output` array, but rather `&output[8]`, which will allow you to study buffer underflow (altering of the memory preceeding the buffer). Also note the other parameters of the call to the `sprintf()` CUT, such as the `format` string and the `string` argument. These details will be important to construct the @ref qutest_sprintf-script "test script"s.
+  <li><span class="tag">17</span> The `sprintf()` CUT is called and the return value is saved in the `ret` automatic variable.
+> <b>NOTE:</b> the output buffer (first argument of `sprintf()`) is not just the `output` array, but rather `&output[8]`, which will allow you to study buffer underflow (altering of the memory preceeding the buffer passed to `sprintf()`). Also note the other parameters of the call to the `sprintf()` CUT, such as the `format` string and the `string` argument. These details will be important to construct the @ref qutest_sprintf-script "test script"s.
   </li>
   <li><span class="tag">18</span> The `QS_BEGIN()` macro starts the @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT to the Target.
   </li>
@@ -178,7 +182,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-script Test Script
-A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the **expectations** of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @note
 The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `SprintfTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
@@ -242,15 +246,17 @@ The following test script performs the same tests as the <a href="http://www.thr
 <ul class="tag">
   <li><span class="tag">2</span> The **test** command starts a test and gives it a name (in double quotes). The name of test will be displayed as the test is executed and should be a quick reminder about the objective of this test. This test command also @ref qutest_reset "resets the Target", which brings the Target into a well-defined initial state and produces the @ref qs_dict "QS dictionary records" (see @ref qutest_sprintf-fixture "test-fixture"[11])
   </li>
-  <li><span class="tag">3</span> The **glb_filter** command sets the @ref qs_global "QS Global Filters" in the Target. Here the global filter allows all User trace records (UA). You need this filter open to see the application-specific trace records, such as `SPRINTF_CALL` (see @ref qutest_sprintf-fixture "test-fixture"[7]).
+  <li><span class="tag">3</span> The **glb_filter** command sets the @ref qs_global "QS Global Filters" in the Target. Here the global filter allows all User trace records (UA). You need to open this filter to see the application-specific trace records, such as `SPRINTF_CALL` (see @ref qutest_sprintf-fixture "test-fixture"[7]).
   </li>
-  <li><span class="tag">4</span> The **current_obj** command sets the @ref qs_curr "QS Current Object" in the Target. The `AP` argument means that the "Application" object will be set. This "Application Current Object" will be used in subsequent poke() command.
+  <li><span class="tag">4</span> The **current_obj** command sets the @ref qs_curr "QS Current Object" in the Target. The `AP` argument means that the "Application Current Object" will be set inside the Target. This "Application Current Object" will be used in subsequent poke() command.
   </li>
-  <li><span class="tag">5</span> The **poke** command pokes the specified "Application Current Object" starting with the specified offset (here 0) with the data elements of size 1 (the second argument) with the data provided in the third argument ("Hello World!\0") into the previously established Application Current Object `format` (see @ref qutest_sprintf-fixture "test-fixture"[4]).
+  <li><span class="tag">5</span> The **poke** command pokes the specified "Application Current Object" starting with the specified offset from the beginning of the object in memory (here 0) with the data elements of size 1 (the second argument) with the data provided in the third argument ("Hello World!\0") into the previously established "Application Current Object" `format` (see @ref qutest_sprintf-fixture "test-fixture"[4]).
   </li>
-  <li><span class="tag">6</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the commandId (see @ref qutest_sprintf-fixture "test-fixture"[16])
+  <li><span class="tag">6</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_sprintf-fixture "test-fixture"[16])
+> <b>NOTE:</b> The first parameter of **command** here is just a number (0), but it is also possible to use a **symbolic name** for the first parameter. This symbolic name will be looked up in the user dictionary (QS_USR_DICTIONARY()) produced by the Target, as illustrated in @ref qutest_leddriver-script "LedDriver Test Script"[2].
   </li>
-  <li><span class="tag">7</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `command 0` command. <b>NOTE:</b> that the expected string starts with a number `0000000001`, which is the @ref qs_tstamp "Target Time-Stamp". In QUTest, the @ref qutest_tstamp "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost.
+  <li><span class="tag">7</span> The **expect** command represents an <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test (a.k.a. <a href="https://state-machine.com/glossary#test_assertion">test assertion</a>). This is the expected output generated by the `command 0` command.
+> <b>NOTE:</b> the expected string starts with a number `0000000001`, which is the @ref qs_tstamp "Target Time-Stamp". In QUTest, the @ref qutest_tstamp "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost. In the later tests you will see how you can count the steps <b>automatically</b> with the `%timestamp` variable.
   </li>
   <li><span class="tag">8</span> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
   </li>
@@ -265,11 +271,11 @@ The following test script performs the same tests as the <a href="http://www.thr
   </li>
   <li><span class="tag">11</span> The **poke** command pokes the specified "Application Current Object" starting with the specified offset (here 0) with the data provided in the second argument. Here you poke a zero-terminated string "dec=%d\0" into the previously established Application Current Object `format`.
   </li>
-  <li><span class="tag">12</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the commandId. The second argument (`1234`) corresponds to `param1` in the @ref qutest_sprintf-fixture "test-fixture"[16].
+  <li><span class="tag">12</span> The **command** command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_sprintf-fixture "test-fixture"[16]).
   </li>
-  <li><span class="tag">13</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `command 0 1234` command.
+  <li><span class="tag">13</span> The **expect** command represents an <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test. This is the expected output generated by the `command 0 1234` command.
   </li>
-  <li><span class="tag">14</span> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
+  <li><span class="tag">14</span> The test finishes with the expectation for the "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
   </li>
 </ul>
 
@@ -308,13 +314,16 @@ The following test script performs the same tests as the <a href="http://www.thr
   </li>
   <li><span class="tag">27</span> The **peek** command reads data from the specified "Application Current Object" (now `output`) starting with the specified offset (here `26`) with the data elements of size provided in the second argument (here `1`) and the number of such elements provided in the third argument (here `4`). Here you are reading bytes (elements size 1) at the end of the formatted output generated in the previouis test. You do this to check for any overflow of the `output` buffer.
   </li>
-  <li><span class="tag">28</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `peek 26 1 4` command. <b>NOTE1:</b> this expectation demonstrates the use of the @ref qutest_tstamp "\%timestamp variable" instead of hard-coded number like `0000000001`. <b>NOTE2:</b> this expectation demonstrates also two "don't care" characters in the expected string (<b>'?'</b>). On the other hand, the expected values at the end of the `output` buffer are the zero-termination of the string (`'00'`) and two bytes `'AA,AA'` pre-filed in the previous test (step [21]).
+  <li><span class="tag">28</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `peek 26 1 4` command.
+> <b>NOTE:</b> this expectation demonstrates the use of the @ref qutest_tstamp "\%timestamp variable" instead of hard-coded number like `0000000001`.@n
+> <b>NOTE:</b> this expectation demonstrates also two "don't care" characters in the expected string (<b>'?'</b>). On the other hand, the expected values at the end of the `output` buffer are the zero-termination of the string (`'00'`) and two bytes `'AA,AA'` pre-filed in the previous test (step [21]).
   </li>
   <li><span class="tag">29</span> Another **peek** command reads the bytes (elements size 1) at the beginning of the formatted output generated in the previouis test. . You do this to check for any underflow of the `output` buffer.
   </li>
   <li><span class="tag">30</span> The **expect** command represents an **expectation** of this test (a.k.a. "test assertion"). This is the expected output generated by the `peek 0 1 10` command. Again, this expectation uses the @ref qutest_tstamp "\%timestamp variable" and "don't care" characters <b>'?'</b>.
   </li>
-  <li><span class="tag">31</span> Every test script must end with the **end** command. This signals to the `qutest.tcl` test runner to output the test statistics. (<b>NOTE:</b> a test script without an `end` will generate error).
+  <li><span class="tag">31</span> Every test script must end with the **end** command. This signals to the `qutest.tcl` test runner to output the test statistics.
+> <b>NOTE:</b> a test script not terminated with an `end` command will generate an error.
   </li>
 </ul>
 
@@ -337,7 +346,7 @@ As an exercise you should modify the Sprintf *test script* to inject some errors
 <img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
 @endhtmlonly
 
-<p>This example is an adaptation of the tests described in Chapters 2 and 3 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip. In **CUT** for this example is located in the files <span class="img file_h">`test_LedDriver.h`</span> and <span class="img file_c">`test_LedDriver.c`</span> in the same directory as the rest of this test.
+<p>This example is an adaptation of the tests described in Chapters 2 and 3 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip. The <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> for this example is located in the file <span class="img file_c">`LedDriver.c`</span> in the same directory as the rest of this test.
 </p>
 
 
@@ -473,19 +482,23 @@ The following listing shows the test fixture for the LedDriver tests (file <span
   </li>
   <li><span class="tag">3</span> The `virtualLeds` static variable is used in the `LedDriver` CUT.
   </li>
-  <li><span class="tag">4</span> The enumerated constants `LEDDRIVER_xxx` will be used for @ref qs_app "application-specific trace records" that will report results of calling the various functions of the LedDriver CUT in the Target. <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  <li><span class="tag">4</span> The enumerated constants `LEDDRIVER_xxx` will be used for @ref qs_app "application-specific trace records" that will report results of calling the various functions of the LedDriver CUT in the Target.
+> <b>NOTE:</b> that the enumeration is offset by #QS_USER.
   </li>
   <li><span class="tag">5</span> This simple *test fixture* again directly contains the main() function. This function contains the bare minimum function calls, as described below.
   </li>
-  <li><span class="tag">6</span> The QS_FILTER_ON(QS_UA_RECORDS) macro opens up the @ref qs_global "QS Global Filter" for all user (i.e., application-specific) records (the `QS_UA_RECORDS` group). This is an alternative to issuing the command `"glb_filter UA"` from the *test script*. (<b>NOTE:</b> QUTest starts with all @ref qs_global "QS Global Filter" disabled).
+  <li><span class="tag">6</span> The QS_FILTER_ON(QS_UA_RECORDS) macro opens up the @ref qs_global "QS Global Filter" for all user (i.e., application-specific) records (the `QS_UA_RECORDS` group). This is an alternative to issuing the command `"glb_filter UA"` from the *test script*.
+> <b>NOTE:</b> QUTest starts with all @ref qs_global "QS Global Filter" disabled.
   </li>
   <li><span class="tag">7</span> The macro QS_OBJ_DICTIONARY(&virtualLeds) generates an object-dictionary entry for the `virtualLeds` variable.
   </li>
   <li><span class="tag">8</span> The macros QS_USR_DICTIONARY() generate user-dictionary entries for all application-specific (user) trace records enumerated in step [4].
   </li>
-  <li><span class="tag">9</span> The callback function `QS_onTestSetup()` is used here to create the LedDRiver before every test. (<b>NOTE:</b> The `QS_onTestSetup()` callback is called for every **test** command in the *test script*).
+  <li><span class="tag">9</span> The callback function `QS_onTestSetup()` is used here to create the LedDRiver before every test.
+> <b>NOTE:</b> The `QS_onTestSetup()` callback is called for every **test** command in the *test script*.
   </li>
-  <li><span class="tag">10</span> The callback function `QS_onTestTeardown()` is used here to destroy the LedDRiver after every test. (<b>NOTE:</b> The `QS_onTestTeardown()` callback is called for every **test** command in the *test script*).
+  <li><span class="tag">10</span> The callback function `QS_onTestTeardown()` is used here to destroy the LedDRiver after every test.
+> <b>NOTE:</b> The `QS_onTestTeardown()` callback is called for every **test** command in the *test script*.
   </li>
   <li><span class="tag">11</span> The `QS_onCommand()` callback is used to call the CUT, whereas each function of the driver is called in the different `case` of the switch. Please note that here the `cmdId`s are the same as the application-specific trace records enumerated in step [4]. This will allow the *test script* to use symbolic names for commands, instead of hard-coded numerical values.
   </li>
@@ -564,11 +577,11 @@ The following test script performs the same tests as the <a href="http://www.thr
 @note
 As you can see, the QUTest&trade; environment enables you to write *test scritps* entirely in terms of the symbols used in the *test fixture*. (You could use hex addesses, if you wished, but this is obviously not recommended.) The key is to generate appropriate @ref @ref qs_dict "QS dictionaries" from the *test fixture*.
 
-@next{qutest_tut_Mock}
+@next{qutest_tut_Flash}
 */
 
 /*###########################################################################*/
-/*! @page qutest_tut_Mock Mocking Example
+/*! @page qutest_tut_Mock Mock Object Example
 
 @tableofcontents
 
@@ -576,7 +589,461 @@ As you can see, the QUTest&trade; environment enables you to write *test scritps
 <img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
 @endhtmlonly
 
-This example is an adaptation of the Flash-memory tests described in Chapter 10 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip.
+<p>This example is an adaptation of the Flash-memory unit tests described in Chapter 10 "The Mock Object" of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a Flash-memory driver (for the M28W160ECT Flash Memory device from Micron Technology).
+
+The most important aspect of this example is the use of a **Mock Object** for simulating the input/output interface to the Flash memory. The <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> for this example is located in the file <span class="img file_c">`Flash.c`</span> in the same directory as the rest of this test.
+</p>
+
+@note
+A mock object is a specific variant of a <a href="https://state-machine.com/glossary#test_double" class="extern"><b>test double</b></a>, which is a collaborator of the CUT that impersonates some function, data, module, or library during test. The CUT does not know it is using a test double; it interacts with the double the same way it interacts with the real collaborator.
+
+
+In case of the Flash memory driver (the CUT in this case), it collaborates with the low-level IO (input/output) code, which is responsible for reading and writing data to a raw memory addresses.
+
+@attention
+This example illustrates how to use @ref qutest_probe "QUTest Test Probes" to alter the behavior of the @ref qutest_flash-fixture "test fixture" from the @ref qutest_flash-script "test script".
+
+
+------------------------------------------------------------------------------
+@section qutest_flash-run Running the Test
+The complete code for the Flash example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Flash`</span>. To run the Flash tests (on Windows), open a command prompt and type:
+
+@verbatim
+qspy -u -t
+@endverbatim
+
+This will start the @ref qspy "QSPY" host application with the UDP socket (`-u` @ref qspy_command "option") and TCP/IP connection to the Target (`-t` @ref qspy_command "option").
+
+Next, open another command prompt window and type:
+
+@verbatim
+cd C:\qp\qpc\examples\qutest\TDDbook_Flash
+make
+@endverbatim
+
+This will build the @ref qutest_flash-fixture "Flash test fixture" as a Windows executable and then it will run the @ref qutest_flash-script "Flash test script". The screen shot below shows the output produced in these two command-prompt windows.
+
+@image html test_flash.png "QUTest Flash test run"
+
+
+------------------------------------------------------------------------------
+@section qutest_flash-mock Mock Object
+The following listing shows the mock object for the low-level IO (input/outpu) operations implemented with QUTest&trade; (file <span class="img file_c">`MockIO.c`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with [xx] labels).
+
+@code
+ [1] #include "qpc.h" /* for QUTEST */
+ [2] #include "IO.h"  /* mocked interface */
+
+     enum {
+ [3]     IO_READ  = QS_USER1,
+         IO_WRITE,
+     };
+
+     /*..........................................................................*/
+ [4] void MockIO_Init(void) {
+         /* dictionaries... */
+ [5]     QS_USR_DICTIONARY(IO_READ);
+         QS_USR_DICTIONARY(IO_WRITE);
+
+ [6]     QS_FUN_DICTIONARY(&IO_Read);
+         QS_FUN_DICTIONARY(&IO_Write);
+     }
+     /*..........................................................................*/
+ [7] ioData IO_Read(ioAddress offset) {
+ [8]     QS_TEST_PROBE_DEF(&IO_Read)
+         ioData ret = (ioData)0;
+ [9]     QS_TEST_PROBE(
+[10]         ret = (ioData)qs_tp_;
+         )
+[11]     QS_BEGIN(IO_READ, (void *)0) /* user-specific record */
+[12]         QS_I16(0, ret);
+[13]         QS_U32(0, offset);
+         QS_END()
+[14]     return ret;
+     }
+     /*..........................................................................*/
+[15] void IO_Write(ioAddress offset, ioData data) {
+[16]     QS_BEGIN(IO_WRITE, (void *)0) /* user-specific record */
+[17]         QS_U32(0, offset);
+[18]         QS_I16(0, data);
+         QS_END()
+     }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. Typically, you need to include this header file in QUTest test doubles.
+  </li>
+  <li><span class="tag">2</span> The `"IO.h"` header file specifies the interface to the code being mocked. The whole purpose of the mock is to implement this interface such that the CUT can call use it as its collaborator.
+> **NOTE:** The CUT does not "know" that it is collaborating with a _test double_ (the mock object in this case).
+  <li><span class="tag">3</span> This enumeration lists the @ref qs_app "application-specific QS trace records" that will be produced by the mocked IO operations. The enumeration starts with #QS_USER1 offset, which is the second group of user-specific records. The first group (#QS_USER offset) is used by the main @ref qutest_flash-fixture "test fixture".
+  </li>
+  <li><span class="tag">4</span> The `MockIO_init()` function performs the initialization of the mock object. This function is not part of the real IO interface (see `IO.h` in the Flash test directory), but is needed only for testing.
+  </li>
+  <li><span class="tag">5</span> The initialization produces @ref qs_dict "user dictionaries" for application-specific trace records produced by the mock.
+> **NOTE:** such "dictionaries" will allow the @ref qutest_flash-script "test script" to refer to the produced application-specific records by their symbolic names.
+  </li>
+  <li><span class="tag">6</span> The initialization produces @ref qs_dict "function dictionaries" for the low-level IO functions implemented by the mock.
+> **NOTE:** such "dictionaries" will allow the @ref qutest_flash-script "test script" to refer to the functions by their symbolic names.
+  </li>
+  <li><span class="tag">7</span> The `IO_Read()` function is one of the low-level IO operations implemented by the mock.
+> **NOTE:** Perhaps the most important aspect of the `IO_Read()` function is the return value it provides to the CUT, which is the error status.
+  </li>
+  <li><span class="tag">8</span> The macro QS_TEST_PROBE_DEF() retrieves the @ref qutest_probe "Test Probe" for this function (argument `&IO_Read`). The "Test Probe" means a 32-bit data item that the @ref qutest_flash-script "test script" has provided for this function before calling it.
+  </li>
+  <li><span class="tag">9</span> The QS_TEST_PROBE() macro utilizes the test probe retrieved by the QS_TEST_PROBE_DEF() macro. If the test probe has been provided (the 32-bit value is not zero) the code in parentheses (step [10]) is executed.
+  </li>
+  <li><span class="tag">10</span> The 32-bit value of the test probe is copied to the return value from the function.
+> **NOTE:** that way the mocked `IO_Read()` function can return to the CUT a value pre-programmed by the @ref qutest_flash-script "test script".
+  </li>
+  <li><span class="tag">11</span> The application-specific trace record `IO_READ` is generated. This trace record reports the details of the call to the `IO_Read()` function.
+  </li>
+  <li><span class="tag">12</span> The return value is reported as `int16_t`.
+  </li>
+  <li><span class="tag">13</span> The memory `offset` parameter is reported as `uint32_t`.
+  </li>
+  <li><span class="tag">14</span> The fake return value is returned to the CUT.
+  </li>
+  <li><span class="tag">15</span> The `IO_Write()` function is another low-level IO operation implemented by the mock.
+  </li>
+  <li><span class="tag">16</span> The application-specific trace record `IO_WRITE` is generated. This trace record reports the details of the call to the `IO_Write()` function.
+  </li>
+  <li><span class="tag">17</span> The memory `offset` parameter is reported as `uint32_t`.
+  </li>
+  <li><span class="tag">18</span>  The memory `data` parameter is reported as `int16_t`.
+  </li>
+</ul>
+
+
+------------------------------------------------------------------------------
+@section qutest_flash-fixture Test Fixture
+The following listing shows the test fixture for the Flash tests (file <span class="img file_c">`test_Flash.c`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with [xx] labels).
+
+@code
+ [1] #include "qpc.h"       /* QUTest interface */
+ [2] #include "Flash.h"     /* CUT */
+     #include "FakeMicroTime.h" /* test double */
+
+     Q_DEFINE_THIS_FILE
+
+     /* mock initialization -----------------------------------------------------*/
+     enum {
+         FLASH_WRITE = QS_USER0,
+         FAKE_MICROTIME_INIT,
+     };
+
+     void MockIO_Init(void);
+
+     /*--------------------------------------------------------------------------*/
+     int main() {
+         QF_init();  /* initialize the framework and the underlying RT kernel */
+         Q_ALLEGE(QS_INIT((void *)0)); /* initialize QS tracing system */
+
+         /* filter setup */
+         QS_FILTER_ON(QS_UA_RECORDS); /* UA==user-all */
+
+         /* dictionaries... */
+         QS_USR_DICTIONARY(FLASH_WRITE);
+         QS_USR_DICTIONARY(FAKE_MICROTIME_INIT);
+
+         QS_FUN_DICTIONARY(&Flash_Create);
+         QS_FUN_DICTIONARY(&Flash_Destroy);
+         QS_FUN_DICTIONARY(&Flash_Write);
+
+         /* initialize the mocks... */
+         MockIO_Init();
+
+         return QF_run(); /* run the tests */
+     }
+
+     /*--------------------------------------------------------------------------*/
+     void QS_onTestSetup(void) {
+         Flash_Create();
+     }
+     /*..........................................................................*/
+     void QS_onTestTeardown(void) {
+         Flash_Destroy();
+     }
+     /*..........................................................................*/
+     void QS_onCommand(uint8_t cmdId,
+                       uint32_t param1, uint32_t param2, uint32_t param3)
+     {
+         (void)param2;
+         (void)param3;
+
+         switch (cmdId) {
+             case FLASH_WRITE: {
+                 int ret = Flash_Write((ioAddress)param1, (ioData)param2);
+                 QS_BEGIN(FLASH_WRITE, (void *)0) /* user-specific record */
+                    QS_I32(0, ret);
+                 QS_END()
+                 break;
+             }
+             case FAKE_MICROTIME_INIT: {
+                 FakeMicroTime_Init(param1, param2);
+                 QS_BEGIN(FAKE_MICROTIME_INIT, (void *)0) /* user-specific record */
+                 QS_END()
+                 break;
+             }
+             default:
+                 break;
+         }
+     }
+     /*..........................................................................*/
+     /*! callback function to "massage" the injected QP events (not used here) */
+     void QS_onTestEvt(QEvt *e) {
+         (void)e;
+     }
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. You need to include this header file in all QUTest test fixtures.
+  </li>
+  <li><span class="tag">2</span> The `"LedDriver.h"` header file includes CUT interface.
+  </li>
+  <li><span class="tag">3</span> The `virtualLeds` static variable is used in the `LedDriver` CUT.
+  </li>
+  <li><span class="tag">4</span> The enumerated constants `LEDDRIVER_xxx` will be used for @ref qs_app "application-specific trace records" that will report results of calling the various functions of the LedDriver CUT in the Target.
+> <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  </li>
+  <li><span class="tag">5</span> This simple *test fixture* again directly contains the main() function. This function contains the bare minimum function calls, as described below.
+  </li>
+  <li><span class="tag">6</span> The QS_FILTER_ON(QS_UA_RECORDS) macro opens up the @ref qs_global "QS Global Filter" for all user (i.e., application-specific) records (the `QS_UA_RECORDS` group). This is an alternative to issuing the command `"glb_filter UA"` from the *test script*.
+> <b>NOTE:</b> QUTest starts with all @ref qs_global "QS Global Filter" disabled.
+  </li>
+  <li><span class="tag">7</span> The macro QS_OBJ_DICTIONARY(&virtualLeds) generates an object-dictionary entry for the `virtualLeds` variable.
+  </li>
+  <li><span class="tag">8</span> The macros QS_USR_DICTIONARY() generate user-dictionary entries for all application-specific (user) trace records enumerated in step [4].
+  </li>
+  <li><span class="tag">9</span> The callback function `QS_onTestSetup()` is used here to create the LedDRiver before every test.
+> <b>NOTE:</b> The `QS_onTestSetup()` callback is called for every **test** command in the *test script*.
+  </li>
+  <li><span class="tag">10</span> The callback function `QS_onTestTeardown()` is used here to destroy the LedDRiver after every test.
+> <b>NOTE:</b> The `QS_onTestTeardown()` callback is called for every **test** command in the *test script*.
+  </li>
+  <li><span class="tag">11</span> The `QS_onCommand()` callback is used to call the CUT, whereas each function of the driver is called in the different `case` of the switch. Please note that here the `cmdId`s are the same as the application-specific trace records enumerated in step [4]. This will allow the *test script* to use symbolic names for commands, instead of hard-coded numerical values.
+  </li>
+  <li><span class="tag">12</span> For example, the `case LEDDRIVER_CREATE` calls the `LedDriver_Destroy()` function from the CUT</li>
+  <li><span class="tag">13</span> Subsequently, the application-specific trace record `LEDDRIVER_CREATE` is generated.
+  <li><span class="tag">14</span> This trace record outputs the value of `virtualLeds` produced by the call to the CUT. Similar strategy is used in all remaining `case` statements in the `QS_onCommand()` callback function.
+</ul>
+
+------------------------------------------------------------------------------
+@section qutest_flash-script Test Script
+The following listing shows the *test script* for the Flash tests (file <span class="img file_tcl">`test_Flash.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@note
+The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `LedDriverTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
+
+@code
+     # QUTEST test script corresponding to the test_Flash.c test fixture.
+     # This example corresponds to FlashTest.cpp test from Chapter 10 "The Mock
+     # Object" of the book: "Test-Driven Development for Embedded Systems" by
+     # James W. Grenning
+
+     # preamble...
+
+     proc on_setup {} {
+         command FAKE_MICROTIME_INIT 0 1
+         expect "%timestamp FAKE_MICROTIME_INIT"
+         expect "%timestamp Trg-Done QS_RX_COMMAND"
+     }
+
+     set address [expr 0x1000]
+     set data    [expr (0xBEEF << 16) >> 16] ;# sign-extend
+
+     # constants from "Flash.h"
+     set FLASH_SUCCESS                0
+     set FLASH_VPP_ERROR              1
+     set FLASH_PROGRAM_ERROR          2
+     set FLASH_PROTECTED_BLOCK_ERROR  3
+     set FLASH_UNKNOWN_PROGRAM_ERROR  4
+     set FLASH_READ_BACK_ERROR        5
+     set FLASH_TIMEOUT_ERROR          6
+
+     # constants from "m28w160ect.h"
+     set CommandRegister         [expr 0x0]
+     set StatusRegister          [expr 0x0]
+
+     set ProgramCommand          [expr 0x40]
+     set Reset                   [expr 0xFF]
+
+     set ReadyBit                [expr 1<<7]
+     set EraseSuspendBit         [expr 1<<6]
+     set EraseErrorBit           [expr 1<<5]
+     set ProgramErrorBit         [expr 1<<4]
+     set VppErrorBit             [expr 1<<3]
+     set ProgramSuspendBit       [expr 1<<2]
+     set BlockProtectionErrorBit [expr 1<<1]
+     set ReservedBit             [expr 1<<0]
+
+     # tests...
+
+     #----------
+     test "Write success ready immediately"
+     probe IO_Read $ReadyBit
+     probe IO_Read $data
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=128"
+     expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=$data"
+     expect "%timestamp IO_READ [expr $data] $address"
+     expect "%timestamp FLASH_WRITE $FLASH_SUCCESS"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write success not immediately ready" -noreset
+     probe IO_Read 0
+     probe IO_Read 0
+     probe IO_Read 0
+     probe IO_Read $ReadyBit
+     probe IO_Read $data
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=0"
+     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=0"
+     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=0"
+     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=128"
+     expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=$data"
+     expect "%timestamp IO_READ [expr $data] $address"
+     expect "%timestamp FLASH_WRITE $FLASH_SUCCESS"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Vpp Error" -noreset
+     probe IO_Read [expr $ReadyBit | $VppErrorBit]
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit | $VppErrorBit]"
+     expect "%timestamp IO_READ [expr $ReadyBit | $VppErrorBit] $StatusRegister"
+     expect "%timestamp IO_WRITE $CommandRegister $Reset"
+     expect "%timestamp FLASH_WRITE $FLASH_VPP_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Program Error" -noreset
+     probe IO_Read [expr $ReadyBit | $ProgramErrorBit]
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit | $ProgramErrorBit]"
+     expect "%timestamp IO_READ [expr $ReadyBit | $ProgramErrorBit] $StatusRegister"
+     expect "%timestamp IO_WRITE $CommandRegister $Reset"
+     expect "%timestamp FLASH_WRITE $FLASH_PROGRAM_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Protected-Block Error" -noreset
+     probe IO_Read [expr $ReadyBit | $BlockProtectionErrorBit]
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit | $BlockProtectionErrorBit]"
+     expect "%timestamp IO_READ [expr $ReadyBit | $BlockProtectionErrorBit] $StatusRegister"
+     expect "%timestamp IO_WRITE $CommandRegister $Reset"
+     expect "%timestamp FLASH_WRITE $FLASH_PROTECTED_BLOCK_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Unknown Program Error" -noreset
+     probe IO_Read [expr $ReadyBit | $EraseSuspendBit | $EraseErrorBit | $ProgramSuspendBit | $ReservedBit]
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit | $EraseSuspendBit | $EraseErrorBit | $ProgramSuspendBit | $ReservedBit]"
+     expect "%timestamp IO_READ [expr $ReadyBit | $EraseSuspendBit | $EraseErrorBit | $ProgramSuspendBit | $ReservedBit] $StatusRegister"
+     expect "%timestamp IO_WRITE $CommandRegister $Reset"
+     expect "%timestamp FLASH_WRITE $FLASH_UNKNOWN_PROGRAM_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Read-Back Error" -noreset
+     probe IO_Read $ReadyBit
+     probe IO_Read [expr $data - 1]
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit]"
+     expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $data - 1]"
+     expect "%timestamp IO_READ [expr $data - 1] $address"
+     expect "%timestamp FLASH_WRITE $FLASH_READ_BACK_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write sucess Ignores Other Bits Until Ready" -noreset
+     probe IO_Read [expr ~$ReadyBit]
+     probe IO_Read $ReadyBit
+     probe IO_Read $data
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=[expr ~$ReadyBit]"
+     expect "%timestamp IO_READ [expr ~$ReadyBit] $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=$ReadyBit"
+     expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+     expect "%timestamp TstProbe Fun=IO_Read,Data=$data"
+     expect "%timestamp IO_READ $data $address"
+     expect "%timestamp FLASH_WRITE $FLASH_SUCCESS"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Timeout" -noreset
+     command FAKE_MICROTIME_INIT 0 500
+     expect "%timestamp FAKE_MICROTIME_INIT"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+     for {set i 0} {$i < 10} {incr i} {
+         probe IO_Read [expr ~$ReadyBit]
+     }
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     for {set i 0} {$i < 10} {incr i} {
+         expect "%timestamp TstProbe Fun=IO_Read,Data=[expr ~$ReadyBit]"
+         expect "%timestamp IO_READ [expr ~$ReadyBit] $StatusRegister"
+     }
+     expect "%timestamp FLASH_WRITE $FLASH_TIMEOUT_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+     #----------
+     test "Write fails Timeout at End-Of-Time" -noreset
+     command FAKE_MICROTIME_INIT 0xFFFFFFFF 500
+     expect "%timestamp FAKE_MICROTIME_INIT"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+     for {set i 0} {$i < 10} {incr i} {
+         probe IO_Read [expr ~$ReadyBit]
+     }
+     command FLASH_WRITE $address $data
+     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_WRITE $address $data"
+     for {set i 0} {$i < 10} {incr i} {
+         expect "%timestamp TstProbe Fun=IO_Read,Data=[expr ~$ReadyBit]"
+         expect "%timestamp IO_READ [expr ~$ReadyBit] $StatusRegister"
+     }
+     expect "%timestamp FLASH_WRITE $FLASH_TIMEOUT_ERROR"
+     expect "%timestamp Trg-Done QS_RX_COMMAND"
+
+
+     # the end
+     end
+@endcode
+
+<ul class="tag">
+  <li><span class="tag">1</span> The **test** command starts the first test of the group. The first test command must @ref qutest_reset "reset the Target", which brings the Target into a well-defined initial state and produces the QS dictionary records (see @ref qutest_leddriver-fixture "test-fixture"[5]).
+  </li>
+  <li><span class="tag">2</span> This **command** illustrates the use of a symbolic name for the `cmdId` paramter. The symbolic name `LEDDRIVER_CREATE` comes from the @ref qs_dict "user dictionary" produced in @ref qutest_leddriver-fixture "test-fixture"[8].
+  </li>
+  <li><span class="tag">3</span> The **expect** command corresponds to the @ref qs_app "user-record" `LEDDRIVER_CREATE` generated in @ref qutest_leddriver-fixture "test-fixture"[13]. Note that the value of the `virtualLeds` variable sent in this user-record is formatted in hex, which corresponds to the macro `QS_U32_HEX()` in @ref qutest_leddriver-fixture "test-fixture"[14].
+  </li>
+</ul>
+
 
 @next{qutest_tut_HSM}
 */
