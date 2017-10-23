@@ -394,6 +394,12 @@ proc ::qspy::rec64 {} {
         isReset   \
         qpVersion \
         b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12
+    
+    # cast bytes as unsigned 8-bit int
+    foreach byte {b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12} {
+        set $byte [expr $$byte&0xFF]
+    }
+
 
     variable theFmt
     set fmt [list ? c s ? i ? ? ? w]
