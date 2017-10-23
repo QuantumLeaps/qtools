@@ -212,7 +212,7 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
-    /* block indefinitely until any input source has intput */
+    /* block indefinitely until any input source has input */
     int nrec = select(l_maxFd, &readSet, 0, 0, NULL);
 
     if (nrec == 0) {
@@ -224,7 +224,7 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any intput available from the keyboard? */
+    /* any input available from the keyboard? */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
@@ -336,7 +336,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
-    /* block indefinitely until any input source has intput */
+    /* block indefinitely until any input source has input */
     int nrec = select(l_maxFd, &readSet, 0, 0, NULL);
 
     if (nrec == 0) {
@@ -348,7 +348,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any intput available from the keyboard? */
+    /* any input available from the keyboard? */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
