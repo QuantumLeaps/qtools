@@ -9,8 +9,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 5.9.0
-# Last updated on  2017-05-14
+# Last updated for version 6.0.0
+# Last updated on  2017-10-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -42,12 +42,12 @@
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspy 5.9
+package provide qspy 6.0
 
 package require Tcl  8.4   ;# need at least Tcl 8.4
 package require udp        ;# need the UDP sockets for Tcl
 
-## @brief facilities for communication with the QSPY back-end
+## @brief facilities for communication with the @ref qspy "QSPY" back-end
 # @note
 # The QSPY back-end distinguishes between two types of messages:@n
 # 1. messages intended for QSPY only (e.g., attach/detach a front-end).
@@ -398,14 +398,14 @@ proc ::qspy::rec64 {} {
     variable theFmt
     set fmt [list ? c s ? i ? ? ? w]
     set theFmt(objPtr)   [lindex $fmt [expr $b3 & 0x0F]]
-    set theFmt(funPtr)   [lindex $fmt [expr $b3 >> 4]]
+    set theFmt(funPtr)   [lindex $fmt [expr ($b3 & 0xFF) >> 4]]
     set theFmt(tstamp)   [lindex $fmt [expr $b4 & 0x0F]]
     set theFmt(sig)      [lindex $fmt [expr $b0 & 0x0F]]
-    set theFmt(evtSize)  [lindex $fmt [expr $b0 >> 4]]
+    set theFmt(evtSize)  [lindex $fmt [expr ($b0 & 0xFF) >> 4]]
     set theFmt(queueCtr) [lindex $fmt [expr $b1 & 0x0F]]
-    set theFmt(poolCtr)  [lindex $fmt [expr $b2 >> 4]]
+    set theFmt(poolCtr)  [lindex $fmt [expr ($b2 & 0xFF) >> 4]]
     set theFmt(poolBlk)  [lindex $fmt [expr $b2 & 0x0F]]
-    set theFmt(tevtCtr)  [lindex $fmt [expr $b1 >> 4]]
+    set theFmt(tevtCtr)  [lindex $fmt [expr ($b1 & 0xFF) >> 4]]
 
     # reset the variables for the new connection...
     set theRxRecCnt   0

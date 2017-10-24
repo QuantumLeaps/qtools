@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QCalc -- Desktop Calculator with C syntax and hex/binary displays
-# Last updated for version 5.9.0
-# Last updated on  2017-04-23
+# Last updated for version 6.0.0
+# Last updated on  2017-08-28
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -104,12 +104,12 @@ proc onEnter {} {
        report_error $ans
    } else {
        history_add $input
-       .ans.dec configure -text $ans
 
        if {[catch {expr int($ans) & 0xFFFFFFFF} ans_int]} {
            .ans.hex configure -text "> MAX_INT"
            .ans_bin configure -text "> MAX_INT"
        } elseif {$ans == [expr floor($ans)]} {
+           set ans $ans_int
            set int0 [expr $ans_int& 0xFFFF]
            set int1 [expr ($ans_int>> 16) & 0xFFFF]
            .ans.hex configure -text [format "0x%04X,%04X" $int1 $int0]
@@ -124,6 +124,8 @@ proc onEnter {} {
            .ans_bin configure -text ""
        }
    }
+
+   .ans.dec configure -text $ans
 }
 #.............................................................................
 proc onUp {} {

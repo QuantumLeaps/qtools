@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "QTools"
+PROJECT_NAME           = "QTools"
 PROJECT_NUMBER         = "5.9.3"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
@@ -29,8 +29,8 @@ SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
 ALIASES += next{1}="<hr><b>Next:</b> @ref \1</p>"
 ALIASES += description="@par <b>Description</b>"
-ALIASES += hint="@par <b>Hint</b>@n"
-ALIASES += usage="@par <b>Usage</b>@n"
+ALIASES += hint="@par <b>Hint</b>"
+ALIASES += usage="@par <b>Usage</b>"
 ALIASES += reqdef{2}="<div class="vmargin20"></div>@anchor \1 <TABLE><TR ALIGN="left"><TH NOWRAP>\1</TH><TH WIDTH="100%">\2</TH></TR></TABLE>"
 ALIASES += reqref{1}="@ref \1 \"\1\""
 ALIASES += termdef{2}="@anchor term_\1 @par \2"
@@ -58,7 +58,7 @@ LOOKUP_CACHE_SIZE      = 0
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_PACKAGE        = NO
 EXTRACT_STATIC         = YES
@@ -108,33 +108,33 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = \
-    main.dox \
-    start.dox \
-    qpspy.dox \
-    qs.dox \
-    qspy.dox \
-    qutest.dox \
-    qutest_tut.dox \
-    qutest_ref.dox \
-    qspyview.dox \
-    qwin.dox \
-    qclean.dox \
-    qcalc.dox \
-    qfsgen.dox \
-    history.dox \
-    modules.dox \
-    macros.h \
-    ../qspy/include/qs_copy.h \
-    ../qspy/include/qspy.h \
-    ../qspy/tcl/qspy.tcl \
-    ../qspy/tcl/qutest.tcl \
-    ../qspy/tcl/qspyview.tcl \
-    ../qspy/tcl/default.tcl \
-    ../qwin/qwin_gui.h \
-    ../qwin/qwin_gui.c \
-    ../qclean/source/main.cpp \
-    ../qfsgen/source/main.cpp \
+INPUT                  = \
+    main.dox \
+    start.dox \
+    qpspy.dox \
+    qs.dox \
+    qspy.dox \
+    qutest.dox \
+    qutest_tut.dox \
+    qutest_ref.dox \
+    qspyview.dox \
+    qwin.dox \
+    qclean.dox \
+    qcalc.dox \
+    qfsgen.dox \
+    history.dox \
+    modules.dox \
+    macros.h \
+    ../qspy/include/qs_copy.h \
+    ../qspy/include/qspy.h \
+    ../qspy/tcl/qspy.tcl \
+    ../qspy/tcl/qutest.tcl \
+    ../qspy/tcl/qspyview.tcl \
+    ../qspy/tcl/default.tcl \
+    ../qwin/qwin_gui.h \
+    ../qwin/qwin_gui.c \
+    ../qclean/source/main.cpp \
+    ../qfsgen/source/main.cpp \
     ../../doxygen/glossary.dox
 
 

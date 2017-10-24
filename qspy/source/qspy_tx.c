@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-09
+* Last updated for version 6.0.0
+* Last updated on  2017-10-24
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -92,7 +92,7 @@ uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
     uint8_t b;
 
     uint8_t *dst = &dstBuf[0];
-    uint8_t const *src = &srcBuf[1]; /* skip the sequence from the soruce */
+    uint8_t const *src = &srcBuf[1]; /* skip the sequence from the source */
 
     --srcBytes; /* account for skipping the sequence number in the source */
 

@@ -58,16 +58,16 @@ if "%1"=="-CHM" (
     
     echo Cleanup...
     rmdir /S /Q  tmp
-    echo CHM file generated in ..\..\html\qtools\
+    echo CHM file generated in ..\..\doxygen\qtools\
 
 ) else (
     echo Cleanup...
-    rmdir /S /Q  ..\..\html\qtools
+    rmdir /S /Q  ..\..\doxygen\qtools
     
     echo Adding custom images...
-    xcopy preview.js ..\..\html\qtools\
-    xcopy img ..\..\html\qtools\img\
-    copy images\favicon.ico ..\..\html\qtools
+    xcopy preview.js ..\..\doxygen\qtools\
+    xcopy img ..\..\doxygen\qtools\img\
+    copy images\favicon.ico ..\..\doxygen\qtools
 
     echo Generating HTML...
     %DOXHOME%\doxygen.exe Doxyfile

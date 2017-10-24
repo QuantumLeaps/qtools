@@ -4,8 +4,8 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-01
+* Last updated for version 6.0.0
+* Last updated on  2017-07-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -91,6 +91,7 @@ static FileType l_fileTypes[] = {
     { ".asm",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* Lint */
     { ".txt",     4, /*CRLF*/ TAB_FLG                 },
+    { ".md",      3, /*CRLF*/ TAB_FLG                 }, /* markdown */
     { ".bat",     4, /*CRLF*/ TAB_FLG                 },
     { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU ld */
     { ".tcl",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
@@ -222,7 +223,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                     && (prev != CR))  /* CR NOT present? */
                 {
                     *dst++ = CR;      /* add CR to the stream */
-                    found |= LF_FLG;   /* cleaned up single LF */
+                    found |= LF_FLG;  /* cleaned up single LF */
                 }
                 *dst++ = LF;          /* copy LF over */
                 break;

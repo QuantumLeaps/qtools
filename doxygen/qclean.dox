@@ -85,7 +85,8 @@ FILE TYPE      | END-OF-LINE | TRAILING WS | TABS    | LONG-LINES
 `.asm`         | Unix (LF)   | remove  | remove  | check
 `.lnt`         | Unix (LF)   | remove  | remove  | check
 `.txt`         | DOS (CR,LF) | remove  | remove  | don't check
-`.bat`         | DOX (CR,LF) | remove  | remove  | don't check
+`.md`          | DOS (CR,LF) | remove  | remove  | don't check
+`.bat`         | DOS (CR,LF) | remove  | remove  | don't check
 `.ld`          | Unix (LF)   | remove  | remove  | check
 `.tcl`         | Unix (LF)   | remove  | remove  | check
 `.py`          | Unix (LF)   | remove  | remove  | check

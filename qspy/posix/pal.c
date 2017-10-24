@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-04-21
+* Last updated for version 6.0.0
+* Last updated on  2017-10-24
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -212,7 +212,7 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
-    /* block indefinitely until any input source has intput */
+    /* block indefinitely until any input source has input */
     int nrec = select(l_maxFd, &readSet, 0, 0, NULL);
 
     if (nrec == 0) {
@@ -224,13 +224,13 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any intput available from the keyboard? */
+    /* any input available from the keyboard? */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
     }
 
-    /* any intput available from the Back-End socket? */
+    /* any input available from the Back-End socket? */
     evt = be_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
@@ -336,7 +336,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
-    /* block indefinitely until any input source has intput */
+    /* block indefinitely until any input source has input */
     int nrec = select(l_maxFd, &readSet, 0, 0, NULL);
 
     if (nrec == 0) {
@@ -348,7 +348,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any intput available from the keyboard? */
+    /* any input available from the keyboard? */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
@@ -468,7 +468,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     size_t nBytes;
     fd_set readSet = l_readSet;
 
-    /* block indefinitely until any input source has intput */
+    /* block indefinitely until any input source has input */
     int nrec = select(l_maxFd, &readSet, 0, 0, NULL);
 
     if (nrec == 0) {
@@ -480,13 +480,13 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any intput available from the keyboard? */
+    /* any input available from the keyboard? */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
     }
 
-    /* any intput available from the Back-End socket? */
+    /* any input available from the Back-End socket? */
     evt = be_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;

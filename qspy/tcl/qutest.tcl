@@ -13,7 +13,7 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 5.9.0
+# Last updated for version 6.0.0
 # Last updated on  2017-05-17
 #
 #                    Q u a n t u m     L e a P s
@@ -46,7 +46,7 @@
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qutest 5.9
+package provide qutest 6.0
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
 
@@ -59,6 +59,7 @@ source $HOME/qspy.tcl
 # this version of qutest
 set VERSION 5.9.0
 
+## @brief facilities for building unit testing scripts for @ref qutest "QUTest"
 namespace eval ::qutest {
     variable TIMEOUT_MS 500 ;#< timeout [ms] for waiting on the QSPY response
 

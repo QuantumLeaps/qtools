@@ -4,8 +4,8 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-04-21
+* Last updated for version 6.0.0
+* Last updated on  2017-07-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -40,7 +40,7 @@
 #ifndef qclean_h
 #define qclean_h
 
-#define VERSION "5.9.0"
+#define VERSION "6.0.0"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);
