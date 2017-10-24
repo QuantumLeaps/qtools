@@ -806,7 +806,7 @@ namespace eval ::qutest {
                 } else {
                     # if test file input uses wildcard, find matches
                     if { [string match * $arg] } {
-                        set test_files [glob -nocomplain $arg]
+                        lappend test_files [glob -nocomplain $arg]
                     } else {
                         lappend test_files $arg
                     }
