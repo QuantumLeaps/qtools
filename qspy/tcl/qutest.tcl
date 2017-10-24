@@ -46,6 +46,9 @@
 #-----------------------------------------------------------------------------
 # @endcond
 
+# this version of qutest
+set VERSION 6.0.0
+
 package provide qutest 6.0
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
@@ -55,9 +58,6 @@ set HOME [file dirname [file normalize [info script]]]
 
 # use the QSPY interface package
 source $HOME/qspy.tcl
-
-# this version of qutest
-set VERSION 5.9.0
 
 ## @brief facilities for building unit testing scripts for @ref qutest "QUTest"
 namespace eval ::qutest {
