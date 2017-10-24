@@ -99,7 +99,7 @@ uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
     /* supply the sequence number */
     ++l_txTargetSeq;
     b = l_txTargetSeq;
-    QS_INSERT_ESC_BYTE(b); /* insert esceped sequence into destination */
+    QS_INSERT_ESC_BYTE(b); /* insert escaped sequence into destination */
 
     for (; srcBytes > 0; ++src, --srcBytes) {
         b = *src;
