@@ -806,7 +806,10 @@ namespace eval ::qutest {
                 } else {
                     # if test file input uses wildcard, find matches
                     if { [string match * $arg] } {
-                        lappend test_files [glob -nocomplain $arg]
+			set matched_files [glob -nocomplain $arg]
+			foreach f $matched_files {
+			    lappend test_files $f
+			}
                     } else {
                         lappend test_files $arg
                     }
