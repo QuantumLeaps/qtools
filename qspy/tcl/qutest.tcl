@@ -796,7 +796,28 @@ namespace eval ::qutest {
         global ::argc ::argv
         variable theHostExe ""
         if {$::argc > 0} {  ;# argv(0) -- test-files
-            set test_files [glob -nocomplain [lindex $::argv 0]]
+            # remove any arguments ending in tcl and add to test file list
+            set test_files { }
+            set new_argv { dummy }
+            foreach arg $argv {
+                # string compares returns 0 if argument ends in tcl
+                if { [string compare -nocase [string range $arg end-3 end] .tcl] } {
+                    lappend new_argv $arg
+                } else {
+                    # if test file input uses wildcard, find matches
+                    if { [string match * $arg] } {
+			set matched_files [glob -nocomplain $arg]
+			foreach f $matched_files {
+			    lappend test_files $f
+			}
+                    } else {
+                        lappend test_files $arg
+                    }
+                }
+            }
+            # make adjustments so that the rest of the argument parsing continues properly
+            set ::argv $new_argv
+            set ::argc [llength $::argv]
         } else {
             set test_files [glob -nocomplain *.tcl] ;# default *.tcl
         }
