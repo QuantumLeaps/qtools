@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.3
-* Last updated on  2017-06-30
+* Last updated for version 6.0.0
+* Last updated on  2017-11-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -565,30 +565,41 @@ int64_t QSpyRecord_getInt64(QSpyRecord * const me, uint8_t size) {
 char const *QSpyRecord_getStr(QSpyRecord * const me) {
     uint8_t const *p;
     int32_t l;
+    bool esc = false;
 
-    /* the following loop finds the beginning of the string
-    * and removes or replaces special characters on-the-fly.
-    * Specifically a leading '&' is removed and all brackets '[]'
-    * are replaced with '<>'. This is to avoid any potential
-    * conflicts in QUTEST with matching strings (e.g., with
-    * string match command or regular explerssions.
+    /* the following loop finds the beginning of the string and removes
+    * or replaces special characters on-the-fly. Specifically a leading '&'
+    * at the beginning of a string is removed and all un-escaped special
+    * characters, such as brackets '[]' are replaced with '<>'. This is
+    * to avoid any potential conflicts in QUTEST with matching strings
+    *(e.g., with the Tcl "string match" command or regular explerssions).
     */
     for (l = me->len, p = me->pos; l > 0; --l, ++p) {
-        if (*p == (uint8_t)0) {
+        if (*p == (uint8_t)0) { /* zero-terminated end of the string? */
             char const *s = (char const *)me->pos;
+            if (*s == '&') {
+                ++s;  /* skip the leading '&' */
+            }
+
+            /* adjust the stream for the next token */
             me->len = l - 1;
             me->pos = p + 1;
-
-            if (*s == '&') {
-                ++s;  /* remove the leading '&' */
+            return s; /* normal return */
+        }
+        else if (*p == '\033') { /* escape character? */
+            esc = true;
+        }
+        else if (!esc) { /* non-escape character while not escaping? */
+            /* handle any un-escaped special characters... */
+            if (*p == '[') { /* replace '[' with '<' */
+                *((uint8_t *)p) = '<'; /* cast 'const' away */
             }
-            return s;
+            else if (*p == ']') { /* replace ']' with '>' */
+                *((uint8_t *)p) = '>'; /* cast 'const' away */
+            }
         }
-        else if (*p == '[') { /* replace '[' with '<' */
-            *((uint8_t *)p) = '<'; /* cast 'const' away */
-        }
-        else if (*p == ']') { /* replace ']' with '>' */
-            *((uint8_t *)p) = '>'; /* cast 'const' away */
+        else { /* non-escape character while escaping */
+           esc = false;
         }
     }
 
