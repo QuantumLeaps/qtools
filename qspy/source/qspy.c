@@ -584,10 +584,12 @@ char const *QSpyRecord_getStr(QSpyRecord * const me) {
             }
             return s;
         }
-        else if (*p == '[') { /* replace '[' with '<' */
+        /* replace '[' with '<' */
+        else if ((*p == '[') && ((p == me->pos) || (*(p - 1) != 27))) {
             *((uint8_t *)p) = '<'; /* cast 'const' away */
         }
-        else if (*p == ']') { /* replace ']' with '>' */
+        /* replace '[' with '<' */
+        else if ((*p == ']') && ((p == me->pos) || (*(p - 1) != 27))) {
             *((uint8_t *)p) = '>'; /* cast 'const' away */
         }
     }
