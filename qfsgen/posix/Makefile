@@ -108,7 +108,11 @@ CPPFLAGS = 	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 
+ifeq "$(findstring Darwin,$(shell uname -a))" ""
 LINKFLAGS := -Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
+else
+LINKFLAGS := -Wl,-map,$(BIN_DIR)/$(PROJECT).map
+endif
 
 #-----------------------------------------------------------------------------
 

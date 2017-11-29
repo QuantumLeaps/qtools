@@ -170,7 +170,9 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         case  57600: spd =  B57600; break;
         case 115200: spd = B115200; break;
         case 230400: spd = B230400; break;
+#ifdef B460800
         case 460800: spd = B460800; break;
+#endif
         default:
             SNPRINTF_LINE("   <COMMS> ERROR    Unsupported rate Baud=%d",
                           baudRate);
