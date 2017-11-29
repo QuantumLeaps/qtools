@@ -1,6 +1,13 @@
 /**
 @page history Revision History
 
+@section qtools_6_0_2 Version 6.0.2, 2017-11-29
+Fixed compilation and linkage on Mac OS for qspy, qclean, qfsgen
+
+Used unsigned integer math in qcalc.tcl
+
+
+------------------------------------------------------
 @section qtools_5_9_3 Version 5.9.3, 2017-07-04
 Fixed bug#175 "QS_QF_ACTIVE_GET & QS_QF_EQUEUE_GET Record Mislabeled in
 QSPY Output" (https://sourceforge.net/p/qpc/bugs/175/ )

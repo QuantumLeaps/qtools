@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, POSIX, GNU compiler
-# Last updated for version 5.5.0
-# Last updated on  2015-08-14
+# Last updated for version 6.0.2
+# Last updated on  2017-11-29
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------

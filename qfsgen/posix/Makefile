@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QFSGEN console, POSIX, GNU compiler
-# Last updated for version 5.9.0
-# Last updated on  2017-04-26
+# Last updated for version 6.0.2
+# Last updated on  2017-11-29
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------

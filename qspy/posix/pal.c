@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.0.0
-* Last updated on  2017-10-24
+* Last updated for version 6.0.2
+* Last updated on  2017-11-29
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -169,8 +169,12 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         case  38400: spd =  B38400; break;
         case  57600: spd =  B57600; break;
         case 115200: spd = B115200; break;
+#ifdef B230400 /* non-standard baud rate defined? */
         case 230400: spd = B230400; break;
+#endif
+#ifdef B460800 /* non-standard baud rate defined? */
         case 460800: spd = B460800; break;
+#endif
         default:
             SNPRINTF_LINE("   <COMMS> ERROR    Unsupported rate Baud=%d",
                           baudRate);
