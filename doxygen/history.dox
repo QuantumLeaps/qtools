@@ -1,10 +1,16 @@
 /**
 @page history Revision History
 
-@section qtools_6_0_2 Version 6.0.2, 2017-11-29
+@section qtools_6_0_3 Version 6.0.3, 2017-12-12
 Fixed compilation and linkage on Mac OS for qspy, qclean, qfsgen
 
+Fixed [bug#180 qspyview.tcl for peek is not in sync with the qs_rx parsing of peek](https://sourceforge.net/p/qpc/bugs/180/).
+
 Used unsigned integer math in qcalc.tcl
+
+In QTools for Windows, updated the GNU-ARM toolchain to the latest available GCC 7.2.0 adapted from SysProgs Prebuilt GNU toolchain for arm-eabi:
+
+http://gnutoolchains.com/arm-eabi/
 
 
 ------------------------------------------------------

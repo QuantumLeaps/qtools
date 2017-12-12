@@ -19,8 +19,8 @@ QTools&trade; is a collection of open source tools for embedded software develop
 The QTools Collection for Windows contains additionally the following open-source, third-party tools:
 
 - GNU-make for Windows (version 3.82)
-- GNU C/C++ toolset for Windows (MinGW version 4.5.2)
-- GNU C/C++ toolset for ARM-EABI (GCC version 6.2.0)
+- GNU C/C++ toolchain for Windows (MinGW)
+- GNU C/C++ toolchain for ARM-EABI ([Prebuilt GNU toolchain for arm-eabi](http://gnutoolchains.com/arm-eabi))
 - TCL/TK for Windows (version 8.4) with **UDP sockets extension**
 - ResEdit utility (version 1.6.6-x64)
 - AVRDUDE for Windows (version 6.1)

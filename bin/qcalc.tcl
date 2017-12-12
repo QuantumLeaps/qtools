@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QCalc -- Desktop Calculator with C syntax and hex/binary displays
-# Last updated for version 6.0.0
-# Last updated on  2017-08-28
+# Last updated for version 6.0.3
+# Last updated on  2017-12-12
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
