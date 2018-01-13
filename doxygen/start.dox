@@ -48,7 +48,7 @@ The following annotated directory tree in the standard <strong>QTools&trade;</st
       <li><span class="img file">`rm.exe`</span> &mdash; rm (remove) utility</li>
       <li>~ ~ ~</li>
     </ul>
-    <li><span class="img folder">`gnu_arm-eabi`</span> &mdash; GNU ARM-EABI toolset (GCC 6.2.0)</li>
+    <li><span class="img folder">`gnu_arm-eabi`</span> &mdash; GNU ARM-EABI toolset (GCC 7.2.0)</li>
     <li><span class="img folder">qspy</span> &mdash; @ref qspy "QSPY tool" for software tracing and testing</li>
     <ul class="tag">
       <li><span class="img folder">`include`</span> &mdash; QSPY includes</li>

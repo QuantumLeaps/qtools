@@ -1,8 +1,13 @@
 /**
 @page history Revision History
 
+@section qtools_6_0_4 Version 6.0.4, 2018-01-13
+This release modifies the behavior of QSPY host application when it receives the reset trace record from the target. Previously, such a reset request would invalidate all QSPY dictionaries (because typically a target reset was followed by the target supplying the dicttionaries anyway). The new behavior is that the dictionaries are invalidated only when the target info is different than the target configuration information that QSPY already has. 
+
+
+------------------------------------------------------
 @section qtools_6_0_3 Version 6.0.3, 2017-12-12
-Fixed compilation and linkage on Mac OS for qspy, qclean, qfsgen
+Fixed compilation and linkage on MacOS for qspy, qclean, qfsgen
 
 Fixed [bug#180 qspyview.tcl for peek is not in sync with the qs_rx parsing of peek](https://sourceforge.net/p/qpc/bugs/180/).
 

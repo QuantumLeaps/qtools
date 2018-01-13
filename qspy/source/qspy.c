@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.0.0
-* Last updated on  2017-11-06
+* Last updated for version 6.0.4
+* Last updated on  2018-01-13
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -257,6 +257,12 @@ static char const *  l_qs_rx_rec[] = {
 #define FPRINF_MATFILE(format_, ...) \
     if (l_matFile != (FILE *)0) { \
         fprintf(l_matFile, format_, ##__VA_ARGS__); \
+    } else (void)0
+
+#define CONFIG_UPDATE(member_, new_, diff_) \
+    if (l_config.member_ != (new_)) { \
+        l_config.member_ =  (new_); \
+        (diff_) = 1U; \
     } else (void)0
 
 /*..........................................................................*/
@@ -1768,21 +1774,31 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
 
             if (QSpyRecord_OK(me)) {
-
                 /* apply the target info... */
-                l_config.version      = (uint16_t)(b & 0xFFFFU);
-                l_config.objPtrSize   = (uint8_t)(buf[3] & 0x0FU);
-                l_config.funPtrSize   = (uint8_t)((buf[3] >> 4) & 0x0FU);
-                l_config.tstampSize   = (uint8_t)(buf[4] & 0x0FU);
-                l_config.sigSize      = (uint8_t)(buf[0] & 0x0FU);
-                l_config.evtSize      = (uint8_t)((buf[0] >> 4) & 0x0FU);
-                l_config.queueCtrSize = (uint8_t)(buf[1] & 0x0FU);
-                l_config.poolCtrSize  = (uint8_t)((buf[2] >> 4) & 0x0FU);
-                l_config.poolBlkSize  = (uint8_t)(buf[2] & 0x0FU);
-                l_config.tevtCtrSize  = (uint8_t)((buf[1] >> 4) & 0x0FU);
+                d = 0U; /* assume no difference in the target info */
+                CONFIG_UPDATE(version ,    (uint16_t)(b & 0xFFFFU), d);
+                CONFIG_UPDATE(objPtrSize,  (uint8_t)(buf[3] & 0xFU), d);
+                CONFIG_UPDATE(funPtrSize,  (uint8_t)((buf[3] >> 4) & 0xFU),d);
+                CONFIG_UPDATE(tstampSize,  (uint8_t)(buf[4] & 0xFU), d);
+                CONFIG_UPDATE(sigSize,     (uint8_t)(buf[0] & 0xFU), d);
+                CONFIG_UPDATE(evtSize,     (uint8_t)((buf[0] >> 4) & 0xFU),d);
+                CONFIG_UPDATE(queueCtrSize,(uint8_t)(buf[1] & 0x0FU), d);
+                CONFIG_UPDATE(poolCtrSize, (uint8_t)((buf[2] >> 4) & 0xFU),d);
+                CONFIG_UPDATE(poolBlkSize, (uint8_t)(buf[2] & 0xFU), d);
+                CONFIG_UPDATE(tevtCtrSize, (uint8_t)((buf[1] >> 4) & 0xFU),d);
 
                 for (e = 0U; e < sizeof(l_config.tstamp); ++e) {
-                    l_config.tstamp[e] = (uint8_t)buf[7U + e];
+                    CONFIG_UPDATE(tstamp[e], (uint8_t)buf[7U + e], d);
+                }
+
+                /* any difference in the target info? */
+                if (d) {
+                    /* reset the dictionaries... */
+                    Dictionary_reset(&l_funDict);
+                    Dictionary_reset(&l_objDict);
+                    Dictionary_reset(&l_mscDict);
+                    Dictionary_reset(&l_usrDict);
+                    SigDictionary_reset(&l_sigDict);
                 }
 
                 /* set the dictionary file name from the time-stamp... */
@@ -1797,12 +1813,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
                 if (a != 0U) {  /* is this also Target RESET? */
                     s = "Trg-RST ";
-                    Dictionary_reset(&l_funDict);
-                    Dictionary_reset(&l_objDict);
-                    Dictionary_reset(&l_mscDict);
-                    Dictionary_reset(&l_usrDict);
-                    SigDictionary_reset(&l_sigDict);
-
                     /* reset the QSPY-Tx channel, if available */
                     if (l_txResetFun != (QSPY_resetFun)0) {
                         (*l_txResetFun)();
@@ -1812,20 +1822,19 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 }
                 else {
                     FILE *dictFile = (FILE *)0;
+
                     s = "Trg-Info";
 
-                    /* do we have dictionary name yet? */
-                    if (l_dictName[0] != '\0') {
-                        FOPEN_S(dictFile, l_dictName, "r");
-                        if (dictFile != (FILE *)0) {
-                            if (QSPY_readDict(dictFile) != QSPY_ERROR) {
-                                SNPRINTF_LINE("           Dictionaries read "
-                                              "from File=%s",
-                                    l_dictName);
-                                QSPY_onPrintLn();
-                            }
-                            fclose(dictFile);
+                    /* we just acquired the dictionary name */
+                    FOPEN_S(dictFile, l_dictName, "r");
+                    if (dictFile != (FILE *)0) {
+                        if (QSPY_readDict(dictFile) != QSPY_ERROR) {
+                            SNPRINTF_LINE("           Dictionaries read "
+                                          "from File=%s",
+                                l_dictName);
+                            QSPY_onPrintLn();
                         }
+                        fclose(dictFile);
                     }
                 }
 
@@ -1840,10 +1849,9 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        (unsigned)l_config.tstamp[1],
                        (unsigned)l_config.tstamp[0]);
                 QSPY_onPrintLn();
-
             }
-            else {
-                l_dictName[0] = '\0';
+            else { /* target info corrupted */
+                l_dictName[0] = '\0'; /* invalidate dictionaries */
             }
             break;
         }

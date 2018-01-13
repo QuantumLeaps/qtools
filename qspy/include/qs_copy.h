@@ -4,8 +4,8 @@
 * @ingroup qs qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.7
-* Last updated on  2017-08-16
+* Last updated for version 6.0.4
+* Last updated on  2018-01-05
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -998,7 +998,7 @@ enum {
     QS_BEGIN_NOCRIT_(QS_ASSERT_FAIL, (void *)0, (void *)0) \
         QS_TIME_(); \
         QS_U16_((uint16_t)(loc_)); \
-        QS_STR_(module_); \
+        QS_STR_(((module_) != (char_t *)0) ? (module_) : "?"); \
     QS_END_NOCRIT_() \
     QS_onFlush(); \
     for (delay_ctr_ = (delay_); delay_ctr_ > (uint32_t)0; --delay_ctr_) {} \
@@ -1075,7 +1075,7 @@ typedef struct {
     uint8_t  seq;         /*!< the record sequence number */
     uint8_t  chksum;      /*!< the checksum of the current record */
 
-    uint_fast8_t critNest; /*!< critical section nesting level */
+    uint8_t  critNest;    /*!< critical section nesting level */
 } QSPriv;
 
 extern QSPriv QS_priv_;

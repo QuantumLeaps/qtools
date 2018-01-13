@@ -87,7 +87,7 @@ static int   l_baudRate = 115200;
 
 static char const l_introStr[] =
     "QSPY host utility %s\n"
-    "Copyright (c) 2005-2017 Quantum Leaps (state-machine.com)\n"
+    "Copyright (c) 2005-2018 Quantum Leaps (state-machine.com)\n"
     "Time Stamp: %s\n";
 
 static char const l_helpStr[] =
