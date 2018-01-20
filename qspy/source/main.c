@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-10
+* Last updated for version 6.1.0
+* Last updated on  2018-01-19
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -77,7 +77,7 @@ static char  l_outFileName[FNAME_SIZE];
 static char  l_savFileName[FNAME_SIZE];
 static char  l_matFileName[FNAME_SIZE];
 static char  l_mscFileName[FNAME_SIZE];
-static char  l_dicFileName[FNAME_SIZE];
+static char  l_dictFileName[FNAME_SIZE];
 
 static char  l_tstampStr  [16];
 
@@ -86,9 +86,9 @@ static int   l_tcpPort  = 6601;
 static int   l_baudRate = 115200;
 
 static char const l_introStr[] =
-    "QSPY host utility %s\n"
-    "Copyright (c) 2005-2018 Quantum Leaps (state-machine.com)\n"
-    "Time Stamp: %s\n";
+    "QSPY %s Copyright (c) 2005-2018 Quantum Leaps\n"
+    "Documentation: https://www.state-machine.com/qtools/qspy.html\n"
+    "Current timestamp: %s\n";
 
 static char const l_helpStr[] =
     "Usage: qspy [options]     <arg> = required, [arg] = optional\n"
@@ -97,35 +97,31 @@ static char const l_helpStr[] =
     "                  (key)\n"
     "---------------------------------------------------------------\n"
     "-h                        help (show this message)\n"
-    "-q[num]           (key-q) quiet mode (no QS data output)\n"
-    "-u[UDP_port]      7701    UDP socket with optional port\n"
-    "-v<QS_version>    5.9     compatibility with QS version\n"
+    "-q [num]          (key-q) quiet mode (no QS data output)\n"
+    "-u [UDP_port]     7701    UDP socket with optional port\n"
+    "-v <QS_version>   6.0     compatibility with QS version\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
     "-g                        produce MscGen output to a file\n"
 #ifdef _WIN32
-    "-c<COM_port>      COM1    com port input (default)\n"
+    "-c <COM_port>     COM1    com port input (default)\n"
 #elif (defined __linux) || (defined __linux__) || (defined __posix)
-    "-c<serial_port>   /dev/ttyS0 serial port input (default)\n"
+    "-c <serial_port>  /dev/ttyS0 serial port input (default)\n"
 #endif
-    "-b<baud_rate>     115200  baud rate for the com port\n"
-    "-t[TCP_port]      6601    TCP/IP input with optional port\n"
-    "-f<file_name>             file input (postprocessing)\n"
-    "-d<file_name>             dictionary input\n"
-    "-T<tstamp_size>   4       QS timestamp size     (bytes)\n"
-    "-O<pointer_size>  4       object pointer size   (bytes)\n"
-    "-F<pointer_size>  4       function pointer size (bytes)\n"
-    "-S<signal_size>   2       event signal size     (bytes)\n"
-    "-E<event_size>    2       event size size       (bytes)\n"
-    "-Q<counter_size>  1       queue counter size    (bytes)\n"
-    "-P<counter_size>  2       pool counter size     (bytes)\n"
-    "-B<block_size>    2       pool block-size size  (bytes)\n"
-    "-C<counter_size>  2       QTimeEvt counter size (bytes)\n"
-    "\n"
-    "NOTE: Do NOT insert spaces between an option and the argument:\n"
-    "   qspy -t 6602   <--- INCORRECT!!!\n"
-    "   qspy -t6602    <--- CORRECT\n";
+    "-b <baud_rate>    115200  baud rate for the com port\n"
+    "-t [TCP_port]     6601    TCP/IP input with optional port\n"
+    "-f <file_name>            file input (postprocessing)\n"
+    "-d [file_name]            dictionary files\n"
+    "-T <tstamp_size>  4       QS timestamp size     (bytes)\n"
+    "-O <pointer_size> 4       object pointer size   (bytes)\n"
+    "-F <pointer_size> 4       function pointer size (bytes)\n"
+    "-S <signal_size>  2       event signal size     (bytes)\n"
+    "-E <event_size>   2       event size size       (bytes)\n"
+    "-Q <counter_size> 1       queue counter size    (bytes)\n"
+    "-P <counter_size> 2       pool counter size     (bytes)\n"
+    "-B <block_size>   2       pool block-size size  (bytes)\n"
+    "-C <counter_size> 2       QTimeEvt counter size (bytes)\n";
 
 static char const l_kbdHelpStr[] =
     "Keyboard shortcuts:\n"
@@ -190,17 +186,17 @@ int main(int argc, char *argv[]) {
                     }
                     break;
 
-                case QSPY_KEYBOARD_EVT:    /* the User pressed a key... */
+                case QSPY_KEYBOARD_EVT: /* the User pressed a key... */
                     isRunning = QSPY_command(l_buf[0]);
                     break;
 
-                case QSPY_DONE_EVT:    /* done (e.g., file processed) */
-                    isRunning = false; /* terminate the event loop */
+                case QSPY_DONE_EVT:     /* done (e.g., file processed) */
+                    isRunning = false;  /* terminate the event loop */
                     break;
 
-                case QSPY_ERROR_EVT:   /* unrecoverable error */
-                    isRunning = false; /* terminate the event loop */
-                    status = -1;       /* error return */
+                case QSPY_ERROR_EVT:    /* unrecoverable error */
+                    isRunning = false;  /* terminate the event loop */
+                    status = -1;        /* error return */
                     break;
             }
         }
@@ -271,10 +267,10 @@ void QSPY_onPrintLn(void) {
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hq::u::v:osmgc:b:t::p:f:d:T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:osmgc:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
-    uint16_t version     = 590U;
+    uint16_t version     = 600U;
     uint8_t tstampSize   = 4U;
     uint8_t objPtrSize   = 4U;
     uint8_t funPtrSize   = 4U;
@@ -286,10 +282,11 @@ static QSpyStatus configure(int argc, char *argv[]) {
     uint8_t tevtCtrSize  = 2U;
     int     optChar;
 
-    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
-    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
-    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
-    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
+    STRNCPY_S(l_outFileName,  "OFF", sizeof(l_outFileName));
+    STRNCPY_S(l_savFileName,  "OFF", sizeof(l_savFileName));
+    STRNCPY_S(l_matFileName,  "OFF", sizeof(l_matFileName));
+    STRNCPY_S(l_mscFileName,  "OFF", sizeof(l_mscFileName));
+    STRNCPY_S(l_dictFileName, "OFF", sizeof(l_dictFileName));
 
     (void)tstampStr();
     printf(l_introStr, QSPY_VER, l_tstampStr);
@@ -320,7 +317,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 else { /* apply the default */
                     l_bePort = 7701;
                 }
-                printf("-u%d\n", l_bePort);
+                printf("-u %d\n", l_bePort);
                 break;
             }
             case 'v': { /* compatibility with QS version */
@@ -330,7 +327,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 {
                     version = (((optarg[0] - '0') * 10)
                               + (optarg[2] - '0')) * 10;
-                    printf("-v%c.%c\n", optarg[0], optarg[2]);
+                    printf("-v %c.%c\n", optarg[0], optarg[2]);
                 }
                 else {
                     fprintf(stderr, "Incorrect version number: %s", optarg);
@@ -369,7 +366,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_comPort, optarg, sizeof(l_comPort));
-                printf("-c%s\n", l_comPort);
+                printf("-c %s\n", l_comPort);
                 l_link = SERIAL_LINK;
                 break;
             }
@@ -383,7 +380,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     fprintf(stderr, "incorrect baud rate: %s\n", optarg);
                     return QSPY_ERROR;
                 }
-                printf("-b%d\n", l_baudRate);
+                printf("-b %d\n", l_baudRate);
                 l_link = SERIAL_LINK;
                 break;
             }
@@ -394,13 +391,18 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_inpFileName, optarg, sizeof(l_inpFileName));
-                printf("-f%s\n", l_inpFileName);
+                printf("-f %s\n", l_inpFileName);
                 l_link = FILE_LINK;
                 break;
             }
-            case 'd': { /* Dictionary input */
-                STRNCPY_S(l_dicFileName, optarg, sizeof(l_dicFileName));
-                printf("-d%s\n", l_dicFileName);
+            case 'd': { /* Dictionary file */
+                if (optarg != NULL) { /* is optional argument provided? */
+                    STRNCPY_S(l_dictFileName, optarg, sizeof(l_dictFileName));
+                }
+                else { /* apply the default */
+                    l_dictFileName[0] = '\0';
+                }
+                printf("-d %s\n", l_dictFileName);
                 break;
             }
             case 't': { /* TCP/IP input */
@@ -412,7 +414,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 if (optarg != NULL) { /* is optional argument provided? */
                     l_tcpPort = (int)strtoul(optarg, NULL, 10);
                 }
-                printf("-t%d\n", l_tcpPort);
+                printf("-t %d\n", l_tcpPort);
                 l_link = TCP_LINK;
                 break;
             }
@@ -487,7 +489,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     /* open Target link... */
     switch (l_link) {
         case NO_LINK: {
-            printf("-c%s\n", l_comPort);
+            printf("-c %s\n", l_comPort);
             /* intentionally fall through */
         }
         case SERIAL_LINK: { /* connect to the target via the serial port */
@@ -559,18 +561,18 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     : (QSPY_CustParseFun)0);
     QSPY_configTxReset(&QSPY_txReset);
 
-    /* NOTE: dictionaries must be read AFTER configuring QSPY */
-    if (l_dicFileName[0] != '\0') {
-        FOPEN_S(l_dicFile, l_dicFileName, "r");
-        if (l_dicFile == (FILE *)0) {
-            printf("   <USER-> Cannot open File=%s\n", l_dicFileName);
-            return QSPY_ERROR;
+    /* NOTE: dictionary file must be set and read AFTER configuring QSPY */
+    if (l_dictFileName[0] != 'O') { /* not "OFF" ? */
+        QSPY_setExternDict(l_dictFileName);
+        if (l_dictFileName[0] != '\0') {
+            FOPEN_S(l_dicFile, l_dictFileName, "r");
+            if (l_dicFile == (FILE *)0) {
+                printf("   <USER-> Cannot open File=%s\n", l_dictFileName);
+                return QSPY_ERROR;
+            }
+            QSPY_readDict(l_dicFile);
+            fclose(l_dicFile);
         }
-        if (QSPY_readDict(l_dicFile) != QSPY_ERROR) {
-            printf("   <USER-> Dictionaries read from File=%s\n",
-                   l_dicFileName);
-        }
-        fclose(l_dicFile);
     }
 
     return QSPY_SUCCESS;
@@ -600,21 +602,20 @@ bool QSPY_command(uint8_t cmdId) {
             printf("Binary Output [s]: %s\n", l_savFileName);
             printf("Matlab Output [m]: %s\n", l_matFileName);
             printf("MscGen Output [g]: %s\n", l_mscFileName);
-            printf("\n");
             break;
 
         case 'r':  /* send RESET command to the Target */
             nBytes = QSPY_encodeResetCmd(l_buf, sizeof(l_buf));
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
             printf("   <USER-> Sending RESET to the Target Stat=%s\n",
-                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
+                          (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 't':  /* send TICK[0] command to the Target */
             nBytes = QSPY_encodeTickCmd(l_buf, sizeof(l_buf), 0U);
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
             printf("   <USER-> Sending TICK-0 to the Target Stat=%s\n",
-                   (stat == QSPY_ERROR) ? "ERROR" : "OK");
+                          (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'u':  /* send TICK[1] command to the Target */
@@ -634,7 +635,8 @@ bool QSPY_command(uint8_t cmdId) {
         case 'd':  /* save Dictionaries to a file */
             str = QSPY_writeDict();
             if (str != (char *)0) {
-                printf("   <USER-> Dictionaries written to File=%s\n", str);
+                printf("   <USER-> Dictionaries written to File=%s\n",
+                       str);
             }
             else {
                 printf("   <USER-> Dictionaries NOT saved\n");

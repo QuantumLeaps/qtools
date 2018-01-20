@@ -4,8 +4,8 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 6.0.0
-* Last updated on  2017-07-20
+* Last updated for version 6.1.0
+* Last updated on  2018-01-19
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -312,8 +312,8 @@ int main(int argc, char *argv[]) {
     char const *rootDir = ".";
     int optChar;
 
-    printf("QClean " VERSION " Copyright (c) 2005-2017 Quantum Leaps\n"
-           "Documentation: https://state-machine.com/qtools/qclean.html\n");
+    printf("QClean " VERSION " Copyright (c) 2005-2018 Quantum Leaps\n"
+           "Documentation: https://www.state-machine.com/qtools/qclean.html\n");
     printf("Usage: qclean [root-dir] [options]\n"
     "       root-dir root directory for recursive cleanup (default is .)\n"
     "       options  control the cleanup, -h prints the help\n");

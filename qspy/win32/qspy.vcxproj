@@ -22,6 +22,7 @@
     <ClCompile Include="..\source\getopt.c" />
     <ClCompile Include="..\source\main.c" />
     <ClCompile Include="..\source\qspy.c" />
+    <ClCompile Include="..\source\qspy_tx.c" />
     <ClCompile Include="pal.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

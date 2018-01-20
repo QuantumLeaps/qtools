@@ -42,9 +42,9 @@ The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE AGREEME
 ------------------------------------------------------------------------------
 @section qtools_source Source Code
 In compliance with GPL, this distribution contains the source code for
-the utilities contributed by Quantum Leaps in the <qtools>\source\
+the utilities contributed by Quantum Leaps in the `<qtools>/source/`
 subdirectory, except for the QSPY source code, which is provided in the
-<qtools>\qspy\source directory. All tools with names starting with 'q'
+`<qtools>/qspy/source/` directory. All tools with names starting with 'q'
 have been developed and are copyrighted by Quantum Leaps.
 
 

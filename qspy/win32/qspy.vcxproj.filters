@@ -46,5 +46,8 @@
     <ClCompile Include="..\source\be.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\qspy_tx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -25,11 +25,9 @@ qspy [options]
 
 where `options` are described in the following table:
 
-@attention
-You should **not** insert spaces between an option and the argument:@n
-`qspy -t 6602  <-- INCORRECT!!` @n
-`qspy -t6602   <-- CORRECT`
-
+@verbatim
+Usage: qspy [options]     <arg> = required, [arg] = optional
+@endverbatim
 
 <TABLE SUMMARY="QSPY options" cellSpacing=4 cellPadding=1 border=0
 ALIGN="center" VALIGN="middle">
@@ -50,15 +48,15 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-q</TD>
-    <TD>-q</TD>
+    <TD>-q [num]</TD>
+    <TD>-q 99</TD>
     <TD>(key-q)</TD>
     <TD></TD>
-    <TD>Quiet mode (no stdout output)</TD>
+    <TD>Quiet mode (reduced stdout output)</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-u[port]</TD>
+    <TD>-u [port]</TD>
     <TD>-u</TD>
     <TD>7701</TD>
     <TD></TD>
@@ -67,8 +65,8 @@ ALIGN="center" VALIGN="middle">
 
   <TR bgColor="#c0c0c0">
     <TD>-v</TD>
-    <TD>-v5.5</TD>
-    <TD>5.9</TD>
+    <TD>-v 5.0</TD>
+    <TD>6.0</TD>
     <TD></TD>
     <TD>Compatibility with QS version</TD>
   </TR>
@@ -107,86 +105,86 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-c&lt;port&gt;</TD>
-    <TD>-cCOM2</TD>
+    <TD>-c &lt;port&gt;</TD>
+    <TD>-c COM2</TD>
     <TD>COM1</TD>
     <TD></TD>
     <TD>COM port selection. Not compatible with -t, -p, -f</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-b&lt;baud&gt;</TD>
-    <TD>-b38400</TD>
+    <TD>-b &lt;baud&gt;</TD>
+    <TD>-b 38400</TD>
     <TD>115200</TD>
     <TD></TD>
     <TD>Baud rate selection. Not compatible with -t, -p, -f</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-t&lt;port&gt;</TD>
-    <TD>-t</TD>
+    <TD>-t &lt;port&gt;</TD>
+    <TD>-t </TD>
     <TD>6601</TD>
     <TD></TD>
     <TD>TCP/IP input selection. Not compatible with -c, -b, -f</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-f&lt;file&gt;</TD>
-    <TD>-fqs.spy</TD>
+    <TD>-f &lt;file&gt;</TD>
+    <TD>-f qs.spy</TD>
     <TD></TD>
     <TD></TD>
     <TD>File input selection. Not compatible with -c, -b, -t, -p</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-d&lt;file&gt;</TD>
-    <TD>-dqspy150831_144229.dic</TD>
+    <TD>-d [file]</TD>
+    <TD>-d qspy150831_144229.dic</TD>
     <TD></TD>
     <TD></TD>
-    <TD>Read dictionaries from a file.</TD>
+    <TD>Read @ref qspy_dict "dictionaries" from a file.</TD>
   </TR>
 
   <TR bgColor="#f0f0c0">
     <TD colspan="5"><strong>Options for configuring Target object sizes:</strong>@n
-Starting with QS/QSPY 5.5.0, the Target can **report** it's configuration to QSPY, which means that you don't need to provide any upper-case options (such as: `-T`, `-O`, `-F`, etc.).
+The Target can **report** it's configuration to QSPY, which means that you don't need to provide any upper-case options (such as: `-T`, `-O`, `-F`, etc.).
     </TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-T&lt;size&gt;</TD>
-    <TD>-T2</TD>
+    <TD>-T &lt;size&gt;</TD>
+    <TD>-T 2</TD>
     <TD>4</TD>
     <TD>@c QS_TIME_SIZE @n (qs_port.h)</TD>
     <TD>Time stamp size in bytes. Valid values: 1, 2, 4</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-O&lt;size&gt;</TD>
-    <TD>-O2</TD>
+    <TD>-O &lt;size&gt;</TD>
+    <TD>-O 2</TD>
     <TD>4</TD>
     <TD>@c QS_OBJ_PTR_SIZE @n (qs_port.h)</TD>
     <TD>Object pointer size in bytes. Valid values: 1, 2, 4, 8</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-F&lt;size&gt;</TD>
-    <TD>-F2</TD>
+    <TD>-F &lt;size&gt;</TD>
+    <TD>-F 2</TD>
     <TD>4</TD>
     <TD>@c QS_FUN_PTR_SIZE @n (qs_port.h)</TD>
     <TD>Function pointer size in bytes. Valid values: 1, 2, 4, 8</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-S&lt;size&gt;</TD>
-    <TD>-S1</TD>
+    <TD>-S &lt;size&gt;</TD>
+    <TD>-S 1</TD>
     <TD>2</TD>
     <TD>@c Q_SIGNAL_SIZE @n (qep_port.h)</TD>
     <TD>Signal size in bytes. Valid values: 1, 2, 4</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-E&lt;size&gt;</TD>
-    <TD>-E1</TD>
+    <TD>-E &lt;size&gt;</TD>
+    <TD>-E 1</TD>
     <TD>2</TD>
     <TD>@c QF_EVENT_SIZ_SIZE @n (qf_port.h)</TD>
     <TD>Event-size size in bytes (i.e., the size of variables that hold
@@ -194,24 +192,24 @@ Starting with QS/QSPY 5.5.0, the Target can **report** it's configuration to QSP
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-Q&lt;size&gt;</TD>
-    <TD>-Q2</TD>
+    <TD>-Q &lt;size&gt;</TD>
+    <TD>-Q 2</TD>
     <TD>1</TD>
     <TD>@c QF_EQUEUE_CTR_SIZE @n (qf_port.h)</TD>
     <TD>Queue counter size in bytes. Valid values 1, 2, 4</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-P&lt;size&gt;</TD>
-    <TD>-P4</TD>
+    <TD>-P &lt;size&gt;</TD>
+    <TD>-P 4</TD>
     <TD>2</TD>
     <TD>@c QF_MPOOL_CTR_SIZE @n (qf_port.h)</TD>
     <TD>Pool counter size in bytes. Valid values: 1, 2, 4</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-B&lt;size&gt;</TD>
-    <TD>-B1</TD>
+    <TD>-B &lt;size&gt;</TD>
+    <TD>-B 1</TD>
     <TD>2</TD>
     <TD>@c QF_MPOOL_SIZ_SIZE @n (qf_port.h)</TD>
     <TD>Block size size in bytes. (i.e., the size of variables that hold
@@ -219,8 +217,8 @@ Starting with QS/QSPY 5.5.0, the Target can **report** it's configuration to QSP
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-C&lt;size&gt;</TD>
-    <TD>-C4</TD>
+    <TD>-C &lt;size&gt;</TD>
+    <TD>-C 4</TD>
     <TD>2</TD>
     <TD>@c QF_TIMEEVT_CTR_SIZE @n (qf_port.h)</TD>
     <TD>Time event counter size. Valid values: 1, 2, 4</TD>
@@ -260,7 +258,7 @@ Key | Action
 `&lt;Esc&gt;` | Exit QSPY
 `h`     | display keyboard help and QSPY status
 `c`     | clear the screen
-`q`     | toggle quite mode (no Target output to the screen</TD>
+`q`     | toggle quite mode (no Target output to the screen)
 `r`     | send RESET command to the Target
 `i`     | send the INFO request to the Target (see also @ref qspy_dict)
 `t`     | send TIKC[0] command to the Target
@@ -1076,87 +1074,66 @@ Either way, the dictionary records should be produced and acquired by the Target
 
 @verbatim
 C:\qp\qpc\examples\arm-cm\dpp_efm32-slstk3401a\qxk\gnu>qspy -cCOM6
-QSPY host utility 5.9.0
-Copyright (c) 2005-2017 Quantum Leaps (state-machine.com)
-Time Stamp: 170519_120317
--fqspy170519_120217.bin
-   <COMMS> File     Opened File=qspy170519_120217.bin
--v590
--T4
--O4
--F4
--S2
--E2
--Q1
--P2
--B2
--C2
+QSPY 6.1.0 Copyright (c) 2005-2018 Quantum Leaps
+Documentation: https://www.state-machine.com/qtools/qspy.html
+Current timestamp: 180119_195728
+-u 7701
+-c COM7
+-v 600
+-T 4
+-O 4
+-F 4
+-S 2
+-E 2
+-Q 1
+-P 2
+-B 2
+-C 2
 
-########## Trg-RST  QP-Ver=590,Build=170519_093948
-           Obj-Dict 0x000055A6->QS_RX
-           Obj-Dict 0x000051F2->l_SysTick_Handler
-           Obj-Dict 0x000051F1->l_GPIO_EVEN_IRQHandler
+########## Trg-RST  QP-Ver=604,Build=180117_155932
+           Obj-Dict 0x00007322->QS_RX
+           Obj-Dict 0x20000D3C->l_SysTick_Handler
+           Obj-Dict 0x20000D3D->l_GPIOPortA_IRQHandler
            Usr-Dict 00000070->PHILO_STAT
            Usr-Dict 00000071->PAUSED_STAT
            Usr-Dict 00000072->COMMAND_STAT
-           Obj-Dict 0x20000D40->smlPoolSto
-           Obj-Dict 0x20000DB4->tableQueueSto
-           Obj-Dict 0x20000CDC->philoQueueSto<0>
-           Obj-Dict 0x20000CF0->philoQueueSto<1>
-           Obj-Dict 0x20000D04->philoQueueSto<2>
-           Obj-Dict 0x20000D18->philoQueueSto<3>
-           Obj-Dict 0x20000D2C->philoQueueSto<4>
-           Obj-Dict 0x200011F8->l_philo<0>
-           Obj-Dict 0x20001228->l_philo<0>.timeEvt
-           Obj-Dict 0x20001238->l_philo<1>
-           Obj-Dict 0x20001268->l_philo<1>.timeEvt
-           Obj-Dict 0x20001278->l_philo<2>
-           Obj-Dict 0x200012A8->l_philo<2>.timeEvt
-           Obj-Dict 0x200012B8->l_philo<3>
-           Obj-Dict 0x200012E8->l_philo<3>.timeEvt
-           Obj-Dict 0x200012F8->l_philo<4>
-           Obj-Dict 0x20001328->l_philo<4>.timeEvt
-           Fun-Dict 0x00000B8D->Philo_initial
-           Fun-Dict 0x00000DD5->Philo_thinking
-           Fun-Dict 0x00000D49->Philo_hungry
-           Fun-Dict 0x00000CA9->Philo_eating
-           Sig-Dict 00000010,Obj=0x200011F8->HUNGRY_SIG
-           Sig-Dict 00000011,Obj=0x200011F8->TIMEOUT_SIG
-===RTC===> St-Init  Obj=l_philo<0>,State=0x00001B05->Philo_thinking
-===RTC===> St-Entry Obj=l_philo<0>,State=Philo_thinking
-0000190000 Init===> Obj=l_philo<0>,State=Philo_thinking
-           Sig-Dict 00000010,Obj=0x20001238->HUNGRY_SIG
-           Sig-Dict 00000011,Obj=0x20001238->TIMEOUT_SIG
-===RTC===> St-Init  Obj=l_philo<1>,State=0x00001B05->Philo_thinking
-===RTC===> St-Entry Obj=l_philo<1>,State=Philo_thinking
-0000190000 Init===> Obj=l_philo<1>,State=Philo_thinking
-           Sig-Dict 00000010,Obj=0x20001278->HUNGRY_SIG
-           Sig-Dict 00000011,Obj=0x20001278->TIMEOUT_SIG
-===RTC===> St-Init  Obj=l_philo<2>,State=0x00001B05->Philo_thinking
-===RTC===> St-Entry Obj=l_philo<2>,State=Philo_thinking
-0000190000 Init===> Obj=l_philo<2>,State=Philo_thinking
-           Sig-Dict 00000010,Obj=0x200012B8->HUNGRY_SIG
-           Sig-Dict 00000011,Obj=0x200012B8->TIMEOUT_SIG
-===RTC===> St-Init  Obj=l_philo<3>,State=0x00001B05->Philo_thinking
-===RTC===> St-Entry Obj=l_philo<3>,State=Philo_thinking
-0000190000 Init===> Obj=l_philo<3>,State=Philo_thinking
-           Sig-Dict 00000010,Obj=0x200012F8->HUNGRY_SIG
-           Sig-Dict 00000011,Obj=0x200012F8->TIMEOUT_SIG
-===RTC===> St-Init  Obj=l_philo<4>,State=0x00001B05->Philo_thinking
-===RTC===> St-Entry Obj=l_philo<4>,State=Philo_thinking
-0000190000 Init===> Obj=l_philo<4>,State=Philo_thinking
-           Obj-Dict 0x2000133C->l_table
-           Fun-Dict 0x00001B05->QHsm_top
-           Fun-Dict 0x00000E9D->Table_initial
-           Fun-Dict 0x00001099->Table_active
-           Fun-Dict 0x000010C5->Table_serving
-           Fun-Dict 0x00000FB1->Table_paused
+           Obj-Dict 0x200015D0->smlPoolSto
+           Obj-Dict 0x20001684->tableQueueSto
+           Obj-Dict 0x20001620->philoQueueSto<0>
+           Obj-Dict 0x20001634->philoQueueSto<1>
+           Obj-Dict 0x20001648->philoQueueSto<2>
+           Obj-Dict 0x2000165C->philoQueueSto<3>
+           Obj-Dict 0x20001670->philoQueueSto<4>
+           Obj-Dict 0x20001AEC->l_philo<0>
+           Obj-Dict 0x20001B14->l_philo<0>.m_timeEvt
+           Obj-Dict 0x20001B24->l_philo<1>
+           Obj-Dict 0x20001B4C->l_philo<1>.m_timeEvt
+           Obj-Dict 0x20001B5C->l_philo<2>
+           Obj-Dict 0x20001B84->l_philo<2>.m_timeEvt
+           Obj-Dict 0x20001B94->l_philo<3>
+           Obj-Dict 0x20001BBC->l_philo<3>.m_timeEvt
+           Obj-Dict 0x20001BCC->l_philo<4>
+           Obj-Dict 0x20001BF4->l_philo<4>.m_timeEvt
+           Fun-Dict 0x000026C5->Philo::initial
+           Fun-Dict 0x000027E1->Philo::thinking
+           Fun-Dict 0x0000287D->Philo::hungry
+           Fun-Dict 0x00002925->Philo::eating
+           Sig-Dict 00000010,Obj=0x20001AEC->HUNGRY_SIG
+           Sig-Dict 00000011,Obj=0x20001AEC->TIMEOUT_SIG
+. . .      . . .
+           Obj-Dict 0x20001C08->l_table
+           Fun-Dict 0x000030CB->QP::QHsm::top
+           Fun-Dict 0x00002A79->Table::initial
+           Fun-Dict 0x00002B8D->Table::active
+           Fun-Dict 0x00002BB9->Table::serving
+           Fun-Dict 0x00002E29->Table::paused
            Sig-Dict 00000005,Obj=0x00000000->DONE_SIG
            Sig-Dict 00000004,Obj=0x00000000->EAT_SIG
            Sig-Dict 00000006,Obj=0x00000000->PAUSE_SIG
            Sig-Dict 00000007,Obj=0x00000000->SERVE_SIG
            Sig-Dict 00000008,Obj=0x00000000->TEST_SIG
-           Sig-Dict 00000010,Obj=0x2000133C->HUNGRY_SIG
+           Sig-Dict 00000010,Obj=0x20001C08->HUNGRY_SIG
+. . .      . . .
 @endverbatim
 
 Once QSPY acquires the dictionaries, it keeps them in the memory and applies them to display the data in symbolic form (rather than hex addresses).
@@ -1170,6 +1147,10 @@ The dictionaries do not need to be complete to be useful. QSPY simply applies th
 
 QSPY can save the dictionaries acquired thus far into a file. This must be triggered by the user (by means of the `d` @ref qspy_keyboard "keyboard command" or from QSpyView menu "File->Save Dictionaries"), because QSPY does not "know" when the dictionaries are "complete", therefore it cannot know when to save them automatically.
 
+@note
+For dictionaries to be saved to a file, the QSPY host application must be lauched with the `-d [file]` @ref qspy_command "command-line option", with of without the optional `[file]` parameter.
+
+
 On the other hand, QSPY generates automatically the file name for saving dictionaries. This file name has always the form `qspy<target-time-stamp>.dic`, where `<target-time-stamp>` unambiguously identifies the Target build date and time. For example, the Target code last built on August 31, 2015 at 14:42:29 will have the name `qspy150831_144229.dic`.
 
 @attention
@@ -1178,7 +1159,7 @@ The internal addresses of objects can change by every code re-build, so dictiona
 The dictionaries are saved to a file in ASCII format. The following listing shows the dictionaries from the DPP example application running on the EK-TM4C123GXL board:
 
 @verbatim
--v550
+-v604
 -T4
 -O4
 -F4
@@ -1188,62 +1169,64 @@ The dictionaries are saved to a file in ASCII format. The following listing show
 -P2
 -B2
 -C2
+-t180117_155932
 Obj-Dic:
 21 4
-0000000000003B18 l_SysTick_Handler
-0000000000003B19 l_GPIOPortA_IRQHandler
-0000000000004018 QS_RX
-0000000020000C74 philoQueueSto[0]
-0000000020000C88 philoQueueSto[1]
-0000000020000C9C philoQueueSto[2]
-0000000020000CB0 philoQueueSto[3]
-0000000020000CC4 philoQueueSto[4]
-0000000020000CFC tableQueueSto
-0000000020000D10 smlPoolSto
-0000000020000D60 l_philo[0]
-0000000020000D8C l_philo[0].timeEvt
-0000000020000D9C l_philo[1]
-0000000020000DC8 l_philo[1].timeEvt
-0000000020000DD8 l_philo[2]
-0000000020000E04 l_philo[2].timeEvt
-0000000020000E14 l_philo[3]
-0000000020000E40 l_philo[3].timeEvt
-0000000020000E50 l_philo[4]
-0000000020000E7C l_philo[4].timeEvt
-0000000020000E90 l_table
+0x00007322 QS_RX
+0x20000D3C l_SysTick_Handler
+0x20000D3D l_GPIOPortA_IRQHandler
+0x200015D0 smlPoolSto
+0x20001620 philoQueueSto<0>
+0x20001634 philoQueueSto<1>
+0x20001648 philoQueueSto<2>
+0x2000165C philoQueueSto<3>
+0x20001670 philoQueueSto<4>
+0x20001684 tableQueueSto
+0x20001AEC l_philo<0>
+0x20001B14 l_philo<0>.m_timeEvt
+0x20001B24 l_philo<1>
+0x20001B4C l_philo<1>.m_timeEvt
+0x20001B5C l_philo<2>
+0x20001B84 l_philo<2>.m_timeEvt
+0x20001B94 l_philo<3>
+0x20001BBC l_philo<3>.m_timeEvt
+0x20001BCC l_philo<4>
+0x20001BF4 l_philo<4>.m_timeEvt
+0x20001C08 l_table
 Fun-Dic:
 9 4
-0000000000000A79 Philo_initial
-0000000000000C45 Philo_eating
-0000000000000C99 Philo_hungry
-0000000000000D01 Philo_thinking
-0000000000000E6D Table_initial
-0000000000000FFD Table_paused
-0000000000001145 Table_serving
-0000000000001355 Table_active
-00000000000017A5 QHsm_top
+0x000026C5 Philo::initial
+0x000027E1 Philo::thinking
+0x0000287D Philo::hungry
+0x00002925 Philo::eating
+0x00002A79 Table::initial
+0x00002B8D Table::active
+0x00002BB9 Table::serving
+0x00002E29 Table::paused
+0x000030CB QP::QHsm::top
 Usr-Dic:
-2 1
-0000000000000046 PHILO_STAT
-0000000000000047 COMMAND_STAT
+3 1
+0x00000046 PHILO_STAT
+0x00000047 PAUSED_STAT
+0x00000048 COMMAND_STAT
 Sig-Dic:
 16 4
-00000004 0000000000000000 EAT_SIG
-00000005 0000000000000000 DONE_SIG
-00000006 0000000000000000 PAUSE_SIG
-00000007 0000000000000000 SERVE_SIG
-00000008 0000000000000000 TERMINATE_SIG
-0000000A 0000000020000DD8 HUNGRY_SIG
-0000000A 0000000020000E50 HUNGRY_SIG
-0000000A 0000000020000E14 HUNGRY_SIG
-0000000A 0000000020000D60 HUNGRY_SIG
-0000000A 0000000020000D9C HUNGRY_SIG
-0000000A 0000000020000E90 HUNGRY_SIG
-0000000B 0000000020000E14 TIMEOUT_SIG
-0000000B 0000000020000E50 TIMEOUT_SIG
-0000000B 0000000020000DD8 TIMEOUT_SIG
-0000000B 0000000020000D60 TIMEOUT_SIG
-0000000B 0000000020000D9C TIMEOUT_SIG
+00000004 0x00000000 EAT_SIG
+00000005 0x00000000 DONE_SIG
+00000006 0x00000000 PAUSE_SIG
+00000007 0x00000000 SERVE_SIG
+00000008 0x00000000 TEST_SIG
+00000010 0x20001B5C HUNGRY_SIG
+00000010 0x20001BCC HUNGRY_SIG
+00000010 0x20001B94 HUNGRY_SIG
+00000010 0x20001AEC HUNGRY_SIG
+00000010 0x20001B24 HUNGRY_SIG
+00000010 0x20001C08 HUNGRY_SIG
+00000011 0x20001B94 TIMEOUT_SIG
+00000011 0x20001BCC TIMEOUT_SIG
+00000011 0x20001B5C TIMEOUT_SIG
+00000011 0x20001AEC TIMEOUT_SIG
+00000011 0x20001B24 TIMEOUT_SIG
 Msc-Dic:
 0 4
 @endverbatim
@@ -1253,9 +1236,9 @@ Msc-Dic:
 @section qspy_dict_use Using Dictionary File
 The dictionary file saved in previous QSPY sessions can be used in two ways:
 
-- you can specify the dictionary file in the `-d` @ref qspy_command "command-line option" to QSPY. In this case QSPY reads the dictionaries before processing any trace records from the Target. (**NOTE:** in this case you don't need to provide any of the upper-case command-line options, because they are read from the dictionary file.) For example: command line: `qspy -dqspy150831_144229.dic` will attempt to read the dictionaries from the specified file.
+- you can specify the dictionary file in the `-d <dictionary_file>` @ref qspy_command "command-line option" to QSPY. In this case QSPY reads the dictionaries from the provided `<dictionary_file>` before processing any trace records from the Target. (**NOTE:** in this case you don't need to provide any of the upper-case command-line options, because they are read from the dictionary file.) For example: command line: `qspy -d qspy180117_155932.dic` will attempt to read the dictionaries from the specified file.
 
-- you can query the Target information (by means of the `i` @ref qspy_keyboard "keyboard command" or from QSpyView menu "Commands->Query Target Info"). When the Target replies and provides its build-time-stamp, QSPY looks for the corresponding dictionary file in the current directory and if such a file is found, QSPY reads the dictionaries from it. (**NOTE:** this option requires that the Target implements the QS receive channel, QS-RX, so that it can receive commands from QSPY).
+- you can specify the dictionary option without the dictionary file `-d` @ref qspy_command "command-line option" to QSPY. Subsequently, once you run QSPY, you can query the Target information (by means of the `i` or `r` @ref qspy_keyboard "keyboard command" or from QSpyView menu "Commands->Query Target Info"). When the Target replies and provides its build-time-stamp, QSPY looks for the corresponding dictionary file in the current directory and if such a file is found, QSPY reads the dictionaries from it. (**NOTE:** this option requires that the Target implements the QS receive channel, QS-RX, so that it can receive commands from QSPY).
 
 @next{qspy_udp}
 */

@@ -1,8 +1,16 @@
 /**
 @page history Revision History
 
-@section qtools_6_0_4 Version 6.0.4, 2018-01-13
-This release modifies the behavior of QSPY host application when it receives the reset trace record from the target. Previously, such a reset request would invalidate all QSPY dictionaries (because typically a target reset was followed by the target supplying the dicttionaries anyway). The new behavior is that the dictionaries are invalidated only when the target info is different than the target configuration information that QSPY already has. 
+@section qtools_6_1_0 Version 6.1.0, 2018-01-20
+This release improves the @ref qspy_command "QSPY command-line" option processing by allowing option parameters to be separated by spaces from the option letter (including the optional parameters). For example, the following command-line would not work in the previous version, but will work now:
+
+qspy -t 6602
+
+At the same time, the option parameters can follow immediately the option letter, so the following command line will work as well (backwards compatiblity):
+
+qspy -t6602
+
+This release also improves the handling of external dictionary files in @ref qspy "QSPY host application". Specifically, the `-d` @ref qspy_command "command-line option" has been extended to allow no parameter, in which case external dictionary file is opened automatically as soon as QSPY receives the target reset or target information. When `-d <file>` option is used, the provided dictionary file is used right away, but the dictioray information might get discarded when the target information does not match the configuration and time-stamp obtained from the dictionary file.
 
 
 ------------------------------------------------------
