@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-18
+* Last updated on  2018-01-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -1829,8 +1829,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 * and this is not the first target info?
                 */
                 if ((d != 0U) && (c != 0U)) {
-                    SNPRINTF_LINE("   <USER-> WARN     Target info "
-                                  "missmatch (dictionaries discarded)");
+                    SNPRINTF_LINE("   <QSPY-> Target info missmatch "
+                                  "(dictionaries discarded)");
                     QSPY_onPrintLn();
                     resetAllDictionaries();
                 }
@@ -1861,18 +1861,18 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                (unsigned)l_config.tstamp[2],
                                (unsigned)l_config.tstamp[1],
                                (unsigned)l_config.tstamp[0]);
+                    }
 
-                        /* try to read the dictionary file...*/
-                        FOPEN_S(dictFile, l_dictFileName, "r");
-                        if (dictFile != (FILE *)0) { /* dictionary found? */
-                            if (QSPY_readDict(dictFile) == QSPY_ERROR) {
-                                SNPRINTF_LINE("   <USER-> WARN     "
-                                    "Dictionaries don't match the target");
-                                QSPY_onPrintLn();
-                                resetAllDictionaries();
-                            }
-                            fclose(dictFile);
+                    /* try to read the dictionary file...*/
+                    FOPEN_S(dictFile, l_dictFileName, "r");
+                    if (dictFile != (FILE *)0) { /* dictionary found? */
+                        if (QSPY_readDict(dictFile) == QSPY_ERROR) {
+                            SNPRINTF_LINE("   <QSPY-> Dictionaries missmatch "
+                                          "the target (discarded)");
+                            QSPY_onPrintLn();
+                            resetAllDictionaries();
                         }
+                        fclose(dictFile);
                     }
                 }
             }
@@ -2243,7 +2243,7 @@ QSpyStatus QSPY_readDict(void *dictFile) {
     uint32_t d = 0U; /* assume no difference in the configuration */
 
     /* output the status to the user */
-    SNPRINTF_LINE("   <USER-> Reading dictionaries from File=%s",
+    SNPRINTF_LINE("   <QSPY-> Reading dictionaries from File=%s",
                   l_dictFileName);
     QSPY_onPrintLn();
 

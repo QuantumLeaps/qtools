@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-19
+* Last updated on  2018-01-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -519,28 +519,28 @@ static QSpyStatus configure(int argc, char *argv[]) {
             fprintf(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
         }
         else {
-            printf("   <USER-> Cannot open File=%s\n", l_outFileName);
+            printf("   <QSPY-> Cannot open File=%s\n", l_outFileName);
             return QSPY_ERROR;
         }
     }
     if (l_savFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_savFile, l_savFileName, "wb"); /* open for writing binary */
         if (l_savFile == (FILE *)0) {
-            printf("   <USER-> Cannot open File=%s\n", l_savFileName);
+            printf("   <QSPY-> Cannot open File=%s\n", l_savFileName);
             return QSPY_ERROR;
         }
     }
     if (l_matFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_matFile, l_matFileName, "w");
         if (l_matFile == (FILE *)0) {
-            printf("   <USER-> Cannot open File=%s\n", l_matFileName);
+            printf("   <QSPY-> Cannot open File=%s\n", l_matFileName);
             return QSPY_ERROR;
         }
     }
     if (l_mscFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_mscFile, l_mscFileName, "w");
         if (l_mscFile == (FILE *)0) {
-            printf("   <USER-> Cannot open File=%s\n", l_mscFileName);
+            printf("   <QSPY-> Cannot open File=%s\n", l_mscFileName);
             return QSPY_ERROR;
         }
     }
@@ -567,7 +567,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
         if (l_dictFileName[0] != '\0') {
             FOPEN_S(l_dicFile, l_dictFileName, "r");
             if (l_dicFile == (FILE *)0) {
-                printf("   <USER-> Cannot open File=%s\n", l_dictFileName);
+                printf("   <QSPY-> Cannot open File=%s\n", l_dictFileName);
                 return QSPY_ERROR;
             }
             QSPY_readDict(l_dicFile);
@@ -586,7 +586,7 @@ bool QSPY_command(uint8_t cmdId) {
 
     switch (cmdId) {
         default:
-            printf("   <USER-> Unrecognized keyboard Command=%c",
+            printf("   <QSPY-> Unrecognized keyboard Command=%c",
                    (char)cmdId);
             /* intentionally fall-through... */
 
@@ -635,11 +635,11 @@ bool QSPY_command(uint8_t cmdId) {
         case 'd':  /* save Dictionaries to a file */
             str = QSPY_writeDict();
             if (str != (char *)0) {
-                printf("   <USER-> Dictionaries written to File=%s\n",
+                printf("   <QSPY-> Dictionaries written to File=%s\n",
                        str);
             }
             else {
-                printf("   <USER-> Dictionaries NOT saved\n");
+                printf("   <QSPY-> Dictionaries NOT saved\n");
             }
             break;
 
@@ -674,7 +674,7 @@ bool QSPY_command(uint8_t cmdId) {
                             l_tstampStr);
                 }
                 else {
-                    printf("   <USER-> Cannot open File=%s for writing\n",
+                    printf("   <QSPY-> Cannot open File=%s for writing\n",
                            l_outFileName);
                     STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
                 }
@@ -694,7 +694,7 @@ bool QSPY_command(uint8_t cmdId) {
                            "qspy%s.bin", tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
                 if (l_savFile == (FILE *)0) {
-                    printf("   <USER-> Cannot open File=%s for writing\n",
+                    printf("   <QSPY-> Cannot open File=%s for writing\n",
                            l_savFileName);
                     STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
                 }
@@ -717,7 +717,7 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMatFile(l_matFile);
                 }
                 else {
-                    printf("   <USER-> Cannot open File=%s for writing\n",
+                    printf("   <QSPY-> Cannot open File=%s for writing\n",
                            l_matFileName);
                     STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
                 }
@@ -740,7 +740,7 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMscFile(l_mscFile);
                 }
                 else {
-                    printf("   <USER-> Cannot open File=%s for writing\n",
+                    printf("   <QSPY-> Cannot open File=%s for writing\n",
                            l_mscFileName);
                     STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
                 }
