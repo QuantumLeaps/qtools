@@ -5,7 +5,8 @@
 @section qtools_about What is it?
 QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://state-machine.com/">Quantum Leaps</a>:
 
-- @ref qpspy  "QP/Spy software tracing and testing for embedded systems", which includes:
+- @ref qpspy "QP/Spy software tracing and testing for embedded systems", which includes:
+  + @ref qspy     "QSPY&trade; Host Application"
   + @ref qutest   "QUTest&trade; Unit Testing Harness"
   + @ref qspyview "QSpyView&trade; Visualization &amp; Monitoring"
 - @ref qwin   "QWin GUI toolkit for prototyping embedded systems on Windows in C or C++"

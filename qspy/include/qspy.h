@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-19
+* Last updated on  2018-01-25
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -91,7 +91,6 @@ typedef struct {
     uint8_t poolBlkSize;
     uint8_t tevtCtrSize;
     uint8_t tstamp[6];
-    uint8_t externDict;
 } QSpyConfig;
 
 typedef uint64_t KeyType;
@@ -146,8 +145,8 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
 void QSPY_txReset(void);
 
 void QSPY_setExternDict(char const *dictName);
-QSpyStatus QSPY_readDict(void *dictFile);
-char const *QSPY_writeDict(void);
+QSpyStatus QSPY_readDict(void);
+QSpyStatus QSPY_writeDict(void);
 
 bool QSPY_command(uint8_t cmdId); /* execute an internal QSPY command */
 void QSPY_sendEvt(QSpyRecord const * const qrec);

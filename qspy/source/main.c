@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-20
+* Last updated on  2018-01-25
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -52,7 +52,7 @@
 #include "getopt.h" /* command-line option processor */
 
 /*..........................................................................*/
-#define FNAME_SIZE  256
+enum { FNAME_SIZE = 256 };
 
 /*..........................................................................*/
 typedef enum {
@@ -69,7 +69,6 @@ static FILE *l_outFile = (FILE *)0;
 static FILE *l_savFile = (FILE *)0;
 static FILE *l_matFile = (FILE *)0;
 static FILE *l_mscFile = (FILE *)0;
-static FILE *l_dicFile = (FILE *)0;
 
 static char  l_comPort    [FNAME_SIZE];
 static char  l_inpFileName[FNAME_SIZE];
@@ -77,7 +76,7 @@ static char  l_outFileName[FNAME_SIZE];
 static char  l_savFileName[FNAME_SIZE];
 static char  l_matFileName[FNAME_SIZE];
 static char  l_mscFileName[FNAME_SIZE];
-static char  l_dictFileName[FNAME_SIZE];
+static char  l_dicFileName[FNAME_SIZE];
 
 static char  l_tstampStr  [16];
 
@@ -282,11 +281,11 @@ static QSpyStatus configure(int argc, char *argv[]) {
     uint8_t tevtCtrSize  = 2U;
     int     optChar;
 
-    STRNCPY_S(l_outFileName,  "OFF", sizeof(l_outFileName));
-    STRNCPY_S(l_savFileName,  "OFF", sizeof(l_savFileName));
-    STRNCPY_S(l_matFileName,  "OFF", sizeof(l_matFileName));
-    STRNCPY_S(l_mscFileName,  "OFF", sizeof(l_mscFileName));
-    STRNCPY_S(l_dictFileName, "OFF", sizeof(l_dictFileName));
+    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
+    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
+    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
+    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
+    STRNCPY_S(l_dicFileName, "OFF", sizeof(l_dicFileName));
 
     (void)tstampStr();
     printf(l_introStr, QSPY_VER, l_tstampStr);
@@ -397,12 +396,14 @@ static QSpyStatus configure(int argc, char *argv[]) {
             }
             case 'd': { /* Dictionary file */
                 if (optarg != NULL) { /* is optional argument provided? */
-                    STRNCPY_S(l_dictFileName, optarg, sizeof(l_dictFileName));
+                    STRNCPY_S(l_dicFileName, optarg, sizeof(l_dicFileName));
+                    printf("-d %s\n", l_dicFileName);
                 }
                 else { /* apply the default */
-                    l_dictFileName[0] = '\0';
+                    l_dicFileName[0] = '?';
+                    l_dicFileName[1] = '\0';
+                    printf("-d\n");
                 }
-                printf("-d %s\n", l_dictFileName);
                 break;
             }
             case 't': { /* TCP/IP input */
@@ -562,17 +563,9 @@ static QSpyStatus configure(int argc, char *argv[]) {
     QSPY_configTxReset(&QSPY_txReset);
 
     /* NOTE: dictionary file must be set and read AFTER configuring QSPY */
-    if (l_dictFileName[0] != 'O') { /* not "OFF" ? */
-        QSPY_setExternDict(l_dictFileName);
-        if (l_dictFileName[0] != '\0') {
-            FOPEN_S(l_dicFile, l_dictFileName, "r");
-            if (l_dicFile == (FILE *)0) {
-                printf("   <QSPY-> Cannot open File=%s\n", l_dictFileName);
-                return QSPY_ERROR;
-            }
-            QSPY_readDict(l_dicFile);
-            fclose(l_dicFile);
-        }
+    if (l_dicFileName[0] != 'O') { /* not "OFF" ? */
+        QSPY_setExternDict(l_dicFileName);
+        QSPY_readDict();
     }
 
     return QSPY_SUCCESS;
@@ -580,7 +573,6 @@ static QSpyStatus configure(int argc, char *argv[]) {
 /*..........................................................................*/
 bool QSPY_command(uint8_t cmdId) {
     size_t nBytes;
-    char const *str;
     bool isRunning = true;
     QSpyStatus stat;
 
@@ -633,14 +625,7 @@ bool QSPY_command(uint8_t cmdId) {
             break;
 
         case 'd':  /* save Dictionaries to a file */
-            str = QSPY_writeDict();
-            if (str != (char *)0) {
-                printf("   <QSPY-> Dictionaries written to File=%s\n",
-                       str);
-            }
-            else {
-                printf("   <QSPY-> Dictionaries NOT saved\n");
-            }
+            QSPY_writeDict();
             break;
 
         case 'c':  /* clear the screen */

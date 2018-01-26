@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-20
+* Last updated on  2018-01-25
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -64,13 +64,16 @@ typedef void     QEvt;
 QSPY_LastOutput QSPY_output;
 
 /****************************************************************************/
-/* name length for internal buffers (longer names truncated) ... */
-#define MAX_NAME_LEN 64
+
+enum {
+    DNAME_SIZE = 64,  /* dictionary name length (longer names truncated) */
+    FNAME_SIZE = 256  /* file name length (longer names truncated) */
+};
 
 /*..........................................................................*/
 typedef struct {
     KeyType key;
-    char    name[MAX_NAME_LEN];
+    char    name[DNAME_SIZE];
 } DictEntry;
 
 typedef struct {
@@ -102,7 +105,7 @@ static void resetAllDictionaries(void);
 typedef struct SigDictEntryTag {
     SigType sig;
     ObjType obj;
-    char    name[MAX_NAME_LEN];
+    char    name[DNAME_SIZE];
 } SigDictEntry;
 
 typedef struct SigDictionaryTag {
@@ -128,12 +131,6 @@ static void SigDictionary_reset(SigDictionary * const me);
 static void SigDictionary_write(SigDictionary const * const me, FILE *stream);
 static bool SigDictionary_read(SigDictionary * const me, FILE *stream);
 
-enum ExternDictStatus {
-    EXTERN_DICT_NONE,
-    EXTERN_DICT_AUTO,
-    EXTERN_DICT_USER
-};
-
 /*..........................................................................*/
 static DictEntry     l_funSto[512];
 static DictEntry     l_objSto[256];
@@ -145,7 +142,7 @@ static Dictionary    l_objDict;
 static Dictionary    l_mscDict;
 static Dictionary    l_usrDict;
 static SigDictionary l_sigDict;
-static char          l_dictFileName[32]; /* dictionary file name */
+static char          l_dictFileName[FNAME_SIZE]; /* dictionary file name */
 
 /*..........................................................................*/
 static QSpyConfig    l_config;
@@ -331,9 +328,8 @@ void QSPY_config(uint16_t version,
     Dictionary_config(&l_usrDict, 1);
     SigDictionary_config(&l_sigDict, l_config.objPtrSize);
 
-    l_config.tstamp[5]  = 0U; /* invalidate the year-part of the timestamp */
-    l_config.externDict = EXTERN_DICT_NONE;
-    l_dictFileName[0]   = '\0'; /* invalidate the dictionary file name */
+    l_config.tstamp[5] = 0U;   /* invalidate the year-part of the timestamp */
+    l_dictFileName[0]  = '\0'; /* assume no external dictionary management */
 
     SNPRINTF_LINE("-v %d", (unsigned)version);       QSPY_onPrintLn();
     SNPRINTF_LINE("-T %d", (unsigned)tstampSize);    QSPY_onPrintLn();
@@ -838,7 +834,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 static void QSpyRecord_process(QSpyRecord * const me) {
     uint32_t t, a, b, c, d, e;
     uint64_t p, q, r;
-    char buf[256];
+    char buf[FNAME_SIZE];
     char const *s = 0;
     char const *w = 0;
 
@@ -1785,8 +1781,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
 
             if (QSpyRecord_OK(me)) {
-                FILE *dictFile = (FILE *)0;
-
                 s = (a != 0U) ? "Trg-RST " : "Trg-Info";
 
                 /* save the year-part of the timestamp
@@ -1848,32 +1842,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 }
 
                 /* should external dictionaries be used (-d option)? */
-                if (l_config.externDict != EXTERN_DICT_NONE) {
-
-                    /* automatic dictionary name generation? */
-                    if (l_config.externDict == EXTERN_DICT_AUTO) {
-                        /* synthesize dictionary name from the timestamp */
-                        SNPRINTF_S(l_dictFileName, sizeof(l_dictFileName),
-                               "qspy%02u%02u%02u_%02u%02u%02u.dic",
-                               (unsigned)l_config.tstamp[5],
-                               (unsigned)l_config.tstamp[4],
-                               (unsigned)l_config.tstamp[3],
-                               (unsigned)l_config.tstamp[2],
-                               (unsigned)l_config.tstamp[1],
-                               (unsigned)l_config.tstamp[0]);
-                    }
-
-                    /* try to read the dictionary file...*/
-                    FOPEN_S(dictFile, l_dictFileName, "r");
-                    if (dictFile != (FILE *)0) { /* dictionary found? */
-                        if (QSPY_readDict(dictFile) == QSPY_ERROR) {
-                            SNPRINTF_LINE("   <QSPY-> Dictionaries missmatch "
-                                          "the target (discarded)");
-                            QSPY_onPrintLn();
-                            resetAllDictionaries();
-                        }
-                        fclose(dictFile);
-                    }
+                if (l_dictFileName[0] != '\0') {
+                    QSPY_readDict();
                 }
             }
             break;
@@ -2175,17 +2145,44 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
 }
 
 /*..........................................................................*/
-char const *QSPY_writeDict(void) {
+void QSPY_setExternDict(char const *dictName) {
+    SNPRINTF_S(l_dictFileName, sizeof(l_dictFileName), dictName);
+}
+/*..........................................................................*/
+QSpyStatus QSPY_writeDict(void) {
     FILE *dictFile = (FILE *)0;
+    char buf[FNAME_SIZE];
 
-    /* do we have dictionary name yet? */
+    /* no external dictionaries configured? */
     if (l_dictFileName[0] == '\0') {
-        return (char *)0;  /* no name yet, can't save dictionaries */
+        SNPRINTF_LINE("   <QSPY-> Dictionaries NOT saved (no -d option)");
+        QSPY_onPrintLn();
+        return QSPY_ERROR;
     }
 
-    FOPEN_S(dictFile, l_dictFileName, "w");
+    /* no external dictionaries configured or no target config yet? */
+    if (l_config.tstamp[5] == 0U) {
+        SNPRINTF_LINE("   <QSPY-> Dictionaries NOT saved (no target info)");
+        QSPY_onPrintLn();
+        return QSPY_ERROR;
+    }
+
+    /* synthesize dictionary name from the timestamp */
+    SNPRINTF_S(buf, sizeof(buf),
+           "qspy%02u%02u%02u_%02u%02u%02u.dic",
+           (unsigned)l_config.tstamp[5],
+           (unsigned)l_config.tstamp[4],
+           (unsigned)l_config.tstamp[3],
+           (unsigned)l_config.tstamp[2],
+           (unsigned)l_config.tstamp[1],
+           (unsigned)l_config.tstamp[0]);
+
+    FOPEN_S(dictFile, buf, "w");
     if (dictFile == (FILE *)0) {
-        return (char *)0;
+        SNPRINTF_LINE("   <QSPY-> Dictionaries could not be saved to File=%s",
+                      buf);
+        QSPY_onPrintLn();
+        return QSPY_ERROR;
     }
 
     fprintf(dictFile, "-v%03d\n", (int)l_config.version);
@@ -2222,81 +2219,106 @@ char const *QSPY_writeDict(void) {
     Dictionary_write(&l_mscDict, dictFile);
 
     fclose(dictFile);
-    return l_dictFileName;
-}
 
-/*..........................................................................*/
-void QSPY_setExternDict(char const *dictName) {
-    if (dictName[0] != '\0') {
-        SNPRINTF_S(l_dictFileName, sizeof(l_dictFileName), dictName);
-        l_config.externDict = EXTERN_DICT_USER;
-    }
-    else {
-        l_dictFileName[0] = '\0';
-        l_config.externDict = EXTERN_DICT_AUTO;
-    }
+    SNPRINTF_LINE("   <QSPY-> Dictionaries saved to File=%s",
+                  buf);
+    QSPY_onPrintLn();
+
+    return QSPY_SUCCESS;
 }
 /*..........................................................................*/
-QSpyStatus QSPY_readDict(void *dictFile) {
-    char type[32];
+QSpyStatus QSPY_readDict(void) {
+    FILE *dictFile;
+    char buf[FNAME_SIZE];
     uint32_t c = l_config.tstamp[5]; /* save the year-part of the tstamp */
     uint32_t d = 0U; /* assume no difference in the configuration */
 
+    /* no external dictionaries configured? */
+    if (l_dictFileName[0] == '\0') {
+        return QSPY_ERROR;
+    }
+    else if (l_dictFileName[0] == '?') { /* automatic dictionaries? */
+
+        /* no target timestamp yet? */
+        if (c == 0U) {
+            return QSPY_ERROR;
+        }
+
+        /* synthesize dictionary name from the timestamp */
+        SNPRINTF_S(buf, sizeof(buf),
+               "qspy%02u%02u%02u_%02u%02u%02u.dic",
+               (unsigned)l_config.tstamp[5],
+               (unsigned)l_config.tstamp[4],
+               (unsigned)l_config.tstamp[3],
+               (unsigned)l_config.tstamp[2],
+               (unsigned)l_config.tstamp[1],
+               (unsigned)l_config.tstamp[0]);
+    }
+    else { /* manual dictionaries */
+        SNPRINTF_S(buf, sizeof(buf), l_dictFileName);
+    }
+
+    FOPEN_S(dictFile, buf, "r");
+    if (dictFile == (FILE *)0) {
+        SNPRINTF_LINE("   <QSPY-> Dictionaries not found File=%s", buf);
+        QSPY_onPrintLn();
+        return QSPY_ERROR;
+    }
+
     /* output the status to the user */
-    SNPRINTF_LINE("   <QSPY-> Reading dictionaries from File=%s",
-                  l_dictFileName);
+    SNPRINTF_LINE("   <QSPY-> Reading dictionaries from File=%s", buf);
     QSPY_onPrintLn();
 
-    while (fgets(type, sizeof(type), (FILE *)dictFile) != (char *)0) {
-        switch (type[0]) {
+    while (fgets(buf, sizeof(buf), (FILE *)dictFile) != (char *)0) {
+        switch (buf[0]) {
             case '-':
-                switch (type[1]) {
+                switch (buf[1]) {
                     case 'v':
                         CONFIG_UPDATE(version,
-                                      (100U*(type[2] - '0')
-                                           + 10U*(type[3] - '0')
-                                           + (type[4] - '0')), d);
+                                      (100U*(buf[2] - '0')
+                                           + 10U*(buf[3] - '0')
+                                           + (buf[4] - '0')), d);
                         break;
                     case 'T':
-                        CONFIG_UPDATE(tstampSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(tstampSize, (buf[2] - '0'), d);
                         break;
                     case 'O':
-                        CONFIG_UPDATE(objPtrSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(objPtrSize, (buf[2] - '0'), d);
                         break;
                     case 'F':
-                        CONFIG_UPDATE(funPtrSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(funPtrSize, (buf[2] - '0'), d);
                         break;
                     case 'S':
-                        CONFIG_UPDATE(sigSize,    (type[2] - '0'), d);
+                        CONFIG_UPDATE(sigSize,    (buf[2] - '0'), d);
                         break;
                     case 'E':
-                        CONFIG_UPDATE(evtSize,    (type[2] - '0'), d);
+                        CONFIG_UPDATE(evtSize,    (buf[2] - '0'), d);
                         break;
                     case 'Q':
-                        CONFIG_UPDATE(queueCtrSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(queueCtrSize, (buf[2] - '0'), d);
                         break;
                     case 'P':
-                        CONFIG_UPDATE(poolCtrSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(poolCtrSize, (buf[2] - '0'), d);
                         break;
                     case 'B':
-                        CONFIG_UPDATE(poolBlkSize,  (type[2] - '0'), d);
+                        CONFIG_UPDATE(poolBlkSize,  (buf[2] - '0'), d);
                         break;
                     case 'C':
-                        CONFIG_UPDATE(tevtCtrSize, (type[2] - '0'), d);
+                        CONFIG_UPDATE(tevtCtrSize, (buf[2] - '0'), d);
                         break;
                     case 't':
                         CONFIG_UPDATE(tstamp[5],
-                            ((type[2 + 0] - '0')*10 + type[2 + 1] - '0'), d);
+                            ((buf[2 + 0] - '0')*10 + buf[2 + 1] - '0'), d);
                         CONFIG_UPDATE(tstamp[4],
-                            ((type[2 + 2] - '0')*10 + type[2 + 3] - '0'), d);
+                            ((buf[2 + 2] - '0')*10 + buf[2 + 3] - '0'), d);
                         CONFIG_UPDATE(tstamp[3],
-                            ((type[2 + 4] - '0')*10 + type[2 + 5] - '0'), d);
+                            ((buf[2 + 4] - '0')*10 + buf[2 + 5] - '0'), d);
                         CONFIG_UPDATE(tstamp[2],
-                            ((type[2 + 7] - '0')*10 + type[2 + 8] - '0'), d);
+                            ((buf[2 + 7] - '0')*10 + buf[2 + 8] - '0'), d);
                         CONFIG_UPDATE(tstamp[1],
-                            ((type[2 + 9] - '0')*10 + type[2 +10] - '0'), d);
+                            ((buf[2 + 9] - '0')*10 + buf[2 +10] - '0'), d);
                         CONFIG_UPDATE(tstamp[0],
-                            ((type[2 +11] - '0')*10 + type[2 +12] - '0'), d);
+                            ((buf[2 +11] - '0')*10 + buf[2 +12] - '0'), d);
                         break;
                     default:
                         return QSPY_ERROR;
@@ -2334,10 +2356,19 @@ QSpyStatus QSPY_readDict(void *dictFile) {
         }
     }
 
+    fclose(dictFile);
+
     /* any differences in config and not the first time through? */
-    return ((d != 0U) && (c != 0U))
-            ? QSPY_ERROR
-            : QSPY_SUCCESS;
+    if ((d != 0U) && (c != 0U)) {
+        SNPRINTF_LINE("   <QSPY-> Dictionaries missmatch "
+                      "the Target (discarded)");
+        QSPY_onPrintLn();
+
+        resetAllDictionaries();
+        return QSPY_ERROR;
+    }
+
+    return QSPY_SUCCESS;
 }
 /*..........................................................................*/
 static void resetAllDictionaries(void) {
@@ -2462,10 +2493,10 @@ static char const *Dictionary_get(Dictionary * const me,
         }
         /* otherwise use the provided buffer... */
         if (me->keySize <= 4) {
-            SNPRINTF_S(buf, MAX_NAME_LEN, "0x%08X", (unsigned)key);
+            SNPRINTF_S(buf, DNAME_SIZE, "0x%08X", (unsigned)key);
         }
         else {
-            SNPRINTF_S(buf, MAX_NAME_LEN, "0x%016"PRIX64"", key);
+            SNPRINTF_S(buf, DNAME_SIZE, "0x%016"PRIX64"", key);
         }
         //Dictionary_put(me, key, buf); /* put into the dictionary */
         return buf;
@@ -2638,11 +2669,11 @@ static char const *SigDictionary_get(SigDictionary * const me,
         }
         /* otherwise use the provided buffer... */
         if (me->ptrSize <= 4) {
-            SNPRINTF_S(buf, MAX_NAME_LEN, "%08d,Obj=0x%08X",
+            SNPRINTF_S(buf, DNAME_SIZE, "%08d,Obj=0x%08X",
                       (int)sig, (int)obj);
         }
         else {
-            SNPRINTF_S(buf, MAX_NAME_LEN, "%08d,Obj=0x%016"PRIX64"",
+            SNPRINTF_S(buf, DNAME_SIZE, "%08d,Obj=0x%016"PRIX64"",
                        (int)sig, obj);
         }
         //SigDictionary_put(me, sig, obj, buf); /* put into the dictionary */
