@@ -36,10 +36,16 @@ QSpyView&trade; currently supports the following @subpage qspyview_ui "commands"
 
 ------------------------------------------------------------------------------
 @section qspyview_struct QSpyView&trade; Structure
-The sequence diagram below shows the general structure of QSpyView&trade;. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the Target data link (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol". The QSpyView&trade; (Tcl/Tk script) attaches to the QSPY host application by means of the @ref qspy_udp "UDP socket" that QSPY opens when the `-u` @ref qspy_command "command-line option" is selected. This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qpspy_proto "QP/Spy Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
+The sequence diagram below shows the general structure of QSpyView&trade;. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the @ref qspy_link "Target data link" (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol".
+
+The QSpyView&trade; (Tcl/Tk script) attaches to the QSPY host application by means of the @ref qspy_udp "UDP socket" that QSPY opens when the `-u` @ref qspy_command "command-line option" is selected. This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qpspy_proto "QP/Spy Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
 
 @note
-The QSpyView Front-End attaches to the @ref udp_channel "binary-channel" of the UDP socket served by QSPY.
+The QSpyView Front-End attaches to the @ref udp_channel "binary-channel" of the UDP socket served by QSPY (<span style="color:blue"><strong>blue arrows</strong></span> in the sequence diagram below).
+
+
+@attention
+The @ref udp_channel "QSPY UDP channel" should **not** be confused with the @ref qspy_link "QSPY target communication channel" (<span style="color:red"><strong>red arrows</strong></span> in the sequence diagram below), which can be serial-port, TCP/IP, or a binary-file.
 
 
 @image html qspy_qspyview.gif "Communication between Target, QSPY, and QSpyView"

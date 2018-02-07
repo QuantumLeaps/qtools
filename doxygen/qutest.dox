@@ -62,13 +62,17 @@ In order to communicate with the QSPY back-end, QUTest requires the Tcl interpre
 
 -------------------------------------------------------------------------------
 @section qutest_run Running QUTest&trade;
-From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should connect to the Target system of your choice. You can also use the `-t` to open a TCP/IP socket for connecting host executables as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:
+From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should @ref qspy_link "connect to the Target" of your choice.
 
+@note
+You can also use the `-t` to open a TCP/IP socket for connecting **host executables** as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:@n
+@n
 @verbatim
 qspy -u -t
 @endverbatim
 
-Second, because QUTest&trade; is implemented as a Tcl script, it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QSpyView`).
+
+Second, because QUTest&trade; is implemented as a Tcl script, it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QUTest` or `QSpyView`).
 
 Once QSPY is running, you can run QUTest from a Windows command-prompt by typing:
 
@@ -99,11 +103,15 @@ Testing with QUTest&trade; involves the following components:
 
 -# A **test script** that drives the tests and checks the generated QSPY output against the expectations ("test-assertions"). The design of *test scripts* is explained in the @ref qutest_tut "QUTest&trade; Tutorial".
 
-The sequence diagram below shows the communication between these QUTest&trade; components. The embedded Target is running a **test fixture** code that communicates with @ref qspy "QSPY" over the Target data link (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol". The QUTest&trade; (Tcl script) attaches to the @ref qspy_text "UDP text channel" of the QSPY host application. This communication uses the @ref qspy_text "QSPY text format" (<span style="color:green"><strong>green arrows</strong></span>) for data forwarded from the Target and binary format for commands sent to the Target
+The sequence diagram below shows the communication between these QUTest&trade; components. The embedded Target is running a **test fixture** code that communicates with @ref qspy "QSPY" over the @ref qspy_link "Target data link" (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol". The QUTest&trade; (Tcl script) attaches to the @ref qspy_text "UDP text channel" of the QSPY host application. This communication uses the @ref qspy_text "QSPY text format" (<span style="color:green"><strong>green arrows</strong></span>) for data forwarded from the Target and binary format for commands sent to the Target
 (<span style="color:blue"><strong>blue arrows</strong></span>).
 
 @note
-The QUTest Front-End attaches to the @ref udp_channel "text-channel" of the UDP socket served by QSPY.
+The QUTest Front-End attaches to the @ref udp_channel "text-channel" of the UDP socket served by QSPY (<strong><span style="color:blue">blue arrows</span> and <span style="color:green">green arrows</span></strong> in the sequence diagram below).
+
+
+@attention
+The @ref udp_channel "QSPY UDP channel" should **not** be confused with the @ref qspy_link "QSPY target communication channel" (<span style="color:red"><strong>red arrows</strong></span> in the sequence diagram below), which can be serial-port, TCP/IP, or a binary-file.
 
 
 @image html qspy_qutest.gif "Communication between Target, QSPY, and QUTest"

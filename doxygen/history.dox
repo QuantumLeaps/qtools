@@ -1,6 +1,17 @@
 /**
 @page history Revision History
 
+@section qtools_6_1_1 Version 6.1.1, 2018-02-06
+This release fixes the following bug in QSPY:
+
+- [bug#202 QSPY 6.1.0 fails to report target communication errors](https://sourceforge.net/p/qpc/bugs/202)
+
+Additionally, the QSPY for POSIX (Linux, MacOS, etc.) corrects the problem with reading input from a file (-f[bin_file] command-line option).
+
+Finally, this release increases the QCLEAN maximum size limit to 10MB per file.
+
+
+------------------------------------------------------
 @section qtools_6_1_0 Version 6.1.0, 2018-01-20
 This release improves the @ref qspy_command "QSPY command-line" option processing by allowing option parameters to be separated by spaces from the option letter (including the optional parameters). For example, the following command-line would not work in the previous version, but will work now:
 

@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.0
-* Last updated on  2018-01-25
+* Last updated for version 6.1.1
+* Last updated on  2018-02-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -40,7 +40,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "6.1.0"
+#define QSPY_VER "6.1.1"
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,10 +169,12 @@ void QSPY_stop(void); /* orderly close all used files */
 
 /* last human-readable line of output from QSPY */
 #define QS_LINE_OFFSET  8
+enum QSPY_LastOutputType { REG_OUT, INF_OUT, ERR_OUT };
 typedef struct {
     char buf[QS_LINE_OFFSET + QS_MAX_LINE_LENGTH];
-    int len; /* the length of the composed string */
-    int rec; /* the corresponding QS record ID */
+    int  len;  /* the length of the composed string */
+    int  rec;  /* the corresponding QS record ID */
+    int  type; /* the type of the output */
 } QSPY_LastOutput;
 
 extern QSPY_LastOutput QSPY_output;

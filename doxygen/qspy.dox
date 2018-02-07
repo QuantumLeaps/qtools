@@ -3,10 +3,12 @@
 @tableofcontents
 
 @section qspy_about About QSPY
-<p>As described in the @ref qspy_system "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a simple console application without a GUI, because its main purpose is to provide the parsing of the @ref qpspy_proto "QP/Spy Data Protocol" and displaying the data in a simple @ref qspy_text "human-readable format". QSPY can also export the data in various other formats, such as format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and format suitable for generating message sequence diagrams with @ref qspy_mscgen "MscGen". Additionally, QSPY can also save the symbolic information about the Target objects in form of @ref qspy_dict "QSPY dictionaries". An example of a @ref qpspy_exa "QSPY session" is shown in the Introduction to QP/Spy.
+<p>As described in the @ref qspy_system "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a simple console application without a GUI, because its main purpose is to provide @ref qspy_link "communication" with the @ref qs "QS target-resident component", parsing of the @ref qpspy_proto "QP/Spy Data Protocol" and displaying the data in a simple @ref qspy_text "human-readable format".
 </p>
 
-Starting with @ref qtools_5_5_0 "version 5.5.0", QSPY supports extensible @ref qspy_udp "UDP-socket" connection, which allows it to serve as a <em>"Back-End"</em> for attaching various "Front-Ends" (such as the @ref qutest "QUTest" Front-End and @ref qspyview "QSpyView" Front-End).
+QSPY can also export the data in various other formats, such as format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and format suitable for generating message sequence diagrams with @ref qspy_mscgen "MscGen". Additionally, QSPY can also save the symbolic information about the Target objects in form of @ref qspy_dict "QSPY dictionaries". An example of a @ref qpspy_exa "QSPY session" is shown in the Introduction to QP/Spy.
+
+Finally, QSPY supports also extensible @ref qspy_udp "UDP-socket" connection, which allows it to serve as a <em>"Back-End"</em> for attaching various "Front-Ends" (such as the @ref qutest "QUTest" Front-End and @ref qspyview "QSpyView" Front-End).
 
 @remark
 QSPY is written in portable C with ports to Windows and POSIX (Linux, macOS) provided. QSPY is also designed to be adaptable to various target-host communication links. Out of the box, the QSPY host application supports serial (RS232), TCP/IP, and file communication links. Adding other communication links is straightforward, because the data link is accessed only through a generic Platform Abstraction Layer (PAL).
@@ -56,7 +58,7 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-u [port]</TD>
+    <TD>-u [UDP_port]</TD>
     <TD>-u</TD>
     <TD>7701</TD>
     <TD></TD>
@@ -64,11 +66,11 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#c0c0c0">
-    <TD>-v</TD>
+    <TD>-v &lt;QS_version&gt;</TD>
     <TD>-v 5.0</TD>
     <TD>6.0</TD>
     <TD></TD>
-    <TD>Compatibility with QS version</TD>
+    <TD>Compatility with QS version</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
@@ -121,7 +123,7 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-t &lt;port&gt;</TD>
+    <TD>-t [TCP-port]</TD>
     <TD>-t </TD>
     <TD>6601</TD>
     <TD></TD>
@@ -250,7 +252,7 @@ The name after `Rec=` indicates the <a href="qs__copy_8h.html#acdb495c1e5524b5d9
 
 -------------------------------------------------------------------------------
 @section qspy_keyboard QSPY Keyboard Commands
-Starting from version 5.5.0, QSPY accepts keyboard input. The following table shows the currently supported key-strokes:
+The QSPY console application accepts keyboard input. The following table shows the currently supported key-strokes:
 
 
 Key | Action
@@ -272,6 +274,19 @@ Key | Action
 
 @note
 QSPY can send many more sophisticated commands to the Target by means of the @ref qspyview "Front-End extension mechanism".
+
+
+-------------------------------------------------------------------------------
+@section qspy_link QSPY Communication with the Target
+QSPY currently provides the following communication links to the @ref qs "QS target-resident component":
+
+
+Communication Link | Command-Line Option
+:------------------|:--------------------
+Serial port        | `-c<COM_port>` and `-b<baud_rate>`
+Binaly File        | `-f<file_name>`
+TCP/IP             | `-t[TCP_port]`
+Other link@n(e.g., JTAG debug probe) | can be added to the QSPY Platform Abstraction Layer
 
 
 -------------------------------------------------------------------------------

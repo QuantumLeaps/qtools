@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.0
-* Last updated on  2018-01-25
+* Last updated for version 6.1.1
+* Last updated on  2018-02-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -227,26 +227,28 @@ static void cleanup(void) {
 }
 
 /*..........................................................................*/
-void Q_onAssert(char const * const file, int line) {
-    printf("   <ERROR> QSPY ASSERTION failed in File=%s,Line=%d\n",
-                    file, line);
+void Q_onAssert(char const * const module, int loc) {
+    printf("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
+           module, loc);
     cleanup();
     exit(-1);
 }
 
 /*..........................................................................*/
 void QSPY_onPrintLn(void) {
-    if ((l_quiet < 0) || (QSPY_output.rec == 0)) {
+    if (l_quiet < 0) {
         fputs(QSPY_line, stdout);
         fputc('\n', stdout);
     }
     else if (l_quiet > 0) {
-        if (l_quiet_ctr == 0U) {
-            l_quiet_ctr = l_quiet;
-            if (l_quiet_ctr < 99) {
-                fputc('\n', stdout);
+        if ((l_quiet_ctr == 0U) || (QSPY_output.type != REG_OUT)) {
+            if ((l_quiet < 99) || (QSPY_output.type != REG_OUT)) {
+                if (l_quiet_ctr != l_quiet - 1) {
+                    fputc('\n', stdout);
+                }
                 fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
                 fputc('\n', stdout);
+                l_quiet_ctr = l_quiet;
             }
         }
         else {
@@ -254,13 +256,23 @@ void QSPY_onPrintLn(void) {
         }
         --l_quiet_ctr;
     }
+
     if (l_outFile != (FILE *)0) {
+        /* the output file receives all trace records, regardles of -q mode */
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
         fputc('\n', l_outFile);
     }
-    if (QSPY_output.rec != 0) {
-        BE_sendLine();
+
+    if (QSPY_output.type != INF_OUT) { /* just an internal info? */
+        BE_sendLine(); /* forward to the back-end */
     }
+
+    QSPY_output.type = REG_OUT; /* reset for the next time */
+}
+/*..........................................................................*/
+void QSPY_printInfo(void) {
+    QSPY_output.type = INF_OUT; /* this is an internal info message */
+    QSPY_onPrintLn();
 }
 
 /*..........................................................................*/
@@ -742,14 +754,6 @@ bool QSPY_command(uint8_t cmdId) {
     }
 
     return isRunning;
-}
-/*..........................................................................*/
-void QSPY_printInfo(void) {
-    QSPY_output.rec = 0; /* don't send this info to the Front-End */
-    if (l_quiet > 0) {
-        fputc('\n', stdout);
-    }
-    QSPY_onPrintLn();
 }
 /*..........................................................................*/
 static char const *tstampStr(void) {

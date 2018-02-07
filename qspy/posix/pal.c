@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.0.2
-* Last updated on  2017-11-29
+* Last updated for version 6.1.1
+* Last updated on  2018-02-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -447,22 +447,20 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
     }
 
     FOPEN_S(l_file, fName, "rb"); /* open for reading binary */
-    if (l_file != (FILE *)0) {
-        QSPY_reset();   /* reset the QSPY parser to start over cleanly */
-        QSPY_txReset(); /* reset the QSPY transmitter */
-
-        SNPRINTF_LINE("   <COMMS> File     Opened File=%s", fName);
-        QSPY_printInfo();
-        return QSPY_SUCCESS;
-    }
-    else {
+    if (l_file == (FILE *)0) {
         SNPRINTF_LINE("   <COMMS> ERROR    Cannot find File=%s", fName);
         QSPY_printError();
         return QSPY_ERROR;
     }
 
+    QSPY_reset();   /* reset the QSPY parser to start over cleanly */
+    QSPY_txReset(); /* reset the QSPY transmitter */
+
     fd = fileno(l_file); /* FILE* to file-descriptor */
     updateReadySet(fd);  /* fd to be checked in select() */
+
+    SNPRINTF_LINE("   <COMMS> File     Opened File=%s", fName);
+    QSPY_printInfo();
 
     return QSPY_SUCCESS;
 }

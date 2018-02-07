@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.0
-* Last updated on  2018-01-25
+* Last updated for version 6.1.1
+* Last updated on  2018-02-06
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -839,7 +839,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
     char const *w = 0;
 
     /* set the current QS record-ID for any output in this function */
-    QSPY_output.rec = me->rec;
+    QSPY_output.rec  = me->rec;
+    QSPY_output.type = REG_OUT;
 
     switch (me->rec) {
         /* Session start ...................................................*/
@@ -1900,7 +1901,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 2);  /* offset */
             b = QSpyRecord_getUint32(me, 1);  /* data size */
-            w = (char const *)QSpyRecord_getMem(me, b, &c);
+            w = (char const *)QSpyRecord_getMem(me, (uint8_t)b, &c);
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u Trg-Peek Offs=%d,Size=%d,Num=%d,Data=<",
                               t, a, b, c);
@@ -1970,8 +1971,7 @@ void QSPY_stop(void) {
 }
 /*..........................................................................*/
 void QSPY_printError(void) {
-    QSPY_output.rec = 0xFF; /* send this error to the Front-End */
-    fputc('\n', stdout);
+    QSPY_output.type = ERR_OUT; /* this is an error message */
     QSPY_onPrintLn();
 }
 
@@ -2006,13 +2006,14 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
             }
             else {
                 SNPRINTF_LINE("   <COMMS> ERROR    Record too long at "
-                           "Seq=%u,", (unsigned)l_seq);
+                           "Seq=%u(?),", (unsigned)l_seq);
                 /* is it a standard QS record? */
                 if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
-                    SNPRINTF_APPEND("Rec=%s", l_qs_rec[l_record[1]]);
+                    SNPRINTF_APPEND("Rec=%s(?)",
+                                    l_qs_rec[l_record[1]]);
                 }
                 else { /* this is a USER-specific record */
-                    SNPRINTF_APPEND("Rec=USER+%3u",
+                    SNPRINTF_APPEND("Rec=USER+%u(?)",
                                (unsigned)(l_record[1] - QS_USER));
                 }
                 QSPY_printError();
@@ -2027,21 +2028,21 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
         else if (b == QS_FRAME) { /* frame byte? */
             if (l_chksum != QS_GOOD_CHKSUM) { /* bad checksum? */
                 if (!isJustStarted) {
-                    isJustStarted = false;
                     SNPRINTF_LINE("   <COMMS> ERROR    Bad checksum in ");
                     if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
-                        SNPRINTF_APPEND("Rec=%s,", l_qs_rec[l_record[1]]);
+                        SNPRINTF_APPEND("Rec=%s(?),",
+                            l_qs_rec[l_record[1]]);
                     }
                     else {
-                        SNPRINTF_APPEND("Rec=USER+%3u,",
-                                   (unsigned)(l_record[1] - QS_USER));
+                        SNPRINTF_APPEND("Rec=USER+%u(?),",
+                            (unsigned)(l_record[1] - QS_USER));
                     }
                     SNPRINTF_APPEND("Seq=%u", (unsigned)l_seq);
                     QSPY_printError();
 
                     if (l_mscFile != (FILE *)0) {
                         fprintf(l_mscFile, "...;\n"
-                            "--- [label=\"Bad checksum at Seq=%u,Id=%u\""
+                            "--- [label=\"Bad checksum at Seq=%u,Id=%u(?)\""
                             ",textbgcolour=\"#ffff00\""
                             ",linecolour=\"#ff0000\"];\n",
                             (unsigned)l_seq, (unsigned)l_record[1]);
@@ -2050,19 +2051,19 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
             }
             else if (l_pos < &l_record[3]) { /* record too short? */
                 SNPRINTF_LINE("   <COMMS> ERROR    Record too short at "
-                           "Seq=%u,",
+                           "Seq=%u(?),",
                            (unsigned)l_seq);
                 if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
                     SNPRINTF_APPEND("Rec=%s", l_qs_rec[l_record[1]]);
                 }
                 else {
-                    SNPRINTF_APPEND("Rec=USER+%3u",
+                    SNPRINTF_APPEND("Rec=USER+%u(?)",
                                (unsigned)(l_record[1] - QS_USER));
                 }
                 QSPY_printError();
                 if (l_mscFile != (FILE *)0) {
                     fprintf(l_mscFile, "...;\n"
-                    "--- [label=\"Record too short at Seq=%u,Id=%u\""
+                        "--- [label=\"Record too short at Seq=%u,Id=%u(?)\""
                         ",textbgcolour=\"#ffff00\""
                         ",linecolour=\"#ff0000\"];\n",
                     (unsigned)l_seq, (unsigned)l_record[1]);
@@ -2074,8 +2075,6 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 ++l_seq; /* increment with natural wrap-around */
 
                 if (!isJustStarted) {
-                    isJustStarted = false;
-
                     /* data discountinuity found?
                     * but not for the QS_EMPTY record?
                     */
@@ -2085,7 +2084,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                         SNPRINTF_LINE("   <COMMS> ERROR    Discontinuity "
                             "Seq=%u->%u",
                             (unsigned)(l_seq - 1), (unsigned)l_record[0]);
-                        QSPY_onPrintLn();
+                        QSPY_printError();
                         if (l_mscFile != (FILE *)0) {
                             fprintf(l_mscFile,
                                 "--- [label=\""
@@ -2096,6 +2095,9 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                                (unsigned)(l_seq - 1), (unsigned)l_record[0]);
                         }
                     }
+                }
+                else {
+                    isJustStarted = false;
                 }
                 l_seq = l_record[0];
 

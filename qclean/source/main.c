@@ -5,13 +5,13 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.0
-* Last updated on  2018-01-19
+* Last updated on  2018-01-29
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -46,8 +46,8 @@
 #include "qclean.h"
 #include "getopt.h"
 
-static char l_src[1024*1024]; /* 1MB */
-static char l_dst[1024*1024]; /* 1MB */
+static char l_src[10*1024*1024]; /* 10MB */
+static char l_dst[10*1024*1024]; /* 10MB */
 static int  l_nFiles     = 0;
 static int  l_nReadOnly  = 0;
 static int  l_nCleaned   = 0;

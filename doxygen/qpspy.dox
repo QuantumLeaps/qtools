@@ -79,10 +79,8 @@ The following sections explain the concepts and components of QP/Spy&trade;:
 
 @tableofcontents
 
-<p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but has many the elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The protocol has provisions for detecting transmission errors and allows for instantaneous re-synchronization after any error, such as data dropouts due to RAM buffer overruns.
+<p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but has many elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any bufferning or transmission error to minimize loss of useful data.
 </p>
-
-The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any error to minimize data loss.
 
 @image html qspy6.gif "QP/Spy transmission protocol"
 
