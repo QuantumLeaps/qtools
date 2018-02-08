@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.1
-* Last updated on  2018-02-06
+* Last updated on  2018-02-08
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -2157,15 +2157,16 @@ QSpyStatus QSPY_writeDict(void) {
 
     /* no external dictionaries configured? */
     if (l_dictFileName[0] == '\0') {
-        SNPRINTF_LINE("   <QSPY-> Dictionaries NOT saved (no -d option)");
-        QSPY_onPrintLn();
+        SNPRINTF_LINE("   <QSPY-> Dictionaries NOT configured "
+                      "(no -d option)");
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* no external dictionaries configured or no target config yet? */
     if (l_config.tstamp[5] == 0U) {
         SNPRINTF_LINE("   <QSPY-> Dictionaries NOT saved (no target info)");
-        QSPY_onPrintLn();
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -2181,9 +2182,9 @@ QSpyStatus QSPY_writeDict(void) {
 
     FOPEN_S(dictFile, buf, "w");
     if (dictFile == (FILE *)0) {
-        SNPRINTF_LINE("   <QSPY-> Dictionaries could not be saved to File=%s",
+        SNPRINTF_LINE("   <QSPY-> Cannot save dictionaries to File=%s",
                       buf);
-        QSPY_onPrintLn();
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
@@ -2231,23 +2232,31 @@ QSpyStatus QSPY_writeDict(void) {
 /*..........................................................................*/
 QSpyStatus QSPY_readDict(void) {
     FILE *dictFile;
-    char buf[FNAME_SIZE];
+    char name[FNAME_SIZE];
+    char buf[256];
     uint32_t c = l_config.tstamp[5]; /* save the year-part of the tstamp */
     uint32_t d = 0U; /* assume no difference in the configuration */
+    QSpyStatus stat = QSPY_SUCCESS; /* assume success */
 
     /* no external dictionaries configured? */
     if (l_dictFileName[0] == '\0') {
+        SNPRINTF_LINE("   <QSPY-> Dictionaries NOT configured "
+                      "(no -d option)");
+        QSPY_printError();
         return QSPY_ERROR;
     }
     else if (l_dictFileName[0] == '?') { /* automatic dictionaries? */
 
         /* no target timestamp yet? */
         if (c == 0U) {
+            SNPRINTF_LINE("   <QSPY-> No Target info yet "
+                          "to read dictionaries");
+            QSPY_printError();
             return QSPY_ERROR;
         }
 
         /* synthesize dictionary name from the timestamp */
-        SNPRINTF_S(buf, sizeof(buf),
+        SNPRINTF_S(name, sizeof(name),
                "qspy%02u%02u%02u_%02u%02u%02u.dic",
                (unsigned)l_config.tstamp[5],
                (unsigned)l_config.tstamp[4],
@@ -2257,22 +2266,27 @@ QSpyStatus QSPY_readDict(void) {
                (unsigned)l_config.tstamp[0]);
     }
     else { /* manual dictionaries */
-        SNPRINTF_S(buf, sizeof(buf), l_dictFileName);
+        SNPRINTF_S(name, sizeof(name), l_dictFileName);
     }
 
-    FOPEN_S(dictFile, buf, "r");
+    FOPEN_S(dictFile, name, "r");
     if (dictFile == (FILE *)0) {
-        SNPRINTF_LINE("   <QSPY-> Dictionaries not found File=%s", buf);
-        QSPY_onPrintLn();
+        SNPRINTF_LINE("   <QSPY-> Dictionaries not found File=%s", name);
+        QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* output the status to the user */
-    SNPRINTF_LINE("   <QSPY-> Reading dictionaries from File=%s", buf);
+    SNPRINTF_LINE("   <QSPY-> Reading dictionaries from File=%s", name);
     QSPY_onPrintLn();
 
     while (fgets(buf, sizeof(buf), (FILE *)dictFile) != (char *)0) {
         switch (buf[0]) {
+            case '#':  /* comment beginning */
+            case '\r': /* empty line (DOS) */
+            case '\n': /* empty line (Unix) */
+                /* skip the comment */
+                break;
             case '-':
                 switch (buf[1]) {
                     case 'v':
@@ -2323,54 +2337,81 @@ QSpyStatus QSPY_readDict(void) {
                             ((buf[2 +11] - '0')*10 + buf[2 +12] - '0'), d);
                         break;
                     default:
-                        return QSPY_ERROR;
-                        break;
+                        SNPRINTF_LINE("   <QSPY-> Unexpected option in "
+                            "Dictionary File=%s,Opt=%c", name, buf[1]);
+                        QSPY_printError();
+                        stat = QSPY_ERROR;
+                        goto error;
                 }
                 break;
             case 'O':
                 if (!Dictionary_read(&l_objDict, (FILE *)dictFile)) {
-                    return QSPY_ERROR;
+                    SNPRINTF_LINE("   <QSPY-> Parsing OBJ dictionaries failed"
+                                  " File=%s", name);
+                    QSPY_printError();
+                    stat = QSPY_ERROR;
+                    goto error;
                 }
                 break;
             case 'F':
                 if (!Dictionary_read(&l_funDict, (FILE *)dictFile)) {
-                    return QSPY_ERROR;
+                    SNPRINTF_LINE("   <QSPY-> Parsing FUN dictionaries failed"
+                                  " File=%s", name);
+                    QSPY_printError();
+                    stat = QSPY_ERROR;
+                    goto error;
                 }
                 break;
             case 'U':
                 if (!Dictionary_read(&l_usrDict, (FILE *)dictFile)) {
-                    return QSPY_ERROR;
+                    SNPRINTF_LINE("   <QSPY-> Parsing USR dictionaries failed"
+                                  " File=%s", name);
+                    QSPY_printError();
+                    stat = QSPY_ERROR;
+                    goto error;
                 }
                 break;
             case 'S':
                 if (!SigDictionary_read(&l_sigDict, (FILE *)dictFile)) {
-                    return QSPY_ERROR;
+                    SNPRINTF_LINE("   <QSPY-> Parsing SIG dictionaries failed"
+                                  " File=%s", name);
+                    QSPY_printError();
+                    stat = QSPY_ERROR;
+                    goto error;
                 }
                 break;
             case 'M':
                 if (!Dictionary_read(&l_mscDict, (FILE *)dictFile)) {
-                    return QSPY_ERROR;
+                    SNPRINTF_LINE("   <QSPY-> Parsing MSC dictionaries failed"
+                                  " File=%s", name);
+                    QSPY_printError();
+                    stat = QSPY_ERROR;
+                    goto error;
                 }
                 break;
             default:
-                return QSPY_ERROR;
-                break;
+                SNPRINTF_LINE("   <QSPY-> Unexpected line in "
+                          "Dictionary File=%s,Char=%c", name, buf[0]);
+                QSPY_printError();
+                stat = QSPY_ERROR;
+                goto error;
         }
     }
 
+error:
     fclose(dictFile);
 
     /* any differences in config and not the first time through? */
-    if ((d != 0U) && (c != 0U)) {
+    if ((stat != QSPY_ERROR) && (d != 0U) && (c != 0U)) {
         SNPRINTF_LINE("   <QSPY-> Dictionaries missmatch "
                       "the Target (discarded)");
         QSPY_onPrintLn();
 
         resetAllDictionaries();
-        return QSPY_ERROR;
+        stat = QSPY_ERROR;
     }
 
-    return QSPY_SUCCESS;
+    return stat;
 }
 /*..........................................................................*/
 static void resetAllDictionaries(void) {

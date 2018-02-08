@@ -1,0 +1,94 @@
+# Qualcomm Technologies
+# comment continues
+# the following empty line is ignored
+
+-v610
+-T4
+-O4
+-F4
+-S2
+-E2
+-Q1
+-P2
+-B2
+-C2
+-t180207_190017
+# another empty line ignored
+
+# however, comments/empty-lines are NOT allowed
+# inside a dictionary block
+
+Obj-Dic:
+21 4
+0x0000C0F1 QS_RX
+0x0000C27E l_rtiCompare0
+0x0000C27F l_ssiTest
+0x08001D00 l_philo<0>
+0x08001D20 l_philo<0>.timeEvt
+0x08001D30 l_philo<1>
+0x08001D50 l_philo<1>.timeEvt
+0x08001D60 l_philo<2>
+0x08001D80 l_philo<2>.timeEvt
+0x08001D90 l_philo<3>
+0x08001DB0 l_philo<3>.timeEvt
+0x08001DC0 l_philo<4>
+0x08001DE0 l_philo<4>.timeEvt
+0x08001E74 philoQueueSto<0>
+0x08001E88 philoQueueSto<1>
+0x08001E9C philoQueueSto<2>
+0x08001EB0 philoQueueSto<3>
+0x08001EC4 philoQueueSto<4>
+0x08001F3C smlPoolSto
+0x08002008 l_table
+0x080020E4 tableQueueSto
+
+# comment lines, empty lines allowed here
+
+Fun-Dic:
+9 4
+0x000049E1 QHsm_top
+0x00005AF1 Table_initial
+0x00005BE1 Table_active
+0x00005C71 Table_serving
+0x00006031 Table_paused
+0x000097E1 Philo_initial
+0x000098A1 Philo_thinking
+0x00009961 Philo_hungry
+0x00009AB1 Philo_eating
+
+# comment lines, empty lines allowed here
+
+Usr-Dic:
+2 1
+0x00000046 PHILO_STAT
+0x00000047 COMMAND_STAT
+
+# comment lines, empty lines allowed here
+
+Sig-Dic:
+16 4
+00000004 0x00000000 EAT_SIG
+00000005 0x00000000 DONE_SIG
+00000006 0x00000000 PAUSE_SIG
+00000007 0x00000000 SERVE_SIG
+00000008 0x00000000 TEST_SIG
+00000010 0x08001D60 HUNGRY_SIG
+00000010 0x08001DC0 HUNGRY_SIG
+00000010 0x08001D90 HUNGRY_SIG
+00000010 0x08001D00 HUNGRY_SIG
+00000010 0x08001D30 HUNGRY_SIG
+00000010 0x08002008 HUNGRY_SIG
+00000011 0x08001D90 TIMEOUT_SIG
+00000011 0x08001DC0 TIMEOUT_SIG
+00000011 0x08001D60 TIMEOUT_SIG
+00000011 0x08001D00 TIMEOUT_SIG
+00000011 0x08001D30 TIMEOUT_SIG
+
+# comment lines, empty lines allowed here
+
+Msc-Dic:
+0 4
+
+# comment lines, empty lines allowed here
+
+
