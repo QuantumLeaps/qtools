@@ -2198,7 +2198,7 @@ QSpyStatus QSPY_writeDict(void) {
     fprintf(dictFile, "-P%01d\n", (int)l_config.poolCtrSize);
     fprintf(dictFile, "-B%01d\n", (int)l_config.poolBlkSize);
     fprintf(dictFile, "-C%01d\n", (int)l_config.tevtCtrSize);
-    fprintf(dictFile, "-t%02d%02d%02d_%02d%02d%02d\n",
+    fprintf(dictFile, "-t%02d%02d%02d_%02d%02d%02d\n\n",
            (int)l_config.tstamp[5],
            (int)l_config.tstamp[4],
            (int)l_config.tstamp[3],
@@ -2589,7 +2589,7 @@ static void Dictionary_reset(Dictionary * const me) {
 static void Dictionary_write(Dictionary const * const me, FILE *stream) {
     int i;
 
-    fprintf(stream, "%d %d\n", me->entries, me->keySize);
+    fprintf(stream, "%d\n", me->keySize);
     for (i = 0; i < me->entries; ++i) {
         DictEntry const *e = &me->sto[i];
         if (me->keySize <= 4) {
@@ -2599,40 +2599,48 @@ static void Dictionary_write(Dictionary const * const me, FILE *stream) {
             fprintf(stream, "0x%016"PRIX64" %s\n", e->key, e->name);
         }
     }
+    fprintf(stream, "***\n"); /* close marker for a dictionary */
 }
 /*..........................................................................*/
 static bool Dictionary_read(Dictionary * const me, FILE *stream) {
     char dictLine[80];
-    int i;
 
     if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
         goto error;
     }
-    if (SSCANF_S(dictLine, "%d %d\n", &me->entries, &me->keySize) != 2) {
+    if (SSCANF_S(dictLine, "%d\n", &me->keySize) != 1) {
         goto error;
     }
-    if ((me->entries > me->capacity) || (me->keySize > 8)) {
+    if (me->keySize > 8) {
         goto error;
     }
-    for (i = 0; i < me->entries; ++i) {
-        DictEntry *e = &me->sto[i];
+
+    Dictionary_reset(me);
+    while (me->entries < me->capacity) {
+        uint64_t key;
+        char name[DNAME_SIZE];
+
         if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
-            goto error;
+            break;
+        }
+        if ((dictLine[0] != '0') || (dictLine[1] != 'x')) {
+            break;
         }
         if (me->keySize <= 4) {
-            unsigned key;
-            if (SSCANF_S(dictLine, "0x%08X %s\n", &key, e->name) != 2) {
+            unsigned k;
+            if (SSCANF_S(dictLine, "0x%08X %s\n", &k, name) != 2) {
                 goto error;
             }
-            e->key = key;
+            key = k;
         }
         else {
             if (SSCANF_S(dictLine, "0x%016"PRIX64" %s\n",
-                &e->key, e->name) != 2)
+                         &key, name) != 2)
             {
                 goto error;
             }
         }
+        Dictionary_put(me, key, name);
     }
     return true;
 
@@ -2798,7 +2806,7 @@ static void SigDictionary_write(SigDictionary const * const me,
 {
     int i;
 
-    fprintf(stream, "%d %d\n", me->entries, me->ptrSize);
+    fprintf(stream, "%d\n", me->ptrSize);
     for (i = 0; i < me->entries; ++i) {
         SigDictEntry const *e = &me->sto[i];
         if (me->ptrSize <= 4) {
@@ -2810,42 +2818,51 @@ static void SigDictionary_write(SigDictionary const * const me,
                     e->sig, e->obj, e->name);
         }
     }
+    fprintf(stream, "***\n"); /* close marker for a dictionary */
 }
 /*..........................................................................*/
 static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
     char dictLine[80];
-    int i;
 
     if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
         goto error;
     }
-    if (SSCANF_S(dictLine, "%d %d\n", &me->entries, &me->ptrSize) != 2) {
+    if (SSCANF_S(dictLine, "%d\n", &me->ptrSize) != 1) {
         goto error;
     }
-    if ((me->entries > me->capacity) || (me->ptrSize > 8)) {
+    if (me->ptrSize > 8) {
         goto error;
     }
-    for (i = 0; i < me->entries; ++i) {
-        SigDictEntry *e = &me->sto[i];
+
+    SigDictionary_reset(me);
+    while (me->entries < me->capacity) {
+        uint32_t sig;
+        uint64_t obj;
+        char name[DNAME_SIZE];
+
         if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
-            goto error;
+            break;
+        }
+        if (dictLine[0] != '0') {
+            break;
         }
         if (me->ptrSize <= 4) {
-            unsigned obj;
+            unsigned o;
             if (SSCANF_S(dictLine, "%08d 0x%08X %s\n",
-                &e->sig, &obj, e->name) != 3)
+                         &sig, &o, name) != 3)
             {
                 goto error;
             }
-            e->obj = obj;
+            obj = o;
         }
         else {
             if (SSCANF_S(dictLine, "%08X %016"PRIX64" %s\n",
-                &e->sig, &e->obj, e->name) != 3)
+                         &sig, &obj, name) != 3)
             {
                 goto error;
             }
         }
+        SigDictionary_put(me, sig, obj, name);
     }
     return true;
 
