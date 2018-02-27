@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.1.1
-* Last updated on  2018-02-06
+* Last updated on  2018-02-27
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -169,12 +169,48 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         case  38400: spd =  B38400; break;
         case  57600: spd =  B57600; break;
         case 115200: spd = B115200; break;
-#ifdef B230400 /* non-standard baud rate defined? */
+
+        /* high baud rates (might not be supported)... */
+#ifdef B230400
         case 230400: spd = B230400; break;
 #endif
-#ifdef B460800 /* non-standard baud rate defined? */
+#ifdef B460800
         case 460800: spd = B460800; break;
 #endif
+#ifdef B500000
+        case 500000: spd = B500000; break;
+#endif
+#ifdef B576000
+        case 576000: spd = B576000; break;
+#endif
+#ifdef B921600
+        case 921600: spd = B921600; break;
+#endif
+#ifdef B1000000
+        case 1000000: spd = B1000000; break;
+#endif
+#ifdef B1152000
+        case 1152000: spd = B1152000; break;
+#endif
+#ifdef B1500000
+        case 1500000: spd = B1500000; break;
+#endif
+#ifdef B2000000
+        case 2000000: spd = B2000000; break;
+#endif
+#ifdef B2500000
+        case 2500000: spd = B2500000; break;
+#endif
+#ifdef B3000000
+        case 3000000: spd = B3000000; break;
+#endif
+#ifdef B3500000
+        case 3500000: spd = B3500000; break;
+#endif
+#ifdef B4000000
+        case 4000000: spd = B4000000; break;
+#endif
+
         default:
             SNPRINTF_LINE("   <COMMS> ERROR    Unsupported rate Baud=%d",
                           baudRate);

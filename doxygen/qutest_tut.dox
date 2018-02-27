@@ -805,35 +805,38 @@ The following listing shows the test fixture for the Flash tests (file <span cla
 @endcode
 
 <dl class="tag">
-  <dt>[1]</dt><dd> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. You need to include this header file in all QUTest test fixtures.
+  <dt>[1]</dt><dd> The `"qpc.h"` header file includes the QP/C framework, which contains the QUTest interface. Typically, you need to include this header file in QUTest test doubles.
   </dd>
-  <dt>[2]</dt><dd> The `"LedDriver.h"` header file includes CUT interface.
+  <dt>[2]</dt><dd> The `"Flash.h"` header file specifies the interface to the CUT.
+  <dt>[3]</dt><dd> The `"FakeMicroTime.h"` header file includes the test double for the `MicroTime` service, as described in the TDD book.
   </dd>
-  <dt>[3]</dt><dd> The `virtualLeds` static variable is used in the `LedDriver` CUT.
+> **NOTE:** The CUT does not "know" that it is collaborating with a _test double_ (the `FakeMicroTime` in this case).
+  <dt>[4]</dt><dd> This enumeration lists the @ref qs_app "application-specific QS trace records" that will be produced by the test fixture (see the `QS_onCommand()` callback at the end of the test fixture). The enumeration starts with #QS_USER0 offset, which is the first group of user-specific records. The second group (#QS_USER1 offset) is used by the `MockIO.c` mock object.
   </dd>
-  <dt>[4]</dt><dd> The enumerated constants `LEDDRIVER_xxx` will be used for @ref qs_app "application-specific trace records" that will report results of calling the various functions of the LedDriver CUT in the Target.
-> <b>NOTE:</b> that the enumeration is offset by #QS_USER.
+  <dt>[5]</dt><dd> This enumeration is for the @ref qs_app "application-specific QS trace record" that will exercise the `FakeMicroTime_Init()` service.
   </dd>
-  <dt>[5]</dt><dd> This simple *test fixture* again directly contains the main() function. This function contains the bare minimum function calls, as described below.
+  <dt>[6]</dt><dd> The `MockIO_init()` function performs the initialization of the mock object. This function is not part of the real IO interface (see `IO.h` in the Flash test directory), but is needed only for testing.
   </dd>
-  <dt>[6]</dt><dd> The QS_FILTER_ON(QS_UA_RECORDS) macro opens up the @ref qs_global "QS Global Filter" for all user (i.e., application-specific) records (the `QS_UA_RECORDS` group). This is an alternative to issuing the command `"glb_filter UA"` from the *test script*.
-> <b>NOTE:</b> QUTest starts with all @ref qs_global "QS Global Filter" disabled.
+  <dt>[7]</dt><dd> The `MockIO_init()` initialization outputs @ref qs_dict "user dictionaries" for application-specific trace records produced by the mock.
+> **NOTE:** such "dictionaries" will allow the @ref qutest_flash-script "test script" to refer to the produced application-specific records by their symbolic names.
   </dd>
-  <dt>[7]</dt><dd> The macro QS_OBJ_DICTIONARY(&virtualLeds) generates an object-dictionary entry for the `virtualLeds` variable.
+  <dt>[8]</dt><dd> The `QS_onTestSetup()` callback creates the Flash object, mimicking the functionality described in the TDD book.
   </dd>
-  <dt>[8]</dt><dd> The macros QS_USR_DICTIONARY() generate user-dictionary entries for all application-specific (user) trace records enumerated in step [4].
+  <dt>[9]</dt><dd> The `QS_onTestTeardown()` callback destroys the Flash object, mimicking the functionality described in the TDD book.
   </dd>
-  <dt>[9]</dt><dd> The callback function `QS_onTestSetup()` is used here to create the LedDRiver before every test.
-> <b>NOTE:</b> The `QS_onTestSetup()` callback is called for every @ref test() "test" command in the *test script*.
+  <dt>[10]</dt><dd> The `FLASH_WRITE` command (enumerated in line [4]) exercises the the `Flash_write()` CUT function.
   </dd>
-  <dt>[10]</dt><dd> The callback function `QS_onTestTeardown()` is used here to destroy the LedDRiver after every test.
-> <b>NOTE:</b> The `QS_onTestTeardown()` callback is called for every @ref test() "test" command in the *test script*.
+  <dt>[11]</dt><dd> The command calls the CUT `Flash_write()` function with the provided parameters @p param1 and @p param2 .
   </dd>
-  <dt>[11]</dt><dd> The `QS_onCommand()` callback is used to call the CUT, whereas each function of the driver is called in the different `case` of the switch. Please note that here the `cmdId`s are the same as the application-specific trace records enumerated in step [4]. This will allow the *test script* to use symbolic names for commands, instead of hard-coded numerical values.
+  <dt>[12]</dt><dd> The command reports also that the function was called using an @ref qs_app "application-specific trace record".
   </dd>
-  <dt>[12]</dt><dd> For example, the `case LEDDRIVER_CREATE` calls the `LedDriver_Destroy()` function from the CUT</dd>
-  <dt>[13]</dt><dd> Subsequently, the application-specific trace record `LEDDRIVER_CREATE` is generated.</dd>
-  <dt>[14]</dt><dd> This trace record outputs the value of `virtualLeds` produced by the call to the CUT. Similar strategy is used in all remaining `case` statements in the `QS_onCommand()` callback function.
+  <dt>[13]</dt><dd> The @ref qs_app "application-specific trace record" reports also the return value from the CUT function.
+  </dd>
+  <dt>[14]</dt><dd> The `FLASH_MICROTIME_INIT` command (enumerated in line [5]) exercises the the `FakeMicroTime_Init()` function from the test double.
+  </dd>
+  <dt>[15]</dt><dd> The command calls the `FakeMicroTime_Init()` function with the provided parameters @p param1 and @p param2 .
+  </dd>
+  <dt>[16]</dt><dd> The command reports also that the function was called using an @ref qs_app "application-specific trace record".
   </dd>
 </dl>
 <div style="clear:both;"></div>

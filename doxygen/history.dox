@@ -6,6 +6,8 @@ This release fixes the following bug in QSPY:
 
 - [bug#202 QSPY 6.1.0 fails to report target communication errors](https://sourceforge.net/p/qpc/bugs/202)
 
+Additionally, this release simplifies the format of the external dictionary files, so that they can be potentially generated from .map files or .elf files. The new format no longer requires storing the number of entries in the dictionary and the entries don't need to be sorted by the key-value. The new dictionary format allows also to add comments and empty lines between the dictionary blocks.
+
 Additionally, the QSPY for POSIX (Linux, MacOS, etc.) corrects the problem with reading input from a file (-f[bin_file] command-line option).
 
 Finally, this release increases the QCLEAN maximum size limit to 10MB per file.
