@@ -33,11 +33,10 @@
 #include <string.h>
 #include "getopt.h"
 
-#define OPTERR 1
-
 char const *optarg = NULL;
 int optind = 0;
 int optopt = '?';
+int opterr = 1;
 
 static char **prev_argv = NULL;  /* Keep a copy of argv and argc to */
 static int prev_argc    = 0;     /* tell if getopt params change */
@@ -149,7 +148,7 @@ int getopt(int argc, char *argv[], char const *optstr) {
     }
     /* Otherwise we're looking at an option */
     else {
-        char *opt_ptr = NULL;
+        char const *opt_ptr = NULL;
 
         /* Grab the option */
         c = argv[argv_index][opt_offset++];
@@ -163,8 +162,8 @@ int getopt(int argc, char *argv[], char const *optstr) {
         }
         /* Invalid argument */
         if (!opt_ptr) {
-            if (OPTERR) {
-                fprintf(stderr, "%s: invalid option -- %c\n", argv[0], c);
+            if (opterr) {
+                fprintf(stderr, "%s: invalid option: -%c\n", argv[0], c);
             }
             optopt = c;
             c = '?';
@@ -219,8 +218,8 @@ int getopt(int argc, char *argv[], char const *optstr) {
                 optopt = c;
                 c = '?';
 
-                if (OPTERR) {
-                    fprintf(stderr,"%s: option requires an argument -- %c\n",
+                if (opterr) {
+                    fprintf(stderr,"%s: option requires an argument: -%c\n",
                             argv[0], optopt);
                 }
             }

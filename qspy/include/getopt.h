@@ -35,9 +35,10 @@
 extern "C" {
 #endif
 
-extern char const *optarg;
-extern int optind;
-extern int optopt;
+extern char const *optarg; /* argument of current option */
+extern int optind;         /* index of first non-option in argv */
+extern int optopt;         /* single option character, as parsed */
+extern int opterr;         /* flag to enable built-in diagnostics */
 
 int getopt(int argc, char *argv[], char const *optstr);
 
