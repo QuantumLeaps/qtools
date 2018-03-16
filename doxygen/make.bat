@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
-:: Last Updated for Version: 6.1.1
-:: Date of the Last Update:  2018-02-06
+:: Last Updated for Version: 6.2.0
+:: Date of the Last Update:  2018-03-13
 ::
 ::                    Q u a n t u m     L e a P s
 ::                    ---------------------------
@@ -29,7 +29,7 @@
 :: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: https://state-machine.com
+:: https://www.state-machine.com
 :: mailto:info@state-machine.com
 :: ==========================================================================
 setlocal
@@ -38,7 +38,7 @@ echo usage:
 echo make
 echo make -CHM
 
-set VERSION=6.1.1
+set VERSION=6.2.0
 
 set DOXHOME="C:\tools\doxygen\bin"
 

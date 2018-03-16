@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.1
-* Last updated on  2018-02-06
+* Last updated for version 6.2.0
+* Last updated on  2018-03-13
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -98,7 +98,7 @@ static char const l_helpStr[] =
     "-h                        help (show this message)\n"
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
     "-u [UDP_port]     7701    UDP socket with optional port\n"
-    "-v <QS_version>   6.0     compatibility with QS version\n"
+    "-v <QS_version>   6.2     compatibility with QS version\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
@@ -281,7 +281,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
         "hq::u::v:osmgc:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
-    uint16_t version     = 600U;
+    uint16_t version     = 620U;
     uint8_t tstampSize   = 4U;
     uint8_t objPtrSize   = 4U;
     uint8_t funPtrSize   = 4U;

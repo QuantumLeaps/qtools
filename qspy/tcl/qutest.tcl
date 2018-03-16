@@ -2,25 +2,27 @@
 # @file
 # @ingroup qpspy
 # @brief QSPY Unit Testing (QUTEST) front-end main script.
+#
 # @description
 # QUTEST is a Unit Testing framework for embedded systems.
 # This script defines a small Domain Specific Language (DSL) for writing
 # user tests. This script also implements a console-based ("headless")
 # front-end to the QSPY back-and for running such user tests.
+#
 # @usage
 # tclsh qutest.tcl [test-files] [host_exe] [host] [port] [local_port]
 
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.0.0
-# Last updated on  2017-10-25
+# Last updated for version 6.2.0
+# Last updated on  2018-03-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -41,13 +43,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 # @endcond
 
 # this version of qutest
-set VERSION 6.0.0
+set VERSION 6.2.0
 
 package provide qutest 6.0
 
@@ -468,21 +470,21 @@ namespace eval ::qutest {
                         set filter0 [expr $filter0 | 0x000003FE]
                         set filter1 [expr $filter1 | 0x03800000]
                     } elseif {$filter == {AO}} { ;# active objects
-                        set filter0 [expr $filter0 | 0x0003FC00]
-                        set filter2 [expr $filter2 | 0x00002000]
+                        set filter0 [expr $filter0 | 0x0007FC00]
+                        set filter2 [expr $filter1 | 0x00002000]
                     } elseif {$filter == {EQ}} { ;# raw queues (for deferral)
-                        set filter0 [expr $filter0 | 0x007C0000]
+                        set filter0 [expr $filter0 | 0x00780000]
                         set filter2 [expr $filter2 | 0x00004000]
                     } elseif {$filter == {MP}} { ;# raw memory pools
-                        set filter0 [expr $filter0 | 0x03800000]
+                        set filter0 [expr $filter0 | 0x03000000]
                         set filter2 [expr $filter2 | 0x00008000]
                     } elseif {$filter == {QF}} { ;# framework
                         set filter0 [expr $filter0 | 0xFC000000]
-                        set filter1 [expr $filter1 | 0x00001F80]
+                        set filter1 [expr $filter1 | 0x00001FC0]
                     } elseif {$filter == {TE}} { ;# time events
                         set filter1 [expr $filter1 | 0x0000007F]
                     } elseif {$filter == {SC}} { ;# scheduler
-                        set filter1 [expr $filter1 | 0x007C0000]
+                        set filter1 [expr $filter1 | 0x007F0000]
                     } elseif {$filter == {U0}} { ;# user 70-79
                         set filter2 [expr $filter2 | 0x0000FFC0]
                     } elseif {$filter == {U1}} { ;# user 80-89
@@ -654,7 +656,7 @@ namespace eval ::qutest {
         }
     }
     #.........................................................................
-    ## @brief dispatch a given event to Current-Object in the Target
+    ## @brief dispatch a given event to Current SM-Object in the Target
     proc dispatch {sig {par ""}} {
         variable theCurrState
         switch $theCurrState {
@@ -664,6 +666,54 @@ namespace eval ::qutest {
             }
             TEST {
                 ::qspy::sendEvent 255 $sig $par
+                expect "           Trg-Ack  QS_RX_EVENT"
+            }
+            FAIL -
+            SKIP {
+                ;# ignore
+            }
+            END -
+            DONE {
+                after_end
+            }
+            default { assert 0 }
+        }
+    }
+    #.........................................................................
+    ## @brief post a given event to Current AO-Object in the Target
+    proc post {sig {par ""}} {
+        variable theCurrState
+        switch $theCurrState {
+            PRE {
+                before_test
+                tran SKIP
+            }
+            TEST {
+                ::qspy::sendEvent 253 $sig $par
+                expect "           Trg-Ack  QS_RX_EVENT"
+            }
+            FAIL -
+            SKIP {
+                ;# ignore
+            }
+            END -
+            DONE {
+                after_end
+            }
+            default { assert 0 }
+        }
+    }
+    #.........................................................................
+    ## @brief publish a given event to subscribers in the Target
+    proc publish {sig {par ""}} {
+        variable theCurrState
+        switch $theCurrState {
+            PRE {
+                before_test
+                tran SKIP
+            }
+            TEST {
+                ::qspy::sendEvent 0 $sig $par
                 expect "           Trg-Ack  QS_RX_EVENT"
             }
             FAIL -
@@ -739,6 +789,8 @@ namespace eval ::qutest {
         $theTestRunner alias continue     ::qutest::continue
         $theTestRunner alias tick         ::qutest::tick
         $theTestRunner alias dispatch     ::qutest::dispatch
+        $theTestRunner alias post         ::qutest::post
+        $theTestRunner alias publish      ::qutest::publish
         $theTestRunner alias init         ::qutest::init
         $theTestRunner alias puts         puts
 
@@ -815,7 +867,8 @@ namespace eval ::qutest {
                     }
                 }
             }
-            # make adjustments so that the rest of the argument parsing continues properly
+            # make adjustments so that the rest of the argument parsing
+            # continues properly
             set ::argv $new_argv
             set ::argc [llength $::argv]
         } else {

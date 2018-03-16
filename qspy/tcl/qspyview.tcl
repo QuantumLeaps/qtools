@@ -13,14 +13,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 5.9.0
-# Last updated on  2017-04-16
+# Last updated for version 6.2.0
+# Last updated on  2018-03-14
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -41,12 +41,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspyview 5.9
+package provide qspyview 6.2
 
 package require Tcl  8.4     ;# need at least Tcl 8.4
 package require Tk   8.4     ;# need at least Tk  8.4
@@ -57,7 +57,7 @@ set HOME [file dirname [file normalize [info script]]]
 source $HOME/qspy.tcl        ;# QSPY interface
 
 # this version of qspyview
-set VERSION 5.9.0
+set VERSION 6.2.0
 
 # command procedures =========================================================
 ## @brief main entry point to the QSpyView front-end application
@@ -287,41 +287,41 @@ proc onAttach {} {
 proc onGlbFilters {} {
 
     set labels [list \
-        QS_EMPTY                     QS_QEP_STATE_ENTRY        \
-        QS_QEP_STATE_EXIT            QS_QEP_STATE_INIT         \
-        QS_QEP_INIT_TRAN             QS_QEP_INTERN_TRAN        \
-        QS_QEP_TRAN                  QS_QEP_IGNORED            \
-        QS_QEP_DISPATCH              QS_QEP_UNHANDLED          \
-        QS_QF_ACTIVE_ADD             QS_QF_ACTIVE_REMOVE       \
-        QS_QF_ACTIVE_SUBSCRIBE       QS_QF_ACTIVE_UNSUBSCRIBE  \
-        QS_QF_ACTIVE_POST_FIFO       QS_QF_ACTIVE_POST_LIFO    \
-        QS_QF_ACTIVE_GET             QS_QF_ACTIVE_GET_LAST     \
-        QS_QF_EQUEUE_INIT            QS_QF_EQUEUE_POST_FIFO    \
-        QS_QF_EQUEUE_POST_LIFO       QS_QF_EQUEUE_GET          \
-        QS_QF_EQUEUE_GET_LAST        QS_QF_MPOOL_INIT          \
-        QS_QF_MPOOL_GET              QS_QF_MPOOL_PUT           \
-        QS_QF_PUBLISH                QS_QF_RESERVED8           \
-        QS_QF_NEW                    QS_QF_GC_ATTEMPT          \
-        QS_QF_GC                     QS_QF_TICK                \
-        QS_QF_TIMEEVT_ARM            QS_QF_TIMEEVT_AUTO_DISARM \
-        QS_QF_TIMEEVT_DISARM_ATTEMPT QS_QF_TIMEEVT_DISARM      \
-        QS_QF_TIMEEVT_REARM          QS_QF_TIMEEVT_POST        \
-        QS_QF_TIMEEVT_CTR            QS_QF_CRIT_ENTRY          \
-        QS_QF_CRIT_EXIT              QS_QF_ISR_ENTRY           \
-        QS_QF_ISR_EXIT               QS_QF_INT_DISABLE         \
-        QS_QF_INT_ENABLE             QS_QF_ACTIVE_POST_ATTEMPT \
-        QS_QF_EQUEUE_POST_ATTEMPT    QS_QF_MPOOL_GET_ATTEMPT   \
-        QS_QF_RESERVED1              QS_QF_RESERVED0           \
-        QS_SCHED_LOCK                QS_SCHED_UNLOCK           \
-        QS_SCHED_NEXT                QS_SCHED_IDLE             \
-        QS_SCHED_RESUME              QS_QEP_TRAN_HIST          \
-        QS_QEP_TRAN_EP               QS_QEP_TRAN_XP            \
-        QS_TEST_PAUSED               QS_TEST_PROBE_GET         \
-        QS_SIG_DICT                  QS_OBJ_DICT               \
-        QS_FUN_DICT                  QS_USR_DICT               \
-        QS_TARGET_INFO               QS_TARGET_DONE            \
-        QS_RX_STATUS                 QS_MSC_RESERVED1          \
-        QS_PEEK_DATA                 QS_ASSERT_FAIL            \
+        QS_EMPTY               STATE_ENTRY       \
+        STATE_EXIT             STATE_INIT        \
+        INIT_TRAN              INTERN_TRAN       \
+        TRAN                   IGNORED           \
+        DISPATCH               UNHANDLED         \
+        ACTIVE_DEFER           ACTIVE_RECALL     \
+        ACTIVE_SUBSCRIBE       ACTIVE_UNSUBSCR   \
+        ACTIVE_POST_FIFO       ACTIVE_POST_LIFO  \
+        ACTIVE_GET             ACTIVE_GET_LAST   \
+        ACTIVE_RECALL_ATMPT    EQUEUE_POST_FIFO  \
+        EQUEUE_POST_LIFO       EQUEUE_GET        \
+        EQUEUE_GET_LAST        RESERVED2         \
+        MPOOL_GET              MPOOL_PUT         \
+        QF_PUBLISH             QF_NEW_REF        \
+        Q_NEW                  QF_GC_ATTEMPT     \
+        QF_GC                  QF_TICK           \
+        TIMEEVT_ARM            TIMEEVT_AUTO_DARM \
+        TIMEEVT_DISARM_ATMPT   TIMEEVT_DISARM    \
+        TIMEEVT_REARM          TIMEEVT_POST      \
+        QF_DELETE_REF          QF_CRIT_ENTRY     \
+        QF_CRIT_EXIT           QF_ISR_ENTRY      \
+        QF_ISR_EXIT            QF_INT_DISABLE    \
+        QF_INT_ENABLE          ACTIVE_POST_ATMPT \
+        EQUEUE_POST_ATMPT      MPOOL_GET_ATMPT   \
+        MUTEX_LOCK             MUTEX_UNLOCK      \
+        SCHED_LOCK             SCHED_UNLOCK      \
+        SCHED_NEXT             SCHED_IDLE        \
+        SCHED_RESUME           TRAN_HIST         \
+        TRAN_EP                TRAN_XP           \
+        TEST_PAUSED            TEST_PROBE_GET    \
+        QS_SIG_DICT            QS_OBJ_DICT       \
+        QS_FUN_DICT            QS_USR_DICT       \
+        QS_TARGET_INFO         QS_TARGET_DONE    \
+        QS_RX_STATUS           QS_MSC_RESERVED1  \
+        QS_PEEK_DATA           QS_ASSERT_FAIL    \
     ]
     global theGlbFilter
     set top [::dialog::create .glbFilter "Global Filters"]
@@ -352,44 +352,54 @@ proc onGlbFilters {} {
         }
     }
 
-    label $pane.std  -text "===== Standard QS recrods ====="
-    label $pane.qep  -text "QEP records..."
-    label $pane.qf   -text "QF records..."
-    label $pane.qk   -text "QK/QV records..."
-    grid $pane.std -columnspan 4
-    grid $pane.qep $pane.qf  $pane.f25 $pane.f41
-    grid $pane.f1  $pane.f10 $pane.f26 $pane.f42
-    grid $pane.f2  $pane.f11 $pane.f27 $pane.f43
-    grid $pane.f3  $pane.f12 $pane.f28 $pane.f44
-    grid $pane.f4  $pane.f13 $pane.f29 $pane.f45
-    grid $pane.f5  $pane.f14 $pane.f30 $pane.f46
-    grid $pane.f6  $pane.f15 $pane.f31 $pane.f47
-    grid $pane.f7  $pane.f16 $pane.f32 $pane.f48
-    grid $pane.f8  $pane.f17 $pane.f33 $pane.f49
-    grid $pane.f9  $pane.f18 $pane.f34 $pane.qk
-    grid $pane.f55 $pane.f19 $pane.f35 $pane.f50
-    grid $pane.f56 $pane.f20 $pane.f36 $pane.f51
-    grid $pane.f57 $pane.f21 $pane.f37 $pane.f52
-    grid $pane.f58 $pane.f22 $pane.f38 $pane.f53
-    grid $pane.f59 $pane.f23 $pane.f39 $pane.f54
-    grid x         $pane.f24 $pane.f40 x
+    label $pane.std -text "===== Standard QS recrods ====="
+    label $pane.sm  -text "SM records..."
+    label $pane.ao  -text "AO records..."
+    label $pane.qf  -text "QF records..."
+    label $pane.te  -text "TE records..."
+    label $pane.eq  -text "EQ records..."
+    label $pane.mp  -text "MP records..."
+    label $pane.sc  -text "SC records..."
+    label $pane.tst -text "TEST records..."
+    grid $pane.std -columnspan 6
+    grid $pane.sm  $pane.ao  $pane.qf  $pane.eq  $pane.te
+    grid $pane.f1  $pane.f10 $pane.f26 $pane.f19 $pane.f32
+    grid $pane.f2  $pane.f11 $pane.f27 $pane.f20 $pane.f33
+    grid $pane.f3  $pane.f12 $pane.f28 $pane.f21 $pane.f34
+    grid $pane.f4  $pane.f13 $pane.f29 $pane.f22 $pane.f35
+    grid $pane.f5  $pane.f14 $pane.f30 $pane.f46 $pane.f36
+    grid $pane.f6  $pane.f15 $pane.f31 $pane.sc  $pane.f37
+    grid $pane.f7  $pane.f16 $pane.f38 $pane.f48 $pane.mp
+    grid $pane.f8  $pane.f17 $pane.f39 $pane.f49 $pane.f24
+    grid $pane.f9  $pane.f18 $pane.f40 $pane.f50 $pane.f25
+    grid $pane.f55 $pane.f45 $pane.f41 $pane.f51 $pane.f47
+    grid $pane.f56 x         $pane.f42 $pane.f52 $pane.tst
+    grid $pane.f57 $pane.f23 $pane.f43 $pane.f53 $pane.f58
+    grid x         x $pane.f44 $pane.f54 $pane.f59
 
-    label $pane.usr -text "===== User QS recrods ====="
-    grid $pane.usr -columnspan 4
-    grid $pane.f70 $pane.f84 $pane.f98  $pane.f112
-    grid $pane.f71 $pane.f85 $pane.f99  $pane.f113
-    grid $pane.f72 $pane.f86 $pane.f100 $pane.f114
-    grid $pane.f73 $pane.f87 $pane.f101 $pane.f115
-    grid $pane.f74 $pane.f88 $pane.f102 $pane.f116
-    grid $pane.f75 $pane.f89 $pane.f103 $pane.f117
-    grid $pane.f76 $pane.f90 $pane.f104 $pane.f118
-    grid $pane.f77 $pane.f91 $pane.f105 $pane.f119
-    grid $pane.f78 $pane.f92 $pane.f106 $pane.f120
-    grid $pane.f79 $pane.f93 $pane.f107 $pane.f121
-    grid $pane.f80 $pane.f94 $pane.f108 $pane.f122
-    grid $pane.f81 $pane.f95 $pane.f109 $pane.f123
-    grid $pane.f82 $pane.f96 $pane.f110 $pane.f124
-    grid $pane.f83 $pane.f97 $pane.f111 x
+    label $pane.ua -text "===== User QS recrods ====="
+    label $pane.u0  -text "U0 records..."
+    label $pane.u1  -text "U1 records..."
+    label $pane.u2  -text "U2 records..."
+    label $pane.u3  -text "U3 records..."
+    label $pane.u4  -text "U4 records..."
+    grid $pane.ua -columnspan 5
+    grid $pane.u0  $pane.u1  $pane.u2  $pane.u3   $pane.u4
+    grid $pane.f70 $pane.f80 $pane.f90 $pane.f100 $pane.f110
+    grid $pane.f71 $pane.f81 $pane.f91 $pane.f101 $pane.f111
+    grid $pane.f72 $pane.f82 $pane.f92 $pane.f102 $pane.f112
+    grid $pane.f73 $pane.f83 $pane.f93 $pane.f103 $pane.f113
+    grid $pane.f74 $pane.f84 $pane.f94 $pane.f104 $pane.f114
+    grid $pane.f75 $pane.f85 $pane.f95 $pane.f105 $pane.f115
+    grid $pane.f76 $pane.f86 $pane.f96 $pane.f106 $pane.f116
+    grid $pane.f77 $pane.f87 $pane.f97 $pane.f107 $pane.f117
+    grid $pane.f78 $pane.f88 $pane.f98 $pane.f108 $pane.f118
+    grid $pane.f79 $pane.f89 $pane.f99 $pane.f109 $pane.f119
+    grid x         x         x         x          $pane.f120
+    grid x         x         x         x          $pane.f121
+    grid x         x         x         x          $pane.f122
+    grid x         x         x         x          $pane.f123
+    grid x         x         x         x          $pane.f124
 
     for {set i 1} {$i < 60} {incr i} {
         grid configure $pane.f$i -sticky w
@@ -397,9 +407,20 @@ proc onGlbFilters {} {
     for {set i 70} {$i < 125} {incr i} {
         grid configure $pane.f$i -sticky w
     }
-    grid configure $pane.qep  -sticky w
-    grid configure $pane.qf   -sticky w
-    grid configure $pane.qk   -sticky w
+    grid configure $pane.sm -sticky w
+    grid configure $pane.ao -sticky w
+    grid configure $pane.qf -sticky w
+    grid configure $pane.te -sticky w
+    grid configure $pane.eq -sticky w
+    grid configure $pane.mp -sticky w
+    grid configure $pane.sc -sticky w
+    grid configure $pane.tst -sticky w
+
+    grid configure $pane.u0 -sticky w
+    grid configure $pane.u1 -sticky w
+    grid configure $pane.u2 -sticky w
+    grid configure $pane.u3 -sticky w
+    grid configure $pane.u4 -sticky w
 
     variable ::dialog::done
     button $top.controls.btn0 -text " Cancel " -command {set ::dialog::done 0}

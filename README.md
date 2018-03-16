@@ -51,7 +51,7 @@ Additionally, QTools for Windows contains the following open-source,
 
 11. GNU C/C++ toolset for Windows (MinGW version 4.5.2)
 
-12. GNU C/C++ toolset for ARM-EABI (GCC version 6.2.0)
+12. GNU C/C++ toolset for ARM-EABI (GCC version 7.2.0)
 
 13. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
 

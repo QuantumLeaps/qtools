@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.1
-* Last updated on  2018-02-08
+* Last updated for version 6.2.0
+* Last updated on  2018-03-14
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -167,24 +167,24 @@ static char const *  l_qs_rec[] = {
     "QS_QEP_UNHANDLED",
 
     /* [10] QF records */
-    "QS_QF_ACTIVE_ADD",
-    "QS_QF_ACTIVE_REMOVE",
+    "QS_QF_ACTIVE_DEFER",
+    "QS_QF_ACTIVE_RECALL",
     "QS_QF_ACTIVE_SUBSCRIBE",
     "QS_QF_ACTIVE_UNSUBSCRIBE",
     "QS_QF_ACTIVE_POST_FIFO",
     "QS_QF_ACTIVE_POST_LIFO",
     "QS_QF_ACTIVE_GET",
     "QS_QF_ACTIVE_GET_LAST",
-    "QS_QF_EQUEUE_INIT",
+    "QS_QF_ACTIVE_RECALL_ATTEMPT",
     "QS_QF_EQUEUE_POST_FIFO",
     "QS_QF_EQUEUE_POST_LIFO",
     "QS_QF_EQUEUE_GET",
     "QS_QF_EQUEUE_GET_LAST",
-    "QS_QF_MPOOL_INIT",
+    "QS_QF_RESERVED2",
     "QS_QF_MPOOL_GET",
     "QS_QF_MPOOL_PUT",
     "QS_QF_PUBLISH",
-    "QS_QF_RESERVED8",
+    "QS_QF_NEW_REF",
     "QS_QF_NEW",
     "QS_QF_GC_ATTEMPT",
     "QS_QF_GC",
@@ -195,7 +195,7 @@ static char const *  l_qs_rec[] = {
     "QS_QF_TIMEEVT_DISARM",
     "QS_QF_TIMEEVT_REARM",
     "QS_QF_TIMEEVT_POST",
-    "QS_QF_TIMEEVT_CTR",
+    "QS_QF_DELETE_REF",
     "QS_QF_CRIT_ENTRY",
     "QS_QF_CRIT_EXIT",
     "QS_QF_ISR_ENTRY",
@@ -205,8 +205,8 @@ static char const *  l_qs_rec[] = {
     "QS_QF_ACTIVE_POST_ATTEMPT",
     "QS_QF_EQUEUE_POST_ATTEMPT",
     "QS_QF_MPOOL_GET_ATTEMPT",
-    "QS_QF_RESERVED1",
-    "QS_QF_RESERVED0",
+    "QS_MUTEX_LOCK",
+    "QS_MUTEX_UNLOCK",
 
     /* [50] built-in scheduler records */
     "QS_SCHED_LOCK",
@@ -674,13 +674,13 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
     static char const *ilfmt[] = {
         "%2"PRIi64,  "%4"PRIi64,  "%6"PRIi64,  "%8"PRIi64,
         "%10"PRIi64, "%12"PRIi64, "%14"PRIi64, "%16"PRIi64,
-        "%18"PRIi64, "%20"PRIi64, "%22"PRIi64, "%24"PRIi64,
+        "%18"PRIi64, "%"PRIi64, "%22"PRIi64, "%24"PRIi64,
         "%26"PRIi64, "%28"PRIi64, "%30"PRIi64, "%32"PRIi64
     };
     static char const *ulfmt[] = {
         "%2"PRIu64,  "%4"PRIu64,  "%6"PRIu64,  "%8"PRIu64,
         "%10"PRIu64, "%12"PRIu64, "%14"PRIu64, "%16"PRIu64,
-        "%18"PRIu64, "%20"PRIu64, "%22"PRIu64, "%24"PRIu64,
+        "%18"PRIu64, "%"PRIu64, "%22"PRIu64, "%24"PRIu64,
         "%26"PRIu64, "%28"PRIu64, "%30"PRIu64, "%32"PRIu64
     };
     static char const *efmt[] = {
@@ -699,7 +699,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         SNPRINTF_LINE("%010u USER+%03d", u32, (int)(me->rec - QS_USER));
     }
 
-    FPRINF_MATFILE("%3d %10u", (int)me->rec, u32);
+    FPRINF_MATFILE("%d %u", (int)me->rec, u32);
 
     while (me->len > 0) {
         char const *s;
@@ -791,21 +791,21 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 SNPRINTF_APPEND(" %s,Obj=%s",
                     SigDictionary_get(&l_sigDict, u32, u64, (char *)0),
                     Dictionary_get(&l_objDict, u64, (char *)0));
-                    FPRINF_MATFILE("%04u %20"PRId64, u32, u64);
+                    FPRINF_MATFILE("%u %"PRId64, u32, u64);
                 break;
             }
             case QS_OBJ_T: {
                 u64 = QSpyRecord_getUint64(me, l_config.objPtrSize);
                 SNPRINTF_APPEND(" %s",
                     Dictionary_get(&l_objDict, u64, (char *)0));
-                FPRINF_MATFILE(" %20"PRId64, u64);
+                FPRINF_MATFILE(" %"PRId64, u64);
                 break;
             }
             case QS_FUN_T: {
                 u64 = QSpyRecord_getUint64(me, l_config.funPtrSize);
                 SNPRINTF_APPEND(" %s",
                     Dictionary_get(&l_funDict, u64, (char *)0));
-                FPRINF_MATFILE(" %20"PRId64, u64);
+                FPRINF_MATFILE(" %"PRId64, u64);
                 break;
             }
             case QS_I64_T: {
@@ -845,7 +845,10 @@ static void QSpyRecord_process(QSpyRecord * const me) {
     switch (me->rec) {
         /* Session start ...................................................*/
         case QS_EMPTY: {
-            if (l_config.version < 550U) {
+            if (l_config.version >= 550U) {
+                /* silently ignore */
+            }
+            else {
                 if (QSpyRecord_OK(me)) {
                     SNPRINTF_LINE("########## Trg-RST  %u",
                                  (unsigned)l_config.version);
@@ -857,9 +860,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     Dictionary_reset(&l_usrDict);
                     SigDictionary_reset(&l_sigDict);
                 }
-            }
-            else {
-                /* silently ignore */
             }
             break;
         }
@@ -877,7 +877,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %"PRId64" %"PRId64"\n",
                             (int)me->rec, p, q);
             }
             break;
@@ -900,7 +900,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_funDict, q, (char *)0),
                        Dictionary_get(&l_funDict, r, buf));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %20"PRId64" %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %"PRId64" %"PRId64" %"PRId64"\n",
                                (int)me->rec, p, q, r);
             }
             break;
@@ -915,7 +915,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, p, q);
             }
             break;
@@ -932,8 +932,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64
-                               " %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64
+                               " %"PRId64"\n",
                                (int)me->rec, t, a, p, q);
             }
             break;
@@ -953,8 +953,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_funDict, q, (char *)0),
                        Dictionary_get(&l_funDict, r, buf));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %20"PRId64
-                               " %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, a, p, q, r);
                 if (l_mscFile != (FILE *)0) {
                     if (Dictionary_find(&l_mscDict, p) >= 0) { /* found? */
@@ -980,7 +979,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, a, p, q);
             }
             break;
@@ -997,7 +996,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, a, p, q);
             }
             break;
@@ -1012,32 +1011,92 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %4u %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %"PRId64"\n",
                                (int)me->rec, a, p, q);
             }
             break;
         }
 
         /* QF records ......................................................*/
-        case QS_QF_ACTIVE_ADD:
-            s = "Add  ";
-        case QS_QF_ACTIVE_REMOVE: {
-            if (s == 0) s = "Remov";
-            t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            a = QSpyRecord_getUint32(me, 1);
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u AO-%s Obj=%s,Pri=%u",
-                       t,
-                       s,
-                       Dictionary_get(&l_objDict, p, (char *)0),
-                       a);
-                QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %2u\n",
-                               (int)me->rec, t, p, a);
+        case QS_QF_ACTIVE_DEFER:
+            if (l_config.version >= 620U) {
+                s = "Defer";
+            }
+            else { /* former QS_QF_ACTIVE_ADD */
+                s = "Add  ";
+            }
+        case QS_QF_ACTIVE_RECALL: {
+            if (l_config.version >= 620U) {
+                if (s == 0) s = "RCall";
+                t = QSpyRecord_getUint32(me, l_config.tstampSize);
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                q = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                a = QSpyRecord_getUint32(me, l_config.sigSize);
+                b = QSpyRecord_getUint32(me, 1);
+                c = QSpyRecord_getUint32(me, 1);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u AO-%s Obj=%s,Que=%s,"
+                                  "Evt<Sig=%s,Pool=%u,Ref=%u>",
+                           t,
+                           s,
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           Dictionary_get(&l_objDict, q, (char *)0),
+                           SigDictionary_get(&l_sigDict, a, p, (char *)0),
+                           b, c);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %"PRId64" %"PRId64" %u %u %u\n",
+                                   (int)me->rec, t, p, q, a, b, c);
+                }
+            }
+            else if (me->rec == QS_QF_ACTIVE_RECALL) { /* former... */
+                                          /*... QS_QF_ACTIVE_REMOVE */
+                if (s == 0) s = "Remov";
+                t = QSpyRecord_getUint32(me, l_config.tstampSize);
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                a = QSpyRecord_getUint32(me, 1);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u AO-%s Obj=%s,Pri=%u",
+                           t,
+                           s,
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           a);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %"PRId64" %u\n",
+                                   (int)me->rec, t, p, a);
+                }
             }
             break;
         }
+        case QS_QF_ACTIVE_RECALL_ATTEMPT: {
+            if (l_config.version >= 620U) {
+                t = QSpyRecord_getUint32(me, l_config.tstampSize);
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                q = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u AO-RCllA Obj=%s,Que=%s",
+                           t,
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           Dictionary_get(&l_objDict, q, (char *)0));
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %"PRId64" %"PRId64"\n",
+                                   (int)me->rec, t, p, q);
+                }
+            }
+            else { /* former QS_QF_EQUEUE_INIT */
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("           EQ-Init  Obj=%s,Len=%u",
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           b);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %"PRId64" %u\n",
+                                   (int)me->rec, p, b);
+                }
+            }
+            break;
+        }
+
         case QS_QF_ACTIVE_SUBSCRIBE:
             s = "Subsc";
         case QS_QF_ACTIVE_UNSUBSCRIBE: {
@@ -1052,7 +1111,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        SigDictionary_get(&l_sigDict, a, p, (char *)0));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64"\n",
                                (int)me->rec, t, a, p);
             }
             break;
@@ -1062,22 +1121,22 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_ACTIVE_POST_ATTEMPT: {
             if (s == 0) s = "PostA";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            if (l_config.version < 420U) {
-                q = (uint64_t)0;
+            if (l_config.version >= 420U) {
+                q = QSpyRecord_getUint64(me, l_config.objPtrSize);
             }
             else {
-                q = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                q = (uint64_t)0;
             }
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             e = QSpyRecord_getUint32(me, l_config.queueCtrSize);
@@ -1094,8 +1153,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        (me->rec == QS_QF_ACTIVE_POST_FIFO ? "Min" : "Mar"),
                        e);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %4u %20"PRId64
-                               " %3u %3u %4u %4u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %u %"PRId64" %u %u %u %u\n",
                                (int)me->rec, t, q, a, p, b, c, d, e);
                 if (l_mscFile != (FILE *)0) {
                     if (Dictionary_find(&l_mscDict, q) < 0) { /* not found? */
@@ -1120,14 +1178,14 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             e = QSpyRecord_getUint32(me, l_config.queueCtrSize);
@@ -1140,7 +1198,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        b, c, d, e);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %3u %3u %4u %4u\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %u %u %u %u\n",
                                (int)me->rec, t, a, p, b, c, d, e);
                 if (l_mscFile != (FILE *)0) {
                     if (Dictionary_find(&l_mscDict, p) < 0) { /* not found? */
@@ -1164,14 +1222,14 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             if (QSpyRecord_OK(me)) {
@@ -1183,7 +1241,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        b, c, d);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %3u %3u %4u\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %u %u %u\n",
                                (int)me->rec, t, a, p, b, c, d);
             }
             break;
@@ -1195,14 +1253,14 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u %s Obj=%s,Evt<Sig=%s,Pool=%u,Ref=%u>",
@@ -1212,24 +1270,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        b, c);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %u %u\n",
                                (int)me->rec, t, a, p, b, c);
             }
             break;
         }
-        case QS_QF_EQUEUE_INIT: {
-            p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("           EQ-Init  Obj=%s,Len=%u",
-                       Dictionary_get(&l_objDict, p, (char *)0),
-                       b);
-                QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %20"PRId64" %4u\n",
-                               (int)me->rec, p, b);
-            }
-            break;
-        }
+
         case QS_QF_EQUEUE_POST_FIFO:
             s = "Post ";
             w = "Min";
@@ -1242,14 +1288,14 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             e = QSpyRecord_getUint32(me, l_config.queueCtrSize);
@@ -1265,22 +1311,29 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        w,
                        e);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %20"PRId64" %3u %3u %4u %4u\n",
+                FPRINF_MATFILE("%d %u %u %"PRId64" %u %u %u %u\n",
                                (int)me->rec, t, a, p,
                                b, c, d, e);
             }
             break;
         }
-        case QS_QF_MPOOL_INIT: {
-            p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            b = QSpyRecord_getUint32(me, l_config.poolCtrSize);
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("           MP-Init  Obj=%s,Blcks=%u",
-                       Dictionary_get(&l_objDict, p, (char *)0),
-                       b);
+        case QS_QF_RESERVED2: {
+            if (l_config.version >= 620U) {
+                SNPRINTF_LINE("           Unknown Rec=%d,Len=%d",
+                       (int)me->rec, (int)me->len);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %20"PRId64" %4u\n",
-                               (int)me->rec, p, b);
+            }
+            else { /* former QS_QF_MPOOL_INIT */
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                b = QSpyRecord_getUint32(me, l_config.poolCtrSize);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("           MP-Init  Obj=%s,Blcks=%u",
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           b);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %"PRId64" %u\n",
+                                   (int)me->rec, p, b);
+                }
             }
             break;
         }
@@ -1303,7 +1356,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        w,
                        c);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %4u %4u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
                                (int)me->rec, t, p, b, c);
             }
             break;
@@ -1318,7 +1371,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        b);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %4u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %u\n",
                                (int)me->rec, t, p, b);
             }
             break;
@@ -1327,28 +1380,28 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* QF */
         case QS_QF_PUBLISH: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                a = QSpyRecord_getUint32(me, l_config.sigSize);
+                b = QSpyRecord_getUint32(me, 1);
+                c = QSpyRecord_getUint32(me, 1);
+            }
+            else {
                 p = (uint64_t)0;
                 a = QSpyRecord_getUint32(me, l_config.sigSize);
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
                 b >>= 6;
             }
-            else {
-                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-                a = QSpyRecord_getUint32(me, l_config.sigSize);
-                b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
-            }
             if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u QF-Pub   Sdr=%s"
+                SNPRINTF_LINE("%010u QF-Pub   Sdr=%s,"
                        "Evt<Sig=%s,Pool=%u,Ref=%u>",
                        t,
                        Dictionary_get(&l_objDict, p, (char *)0),
                        SigDictionary_get(&l_sigDict, a, 0, (char *)0),
                        b, c);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %4u %10u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
                                (int)me->rec, t, p, a, b);
                 if (l_mscFile != (FILE *)0) {
                     if (Dictionary_find(&l_mscDict, p) < 0) { /* not found? */
@@ -1366,6 +1419,24 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
+        case QS_QF_NEW_REF: {
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, l_config.sigSize);
+            b = QSpyRecord_getUint32(me, 1);
+            c = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u QF-NewRf Evt<Sig=%s,Pool=%u,Ref=%u>",
+                       t,
+                       SigDictionary_get(&l_sigDict, a, 0, (char *)0),
+                       b, c);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %u %u %u\n",
+                               (int)me->rec, t, a, b, c);
+            }
+            break;
+        }
+
         case QS_QF_NEW: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.evtSize);
@@ -1376,25 +1447,70 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, c, 0, (char *)0),
                        a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %4u\n",
+                FPRINF_MATFILE("%d %u %u %u\n",
                                (int)me->rec, t, a, c);
             }
             break;
         }
+
+        case QS_QF_DELETE_REF: {
+            if (l_config.version >= 620U) {
+                t = QSpyRecord_getUint32(me, l_config.tstampSize);
+                a = QSpyRecord_getUint32(me, l_config.sigSize);
+                b = QSpyRecord_getUint32(me, 1);
+                c = QSpyRecord_getUint32(me, 1);
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u QF-DelRf Evt<Sig=%s,Pool=%u,Ref=%u>",
+                           t,
+                           SigDictionary_get(&l_sigDict, a, 0, (char *)0),
+                           b, c);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %u %u %u\n",
+                                   (int)me->rec, t, a, b, c);
+                }
+            }
+            else { /* former QS_QF_TIMEEVT_CTR */
+                t = QSpyRecord_getUint32(me, l_config.tstampSize);
+                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                q = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                c = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
+                d = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
+                if (l_config.version >= 500U) {
+                    b = QSpyRecord_getUint32(me, 1);
+                }
+                else {
+                    b = 0U;
+                }
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u TE%1u-Ctr  Obj=%s,AO=%s,"
+                           "Tim=%u,Int=%u",
+                           t,
+                           b,
+                           Dictionary_get(&l_objDict, p, (char *)0),
+                           Dictionary_get(&l_objDict, q, buf),
+                           c, d);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %"PRId64" %"PRId64" %u %u\n",
+                                   (int)me->rec, t, p, q, c, d);
+                }
+            }
+            break;
+        }
+
         case QS_QF_GC_ATTEMPT:
             s = "QF-gcA  ";
         case QS_QF_GC: {
             if (s == 0) s = "QF-gc   ";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
-            if (l_config.version < 420U) {
+            if (l_config.version >= 420U) {
                 b = QSpyRecord_getUint32(me, 1);
-                c = b & 0x3F;
-                b >>= 6;
+                c = QSpyRecord_getUint32(me, 1);
             }
             else {
                 b = QSpyRecord_getUint32(me, 1);
-                c = QSpyRecord_getUint32(me, 1);
+                c = b & 0x3F;
+                b >>= 6;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u %s Evt<Sig=%s,Pool=%d,Ref=%d>",
@@ -1403,25 +1519,25 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, 0, (char *)0),
                        b, c);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %u %u\n",
                                (int)me->rec, t, a, b, c);
             }
             break;
         }
         case QS_QF_TICK: {
             a = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("           Tick<%1u>  Ctr=%010u",
                         b,
                         a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u\n", (int)me->rec, a);
+                FPRINF_MATFILE("%d %u\n", (int)me->rec, a);
                 if (l_mscFile != (FILE *)0) {
                     fprintf(l_mscFile,
                             "--- [label=\"tick %u\""
@@ -1441,11 +1557,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             q = QSpyRecord_getUint64(me, l_config.objPtrSize);
             c = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
             d = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u TE%1u-%s Obj=%s,AO=%s,Tim=%u,Int=%u",
@@ -1456,8 +1572,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, q, buf),
                        c, d);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %20"PRId64
-                               " %10u %10u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %"PRId64" %u %u\n",
                                (int)me->rec, t, p, q, c, d);
             }
             break;
@@ -1465,11 +1580,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_TIMEEVT_AUTO_DISARM: {
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
             q = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("           TE%1u-ADis Obj=%s,AO=%s",
@@ -1477,7 +1592,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        Dictionary_get(&l_objDict, q, buf));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %"PRId64" %"PRId64"\n",
                                (int)me->rec, p, q);
            }
             break;
@@ -1486,11 +1601,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
             q = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u TE%1u-DisA Obj=%s,AO=%s",
@@ -1499,7 +1614,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, (char *)0),
                        Dictionary_get(&l_objDict, q, buf));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, p, q);
             }
             break;
@@ -1511,11 +1626,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             c = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
             d = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
             e = QSpyRecord_getUint32(me, 1);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u TE%1u-Rarm Obj=%s,AO=%s,"
@@ -1526,8 +1641,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, q, buf),
                        c, d, e);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %20"PRId64
-                               " %10u %10u %1u\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %"PRId64" %u %u %u\n",
                                (int)me->rec, t, p, q, c, d, e);
             }
             break;
@@ -1537,11 +1651,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             q = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
+            if (l_config.version >= 500U) {
+                b = QSpyRecord_getUint32(me, 1);
             }
             else {
-                b = QSpyRecord_getUint32(me, 1);
+                b = 0U;
             }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u TE%1u-Post Obj=%s,Sig=%s,AO=%s",
@@ -1551,34 +1665,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        SigDictionary_get(&l_sigDict, a, q, (char *)0),
                        Dictionary_get(&l_objDict, q, buf));
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %4u %20"PRId64"\n",
+                FPRINF_MATFILE("%d %u %"PRId64" %u %"PRId64"\n",
                                (int)me->rec, t, p, a, q);
-            }
-            break;
-        }
-        case QS_QF_TIMEEVT_CTR: {
-            t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            q = QSpyRecord_getUint64(me, l_config.objPtrSize);
-            c = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
-            d = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
-            if (l_config.version < 500U) {
-                b = 0U;
-            }
-            else {
-                b = QSpyRecord_getUint32(me, 1);
-            }
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u TE%1u-Ctr  Obj=%s,AO=%s,"
-                       "Tim=%u,Int=%u",
-                       t,
-                       b,
-                       Dictionary_get(&l_objDict, p, (char *)0),
-                       Dictionary_get(&l_objDict, q, buf),
-                       c, d);
-                QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %20"PRId64" %20"PRId64" %10u %10u\n",
-                               (int)me->rec, t, p, q, c, d);
             }
             break;
         }
@@ -1594,7 +1682,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        s,
                        a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u\n",
+                FPRINF_MATFILE("%d %u %u\n",
                                (int)me->rec, t, a);
            }
             break;
@@ -1612,7 +1700,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        s,
                        a, b);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %u\n",
                                (int)me->rec, t, a, b);
             }
             break;
@@ -1632,7 +1720,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        s,
                        a, b);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %u\n",
                                (int)me->rec, t, a, b);
             }
             break;
@@ -1645,7 +1733,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 SNPRINTF_LINE("%010u Sch-Next Pri=%u->%u",
                        t, b, a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %u\n",
                                (int)me->rec, t, a, b);
             }
             break;
@@ -1657,7 +1745,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 SNPRINTF_LINE("%010u Sch-Idle Pri=%u->0",
                        t, a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u\n",
+                FPRINF_MATFILE("%d %u %u\n",
                                (int)me->rec, t, a);
             }
             break;
@@ -1670,7 +1758,25 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 SNPRINTF_LINE("%010u Sch-Rsme Prio=%u->%u",
                        t, b, a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %3u %3u\n",
+                FPRINF_MATFILE("%d %u %u %u\n",
+                               (int)me->rec, t, a, b);
+            }
+            break;
+        }
+        case QS_MUTEX_LOCK:
+            if (s == 0) s = "Mtx-Lock";
+        case QS_MUTEX_UNLOCK: {
+            if (s == 0) s = "Mtx-Unlk";
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, 1);
+            b = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u %s Pro=%u,Ceil=%u",
+                       t,
+                       s,
+                       a, b);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %u %u\n",
                                (int)me->rec, t, a, b);
             }
             break;
@@ -1714,7 +1820,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                   a, p, s);
                 }
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %s=[%4u %20"PRId64"];\n",
+                FPRINF_MATFILE("%d %s=[%u %"PRId64"];\n",
                                (int)me->rec, getMatDict(s), a, p);
             }
             break;
@@ -1734,7 +1840,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                   p, s);
                 }
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %s=%20"PRId64";\n",
+                FPRINF_MATFILE("%d %s=%"PRId64";\n",
                                (int)me->rec, getMatDict(s), p);
             }
             break;
@@ -1754,7 +1860,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                   p, s);
                 }
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %s=%20"PRId64";\n",
+                FPRINF_MATFILE("%d %s=%"PRId64";\n",
                             (int)me->rec, getMatDict(s), p);
             }
             break;
@@ -1868,7 +1974,9 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
 
         case QS_RX_STATUS: {
-            if (l_config.version < 580U) {
+            if (l_config.version >= 580U) {
+            }
+            else {
                 t = QSpyRecord_getUint32(me, l_config.tstampSize);
             }
             a = QSpyRecord_getUint32(me, 1U);
@@ -1944,7 +2052,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 SNPRINTF_LINE("%010u =ASSERT= Mod=%s,Loc=%u",
                        t, s, a);
                 QSPY_onPrintLn();
-                FPRINF_MATFILE("%3d %10u %4u %s\n",
+                FPRINF_MATFILE("%d %u %u %s\n",
                             (int)me->rec, (unsigned)t, (unsigned)a, s);
             }
             break;

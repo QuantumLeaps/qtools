@@ -1,6 +1,23 @@
 /**
 @page history Revision History
 
+@section qtools_6_2_0 Version 6.2.0, 2018-03-13
+This release updates QSPY host utility as well as the `qutest.tcl` and `qspyview.tcl` scripts for the following new QS records introduced in QP/C/C++ 6.2.0:
+
+- #QS_QF_ACTIVE_DEFER (replaces QS_QF_ACTIVE_ADD)
+- #QS_QF_ACTIVE_RECALL (replaces QS_QF_ACTIVE_REMOVE)
+- #QS_QF_ACTIVE_RECALL_ATTEMPT (replaces QS_QF_EQUEUE_INIT)
+- QS_QF_RESERVED2 (replaces QS_QF_MPOOL_INIT)
+- #QS_QF_NEW_REF (replaces QS_QF_TIMEEVT_CTR)
+- #QS_MUTEX_LOCK (replaces QS_QF_RESERVED1)
+- #QS_MUTEX_UNLOCK (replaces QS_QF_RESERVED0)
+
+The global filter settings in the `qutest.tcl` and `qspyview.tcl` scripts have been updated to the augmented and re-organized QS trace records.
+
+Additionally, new commands post() and publish() have been added to the QUTest "testing DSL" (`qutest.tcl` script). Examples of use of these new commands are provided in QP/C/C++ directory `<qpc|qpcpp>\examples\qutest\defer\`.
+
+
+------------------------------------------------------
 @section qtools_6_1_1 Version 6.1.1, 2018-02-06
 This release fixes the following bug in QSPY:
 
