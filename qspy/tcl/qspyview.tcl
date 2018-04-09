@@ -225,7 +225,7 @@ proc onAbout {} {
     label $form.lbl3 -text "Documentation:\nhttps://state-machine.com/qspy/"
     pack $form.lbl3 -side top
     label $form.lbl4 -text \
-        "Copyright (c) 2005-2017 Quantum Leaps\nstate-machine.com"
+        "Copyright (c) 2005-2018 Quantum Leaps\nstate-machine.com"
     pack $form.lbl4 -side top
 
     variable ::dialog::done

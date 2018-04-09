@@ -4,14 +4,14 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.0
-* Last updated on  2018-01-29
+* Last updated for version 6.2.0
+* Last updated on  2018-04-09
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -305,7 +305,7 @@ static char const l_helpStr[] =
     "-h                      help (show this message and exit)\n"
     "-q                      query only (no cleanup when -q present)\n"
     "-r                      check also read-only files\n"
-    "-l[limit]     %d        line length limit (not checked when -l absent)";
+    "-l[limit]     %d        line length limit (not checked when -l absent)\n";
 
 /*..........................................................................*/
 int main(int argc, char *argv[]) {

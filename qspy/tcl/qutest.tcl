@@ -889,7 +889,7 @@ namespace eval ::qutest {
 
         global VERSION
         puts "QUTEST unit testing front-end $VERSION"
-        puts "Copyright (c) 2005-2017 Quantum Leaps"
+        puts "Copyright (c) 2005-2018 Quantum Leaps"
         puts "help at: https://state-machine.com/qtools/qutest.html"
 
         # attach to QSPY...
