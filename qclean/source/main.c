@@ -305,7 +305,7 @@ static char const l_helpStr[] =
     "-h                      help (show this message and exit)\n"
     "-q                      query only (no cleanup when -q present)\n"
     "-r                      check also read-only files\n"
-    "-l[limit]     %d        line length limit (not checked when -l absent)";
+    "-l[limit]     %d        line length limit (not checked when -l absent)\n";
 
 /*..........................................................................*/
 int main(int argc, char *argv[]) {
