@@ -9,14 +9,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 6.0.0
-# Last updated on  2017-10-24
+# Last updated for version 6.2.1
+# Last updated on  2018-04-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -37,17 +37,18 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspy 6.0
+package provide qspy 6.2
 
 package require Tcl  8.4   ;# need at least Tcl 8.4
 package require udp        ;# need the UDP sockets for Tcl
 
 ## @brief facilities for communication with the @ref qspy "QSPY" back-end
+#
 # @note
 # The QSPY back-end distinguishes between two types of messages:@n
 # 1. messages intended for QSPY only (e.g., attach/detach a front-end).
@@ -61,6 +62,8 @@ namespace eval ::qspy {
     namespace export \
         attach \
         detach \
+        udp_port \
+        udp_remote \
         sendPkt \
         sendAttach \
         sendEvent
@@ -157,34 +160,51 @@ namespace eval ::qspy {
 } ;# namespace eval
 
 # command procedures =========================================================
+
 ## @brief attach to the QSPY back-end
+#
 # @description
-# This function is called from main() in qspyview.tcl to attach the
-# QSpyView front-end to the QSPY back-end. If the UDP socket could be
-# successfully open, this function installs the onRecvPkt() as the
-# event handler for reading from the UDP socket.
+# This function "attaches" a given script (front-end) to the QSPY back-end.
+# If the UDP socket could open successfully, the function configures the
+# socket and installs the onRecvPkt() procedure as the event handler for
+# reading from the UDP socket.
 #
-# @param[in] host name or IP address of the host running QSPY back-end
-# @param[in] port UDP port number at which QSPY back-end is listening
-# @param[in] local_port local UDP port at which to open connection to QSPY
-# @param[in] channels QSPY data channels (binary or/and text) to connect to
+# @param[in] host name or IP address of the host running QSPY back-end.
+#            Optionally, the host name might contain the port number
+#            provided immediately after ':', e.g.: 192.168.1.24:7705
+# @param[in] local_port local UDP port at which to open connection to QSPY.
+#            The default value of 0 means that the system will choose a port.
+# @param[in] channels QSPY data channels (binary or/and text) to connect to.
 #
-# @returns true if the connection has been established or false if any
-# errors have occurred.
+# @returns
+# true if the connection has been established or false if not.
+#
 # @sa onRecvPkt()
 #
-proc ::qspy::attach {host port local_port {channels 1}} {
+proc ::qspy::attach {host {local_port 0} {channels 1}} {
     variable theSocket
     variable theIsAttached
 
     set theIsAttached 0
 
-    # set-up the UDP socket for communication with QSPY...
-    #set theSocket [udp_open $local_port]
-    if {[catch {udp_open $local_port} theSocket]} {
+    # open the UDP socket for communication with QSPY...
+    if {$local_port} { ;# local_port specificed explicitly?
+        set err [catch {udp_open $local_port} theSocket]
+    } else { ;# local_port not specified--let the system choose a port
+        set err [catch {udp_open} theSocket]
+    }
+
+    if {$err} {
         return false
     } else {
-        fconfigure $theSocket -remote [list $host $port]
+        # parse the host name and optional port number...
+        set host_port [split $host :]
+        if {[lindex $host_port 1] == ""} {
+            lappend host_port 7701 ;# the default UDP port of QSPY
+        }
+
+        # configure the UDP socket...
+        fconfigure $theSocket -remote $host_port
         fconfigure $theSocket -myport
         fconfigure $theSocket -buffering none
         fconfigure $theSocket -buffersize 4096
@@ -195,14 +215,18 @@ proc ::qspy::attach {host port local_port {channels 1}} {
 
         sendAttach $channels ;# send the attach packet to QSPY
 
+        #puts "UDP local port [udp_conf $theSocket -myport]"
+
         return true
     }
 }
 #.............................................................................
 ## @brief detach from the QSPY back-end
+#
 # @description
 # This function should be called to free up the connection to the QSPY
 # back-end.
+#
 # @sa onCleanup()
 #
 proc ::qspy::detach {} {
@@ -215,11 +239,32 @@ proc ::qspy::detach {} {
     close $theSocket
     set theSocket 0 ;# invalidate the socket
 }
+#.............................................................................
+## @brief obtain the UDP port number
+#
+# @sa http://tcludp.sourceforge.net/#3
+#
+proc ::qspy::udp_port {} {
+    variable theSocket
+    return [udp_conf $theSocket -myport]
+}
+#.............................................................................
+## @brief obtain the remote host and port number
+#
+# @sa http://tcludp.sourceforge.net/#3
+#
+proc ::qspy::udp_remote {} {
+    variable theSocket
+    return [udp_conf $theSocket -remote]
+}
+
 
 # receive/send from the QSPY Back-End ========================================
 ## @brief fileevent handler for the UDP socket to the QSPY back-end
+#
 # @description
 # This function is called once per each UDP packet received from QSPY.
+#
 # @sa proc attach(), line:@n
 # `fileevent $theSocket readable [namespace code onRecvPkt]`
 proc ::qspy::onRecvPkt {} { ;# socket event handler
@@ -262,12 +307,14 @@ proc ::qspy::onRecvPkt {} { ;# socket event handler
 }
 #.............................................................................
 ## @brief send a UDP packet to the QSPY back-end
-# @param[in] pkt packet binary data (created by `binary format ...`)
+#
 # @description
 # The function increments the sequence number of transmitted packets
 # and pre-pends it in front of the binary packet data to form the
 # complete UDP packet as expected by the QSPY back-end. This allows
 # the QSPY back-end to detect any dropped packets (gaps in the sequence).
+#
+# @param[in] pkt packet binary data (created by `binary format ...`)
 #
 proc ::qspy::sendPkt {pkt} {
     variable theTxPktSeq
@@ -331,6 +378,7 @@ proc ::qspy::sendTestProbe {fun data} {
 }
 #.............................................................................
 ## @brief send an event to the Target (via the QSPY back-end)
+#
 # @description
 # The function sends a event to the embedded Target running QS-RX.
 # The event is dynamically allocated inside the Target (with `Q_NEW()`),

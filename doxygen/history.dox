@@ -1,6 +1,36 @@
 /**
 @page history Revision History
 
+@section qtools_6_2_1 Version 6.2.1, 2018-04-13
+This release simplifies the usage of the QUTest (qutest.tcl) and QSpyView (qspyview.tcl) utilities by reducing the number of parameters required by these scripts. Specifically, the "local_port" parameter might be now omitted and still every instance of qutest.tcl / qspyview.tcl will be given a unique local UDP port. Additionally, the "port" parameter has been combined with the "host" parameter in the form host[:port].
+
+Here is the new usage of qutest.tcl script:
+@code
+tclsh qutest.tcl [test-scripts] [host_exe] [host[:port]] [local_port]
+@endcode
+
+Here is the new usage of qspyview.tcl script:
+@code
+wish qspyview.tcl [extension_script] [host[:port]] [local_port]
+@endcode
+
+For example, to attach to QSPY running on the host 192.168.1.100 and port 7705, you now can launch these scripts as follows:
+
+@code
+tclsh qutest.tcl *.tcl test_fixture.exe 192.168.1.100:7705
+wish qspyview.tcl dpp.tcl 192.168.1.100:7705
+@endcode
+
+Modified files:
+- qspy.tcl
+- qspyview.tcl
+- qutest.tcl
+
+@note
+The changes should be transparent for most existing QSpyView and QUTest projects (this include all examples shipped in QP/C and QP/C++). However, projects that run QSPY at non-default UDP ports might need to be adjusted.
+
+
+------------------------------------------------------
 @section qtools_6_2_0 Version 6.2.0, 2018-03-13
 This release updates QSPY host utility as well as the `qutest.tcl` and `qspyview.tcl` scripts for the following new QS records introduced in QP/C/C++ 6.2.0:
 

@@ -10,13 +10,13 @@
 # front-end to the QSPY back-and for running such user tests.
 #
 # @usage
-# tclsh qutest.tcl [test-files] [host_exe] [host] [port] [local_port]
+# tclsh qutest.tcl [test-scripts] [host_exe] [host[:port]] [local_port]
 
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.2.0
-# Last updated on  2018-03-13
+# Last updated for version 6.2.1
+# Last updated on  2018-04-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -49,9 +49,9 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.2.0
+set VERSION 6.2.1
 
-package provide qutest 6.0
+package provide qutest 6.2
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
 
@@ -839,11 +839,10 @@ namespace eval ::qutest {
         # set defaults for communication with the QSPY back-end
         # NOTE (all these can be overridden by command-line options)
         set qspy_host  "localhost"
-        set qspy_port  7701
-        set local_port 7702
+        set local_port 0 ;# the system will choose the local UDP port
 
         # command-line optional arguments processing...
-        # [host_exe [host [port [local_port]]]]
+        # [host_exe] [host[:port]] [local_port]
         #
         global ::argc ::argv
         variable theHostExe ""
@@ -880,11 +879,8 @@ namespace eval ::qutest {
         if {$::argc > 2} {  ;# argv(2) -- host running QSPY
             set qspy_host [lindex $::argv 2]
         }
-        if {$::argc > 3} {  ;# argv(3) -- QSPY port
-            set qspy_port [lindex $::argv 3]
-        }
-        if {$::argc > 4} {  ;# argv(4) -- local port
-            set local_port [lindex $::argv 4]
+        if {$::argc > 3} {  ;# argv(3) -- local port
+            set local_port [lindex $::argv 3]
         }
 
         global VERSION
@@ -894,7 +890,7 @@ namespace eval ::qutest {
 
         # attach to QSPY...
         variable ::qspy::theIsAttached 0
-        if {[::qspy::attach $qspy_host $qspy_port $local_port $channels]} {
+        if {[::qspy::attach $qspy_host $local_port $channels]} {
             puts -nonewline "Attaching to QSPY..."
             flush stdout
         } else {  ;# failed to attach
@@ -909,7 +905,8 @@ namespace eval ::qutest {
 
         if {$::qspy::theIsAttached} { ;# NO time out?
             after cancel $id
-            puts "OK"
+            puts "OK (UDP-Port=[::qspy::udp_port])"
+            #puts "OK"
         } else { ;# timeout
             ::qspy::detach ;# detach from QSPY
             puts "FAILED!"

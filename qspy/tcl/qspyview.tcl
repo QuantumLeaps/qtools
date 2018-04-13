@@ -7,14 +7,15 @@
 # This script implements a GUI-based front-end to the QSPY back-and for
 # displaying the data coming from the Target system and for providing
 # a GUI to the embedded Target.
+#
 # @usage
-# wish qspyview.tcl [extension_script] [host] [port] [local_port]
+# wish qspyview.tcl [extension_script] [host[:port]] [local_port]
 
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 6.2.0
-# Last updated on  2018-03-14
+# Last updated for version 6.2.1
+# Last updated on  2018-04-13
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -57,7 +58,7 @@ set HOME [file dirname [file normalize [info script]]]
 source $HOME/qspy.tcl        ;# QSPY interface
 
 # this version of qspyview
-set VERSION 6.2.0
+set VERSION 6.2.1
 
 # command procedures =========================================================
 ## @brief main entry point to the QSpyView front-end application
@@ -68,21 +69,17 @@ proc main {} {
     # set defaults for communication with the QSPY back-end
     # NOTE (all these can be overridden by command-line options)
     set qspy_host  "localhost"
-    set qspy_port  7701
-    set local_port 7702
+    set local_port 0 ;# the system will choose the local UDP port
 
     # command-line processing...
-    # wish qspyview.tcl [extension_script [host [port [local_port]]]]
+    # wish qspyview.tcl [extension_script] [host[:port]] [local_port]
     #
     global ::argc ::argv theHostExe
-    if {$::argc > 1} {  ;# argv(1) -- host running QSPY
+    if {$::argc > 1} {  ;# argv(1) -- host/port running QSPY
         set qspy_host [lindex $::argv 1]
     }
-    if {$::argc > 2} {  ;# argv(2) -- QSPY port
-        set qspy_port [lindex $::argv 2]
-    }
-    if {$::argc > 3} {  ;# argv(3) -- local port
-        set local_port [lindex $::argv 3]
+    if {$::argc > 2} {  ;# argv(2) -- local port
+        set local_port [lindex $::argv 2]
     }
 
     # add a trace to monitor the QSPY socket counters
@@ -92,7 +89,7 @@ proc main {} {
     trace add variable ::qspy::theIsAttached write traceIsAttached
 
     # attach to QSPY...
-    if {[::qspy::attach $qspy_host $qspy_port $local_port]} {
+    if {[::qspy::attach $qspy_host $local_port]} {
         after 200 ;# wait for the Target to respond to the info request
         update
 
