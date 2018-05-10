@@ -2,7 +2,7 @@
 
 # What's New?
 View QTools Revision History at: 
-https://state-machine.com/qtools/history.html
+https://www.state-machine.com/qtools/history.html
 
 ---------------------------------------------------------------------------
 # About QTools
@@ -59,6 +59,8 @@ Additionally, QTools for Windows contains the following open-source,
 
 15. AVRDUDE for Windows (version 6.1)
 
+16. LMFlash for Windows (build 1613)
+
 
 Additionally, QTools for Windows contains the following PC-Lint option
 files various compilers (in sub-directory lint):
@@ -91,11 +93,16 @@ Most tools included in this collection are distributed under the terms
 of the GNU General Public License (GPL) as published by the Free
 Software Foundation, either version 2 of the License, or (at your
 option) any later version. The text of GPL version 2 is included in the
-file GPLv2.txt in the root directory of the QTools distribution.
+file GPLv2.txt in the licenses/ subdirectory of the QTools distribution.
 
 The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE
-AGREEMENT, included in the file TCL_LICENSE.txt in the root directory of
-the QTools distribution.
+AGREEMENT, included in the file TCL_LICENSE.txt in the licenses/
+subdirectory of the QTools distribution.
+
+The LMFlash utility for Windows is is distributed under the terms of the
+LMFlash license, included in the file LMFlash_LICENSE.rtf in the licenses/
+subdirectory of the QTools distribution. Specifically, the LMFlash utility
+is distributed according to Section 2a "Demonstration License".
 
 
 ---------------------------------------------------------------------------
@@ -184,6 +191,6 @@ Has been taken from:
 
 ---------------------------------------------------------------------------
 # Contact information:
-- https://state-machine.com
+- https://www.state-machine.com
 - mailto:info@state-machine.com
 

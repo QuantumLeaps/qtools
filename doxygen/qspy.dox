@@ -1372,7 +1372,7 @@ Tick-rate  |    c          | system tick rate number
 This packet has Record-ID==PEEK and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 Peek-addr  | Target-dependent@n Typically i | Address of the data in the Target
 Peek-length| c             | Number of bytes to peek
 
@@ -1388,7 +1388,7 @@ Peek-length| c             | Number of bytes to peek
 This packet has Record-ID==POKE and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 Poke-addr  | Target-dependent@n Typically i | Address of the data in the Target
 Poke-length| c             | Number of bytes to poke (<= 8)
 Poke-data  | user-defined  | Binary data to poke to the Target (8 bytes maximum)
@@ -1408,7 +1408,7 @@ The Poke-data part of the Data Payload must be formatted with the particular end
 This packet has Record-ID==GLB_FILTER and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 Data Len   | c             | Number of bytes sent (currently 16)
 Filters    | b128          | 128 bits, each bit corresponding to Global Filter
 
@@ -1424,7 +1424,7 @@ Filters    | b128          | 128 bits, each bit corresponding to Global Filter
 This packet has Record-ID==LOC_FILTER and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 Local filter #| c          | The Number of the Local Filter
 Object-addr   | Target-dependent@n Typically i | Address of the object in the Target
 
@@ -1450,7 +1450,7 @@ This packet provides a shortcut for setting the Active Object Local Filter by pr
 The packet has Record-ID==AO_FILTER and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 AO prio    | c             | Priority of the AO to filter (0 to disable the AO filter)
 
 <strong>Code Example:</strong>
@@ -1464,7 +1464,7 @@ AO prio    | c             | Priority of the AO to filter (0 to disable the AO f
 This packet has Record-ID==EVENT and Data Payload of the form:
 
 Data item  | binary format | description
------------|---------------|--------------
+-----------|---------------|-------------
 AO prio    | c             | Priority of the recipient AO (0 to publish the event)
 signal     | Target-dependent@n Typically s  | signal of the event
 parameters | user-defined  | Binary data corresponding to all event parameters
@@ -1478,7 +1478,7 @@ The parameters need to match exactly the event memory layout in your Target, inc
 For example, let's assume that the parameters of your event are: a byte, followed by a 2-byte integer, followed by a 4-byte integer. Also, let's assume that your Target is little endian. From the @ref qspyview_events "Generate Event..." command you discover that to format this event correctly you need to use the following event parameters:
 
 Par # | format | data (example)
-------|--------|---------------
+------|--------|-------------
 par1: | c      | 0x11
 par2: | c      | 0x00
 par3: | s      | 0x1122
@@ -1503,7 +1503,16 @@ The qspy.tcl module provides specialized procedure `::qspy::sendEvent prio sig p
 
 <div class="separate"></div>
 @subsection udp_ATTACH  Attach to the QSPY Back-End (ATTACH)
-This packet has Record-ID==ATTACH and has no Data Payload.
+This packet has Record-ID==ATTACH and Data Payload of the form:
+
+Data item  | binary format | description
+-----------|---------------|-------------
+channels   | c             | Binary bitmask of @ref udp_channel "QSPY channels" to attach to
+
+<strong>Code Example:</strong>
+@code
+::qspy::sendPkt [binary format cc $QSPY(ATTACH) $channels]
+@endcode
 
 
 <div class="separate"></div>

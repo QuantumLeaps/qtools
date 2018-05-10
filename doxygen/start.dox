@@ -3,7 +3,7 @@
 @tableofcontents
 
 @section install Downloading and Installing QTools&trade;
-The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="https://sourceforge.net/projects/qpc/files/Qtools">SourceForge</a> as well as from <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools">GitHub</a>. The QTools&trade; download is provided as a Windows EXE (for Windows) or as a ZIP file for POSIX (Linux). The EXE installer is recommended, because it is <b>digitally signed by Quantum Leaps</b> and provides an uninstaller. Either way, uninstalling QTools is easy and requires only deleting the `qtools` directory from your disk.
+The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="https://sourceforge.net/projects/qpc/files/Qtools">SourceForge</a> as well as from <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools/releases">GitHub</a>. The QTools&trade; download is provided as a Windows EXE (for Windows) or as a ZIP file for POSIX (Linux). The EXE installer is recommended, because it is <b>digitally signed by Quantum Leaps</b> and provides an uninstaller. Either way, uninstalling QTools is easy and requires only deleting the `qtools` directory from your disk.
 
 @image html qtools_install.png "QTools installer on Windows"
 

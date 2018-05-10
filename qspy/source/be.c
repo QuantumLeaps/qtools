@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-12
+* Last updated for version 6.3.0
+* Last updated on  2018-05-10
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -170,7 +170,12 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
                 QSPY_printInfo();
             }
 
-            l_channels = qrec->start[2];
+            if (qrec->tot_len > 2U) { /* payload contains channels? */
+                l_channels = qrec->start[2];
+            }
+            else { /* old payload without channels */
+                l_channels = BINARY_CH; /* default to binary channel  */
+            }
             l_rxBeSeq  = qrec->start[0]; /* re-start the receive  sequence */
             l_txBeSeq  = 0U;             /* re-start the transmit sequence */
 

@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.0.0
-* Last updated on  2017-10-24
+* Last updated for version 6.3.0
+* Last updated on  2018-05-10
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -211,17 +211,17 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
         else if (qrec->rec == QSPY_SEND_CURR_OBJ) {
             objPkt[1] = (uint8_t)QS_RX_CURR_OBJ;
 
-            /* QS_rxHandleGoodFrame_() in qs_rx.c */
+            /* see enum QSpyObjKind in qs_copy.c */
             switch (qrec->start[2]) { /* object-kind */
-                case 0:
-                case 1:
-                case 6:
+                case SM_OBJ:
+                case AO_OBJ:
+                case SM_AO_OBJ:
                     l_currSM = (ObjType)key; /* store for QSPY_sendEvent() */
                     break;
-                case 2:
-                case 3:
-                case 4:
-                case 5:
+                case MP_OBJ:
+                case EQ_OBJ:
+                case TE_OBJ:
+                case AP_OBJ:
                     break;
                 default:
                     SNPRINTF_LINE("   <F-END> ERROR    "

@@ -1,7 +1,7 @@
 /**
 @page history Revision History
 
-@section qtools_6_2_1 Version 6.2.1, 2018-04-13
+@section qtools_6_3_0 Version 6.3_0, 2018-05-10
 This release simplifies the usage of the QUTest (qutest.tcl) and QSpyView (qspyview.tcl) utilities by reducing the number of parameters required by these scripts. Specifically, the "local_port" parameter might be now omitted and still every instance of qutest.tcl / qspyview.tcl will be given a unique local UDP port. Additionally, the "port" parameter has been combined with the "host" parameter in the form host[:port].
 
 Here is the new usage of qutest.tcl script:
@@ -25,6 +25,8 @@ Modified files:
 - qspy.tcl
 - qspyview.tcl
 - qutest.tcl
+
+Also, this release adds the LMFlash utility to QTools for Windows for flash programming of TM4C MCUs.
 
 @note
 The changes should be transparent for most existing QSpyView and QUTest projects (this include all examples shipped in QP/C and QP/C++). However, projects that run QSPY at non-default UDP ports might need to be adjusted.

@@ -15,8 +15,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.2.1
-# Last updated on  2018-04-13
+# Last updated for version 6.3.0
+# Last updated on  2018-05-10
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -49,9 +49,9 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.2.1
+set VERSION 6.3.0
 
-package provide qutest 6.2
+package provide qutest 6.3
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
 

@@ -9,8 +9,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 6.2.1
-# Last updated on  2018-04-13
+# Last updated for version 6.3.0
+# Last updated on  2018-05-10
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -42,7 +42,7 @@
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspy 6.2
+package provide qspy 6.3
 
 package require Tcl  8.4   ;# need at least Tcl 8.4
 package require udp        ;# need the UDP sockets for Tcl

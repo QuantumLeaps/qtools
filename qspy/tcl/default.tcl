@@ -8,8 +8,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- Customization example to extend the qspyview.tcl script
-# Last updated for version 5.8.3
-# Last updated on  2017-03-15
+# Last updated for version 6.3.0
+# Last updated on  2018-05-10
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -36,7 +36,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 #-----------------------------------------------------------------------------
 # @endcond
