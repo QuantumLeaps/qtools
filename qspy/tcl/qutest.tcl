@@ -15,8 +15,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.3.0
-# Last updated on  2018-05-10
+# Last updated for version 6.3.1
+# Last updated on  2018-05-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -49,7 +49,7 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.3.0
+set VERSION 6.3.1
 
 package provide qutest 6.3
 

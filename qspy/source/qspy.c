@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.2.0
-* Last updated on  2018-03-14
+* Last updated for version 6.3.1
+* Last updated on  2018-05-25
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -803,9 +803,9 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             }
             case QS_FUN_T: {
                 u64 = QSpyRecord_getUint64(me, l_config.funPtrSize);
-                SNPRINTF_APPEND(" %s",
+                SNPRINTF_APPEND("%s",
                     Dictionary_get(&l_funDict, u64, (char *)0));
-                FPRINF_MATFILE(" %"PRId64, u64);
+                FPRINF_MATFILE("%"PRId64, u64);
                 break;
             }
             case QS_I64_T: {

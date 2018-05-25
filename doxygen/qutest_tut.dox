@@ -643,15 +643,13 @@ The following listing shows the mock object for the low-level IO (input/outpu) o
  [2] #include "IO.h"  /* mocked interface */
 
      enum {
- [3]     IO_READ  = QS_USER1,
-         IO_WRITE,
+ [3]     IO_CALL = QS_USER1,
      };
 
      /*..........................................................................*/
  [4] void MockIO_Init(void) {
          /* dictionaries... */
- [5]     QS_USR_DICTIONARY(IO_READ);
-         QS_USR_DICTIONARY(IO_WRITE);
+ [5]     QS_USR_DICTIONARY(IO_CALL);
 
  [6]     QS_FUN_DICTIONARY(&IO_Read);
          QS_FUN_DICTIONARY(&IO_Write);
@@ -663,17 +661,19 @@ The following listing shows the mock object for the low-level IO (input/outpu) o
  [9]     QS_TEST_PROBE(
 [10]         ret = (ioData)qs_tp_;
          )
-[11]     QS_BEGIN(IO_READ, (void *)0) /* user-specific record */
-[12]         QS_I16(0, ret);
-[13]         QS_U32(0, offset);
+[11]     QS_BEGIN(IO_CALL, (void *)0) /* user-specific record */
+[12]         QS_FUN(&IO_Read);
+[13]         QS_I16(0, ret);
+[14]         QS_U32(0, offset);
          QS_END()
-[14]     return ret;
+[15]     return ret;
      }
      /*..........................................................................*/
-[15] void IO_Write(ioAddress offset, ioData data) {
-[16]     QS_BEGIN(IO_WRITE, (void *)0) /* user-specific record */
-[17]         QS_U32(0, offset);
-[18]         QS_I16(0, data);
+[16] void IO_Write(ioAddress offset, ioData data) {
+[17]     QS_BEGIN(IO_CALL, (void *)0) /* user-specific record */
+[18]         QS_FUN(&IO_Write);
+[19]         QS_U32(0, offset);
+[20]         QS_I16(0, data);
          QS_END()
      }
 @endcode
@@ -703,21 +703,25 @@ The following listing shows the mock object for the low-level IO (input/outpu) o
   <dt>[10]</dt><dd> The 32-bit value of the test probe is copied to the return value from the function.
 > **NOTE:** that way the mocked `IO_Read()` function can return to the CUT a value pre-programmed by the @ref qutest_flash-script "test script".
   </dd>
-  <dt>[11]</dt><dd> The application-specific trace record `IO_READ` is generated. This trace record reports the details of the call to the `IO_Read()` function.
+  <dt>[11]</dt><dd> The application-specific trace record `IO_CALL` is generated.
   </dd>
-  <dt>[12]</dt><dd> The return value is reported as `int16_t`.
+  <dt>[12]</dt><dd> The specific IO function is reported, which will produce the symbolic name of the function in QSPY (the dictionary for this function has been produced in step [6]).
   </dd>
-  <dt>[13]</dt><dd> The memory `offset` parameter is reported as `uint32_t`.
+  <dt>[13]</dt><dd> The return value is reported as `int16_t`.
   </dd>
-  <dt>[14]</dt><dd> The fake return value is returned to the CUT.
+  <dt>[14]</dt><dd> The memory `offset` parameter is reported as `uint32_t`.
   </dd>
-  <dt>[15]</dt><dd> The `IO_Write()` function is another low-level IO operation implemented by the mock.
+  <dt>[15]</dt><dd> The fake return value is returned to the CUT.
   </dd>
-  <dt>[16]</dt><dd> The application-specific trace record `IO_WRITE` is generated. This trace record reports the details of the call to the `IO_Write()` function.
+  <dt>[16]</dt><dd> The `IO_Write()` function is another low-level IO operation implemented by the mock.
   </dd>
-  <dt>[17]</dt><dd> The memory `offset` parameter is reported as `uint32_t`.
+  <dt>[17]</dt><dd> The application-specific trace record `IO_CALL` is generated.
   </dd>
-  <dt>[18]</dt><dd>  The memory `data` parameter is reported as `int16_t`.
+  <dt>[18]</dt><dd> The specific IO function is reported, which will produce the symbolic name of the function in QSPY (the dictionary for this function has been produced in step [6]).
+  </dd>
+  <dt>[19]</dt><dd> The memory `offset` parameter is reported as `uint32_t`.
+  </dd>
+  <dt>[20]</dt><dd>  The memory `data` parameter is reported as `int16_t`.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -898,12 +902,12 @@ The following test script performs the same tests as the <a href="https://cppute
 [10] probe IO_Read $ReadyBit
 [11] probe IO_Read $data
 [12] command FLASH_WRITE $address $data
-[13] expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
-[14] expect "%timestamp IO_WRITE $address $data"
+[13] expect "%timestamp IO_CALL IO_Write $CommandRegister $ProgramCommand"
+[14] expect "%timestamp IO_CALL IO_Write $address $data"
 [15] expect "%timestamp TstProbe Fun=IO_Read,Data=128"
-[16] expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+[16] expect "%timestamp IO_CALL IO_Read $ReadyBit $StatusRegister"
 [17] expect "%timestamp TstProbe Fun=IO_Read,Data=$data"
-[18] expect "%timestamp IO_READ [expr $data] $address"
+[18] expect "%timestamp IO_CALL IO_Read [expr $data] $address"
 [19] expect "%timestamp FLASH_WRITE $FLASH_SUCCESS"
 [20] expect "%timestamp Trg-Done QS_RX_COMMAND"
 
@@ -915,18 +919,18 @@ The following test script performs the same tests as the <a href="https://cppute
      probe IO_Read $ReadyBit
      probe IO_Read $data
 [23] command FLASH_WRITE $address $data
-     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
-     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp IO_CALL IO_Write $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_CALL IO_Write $address $data"
      expect "%timestamp TstProbe Fun=IO_Read,Data=0"
-     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp IO_CALL IO_Read 0 $StatusRegister"
      expect "%timestamp TstProbe Fun=IO_Read,Data=0"
-     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp IO_CALL IO_Read 0 $StatusRegister"
      expect "%timestamp TstProbe Fun=IO_Read,Data=0"
-     expect "%timestamp IO_READ 0 $StatusRegister"
+     expect "%timestamp IO_CALL IO_Read 0 $StatusRegister"
      expect "%timestamp TstProbe Fun=IO_Read,Data=128"
-     expect "%timestamp IO_READ $ReadyBit $StatusRegister"
+     expect "%timestamp IO_CALL IO_Read $ReadyBit $StatusRegister"
      expect "%timestamp TstProbe Fun=IO_Read,Data=$data"
-     expect "%timestamp IO_READ [expr $data] $address"
+     expect "%timestamp IO_CALL IO_Read [expr $data] $address"
      expect "%timestamp FLASH_WRITE $FLASH_SUCCESS"
      expect "%timestamp Trg-Done QS_RX_COMMAND"
 
@@ -934,11 +938,11 @@ The following test script performs the same tests as the <a href="https://cppute
 [24] test "Write fails Vpp Error" -noreset
 [25] probe IO_Read [expr $ReadyBit | $VppErrorBit]
      command FLASH_WRITE $address $data
-     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
-     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp IO_CALL IO_Write $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_CALL IO_Write $address $data"
      expect "%timestamp TstProbe Fun=IO_Read,Data=[expr $ReadyBit | $VppErrorBit]"
-     expect "%timestamp IO_READ [expr $ReadyBit | $VppErrorBit] $StatusRegister"
-     expect "%timestamp IO_WRITE $CommandRegister $Reset"
+     expect "%timestamp IO_CALL IO_Read [expr $ReadyBit | $VppErrorBit] $StatusRegister"
+     expect "%timestamp IO_CALL IO_Write $CommandRegister $Reset"
      expect "%timestamp FLASH_WRITE $FLASH_VPP_ERROR"
      expect "%timestamp Trg-Done QS_RX_COMMAND"
 
@@ -970,8 +974,8 @@ The following test script performs the same tests as the <a href="https://cppute
          probe IO_Read [expr ~$ReadyBit]
      }
      command FLASH_WRITE $address $data
-     expect "%timestamp IO_WRITE $CommandRegister $ProgramCommand"
-     expect "%timestamp IO_WRITE $address $data"
+     expect "%timestamp IO_CALL IO_Write $CommandRegister $ProgramCommand"
+     expect "%timestamp IO_CALL IO_Write $address $data"
 [27] for {set i 0} {$i < 10} {incr i} {
          expect "%timestamp TstProbe Fun=IO_Read,Data=[expr ~$ReadyBit]"
          expect "%timestamp IO_READ [expr ~$ReadyBit] $StatusRegister"

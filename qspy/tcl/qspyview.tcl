@@ -14,8 +14,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 6.3.0
-# Last updated on  2018-05-10
+# Last updated for version 6.3.1
+# Last updated on  2018-05-24
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -58,7 +58,7 @@ set HOME [file dirname [file normalize [info script]]]
 source $HOME/qspy.tcl        ;# QSPY interface
 
 # this version of qspyview
-set VERSION 6.3.0
+set VERSION 6.3.1
 
 # command procedures =========================================================
 ## @brief main entry point to the QSpyView front-end application
