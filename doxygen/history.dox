@@ -1,18 +1,18 @@
 /**
 @page history Revision History
 
-@section qtools_6_3_1 Version 6.3_1, 2018-05-24
-This minor release corrects the QSPY utility. Specifically, the @ref qs_app "application-specific output" from the macro QS_FUN() contained an extra space (' ') before the function name. This extra space has been now removed.
+@section qtools_6_3_1 Version 6.3.1, 2018-05-24
+This minor release corrects the QSPY utility. Specifically, the @ref qs_app "application-specific output" from the macros QS_FUN(), QS_OBJ() and QS_SIG() contained extra space (' ') before the function/object/signal name. This extra space has been now removed.
 
 @note
-The change might impact existing QUTest test scripts, which parse the QS_FUN() output.
+The change might impact existing QUTest test scripts, which parse the QS_FUN(), QS_OBJ() or QS_SIG() output.
 
 @note
-The corrected QS_FUN() output (without the extra space) is assumed in the QUTest examples that ship in QP/C/C++ 6.3.1.
+The corrected QS_FUN(), QS_OBJ() and QS_SIG() output (without the extra space) is assumed in the QUTest examples that ship in QP/C/C++ 6.3.1.
 
 
 ------------------------------------------------------
-@section qtools_6_3_0 Version 6.3_0, 2018-05-10
+@section qtools_6_3_0 Version 6.3.0, 2018-05-10
 This release simplifies the usage of the QUTest (qutest.tcl) and QSpyView (qspyview.tcl) utilities by reducing the number of parameters required by these scripts. Specifically, the "local_port" parameter might be now omitted and still every instance of qutest.tcl / qspyview.tcl will be given a unique local UDP port. Additionally, the "port" parameter has been combined with the "host" parameter in the form host[:port].
 
 Here is the new usage of qutest.tcl script:

@@ -788,17 +788,23 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             case QS_SIG_T: {
                 u32 = QSpyRecord_getUint32(me, l_config.sigSize);
                 u64 = QSpyRecord_getUint64(me, l_config.objPtrSize);
-                SNPRINTF_APPEND(" %s,Obj=%s",
-                    SigDictionary_get(&l_sigDict, u32, u64, (char *)0),
-                    Dictionary_get(&l_objDict, u64, (char *)0));
-                    FPRINF_MATFILE("%u %"PRId64, u32, u64);
+                if (u64 != (uint64_t)0) {
+                    SNPRINTF_APPEND("%s,Obj=%s",
+                        SigDictionary_get(&l_sigDict, u32, u64, (char *)0),
+                        Dictionary_get(&l_objDict, u64, (char *)0));
+                }
+                else {
+                    SNPRINTF_APPEND("%s",
+                        SigDictionary_get(&l_sigDict, u32, u64, (char *)0));
+                }
+                FPRINF_MATFILE("%u %"PRId64, u32, u64);
                 break;
             }
             case QS_OBJ_T: {
                 u64 = QSpyRecord_getUint64(me, l_config.objPtrSize);
-                SNPRINTF_APPEND(" %s",
+                SNPRINTF_APPEND("%s",
                     Dictionary_get(&l_objDict, u64, (char *)0));
-                FPRINF_MATFILE(" %"PRId64, u64);
+                FPRINF_MATFILE("%"PRId64, u64);
                 break;
             }
             case QS_FUN_T: {
