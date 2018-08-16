@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "QTools"
-PROJECT_NUMBER         = "6.3.1"
+PROJECT_NUMBER         = "6.3.4"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -129,6 +129,10 @@ INPUT                  = \
     macros.h \
     ../qspy/include/qs_copy.h \
     ../qspy/include/qspy.h \
+    ../qspy/qspypy/config.py \
+    ../qspy/qspypy/fixtures.py \
+    ../qspy/qspypy/qspy.py \
+    ../qspy/qspypy/qutest.py \
     ../qspy/tcl/qspy.tcl \
     ../qspy/tcl/qutest.tcl \
     ../qspy/tcl/qspyview.tcl \
@@ -145,6 +149,7 @@ FILE_PATTERNS          = \
     *.h \
     *.c \
     *.cpp \
+    *.py \
     *.tcl
 
 RECURSIVE              = YES

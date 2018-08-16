@@ -25,7 +25,25 @@ computer (Windows, Linux, MacOS).
 
 The usage of the "qutest.tcl" script is as follows:
 
-tclsh qutest.tcl test_script [host_exe [host [port [local_port]]]]
+tclsh qutest.tcl [test_script] [host_exe] [host_ip]
+
+where:
+[test_scripts] - optional specification of the Python test scripts to run.
+                 If not specified, the scripts are chosen by the general
+                 rules of the PyTest framework.
+
+[target_exe]   - optional specification of the target executable to
+                 launch for testing embedded code on the host computer.
+                 If not specified, an embedded target is assumed.
+
+[host_ip]      - optional IP-address:port for the host running the QSpy
+                 utility. If not specified, the default is localhost:7701.
+
+Examples:
+tclsh C:\qp\qtools\qspy\tcl\qutest.tcl
+tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl
+tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl mingw\dpp.exe
+tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl mingw\dpp.exe 192.168.1.100:7705
 
 
 Using qspyview.tcl
@@ -36,15 +54,17 @@ on the host computer (Windows, Linux, MacOS).
 
 The usage of the "qspyview.tcl" script is as follows:
 
-wish qspyview.tcl [extension_script [host [port [local_port]]]]
+wish qspyview.tcl [extension_script] [host_ip]
 
-http://www.freertos.org/
+where:
+[extension_script] - optional specification of the extension scripts
+                 that customizes QSpyView for a particular project.
+                 If not specified, the "default.tcl" extension script
+                 is used that provides empty placeholders for all QS
+                 trace records and commands that you can receive from
+                 and send to the QS Target component.
 
-wish qspyview.tcl
-
-When executed without additional parameters, the script uses the default.tcl
-extension that provides empty placeholders for all QS trace records and
-commands that you can receive from and send to the QS Target component.
+[host_ip]      - optional IP-address:port for the host running the QSpy
 
 
 Customizing QSPYview
@@ -73,7 +93,13 @@ Tcl scripts to exercise the Target.
 
 More Information
 ================
-More information about the QS/QSPY software tracing system is available
+More information about the QP/QSPY software tracing system is available
 online at:
 
-https://state-machine.com/qtools/qspy.html
+https://www.state-machine.com/qtools/qpspy.html
+
+More information about the QUTest unit testing harness is available
+online at:
+
+https://www.state-machine.com/qtools/qutest.html
+

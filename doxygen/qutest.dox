@@ -1,89 +1,64 @@
 /*! @page qutest QUTest&trade; Unit Testing Harness
 
-@image html qutest_banner.jpg
+![](qutest_banner.jpg)
 
 @section qutest_about About QUTest&trade;
-<p><strong>QUTest&trade;</strong> (pronounced '_cutest_') is a **unit testing harness**, which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://state-machine.com/products/#QP" target="_blank" class="extern">QP/C/C++ applications</a>, which is a highly recommended best-practice.
+<p><strong>QUTest&trade;</strong> (pronounced '_cutest_') is a **unit testing harness** (a.k.a. *unit testing framework*), which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://state-machine.com/products/#QP" target="_blank" class="extern">QP/C/C++ applications</a>, which is a highly recommended best-practice.
 </p>
 
-@htmlonly
-<img style="float:left; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
-@endhtmlonly
-
-
 @note
-Even though QUTest&trade; has been primarily designed for testing of <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">QP state machines</a>, it can also be used to test **any embedded C or C++ code**. To demonstrate this capability, the QUTest&trade; comes with several examples of testing embedded code from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. These tests include examples of such techniques as using <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a> and <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a> with QUTest&trade;.@n@n@n
+Even though QUTest&trade; has been primarily designed for testing of <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">QP state machines</a>, it can also be used to test **any embedded C or C++ code**. To demonstrate this capability, the QUTest&trade; comes with several examples of testing embedded code from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. These tests are explained in the @ref qutest_tut "QUTest Tutorial" and demonstrate such techniques as using <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a> and <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a> with QUTest&trade;.
 
 
-@image html qutest_ex.png "Example of a QUTest&trade; session on an embedded board (EFM32-SLSTK)"
+<div class="separate"></div>
+@subsection qutest_how How it works?
+In a nutshell, working with QUTest&trade; is similar to "debugging with printf", where you instrument the code with the `printf` statements (or `sprintf` or similar). You then run the code with a controlled set of inputs, and examine the produced output from the `printf`s to determine whether the code under test operates correctly. The main differences from using `printf`s are (1) that the much more efficient @ref qpspy "QP/Spy" is used instead and (2) that both generating the inputs and the checking of the test outputs are **automated**.
+
+The process of testing embedded code with QUTest&trade; involves the following components:
+
+-# The **Target** that runs an instrumented @ref qutest_fixture "test fixture" code, whose job is to exercise your **CUT** (<b>C</b>ode <b>U</b>nder <b>T</b>est). Please note that a *test fixture* only exercises the CUT  and reports the results to the host using @ref qpspy "QP/Spy", but the *test fixture* does **not** check if the CUT operates "correctly".@n
+> NOTE: Several examples of *test fixtures* are explained in the @ref qutest_tut "QUTest Tutorial". The details of *test fixtures* are described in @ref qutest_fixture "QUTest Fixture Reference".
+
+-# The @ref qspy "QSPY" "back-end" application that receives the tracing data from the Target and also opens a communication channel for the QUTest "front-end".
+
+-# The **QUTest** "front-end" that executes @ref qutest_script "test scripts", which drive the tests and check the QSPY output against the expectations ("test-assertions").@n
+> NOTE: Several examples of *test scripts* are explained in the @ref qutest_tut "QUTest Tutorial".  The details of *test scripts* are described in @ref qutest_script "QUTest Script Reference".
+
+
+![Communication between Target, QSPY, and QUTest](qutest_targ.gif)
+@n
+
+@attention
+To work effectively with QUTest&trade;, you need to understand **how much output to expect from any given input**. Additionally, you need to understand how QUTest ensures that for every input to the *test fixture*, the generated QSPY output matches all test expectations and that there are no extra expectations or missing expectations after every command from the *test script*. These subjects are explained in the section @ref qutest_rtc "Run-to-Completion Processing".
+
+
+The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the QSPY host application via a TCP/IP socket (QSPY started with the `-t` @ref qspy_command "command-line option"). In this case all QUTest&trade; components execute on the host computer.
+
+![QUTest with Host Executable](qutest_host.gif)
 
 
 <div class="separate"></div>
 @subsection qutest_special What's Special about QUTest&trade;?
 Unlike other existing unit testing harnesses for embedded systems (e.g., <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> or <a href="http://cpputest.github.io/" target="_blank" class="extern">CppUTest</a>) QUTest&trade; is **not based on** <a href="https://en.wikipedia.org/wiki/XUnit" target="_blank" class="extern"><strong>xUnit</strong></a>, which was originally designed to run tests on host computers. Instead, QUTest&trade; is geared towards unit testing of **deeply embedded systems**. Here is a list of QUTest&trade; unique features, specifically designed for this purpose:
 
-- QUTest&trade; separates the *execution* of the CUT (Code Under Test) from *checking* of the "test assertions". The embedded target is concerned only with running a <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixture</b></a> that exercises the CUT and produces QP/Spy&trade; trace, but it does *not* check the "test assertions". Checking the "test assertions" against the expectations is performed on the host computer by means of *test scripts*. This approach is more intuitive for embedded developers and actually simplifies the development of all sorts of <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>, including <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a>, *without breaking encapsulation* of the CUT.
+- QUTest&trade; separates the *execution* of the CUT (Code Under Test) from *checking* of the "test assertions". The embedded target is concerned only with running a @ref qqtest_fixture "test fixture" that exercises the CUT and produces QP/Spy&trade; trace, but it does *not* check the "test assertions". Checking the "test assertions" against the expectations is performed on the host computer by means of @ref qtest_script "test scripts".
 
-- QUTest&trade; is a unique test harness on the embedded market that supports **scripting**. QUTest *test scripts* run on the Host, which skips compilation and uploading the code to the Target and thus shortens the TDD micro-cycle.
+- The QUTest&trade; approach is more **intuitive for embedded developers**, because it is conceptually like automated "debugging by printf" that most embedded developers use extensively. As it turns out, this approach also simplifies the development of all sorts of <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>, including <a href="https://en.wikipedia.org/wiki/Mock_object" target="_blank" class="extern">mocks</a>, *without breaking encapsulation* of the CUT.
+
+- QUTest&trade; is a unique test harness on the embedded market that supports **scripting**. QUTest @ref qtest_script "test scripts" run on the Host, which skips compilation and uploading the code to the Target and thus shortens the TDD micro-cycle. (NOTE: QUTest&trade; supports *test scripts* written either in [TCL](https://en.wikipedia.org/wiki/Tcl) or [Python](https://docs.pytest.org)).
 
 - QUTest&trade; supports **resetting the Target** for each individual test, if needed. This goes far beyond providing test `setup()` and `teardown()` functions that other test fixtures offer (and of course QUTest supports as well). Clean reset of the Target avoids erroneous tests that implicitly rely on side effects from previously executed code. This is particularly important for embedded systems and for state machines, so that each test can start from a known reset condition.
 
 - QUTest&trade; supports **testing Design by Contract** (assertions in C or C++, not to be confused with "test assertions") in the CUT. This is a carefully designed, unique feature of QUTest not available in other test harnesses. A successful test of DbC might actually mean breaking an assertion in the Target code.
 
-- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> that run on the Target **do not require dynamic memory** allocation (`malloc()/free()` in C or `new/delete` in C++). This means that you don't need to commit any of your precious embedded RAM to the heap (you can set the heap size to zero) and you don't need to link the heap management code. Avoiding dynamic memory allocation is one of the best practices of real-time embedded programming, which you don't need to compromise to run QUTest.
+- QUTest&trade; @ref qqtest_fixture "test fixtures" that run on the Target **do not require dynamic memory** allocation (`malloc()/free()` in C or `new/delete` in C++). This means that you don't need to commit any of your precious embedded RAM to the heap (you can set the heap size to zero) and you don't need to link the heap management code. Avoiding dynamic memory allocation is one of the best practices of real-time embedded programming, which you don't need to compromise to run QUTest.
 
-- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> that run on the Target **do not require non-local jumps** (`setjmp()()/longjmp()` in C or `throw/catch` in C++), which are needed by other test harnesses to discontinue failing tests. QUTest&trade; *test fixtrues* do not need to discontinue failing tests, because they don't check "testing assertions", so a test fixture does not "know" if it is failing or passing. Should a test fixture crash on the Target, it simply waits for the target reset commanded by a *test script*.
+- QUTest&trade; @ref qqtest_fixture "test fixtures" that run on the Target **do not require non-local jumps** (`setjmp()()/longjmp()` in C or `throw/catch` in C++), which are needed by other test harnesses to discontinue failing tests. QUTest&trade; *test fixtures* do not need to discontinue failing tests, because they don't check "testing assertions", so a *test fixture does* not "know" if it is failing or passing. Should a test fixture crash on the Target, it simply waits for the target reset commanded by a @ref qtest_script "test script".
 
-- QUTest&trade; <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixtures</b></a> can be based on the actual **application code**. For example you can reuse the same `main()` function in a *test fixture* and in your final application. This means that you can either grow your *test fixture* into a final application through TDD, or you can more easily add unit tests to an existing application.
+- QUTest&trade; @ref qqtest_fixture "test fixtures" can be based on the actual **application code**. For example you can reuse the same `main()` function in a *test fixture* and in your final application. This means that you can either grow your *test fixture* into a final application through TDD, or you can more easily add unit tests to an existing application.
 
 @note
 Even though QUTest&trade; is particularly suitable for running tests on deeply embedded targets, it also fully supports running *the same* tests on your @ref qutest_host "host computer". In fact, running the tests as much as possible on the host and thus avoiding the target-hardware bottleneck is the highly recommended best-practice of embedded TDD. QUTest&trade; supports **fully-automated** unit testing, both on the embedded target and on the host computer.
-
-
--------------------------------------------------------------------------------
-@section qutest_install Installing QUTest&trade; and Tcl
-QUTest&trade; is bundled with QSPY and is installed automatically when you @ref install "install QTools". Specifically, `QUTest` consists of the <span class="img file_tcl">qspy.tcl</span> and <span class="img file_tcl">qutest.tcl</span> Tcl scripts located in the @ref qspy_files <span class="img folder">qtools/qspy/tcl</span> folder.
-
-@attention
-Even though QUTest&trade; is implemented in <a href="http://www.tcl.tk/man/tcl8.4/" target="_blank" class="extern">Tcl (Tool Command Language)</a>, you don't need to know Tcl to write effective tests with QUTest&trade;. The @ref qutest_tut "actual tests" that you will write utilize a small, carefully designed set of commands that form a small <a href="https://en.wikipedia.org/wiki/Domain-specific_language" target="_blank" class="extern">DSL (Domain Specific Language)</a> for unit testing. The Tcl interpreter just happened to be an effective vehicle to implement this "Unit Testing DSL".
-
-
-<div class="separate"></div>
-@subsection qutest_windows Windows
-In order to run `QUTest`, you need the <em>Tcl interpreter</em> called **tclsh** installed on your machine. `tclsh` (version 8.4) is included in the QTools collection for Windows, so it will be available if you @ref install "install QTools&trade;". Also, the Tcl/Tk distribution included in QTools has been already extended with the @ref qspy_udp "UDP-Sockets" for Tcl, so you can use the `tclsh` and `wish` interpreters "as is" without any additional modifications.
-
-<div class="separate"></div>
-@subsection qutest_linux Linux
-On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/Tk distribution with the UDP Sockets for Tcl.
-
-@note
-In order to communicate with the QSPY back-end, QUTest requires the Tcl interpreter extended with **UDP Sockets**. Istructions of adding UDP Sockets to Tcl are included in the QTools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
-
-
--------------------------------------------------------------------------------
-@section qutest_run Running QUTest&trade;
-From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should @ref qspy_link "connect to the Target" of your choice.
-
-@note
-You can also use the `-t` to open a TCP/IP socket for connecting **host executables** as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:@n
-@n
-@verbatim
-qspy -u -t
-@endverbatim
-
-
-Second, because QUTest&trade; is implemented as a Tcl script, it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QUTest` or `QSpyView`).
-
-Once QSPY is running, you can run QUTest from a Windows command-prompt by typing:
-
-@verbatim
-tclsh %QTOOLS%\qspy\tcl\qutest.tcl
-@endverbatim
-
-This would launch `qutest` in the current directory and look for test scripts (`*.tcl` files) to execute them as tests.
-
-@attention
-Typically, the <span class="img file_tcl">qutest.tcl</span> script is started from a `Makefile`, which also builds the code under test (CUT) and loads it into the Target. The following @subpage qutest_tut "QUTest&trade; Tutorial" introduces QUTest&trade; concepts while the @subpage qutest_ref "QUTest&trade; Reference" goes into more detail.
 
 
 <div class="separate"></div>
@@ -94,47 +69,297 @@ The QUTest&trade; examples are co-located with the QP frameworks to which they p
 - QUTest&trade; examples for the <a href="https://state-machine.com/qpcpp" target="_blank" class="extern"><strong>QP/C++ framework</strong></a> are located in the QP/C++ installation directory, in the sub-directory <span class="img folder">`qpcpp\examples\qutest`</span>
 
 
-------------------------------------------------------------------------------
-@section qutest_struct QUTest&trade; Structure
-Testing with QUTest&trade; involves the following components:
--# A **test fixture** code that is written in C (or C++) and runs in your embedded Target (or on the host as a host-executable). The **test fixture** is linked with the **stub** of the QP framework (see <a href="https://state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">`qutest.c`</a>), which provides the complete QP API to your <b>CUT</b> (<b>C</b>ode <b>U</b>nder <b>T</b>est), but instead of actually running the code as a QP application, it waits for and executes commands from the @ref qspy "QSPY" host application. The design of *test fixtures* is explained in the @ref qutest_tut "QUTest&trade; Tutorial".
+@subpage qutest_rtc "&nbsp;"
+@subpage qutest_tut "&nbsp;"
+@subpage qutest_fixture "&nbsp;"
+@subpage qutest_script "&nbsp;"
 
--# The @ref qspy "QSPY" host application started with the `-u` @ref qspy_command "command-line option" (UDP socket) and with the proper communication link for your Target (e.g., `-t` @ref qspy_command "command-line option" (TCP/IP) link for a host executable);
+@next{qutest_rtc}
+*/
 
--# A **test script** that drives the tests and checks the generated QSPY output against the expectations ("test-assertions"). The design of *test scripts* is explained in the @ref qutest_tut "QUTest&trade; Tutorial".
+/*! @page qutest_rtc Run-to-Completion Processing
 
-The sequence diagram below shows the communication between these QUTest&trade; components. The embedded Target is running a **test fixture** code that communicates with @ref qspy "QSPY" over the @ref qspy_link "Target data link" (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol". The QUTest&trade; (Tcl script) attaches to the @ref qspy_text "UDP text channel" of the QSPY host application. This communication uses the @ref qspy_text "QSPY text format" (<span style="color:green"><strong>green arrows</strong></span>) for data forwarded from the Target and binary format for commands sent to the Target
-(<span style="color:blue"><strong>blue arrows</strong></span>).
+@tableofcontents
 
-@note
-The QUTest Front-End attaches to the @ref udp_channel "text-channel" of the UDP socket served by QSPY (<strong><span style="color:blue">blue arrows</span> and <span style="color:green">green arrows</span></strong> in the sequence diagram below).
-
+<p>The central concept applied in QUTest is **Run-to-Completion (RTC)** processing, both in the *test fixture* (Target) and in the *test script* (Host). RTC processing means that the code progresses in discrete, uninterruptible steps and that new inputs (commands) are recognized only *after* the current RTC step completes.
+</p>
 
 @attention
-The @ref udp_channel "QSPY UDP channel" should **not** be confused with the @ref qspy_link "QSPY target communication channel" (<span style="color:red"><strong>red arrows</strong></span> in the sequence diagram below), which can be serial-port, TCP/IP, or a binary-file.
+RTC Processing is the key to understanding **how much output to expect from any given input** as well as **when a given input will be processed**.
 
 
-@image html qspy_qutest.gif "Communication between Target, QSPY, and QUTest"
+Of course, it is not a coincidence that the RTC processing of QUTest matches exactly the RTC processing in event-driven systems of state machines. And the good news here is that for all interactions with state machines, the RTC output generated by a *test fixture* will correspond exactly to the RTC step in the state machine.
 
-<ul class="tag">
-  <li><span class="tag">A</span> The QUTest&trade; front-end sends commands to the QSPY (e.g., target reset), which are relayed to the Target
+However, a bit more tricky parts are the system reset, test initialization, and general processing of commands issued by *test scripts*. The following sections explain these parts by means of annotated sequence diagrams.
 
-  <li><span class="tag">B</span> The Target responds by sending QS trace records to QSPY, which parses them and sends the text-format to QUTest. The QUTest then compares the produced output to the expected output (checks the "test assertions")
-  </li>
+@remark
+For simplicity, the sequence diagrams in this section omit the QSPY intermediary from the communication between a *test fixture* (Target) and a *test script*. It is understood that every command from the *test script* goes to QSPY first and then is forwarded to the Target, and that every output from the Target goes through QSPY to reach the *test script*.
 
-  <li><span class="tag">C</span> UDP packets with  @ref qpspy_proto "Record-ID" in the range `128..255` are not relayed to the Target, but instead are used for communication between the QUTest&trade; Front-End and the QSPY Back-End.
-  </li>
-</ul>
+
+------------------------------------------------------------------------------
+@section qutest_reset Target Reset
+Most individual tests in a *test script*, start with a clean **target reset**. The following sequence diagram shows the details of this process. The explanation section following the diagram clarifies the interesting points (labeled with `[xx]`). :
+
+![Target reset](qutest_reset.gif)
+
+<dl class="tag">
+  <dt>[0]</dt><dd> A *test script* executes the test() command.
+  </dd>
+  <dt>[1]</dt><dd> By default, each test starts with calling an internal function reset() to reset the Target. This reset() function sends the `QS_RX_RESET` request to the *test fixture*. After this, the *test script* enters a wait state in which it waits for `QS_TARGET_INFO` reply from the Target.
+  </dd>
+> **NOTE:** The *test script* enters the Tcl event loop ([vwait](https://www.tcl.tk/man/tcl8.4/TclCmd/vwait.htm)) after **every command**.@n
+> **NOTE:** The Target reset can be suppressed by the `-noreset` option given after the reset() command, which is illustrated in the @ref qutest_noreset "-noreset Tests" sequence diagram. Please note, however, that the first test in a *test script* (test group) and any test immediately following an @ref qutuest_assert "assertion-test" **must** cleanly reset the Target (so it cannot use the `-noreset` option).
+  <dt>[2]</dt><dd> The *test fixture* processes the `QS_RX_RESET` request immediately by calling the QS_onReset() callback inside the Target.
+  </dd>
+> **NOTE:** Embedded Targets reboot automatically after resetting. In case of a **host executable**, however, QUTest&trade; (qutest.tcl) launches it again.@n
+  <dt>[3]</dt><dd> The Target starts executing the *test fixture* code from the beginning. After QS gets initialized (QS_INIT()), the *test fixture* sends the `QS_TARGET_INFO` reply to the *test script*.
+  </dd>
+  <dt>[4]</dt><dd> Upon reception of the awaited `QS_TARGET_INFO` reply, the *test script* attempts to execute the `on_reset()` procedure. If `on_reset()` is defined in the script, it runs at this time. (This scenario assumes that `on_reset()` is defined and runs until step [8]).
+  </dd>
+  <dt>[5]</dt><dd> A *test fixture* continues the initialization RTC step and typically produces some @ref qs_dict "QS dictionaries".
+  </dd>
+> **NOTE:** The @ref qs_dict "QS dictionaries" are consumed by QSPY and are **not** forwarded to the *test script*.
+  <dt>[6]</dt><dd> The *test fixture* might also produce some output that **is** forwarded to the *test script*.
+  </dd>
+  <dt>[7]</dt><dd> Any such output needs to be explicitly expected by the *test script*. The `on_reset()` procedure is the ideal place to handle such output.
+  </dd>
+> **NOTE:** The main purpose of the `on_reset()` procedure is to consume any output generated during the reset RTC step as well as to perform any setup that should follow the Target reset. In principle, instead of coding `on_reset()`, you could place all this code directly at every test, but this would be repetitious and defining `on_reset()` allows you to avoid such repetitions.
+  <dt>[8]</dt><dd> The `on_reset()` procedure ends and the *test script* sends `QS_RX_TEST_SETUP` to the Target.
+  </dd>
+  <dt>[9]</dt><dd> `QS_RX_TEST_SETUP` typically arrives while the *test fixture* still runs the initialization RTC. Therefore, `QS_RX_TEST_SETUP` is **not** processed immediately and its processing is delayed until the end of the current RTC step.
+  </dd>
+  <dt>[10]</dt><dd> A *test fixture* continues the initialization RTC step and might still produce some @ref qs_dict "QS dictionaries".
+  </dd>
+  <dt>[11]</dt><dd> Finally, the *test fixture* completes the initialization RTC by calling `QF_run()`. `QF_run()` runs an event loop, in which it processes commands that have accumulated from the *test script*.
+  </dd>
+  <dt>[12]</dt><dd> The first such command is `QS_RX_TEST_SETUP`, which has been waiting in the input buffer.
+  </dd>
+  <dt>[13]</dt><dd> The acknowledgement for the `QS_RX_TEST_SETUP` is sent back to the *test script*
+  </dd>
+  <dt>[14]</dt><dd> Upon reception of `Trg-Ack QS_RX_TEST_SETUP`, the *test script* attempts to execute the `on_setup()` procedure. If `on_setup()` is defined in the script, it runs at this time.
+  </dd>
+> **NOTE:** The main purpose of the `on_setup()` procedure is to consume any output generated from the `QS_onTestSetup()` callback in the *test fixture* invoked in the next step [15]. Note also the `QS_onTestSetup()` runs in all tests, including @ref qutest_noreset "-noreset tests".
+  <dt>[15]</dt><dd> The *test fixture* calls the `QS_onTestSetup()` callback function in the Target.
+  </dd>
+  <dt>[16]</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
+
+------------------------------------------------------------------------------
+@section qutest_pause Pausing the Reset
+As explained in the previous section, the initialization RTC step in the *test fixture* extends throughout `main()`, from the beginning till the final call to `QF_run()`. The *test fixture* is unable to process any commands from the *test script* until the end of this long RTC step, which can limit the flexibility of the *test fixture*.
+
+For example, consider the *test fixture* in the DPP example for QUTest (directory `qp/examples/qutest/dpp`). This *test fixture* reuses the `main()` function from the actual DPP application, which starts multiple active objects. To enable unit testing of a specific single active objects, it would be very convenient if the *test script* could set up the @ref qs_local "QS Local Filter" for the chosen active object component. Such local filter would then select the output, such as initialization from a given AO. But the problem is that such local filter requires the @ref qs_dict "QS object dictionary" to be already transmitted to QSPY. On the other hand, the local filter needs to take effect before the AOs are started. In other words, the initialization RTC step needs to be split into shorter pieces, right after sending the dictionaries, but before starting active objects.
+
+For such situations, QUTest provides the QS_TEST_PAUSE() macro, which pauses the execution of an RTC step and enters an event loop within the *test fixture*. This, in turn, allows the *test fixture* to process any commands from the *test script*, before the RTC continues to completion (or to another QS_TEST_PAUSE(), if needed).
+
+The following *test fixture* code illustrates the use of the QS_TEST_PAUSE() macro:
+
+@code
+     int main(int argc, char *argv[]) {
+         static QEvt const *tableQueueSto[N_PHILO];
+         static QEvt const *philoQueueSto[N_PHILO][N_PHILO];
+         ~ ~ ~
+
+         QF_init();    /* initialize the framework and the underlying RT kernel */
+         BSP_init(argc, argv); /* NOTE: calls QS_INIT() */
+
+         /* object dictionaries... */
+         QS_OBJ_DICTIONARY(AO_Table);
+         QS_OBJ_DICTIONARY(AO_Philo[0]);
+         QS_OBJ_DICTIONARY(AO_Philo[1]);
+         QS_OBJ_DICTIONARY(AO_Philo[2]);
+         ~ ~ ~
+
+         /* pause execution of the test and wait for the test script to continue */
+ [1]     QS_TEST_PAUSE();
+
+         /* initialize publish-subscribe... */
+         QF_psInit(subscrSto, Q_DIM(subscrSto));
+
+         /* initialize event pools... */
+         QF_poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+         /* start the active objects... */
+         Philo_ctor(); /* instantiate all Philosopher active objects */
+         for (n = 0U; n < N_PHILO; ++n) {
+             QACTIVE_START(AO_Philo[n],      /* AO to start */
+                      (n + 1),               /* QP priority of the AO */
+                      philoQueueSto[n],      /* event queue storage */
+                      Q_DIM(philoQueueSto[n]), /* queue length [events] */
+                      (void *)0,             /* stack storage (not used) */
+                      0U,                    /* size of the stack [bytes] */
+                      (QEvt *)0);            /* initialization event */
+         }
+         ~ ~ ~
+
+ [2]     return QF_run(); /* run the QF application */
+     }
+@endcode
+
+<dl class="tag">
+  <dt>[1]</dt><dd> The QS_TEST_PAUSE() macro pauses the initialization RTC after producing QS dictionaries, but before starting active objects.
+  </dd>
+  <dt>[2]</dt><dd> The QF_run() function completes the initialization RTC.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
+The following sequence diagram shows the details of pausing a test. The explanation section following the diagram clarifies the interesting points (labeled with `[xx]`). :
+
+![Pausing a test](qutest_pause.gif)
+
+<dl class="tag">
+  <dt>[1]</dt><dd> The target reset proceeds as before and produces the `QS_TARGET_INFO` trace record.
+  </dd>
+  <dt>[2]</dt><dd> At some point, however, the *test fixture* executes <b>QS_TEST_PAUSE()</b>, which sends `QS_TEST_PAUSED` record to the *test script*. At this point, the *test fixture* enters the event loop, so the initialization RTC finishes and the *test fixture* is now responsive to commands.
+  </dd>
+  <dt>[3]</dt><dd> At this point, the *test script* must be explicitily expecting `QS_TEST_PAUSE` by means of the expect_pause() command.
+  </dd>
+> **NOTE:** The best place to put expect_pause() is the `on_reset()` procedure, which should be defined in *test scripts* corresponding to *test fixtures* that call QS_TEST_PAUSE().
+  <dt>[4]</dt><dd> The `on_reset()` procedure can now execute commands that are processed **immediately** in the *test fixture*.
+  </dd>
+  <dt>[5]</dt><dd> Eventually the `on_reset()` procedure releases the *test fixture* from the pause by executing the continue() command. This command sends `QS_RX_TEST_CONTINUE` to the *test fixture*.
+  </dd>
+  <dt>[6]</dt><dd> Upon reception of `QS_RX_TEST_CONTINUE`, the *test fixture* continues the initialization in another RTC step.
+  </dd>
+  <dt>[7]</dt><dd> The `on_reset()` procedure ends and the test script sends `QS_RX_TEST_SETUP` to the Target.
+  </dd>
+  <dt>[8]</dt><dd> The test proceeds as before.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
+The following *test script* code illustrates the use of the expect_pause() and continue() commands:
+
+@code
+     proc on_reset {} {
+ [1]     expect_pause
+ [2]     glb_filter SM
+         loc_filter SM_AO AO_Philo<2>
+ [3]     continue
+ [4]     expect "===RTC===> St-Init  Obj=AO_Philo<2>,State=QHsm_top->Philo_thinking"
+         expect "===RTC===> St-Entry Obj=AO_Philo<2>,State=Philo_thinking"
+         expect "%timestamp Init===> Obj=AO_Philo<2>,State=Philo_thinking"
+         glb_filter SM AO UA
+         current_obj SM_AO AO_Philo<2>
+     }
+@endcode
+
+
+------------------------------------------------------------------------------
+@section qutest_noreset -noreset Test
+In some tests, you specifically don't want to reset the Target, but rather you want to pick up exactly where the previous test left off. For example, you wish to test a specific state of your state machine, which you reached by dispatching or posting a specific sequence of events to it in the previous tests.
+
+For such tests, you can suppress the target reset by following the test() command with the **-noreset** option. Such tests are called "-noreset Tests".
 
 @note
-As you can see, the QUTest structure separates test execution from checking the test expectations (a.k.a. "test assertions"). This leads to a testing strategy most suitable to deeply embedded systems, where the embedded Target needs to execute only a minimal **test fixture** code, while actual driving of the tests and checking "test assertions" is performed on a powerful host computer. In practice, a well designed *test fixture* can serve many tests, which greatly increases the flexibility of testing, because tests are just scripts, which run in seconds and don't require compilation and uploading to the Target.
+A "-norest Test" is not allowed as the first test of a *test group* and also not after an @ref qutest_assert.
 
 
-<div class="separate"></div>
-@subsection qutest_host Host Executable
-The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the QSPY host application via a TCP/IP socket (QSPY started with the `-t` @ref qspy_command "command-line option"). In this case all QUTest&trade; components executes on the host computer.
+The following sequence diagram shows the details of this process. The explanation section following the diagram clarifies the interesting points (labeled with `[xx]`). :
 
-@image html qspy_host.gif "QUTest with Host Executable"
+![-noreset Test](qutest_noreset.gif)
+
+<dl class="tag">
+  <dt>[0]</dt><dd> The *test fixture* is done processing commands from any previous test(s) and is running an event loop.
+  </dd>
+  <dt>[1]</dt><dd> The *test script* executes the `test() -noreset` command.
+  </dd>
+  <dt>[2]</dt><dd> The `test() -noreset` command sends `QS_RX_TEST_SETUP` command to the *test fixture*.
+  </dd>
+  <dt>[3]</dt><dd> The *test fixture* processes `QS_RX_TEST_SETUP` immediatel, because it is running event loop.
+  </dd>
+  <dt>[4]</dt><dd> The *test fixture* responds with `Trg-Ack QS_RX_TEST_SETUP`.
+  </dd>
+  <dt>[5]</dt><dd> Upon reception of `Trg-Ack QS_RX_TEST_SETUP`, the *test script* attempts to execute the `on_setup()` procedure. If `on_setup()` is defined in the script, it runs at this time.
+> **NOTE**: The main purpose of the on_setup() procedure is to consume any output generated from the QS_onTestSetup() callback in the test fixture invoked in the next step [6].
+  </dd>
+  <dt>[6]</dt><dd> The *test fixture* calls the QS_onTestSetup() callback function in the Target.
+  </dd>
+  <dt>[7]</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
+------------------------------------------------------------------------------
+@section qutest_assert Assertion Test
+
+The use of assertions in embedded code (and especially in safety-critical code) is considered one of the **best practices** and the QP frameworks provide assertion facilities specifically designed for deeply embedded systems.
+
+Assuming that you are using QP assertions in your code, an assertion failure can happen during a unit test. When it happens, the *test fixture* will produce the non-maskable `QS_ASSERT_FAIL` trace record. When this record arrives during a regular test, it will not be expected, so the test will fail. This is exactly what you want, because a failing assertion represents an error, which needs to be fixed.
+
+@note
+The QP assertion handler `Q_onAssert()` is defined in the @ref qutest_stub "QUTest Stub". This assertion handler is instrumented to produce the `QS_ASSERT_FAIL` trace record.
+
+
+However, sometimes you exactly want to test the assertion code itself, so you intentionally force an assertion in your test. In that case an assertion failure is expected and the test passes when assertion fails. Such tests are called "Assertion Tests" and QUTest&trade; has been specifically designed to support such tests.
+
+Here is an example of an "Assertion Test":
+
+@code
+test "TIMEOUT->Philo_thinking (ASSERT)"
+probe QActive_post_ 1
+dispatch TIMEOUT_SIG
+expect "%timestamp Disp===> Obj=AO_Philo<2>,Sig=TIMEOUT_SIG,State=Philo_thinking"
+expect "===RTC===> St-Exit  Obj=AO_Philo<2>,State=Philo_thinking"
+expect "%timestamp TstProbe Fun=QActive_post_,Data=1"
+expect "%timestamp =ASSERT= Mod=qf_actq,Loc=110"
+@endcode
+
+As you can see, the test ends with an explicit expectation of an assertion failure: `expect "%timestamp =ASSERT= Mod=qf_actq,Loc=..."`. This is very easy and natural in QUTest.
+
+@note
+The only special treatment required here is that a test immediately following an such an "Assertion Test" must necessarily reset the Target (it cannot be a @ref qutest_noreset "-noreset Test").
+
+
+------------------------------------------------------------------------------
+@section qutest_simple Simple Commands
+Simple *test script* commands do not produce any output from the Target, except only the "Trg-Ack" (acknowledgement). Examples of `<SIMPLE-COMMAND>` include glb_filter(), loc_filter() and current_obj(),
+
+![Simple command processing](qutest_simple.gif)
+
+<dl class="tag">
+  <dt>[1]</dt><dd> A *test script* sends a `<SIMPLE-COMMAND>` to the *test fixture*.
+  </dd>
+  <dt>[2]</dt><dd> The *test fixture* receives the command and immediately starts processing it.
+  </dd>
+  <dt>[3]</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <SIMPLE-COMMAND>" (acknowledgement of the specific `<SIMPLE-COMMAND>`).
+  </dd>
+  <dt>[4]</dt><dd> Immediately after sending the `<SIMPLE-COMMAND>`, the *test script* enters an implicit expect state, in which it waits for the "Trg-Ack <SIMPLE-COMMAND>" output from the Target. The processing of the `<SIMPLE-COMMAND>` ends when the next output received from the Target matches exactly the expected output.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
+
+------------------------------------------------------------------------------
+@section qutest_complex Complex Commands
+Complex *test script* commands might produce some output from the Target, not just the "Trg-Ack" (acknowledgement). Examples of `<COMPLEX-COMMAND>` include dispatch(), post() and tick(),
+
+![Complex command processing](qutest_complex.gif)
+
+<dl class="tag">
+  <dt>[1]</dt><dd> A *test script* sends a `<COMPLEX-COMMAND>` to the *test fixture*.
+  </dd>
+  <dt>[2]</dt><dd> The *test fixture* receives the command and immediately starts processing it.
+  </dd>
+  <dt>[3]</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <COMPLEX-COMMAND>" (acknowledgement of the specific `<COMPLEX-COMMAND>`).
+  </dd>
+  <dt>[4]</dt><dd> The `<COMPLEX-COMMAND>` must be followed in the *test script* by the explicit expect() commands that concume any ouptu produced by the command.
+  </dd>
+  <dt>[5-6]</dt><dd> The *test fixture* produces some output.
+  </dd>
+  <dt>[7]</dt><dd> Each such ouput is consumed by the matching expect() command.
+  </dd>
+  <dt>[8]</dt><dd> The *test fixture* sends additional QS record "Trg-Done <COMPLEX-COMMAND>", which explicitly delimits the output from this parricualr command.
+  </dd>
+  <dt>[8]</dt><dd> The *test script* must consume the "Trg-Done <COMPLEX-COMMAND>" record by an explicit expect() command.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
+
 
 @next{qutest_tut}
 */

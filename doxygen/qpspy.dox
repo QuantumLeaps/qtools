@@ -9,24 +9,42 @@ So the questions are: How can you monitor the behavior of a running real-time sy
 
 Techniques based on **software tracing** can answer many of these questions. Software tracing is a method for obtaining diagnostic information in a live environment without the need to stop the application to get the system feedback. Software tracing always involves some form of a target system instrumentation to log interesting discrete events for subsequent retrieval from the system and analysis.
 
+@anchor qpspy_framework
+@note
+Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://state-machine.com/products/#QP">QP&trade; real-time frameworks</a>. Due to the inversion of a control, a real-time framework controls almost all interesting interactions in the system, so an instrumented real-time framework can provide much more comprehensive and detailed information than any traditional RTOS.
+
 
 ------------------------------------------------------------------------------
 @section ab_about What is it?
 
-<strong>QP/Spy&trade;</strong> is a @ref concepts "software tracing and testing system" specifically designed for embedded systems, such as single chip microcontrollers. The job of QP/Spy is to capture information about an embedded code's execution and send it to the host computer with minimal impact on the real-time performance of the embedded code. QP/Spy can also send commands and data *to the embedded target*, which serves as the basis for @ref qutest "Unit Testing" and for @ref qspyview "Visualization" subsystems of the QP/Spy system.
+<strong>QP/Spy&trade;</strong> is a @ref concepts "software tracing and testing system" specifically designed for embedded systems, such as single chip microcontrollers. The job of QP/Spy is to capture information about an embedded code's execution and send it to the host computer with minimal impact on the real-time performance of the embedded code.
 
-@anchor qpspy_framework
-@note
-Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://state-machine.com/products/#QP">QP active object frameworks</a>. Due to the inversion of a control, a reactive framework controls almost all interesting interactions in the system, so an instrumented event-driven framework can provide much more comprehensive and detailed information than any traditional RTOS.
+@image html qpspy0.gif "Software tracing data records flowing from Target to the Host"
 
+@remarks
+QP/Spy can also (optionally) send commands and data **to the embedded target** (see @ref qpspy_rx "Bi-Directional QP/Spy"), which serves as the basis for @ref qutest "Unit Testing" and for @ref qspyview "Visualization" subsystems of the QP/Spy system.
 
 
 ------------------------------------------------------------------------------
 @section ab_how How it works?
-In a nutshell, working with QP/Spy&trade; is similar to peppering the code with `printf` statements for logging and debugging, except that QP/Spy&trade; is much less intrusive, and more lightweight, portable and @ref qspy_filters "selective" than the primitive `printf`.
+In a nutshell, working with QP/Spy&trade; is similar to peppering the code with `printf` or similar (like `sprintf`) statements for logging and debugging, except that QP/Spy&trade; is much less intrusive, more lightweight, portable and @ref qspy_filters "selective" than the primitive `printf`. Additionally, unlike the `printf` output, the data produced by QP/Spy&trade; contain the data *integrity* and *continuity* checks, so the host computer can tell when it receives corrupt data or incomplete data.
 
-@note
-The main difference between the QP/Spy&trade; tracing system and peppering the code with `printf` statements is *where* the data **formatting** and **sending** is done. When you use `printfs`, the data formatting and sending occur in the *time-critical* paths through the embedded code. In contrast, the QP/Spy system produces *raw binary data*, so all the time-consuming formatting is removed from the embedded system and is done after the fact in the host computer. Additionally, in QP/Spy, data logging and sending to the host are separated so that the embedded system can typically perform the transmission outside of the time-critical path, for example in the idle processing of the embedded CPU. Finally, the code size of the @ref qs "target-resident component" in QP/Spy is merely a few hundred bytes, which contrasts with several kilobytes of code required by a full-blown `printf` formatter.
+The main advantages of the QP/Spy&trade; tracing system over peppering the code with `printf` statements are:
+
+- When you use `printfs`, the data formatting and sending occur in the *time-critical* paths through the embedded code. In contrast, QP/Spy produces raw *binary data*, so all the time-consuming formatting is removed from the embedded system and is done after the fact in the host computer.
+
+- in QP/Spy, data logging and sending to the host are **separated** so that the embedded system can typically perform the transmission outside of the time-critical path, for example in the *idle processing* of the embedded CPU.
+
+- Data produced by `printf` gives you no clue if the data gets corrupted or lost in transmission. In contrast, the @ref qpspy_proto "QP/Spy transmission protocol" checks for data **integrity** and **continuity**.
+
+- The QP/Spy tracing provides flexible @ref qs_filters "filtering" mechanisms, which allow you to selectively trace only the aspects of the system that you choose and suppress the data that is not interesting at the moment.
+
+- The QP/Spy tracing is implemented as macros that are active only in the "Spy" build configuration and are inactive in the Release or Debug build configurations. This means that you can safely leave the instrumentation in the code for future maintenance, development and testing.
+
+- The QP/Spy trace data contain precise, high-granularity **timestamps**, so you can tie the data to the common timeline.
+
+- The code size of the @ref qs "target-resident component" in QP/Spy is merely a few hundred bytes, which contrasts with several kilobytes of code required by a full-blown `printf` formatter.
+
 
 The picture below shows a typical setup for software tracing. The embedded Target system is executing instrumented code, which logs the trace data into a RAM buffer inside the Target. From that buffer the trace data is sent over a data link to a Host computer, which stores, displays, and analyzes the information. This configuration means that a software tracing always requires two components: a "Target resident component" for generating and sending the trace data (@ref qs "QS" in QP/Spy&trade;), and a "Host resident component" to receive, decompress, visualize, and analyze the data (@ref qspy "QSPY" in QP/SPy&trade;).
 
@@ -53,7 +71,9 @@ Finally, the tracing facility must allow consolidating data from all parts of th
 
 <div class="separate"></div>
 @subsection qpspy_rx Bi-Directional Connection to the Target
-While traditional software tracing systems support only uni-directional output of trace data from the embedded Target to a Host computer, QP/Spy supports bi-directional communication to the target as well. This capability allows users to send commands and data to the Target and form the basis for @ref qutest "Unit Testing" and @ref qspyview "Visualization and Monitoring" of the embedded Target.
+While traditional software tracing systems support only uni-directional output of trace data from the embedded Target to a Host computer, QP/Spy supports bi-directional communication to the target as well. This capability allows users to send commands and data to the Target and form the basis for @ref qutest "Unit Testing" and @ref qspyview "Visualization and Monitoring" of embedded Targets.
+
+@image html qpspy1.gif "Bi-directional data exchange between the Target and the Host"
 
 <div class="separate"></div>
 @subsection qpspy_udp UDP Socket Extension
@@ -79,8 +99,10 @@ The following sections explain the concepts and components of QP/Spy&trade;:
 
 @tableofcontents
 
-<p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but has many elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any bufferning or transmission error to minimize loss of useful data.
+<p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but contains the mechanisms for checking both data **integrity** and **continuity**.
 </p>
+
+The QP/Spy&trade; data protocol has many elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any bufferning or transmission error to minimize loss of useful data.
 
 @image html qspy6.gif "QP/Spy transmission protocol"
 

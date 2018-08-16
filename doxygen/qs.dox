@@ -41,12 +41,23 @@ enum MyAppRecords {
 };
 ~ ~ ~
 QS_BEGIN(PHILO_STAT, AO_Philo[n]) /* application-specific record begin */
-    QS_U8(1, n);  /* Philosopher number */
-    QS_STR(stat); /* Philosopher status */
+    QS_U8(1, n);  /* application-specific data element (Philo number) */
+    QS_STR(stat); /* application-specific data element (Philo status) */
 QS_END()          /* application-specific record end */
 @endcode
 
-The biggest challenge in supporting flexible "application-specific" trace records is to provide the data type information with the data itself, so that QSPY "knows" how to parse such record and move on to the next data element within the record. The figure below shows the encoding of the application-specific trace record from the listing previous.
+As you can see from the example above, an application-specific trace record always begins with QS_BEGIN(), followed by a number of @ref qs_app_el "application-specific data elements", followed by QS_END().
+
+@attention
+The application-specific records use the 55 @ref qpspy_proto "record-IDs" in the range #QS_USER .. 124 (see also User-All group in @ref qs_global "Global Filters"). Therefore, you need to **offset** your application-specific trace records by the #QS_USER constant to avoid overlap with the @ref qs_pre "predefined QS records" already instrumented into the QP components.
+
+@note
+As all QS trace records, the application-specific records are produced in a critical section of code (interrupts disabled). Therefore, you should keep the number of @ref qs_app_el "application-specific data elements" of the record reasonably short.
+
+
+<div class="separate"></div>
+@subsection qs_app_rep Application-Specific Record Representation
+The biggest challenge in supporting flexible "application-specific" trace records is to provide the data type information with the data itself, so that @ref qspy "QSPY" "knows" how to parse such record and move on to the next data element within the record. The figure below shows the encoding of the application-specific trace record from the listing previous.
 
 @image html qspy_app.gif "Structure of an Application-Specific trace record"
 
@@ -61,11 +72,104 @@ As shown in the listing above, typically the application-specific records are en
 
 The record-begin macro QS_BEGIN() takes two arguments. The first argument (e.g., `PHILO_STAT`) is the enumerated @ref qpspy_proto "record-ID", which is used in the @ref qs_global "global filter" and is part of the each record header.
 
-@attention
-The application-specific record types cannot start from zero but rather must be offset by at least the value #QS_USER to avoid overlap with the @ref qs_pre "predefined QS records" already instrumented into the QP components.
-
-
 The second argument (e.g., `AO_Philo[n]` in the example above) is used for the @ref qs_local "local filter", which allows you to selectively log only specific application-level objects. The code snippet shows an example of an application-specific trace record, including the use of the second parameter of the QS_BEGIN() macro.
+
+
+<div class="separate"></div>
+@subsection qs_app_el Application-Specific Data Elements
+The following table summarizes the supported data elements that can be used inside the Application-Specific trace records:
+
+<center>
+Data Element    | Example         | Comments
+----------------|-----------------|---------
+QS_U8()         | `QS_U8(0, n);`  | Outputs a `uint8_t` integer with format `"%u"`
+QS_I8()         | `QS_I8(3, m);`  | Outputs a `int8_t` integer with format `"%3d"`
+QS_U16()        | `QS_U16(5, n);` | Outputs a `uint16_t` integer with format `"%5u"`
+QS_I16()        | `QS_I16(0, m);` | Outputs a `int16_t` integer with format `"%d"`
+QS_U32()        | `QS_U32(8, n);` | Outputs a `uint32_t` integer with format `"%8u"`
+QS_I32()        | `QS_I32(0, m);` | Outputs a `int32_t` integer with format `"%d"`
+QS_U32_HEX()    | `QS_U32_HEX(8, h)` | Outputs a `uint32_t` integer with format `"%8X"`
+QS_U64()        | `QS_U32(0, n);` | Outputs a `uint32_t` integer with format `"%2"PRIi64`
+QS_F32()        | `QS_F32(0, 3.1415F);` | Outputs a 32-bit `float` with format `"%7.0e"`@n (zero digits after the comma)
+QS_F64()        | `QS_F64(4, sqrt(2.0));` | Outputs a 64-bit `double` with format `"%12.4e"` @n (4 digits after the comma)
+QS_STR()        | `QS_STR("Hello")`  | Outputs a zero-terminated string with format `"%s"`
+QS_MEM()        | `QS_MEM(&my_struct, 16)` | Outputs 16 bytes of memory starting from `&my_struct`.@n The bytes are output using the hex format `"%02X"`
+QS_OBJ()        | `QS_OBJ(&my_obj);` | Outputs an object pointer.@n If an object dictionary for the object exists,@n @ref qspy "QSPY" will display the symbolic name of the object
+QS_FUN()        | `QS_OBJ(&foo);` | Outputs a function pointer.@n If a function dictionary for the function exists,@n @ref qspy "QSPY" will display the symbolic name of the function
+QS_SIG()        | `QS_SIG(TIMEOUT_SIG, (void*)0);` | Outputs a signal.@n If siganl dictionary for the siganl exists,@n @ref qspy "QSPY" will display the symbolic name of the signal
+</center>
+
+
+<div class="separate"></div>
+@subsection qs_app_exa Application-Specific Record Examples
+The following examples show the QS application-specific trace records as C code on the left, and the output generated by the @ref qspy "QSPY" host application from these records. The examples assume that the @ref qs_dict "QS dictionaries" have been produced for the Record-IDs and function/object pointers used.
+
+<table cellSpacing="8" align="center" valign="middle">
+  <tr bgColor="#c8cedc">
+    <th><b>Trace Record</b></th>
+    <th><b>QSPY ouptut</b></th>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN(PHILO_STAT, AO_Philo[n])
+    QS_U8(1, n);
+    QS_STR(stat);
+QS_END()
+@endcode
+    </td>
+    <td>
+`1018004718 PHILO_STAT 1 thinking`
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN(IO_CALL, (void *)0)
+    QS_FUN(&IO_Read);
+    QS_I16(0, ret);
+    QS_U32(0, offset);
+QS_END()
+@endcode
+    </td>
+    <td>
+`1055004424 IO_CALL IO_Read -129 0`
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN(DATA_RX, (void *)0)
+    QS_OBJ(me);
+    QS_U16(data_len);
+    QS_MEM(data_buf, 16);
+QS_END()
+@endcode
+    </td>
+    <td>
+`0207024814 DATA_RX l_uart2 10  17 84 BB 40 FD 15 00 00 99 0B 00 00 90 0D 00 20`
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN(FP_DATA, (void *)0)
+    QS_F32(6, 3141.5F);
+    QS_F64(10, -2.718281828e5);
+QS_END()
+@endcode
+    </td>
+    <td>
+`0991501750 FP_DATA  3.141500e+003 -2.7182818280e+005`
+    </td>
+  </tr>
+
+</table>
+
 
 
 -------------------------------------------------------------------------------
@@ -87,6 +191,7 @@ QS provides a simple interface for setting and clearing individual Record-IDs as
 
 The following table summarizes the Record-IDs and groups of Record-IDs that you can use as arguments to QS_FILTER_ON() and QS_FILTER_OFF()
 
+@n
 <center>
 Record-ID Group | Example | Applies to QS Records
 ----------------|---------|----------------------
@@ -105,6 +210,7 @@ User Group-3    | QS_FILTER_ON(QS_U3_RECORDS);@n QS_FILTER_OFF(QS_U3_RECORDS); |
 User Group-4    | QS_FILTER_ON(QS_U4_RECORDS);@n QS_FILTER_OFF(QS_U4_RECORDS); | #QS_USER + 40 .. #QS_USER + 54
 User-All        | QS_FILTER_ON(QS_UA_RECORDS);@n QS_FILTER_OFF(QS_UA_RECORDS); | #QS_USER + 0  .. #QS_USER + 54
 </center>
+@n
 
 @note
 The QS global filter cannot disable a special class of QS records, which are called **non-maskable**. These non-maskable records include: @ref qs_dict "dictionary records", target-information records, QS-RX status responses, QUTest-status responses, and the Target assertion record.
@@ -144,7 +250,7 @@ Current Objects can be set only by sending commands to the @ref qs_rx "QS-RX rec
 
 -------------------------------------------------------------------------------
 @section qs_dict QS Dictionaries
-By the time you compile and load your application image to the Target, the symbolic names of various objects, function names, and event signal names are stripped from the code. Therefore, if you want to have the symbolic information available to the @ref qspy "QSPY host-resident component", you need to supply it somehow to the software tracing system.
+By the time you compile and load your application image to the Target, the symbolic names of various objects, function names, and event signal names are stripped from the code. Therefore, if you want to have the symbolic information available to the @ref qspy "QSPY" host-resident component, you need to supply it somehow to the software tracing system.
 
 The QS Target-resident component provides special **dictionary trace records** designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records:
 
@@ -153,7 +259,7 @@ The QS Target-resident component provides special **dictionary trace records** d
 - signal dictionary  ( QS_SIG_DICTIONARY() )
 - user dictionary  ( QS_USR_DICTIONARY() )
 
-The dictionary trace records are typically generated during the system initialization and this is the only time when they are sent to the QSPY host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
+The dictionary trace records are typically generated during the system initialization and this is the only time when they are sent to the @ref qspy "QSPY" host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
 
 @code
 void main(void) {
@@ -181,18 +287,18 @@ The dictionary trace records are not absolutely required to generate the human-r
 The QS target component contains the receive-channel (QS-RX), which can receive data from the @ref qspy "QSPY" host application. The QS-RX channel provides the following services:
 - Remotely reset of the Target
 - Request target information (version, all sizes of objects, build time-stamp)
-- Execute a user-defined command inside the Target with arguments supplied from QSPY
+- Execute a user-defined command inside the Target with arguments supplied from @ref qspy "QSPY"
 - Inject an arbitrary event to the Target (dispatch, post or publish)
 - Set @ref qs_global "global QS filters" inside the Target
 - Set @ref qs_local "local QS filters" inside the Target
 - Set @ref qs_curr "current QS object" inside the Target
-- Peek data inside the Target and send to QSPY
-- Poke data (supplied from QSPY) into the Target
-- Fill specified memory area in the Target with bit pattern supplied from QSPY
+- Peek data inside the Target and send to @ref qspy "QSPY"
+- Poke data (supplied from @ref qspy "QSPY") into the Target
+- Fill specified memory area in the Target with bit pattern supplied from @ref qspy "QSPY"
 - Execute clock tick inside the Target
 - Execute test setup inside the Target
 - Execute test teardown inside the Target
-- Store a @ref qutest_tp "Test Probe" supplied from QSPY inside the Target
+- Store a @ref qutest_tp "Test Probe" supplied from @ref qspy "QSPY" inside the Target
 
 @note
 The QS-RX channel is the backbone for interacting with the target system and implemeting such features as @ref qutest "Unit Testing" and @ref qspyview "Visualization/Monitoring" of the target system.

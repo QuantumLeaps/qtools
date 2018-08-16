@@ -1936,7 +1936,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 * and this is not the first target info?
                 */
                 if ((d != 0U) && (c != 0U)) {
-                    SNPRINTF_LINE("   <QSPY-> Target info missmatch "
+                    SNPRINTF_LINE("   <QSPY-> Target info mismatch "
                                   "(dictionaries discarded)");
                     QSPY_onPrintLn();
                     resetAllDictionaries();
@@ -2517,7 +2517,7 @@ error:
 
     /* any differences in config and not the first time through? */
     if ((stat != QSPY_ERROR) && (d != 0U) && (c != 0U)) {
-        SNPRINTF_LINE("   <QSPY-> Dictionaries missmatch "
+        SNPRINTF_LINE("   <QSPY-> Dictionaries mismatch "
                       "the Target (discarded)");
         QSPY_onPrintLn();
 
