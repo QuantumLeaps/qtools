@@ -4,12 +4,12 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.1
-* Last updated on  2018-05-25
+* Last updated for version 6.3.5
+* Last updated on  2018-09-17
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
 * Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
@@ -860,11 +860,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                  (unsigned)l_config.version);
                     QSPY_onPrintLn();
 
-                    Dictionary_reset(&l_funDict);
-                    Dictionary_reset(&l_objDict);
-                    Dictionary_reset(&l_mscDict);
-                    Dictionary_reset(&l_usrDict);
-                    SigDictionary_reset(&l_sigDict);
+                    resetAllDictionaries();
                 }
             }
             break;
@@ -2534,6 +2530,9 @@ static void resetAllDictionaries(void) {
     Dictionary_reset(&l_mscDict);
     Dictionary_reset(&l_usrDict);
     SigDictionary_reset(&l_sigDict);
+
+    /* pre-fill known entries */
+    Dictionary_put(&l_usrDict, 124, "QUTEST_ON_POST");
 }
 /*..........................................................................*/
 SigType QSPY_findSig(char const *name, ObjType obj) {

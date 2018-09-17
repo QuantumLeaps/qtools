@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.0
-# Last updated on: 2018-08-16
+# Last updated for version: 2.0.1
+# Last updated on: 2018-09-17
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -42,6 +42,7 @@ import sys
 import signal
 import pytest
 import time
+import fnmatch
 from threading import Event
 from queue import Queue
 from subprocess import Popen
@@ -64,6 +65,7 @@ class qutest_context():
         self.on_reset_callback = None
         self.on_setup_callback = None
         self.on_teardown_callback = None
+        self.timestamp = 0
 
     def session_setup(self):
         """ Setup that should run on once per session. """
@@ -237,6 +239,7 @@ class qutest_context():
 
         self.qspy.sendSetup()
         self.expect('           Trg-Ack  QS_RX_TEST_SETUP')
+        self.timestamp = 0
         if self.on_setup_callback is not None:
             self.on_setup_callback(self)
 
@@ -252,6 +255,7 @@ class qutest_context():
         """ Resets the target and calls any registered reset handler """
 
         self.reset_target()
+        self.timestamp = 0
         if self.on_reset_callback is not None:
             self.on_reset_callback(self)
 
@@ -420,9 +424,7 @@ class qutest_context():
         If no string is returned in EXPECT_TIMEOUT_SEC the test will fail
 
         Args:
-          match : is either an entire string or one prepended with
-                  %timestamp to ignore timestamp and/or
-                  postpended with * to ignore ending
+          match : the expected match for the QSPY output
         """
 
         try:
@@ -435,26 +437,19 @@ class qutest_context():
 
         _, line = qspy.parse_QS_TEXT(next_packet)
 
-        magic_string = '%timestamp'
-
-        if match.startswith(magic_string):
-            line_start = len(magic_string)
+        if match.startswith('%timestamp'):
+            self.timestamp += 1
+            expected = '{:010d}'.format(self.timestamp) + match[10:]
+        elif match[0:9].isdigit():
+            self.timestamp += 1
+            expected = match
         else:
-            line_start = 0
+            expected = match
 
-        if match.endswith('*'):
-            line_end = match.find('*', line_start)
-            match = match.rstrip('*')
-        else:
-            line_end = len(match)
-
-        expected = match[line_start:]
-        actual = line[line_start:line_end]
-        #assert expected == actual, 'Expect Match Failed! \nExpected:\"{0}\"\nReceived:\"{1}\"'.format(expected, actual)
-        if expected != actual:
+        if not fnmatch.fnmatchcase(line,expected):
             __tracebackhide__ = True
             pytest.fail('Expect Match Failed! \nExpected:\"{0}\"\nReceived:\"{1}\"'.format(
-                expected, actual))
+                expected, line))
 
     ################### qspy backend callbacks #######################
 

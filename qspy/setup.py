@@ -1,6 +1,6 @@
 # Setup script for the "qspypy" package
-# Last updated for version: 2.0.0
-# Last updated on: 2018-08-16
+# Last updated for version: 2.0.1
+# Last updated on: 2018-09-16
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -32,7 +32,7 @@ with open("qspypy/README.md", "r") as fh:
 
 setuptools.setup(
     name="qspypy",
-    version="2.0.0",
+    version="2.0.1",
     author="Lotus Engineering, LLC/Quantum Leaps, LLC",
     author_email="info@state-machine.com",
     description="Python support for QUTest scripts",

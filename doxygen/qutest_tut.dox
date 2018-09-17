@@ -3,73 +3,19 @@
 <p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first couple of examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests described in the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. Later examples in this Tutorial show how to test <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">hierarchical state machines</a> and <a href="https://state-machine.com/doc/concepts#Active" target="_blank" class="extern">active objects</a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
 </p>
 
-As mentioned in the Section @ref qutest_how "How it works?", testing with QUTest&trade; always involves two components: (1) a @ref qutest_fixture "test fixture" code written in C (or C++) that runs on the Target and (2) a @ref qutest_script "test scipt(s)" that run on the host. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
+As mentioned in the Section \"@ref qutest_how "How it works?"\", testing with QUTest&trade; always involves two components: (1) a @ref qutest_fixture "test fixture" code written in C (or C++) that runs on the Target and (2) a @ref qutest_script "test scipt(s)" that run on the host. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
 
 @note
-This Tutorial assumes that you run on Windows and that both QTools&trade; and QP&trade;/C framework have been installed in the default location (<span class="img folder">`C:\qp`</span> on Windows) and also that the `QTOOLS` environment variable has been defined and that the `%QTOOLS%\bin` directory has been added to the `PATH`. Please refer to the @ref install "QTools Installation" section for more information about downloading and installing QTools&trade;.
+This Tutorial assumes that you run on Windows and that both QTools&trade; and QP&trade;/C framework have been installed in the default location (<span class="img folder">`C:\qp`</span> on Windows) and also that the **QTOOLS** environment variable has been defined and that the <strong>\%QTOOLS%\\bin</strong> directory has been added to the **PATH**. Please refer to the @ref install "QTools Installation" section for more information about downloading and installing QTools&trade;.
 
 
 This Tutorial consists of the following lessons:
 
-- @subpage qutest_inst
 - @subpage qutest_tut_Sprintf
 - @subpage qutest_tut_LedDriver
 - @subpage qutest_tut_Mock
 - @subpage qutest_tut_qhsm
 - @subpage qutest_tut_qact
-
-@next{qutest_inst}
-*/
-
-/*###########################################################################*/
-/*! @page qutest_inst Installing QUTest&trade; and Tcl
-
-@tableofcontents
-
-QUTest&trade; is bundled with QSPY and is installed automatically when you @ref install "install QTools". Specifically, `QUTest` consists of the <span class="img file_tcl">qspy.tcl</span> and <span class="img file_tcl">qutest.tcl</span> Tcl scripts located in the @ref qspy_files <span class="img folder">qtools/qspy/tcl</span> folder.
-
-@remark
-Even though QUTest&trade; is implemented in <a href="http://www.tcl.tk/man/tcl8.4/" target="_blank" class="extern">Tcl (Tool Command Language)</a>, you don't need to know Tcl to write effective tests with QUTest&trade;. The @ref qutest_tut "actual tests" that you will write utilize a small, carefully designed set of commands that form a small <a href="https://en.wikipedia.org/wiki/Domain-specific_language" target="_blank" class="extern">DSL (Domain Specific Language)</a> for unit testing. The Tcl interpreter just happened to be an effective tool to implement this "Unit Testing DSL".
-
-
-------------------------------------------------------------------------------
-@section qutest_windows Windows
-In order to run `QUTest`, you need the <em>Tcl interpreter</em> called **tclsh** installed on your machine. `tclsh` (version 8.4) is included in the QTools collection for Windows, so it will be available if you @ref install "install QTools&trade;". Also, the Tcl/Tk distribution included in QTools has been already extended with the @ref qspy_udp "UDP-Sockets" for Tcl, so you can use the `tclsh` and `wish` interpreters "as is" without any additional modifications.
-
-
-------------------------------------------------------------------------------
-@section qutest_linux Linux
-On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/Tk distribution with the UDP Sockets for Tcl.
-
-@note
-In order to communicate with the QSPY back-end, QUTest requires the Tcl interpreter extended with **UDP Sockets**. Istructions of adding UDP Sockets to Tcl are included in the QTools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
-
-
-------------------------------------------------------------------------------
-@section qutest_run Running QUTest&trade;
-From the description so far it should be clear that before starting QUTest, you need to make sure that the @ref qspy "QSPY" host application is running on this machine with the `-u` @ref qspy_command "command-line option". QSPY can be launched from a command-prompt and should @ref qspy_link "connect to the Target" of your choice.
-
-@note
-You can also use the `-t` to open a TCP/IP socket for connecting **host executables** as Targets. For example, to start QSPY and open a TCP/IP connection, you can open a command prompt and type:@n
-@n
-@verbatim
-qspy -u -t
-@endverbatim
-
-
-Second, because QUTest&trade; is implemented as a Tcl script (`qutest.tcl`), it requires the Tcl interpreter called **tclsh** (Tcl shell) to run. This Tcl interpreter needs to be augmented with the <a href="http://tcludp.sourceforge.net/" target="_blank" class="extern">UDP socket extension</a>, because the standard Tcl/Tk distributions typically don't support UDP. (<strong>NOTE:</strong> The Tcl interpreters included in the <a href="https://sourceforge.net/projects/qpc/files/qtools" target="_blank" class="extern">QTools collection for Windows</a> are already augmented with the UDP socket extension, so you don't need to do anything to use them for `QUTest` or `QSpyView`).
-
-Once QSPY is running, you can run QUTest from a Windows command-prompt by typing:
-
-@verbatim
-tclsh %QTOOLS%\qspy\tcl\qutest.tcl
-@endverbatim
-
-This would launch `qutest` in the current directory and look for @ref qtest_script "test scripts" (`*.tcl` files) to execute them as tests.
-
-@remark
-The <span class="img file_tcl">qutest.tcl</span> script is typically started from a `Makefile`, which in TDD both builds the Code Under Test (CUT) and *runs the tests*. The following @ref qutest_overview "QUTest&trade; Overview" section introduces QUTest&trade; concepts while the @ref qutest_tut "QUTest&trade; Tutorial" goes into more detail.
-
 
 @next{qutest_tut_Sprintf}
 */
@@ -104,17 +50,18 @@ Next, open another command prompt window and type:
 
 @verbatim
 cd C:\qp\qpc\examples\qutest\TDDbook_Sprintf
+make SCRIPT=py
 make
 @endverbatim
 
-This will build the @ref qutest_sprintf-fixture "Sprintf test fixture" as a Windows executable and then it will run the @ref qutest_sprintf-script "Sprintf test script". The screen shot below shows the output produced in these two command-prompt windows.
+This will build the @ref qutest_sprintf-fixture "Sprintf test fixture" as a Windows executable and then it will run the @ref qutest_sprintf-tcl "Sprintf test script (Tcl)". The screen shot below shows the output produced in these two command-prompt windows.
 
 ![QUTest sprintf() test run](test_sprintf.png)
 
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-fixture Test Fixture
-The job of a <a href="https://state-machine.com/glossary#test_fixture" class="extern"><b>test fixture</b></a> is to exercise the <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (the `sprintf()` function in this case) and report the results back to the QSPY host application. Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-script "test script"(s). A properly written test fixture can be typically used for many tests (implemented in test scripts).
+The job of a @ref qutest_fixture "test fixture" is to exercise the <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (the `sprintf()` function in this case) and report the results back to the @ref qspy "QSPY host application". Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-tcl "test script"(s). A properly written test fixture can be typically used for many tests (implemented in test scripts).
 
 @remark
 Coming up with a "good" *test fixture* requires some practice, but when you study the examples in this Tutorial, you will see examples of flexible *test fixtures* that allow you to to run a wide variety of tests on them.
@@ -169,7 +116,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
 [17]             int ret = sprintf(&output[8],
                                    format, param1, string, param2, param3);
 [18]             QS_BEGIN(SPRINTF_CALL, (void *)0) /* user-specific record */
-[19]                 QS_U8(3, (uint8_t)ret);  /* return value */
+[19]                 QS_U8(0, (uint8_t)ret);  /* return value */
 [20]                 QS_STR(&output[8]);      /* produced string */
 [21]             QS_END()
                  break;
@@ -207,7 +154,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </dd>
   <dt>[10]</dt><dd> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails. (In which case continuationon of the test makes no sense).
   </dd>
-  <dt>[11]</dt><dd> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-script "test scripts" need to know about.
+  <dt>[11]</dt><dd> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-tcl "test scripts" need to know about.
 > <b>NOTE:</b> you need to do this, so that the test scripts can refer to the objects by the same symbolic names as the *test fixture*.
   </dd>
   <dt>[12]</dt><dd> Finally, at the end of `main()` you need to call `QF_run()` to run the tests.
@@ -222,7 +169,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
 > <b>NOTE:</b> You can use other `cmdId`s to call other pieces of CUT or to provide different variants of calling the same CUT, as you see fit. Much of the art of writing *test fixtures* lies in constructing flexible remote commands that exercise your CUT.
   </dd>
   <dt>[17]</dt><dd> The `sprintf()` CUT is called and the return value is saved in the `ret` automatic variable.
-> <b>NOTE:</b> the output buffer (first argument of `sprintf()`) is not just the `output` array, but rather `&output[8]`, which will allow you to study buffer underflow (altering of the memory preceeding the buffer passed to `sprintf()`). Also note the other parameters of the call to the `sprintf()` CUT, such as the `format` string and the `string` argument. These details will be important to construct the @ref qutest_sprintf-script "test script"s.
+> <b>NOTE:</b> the output buffer (first argument of `sprintf()`) is not just the `output` array, but rather `&output[8]`, which will allow you to study buffer underflow (altering of the memory preceeding the buffer passed to `sprintf()`). Also note the other parameters of the call to the `sprintf()` CUT, such as the `format` string and the `string` argument. These details will be important to construct the @ref qutest_sprintf-tcl "test script"s.
   </dd>
   <dt>[18]</dt><dd> The `QS_BEGIN()` macro starts the @ref qs_app "application-specific" trace record that will report results of calling the `sprintf()` CUT to the Target.
   </dd>
@@ -239,11 +186,16 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
 
 
 ------------------------------------------------------------------------------
-@section qutest_sprintf-script Test Script
+@section qutest_sprintf-tcl Test Script (Tcl)
 A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@remark
+Even though a *test script* uses Tcl under the hood, you don't need to know Tcl to write effective tests. The actual set of commands that you use and need to know about forms a small "Domain Specific Language" (DSL) for unit testing, which just happens to be implemented with Tcl as a command interpreter.
+
 
 @note
 The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `SprintfTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
+
 
 @code
  [1] # QUTEST test script corresponding to the test_Sprintf.c test fixture.
@@ -259,7 +211,7 @@ The following test script performs the same tests as the <a href="http://www.thr
  [4] current_obj AP format
  [5] poke 0 1 "Hello World!\0"
  [6] command 0
- [7] expect "0000000001 SPRINTF_CALL  12 Hello World!"
+ [7] expect "0000000001 SPRINTF_CALL 12 Hello World!"
  [8] expect "0000000002 Trg-Done QS_RX_COMMAND"
 
      #----------
@@ -267,7 +219,7 @@ The following test script performs the same tests as the <a href="http://www.thr
 [10] current_obj AP format
 [11] poke 0 1 "dec=%d\0"
 [12] command 0 1234
-[13] expect "0000000001 SPRINTF_CALL   8 dec=1234"
+[13] expect "0000000001 SPRINTF_CALL 8 dec=1234"
 [14] expect "0000000002 Trg-Done QS_RX_COMMAND"
 
      #----------
@@ -279,7 +231,7 @@ The following test script performs the same tests as the <a href="http://www.thr
 [20] current_obj AP output
 [21] fill 0 1 100 0xAA
 [22] command 0 4321
-[23] expect "0000000001 SPRINTF_CALL  19 dec=4321, str=Hello"
+[23] expect "0000000001 SPRINTF_CALL 19 dec=4321, str=Hello"
 [24] expect "0000000002 Trg-Done QS_RX_COMMAND"
 
      #----------
@@ -295,7 +247,7 @@ The following test script performs the same tests as the <a href="http://www.thr
 @endcode
 
 <dl class="tag">
-  <dt>[1]</dt><dd> Lines starting with a pund sign ('#') or empty lines are comments which are ignored by QUTest.
+  <dt>[1]</dt><dd> Lines starting with a pound sign ('#') or empty lines are comments which are ignored by QUTest.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -389,12 +341,86 @@ The following test script performs the same tests as the <a href="http://www.thr
 </dl>
 <div style="clear:both;"></div>
 
-@note
-Even though a *test script* uses Tcl under the hood, you don't need to know Tcl to write effective tests. The actual set of commands that you use and need to know about forms a small "Domain Specific Language" (DSL) for unit testing, which just happens to be implemented with Tcl as a command interpreter.
-
-
 @remark
 As an exercise you should modify the Sprintf *test script* to inject some errors and observe how the tests can fail.
+
+
+------------------------------------------------------------------------------
+@section qutest_sprintf-py Test Script (Python)
+The following listing shows the Python *test script* for the Sprintf tests (file <span class="img file_py">`test_Sprintf.py`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+
+@remark
+Python *test scripts* is based on <a href="https://docs.pytest.org" target="_blank" class="extern">PyTest</a>. For this reason, the directory that holds Python test scripts must also contain the configuration file <span class="img file_py"><a target="_blank" class="extern" href="https://pytest.readthedocs.io/en/latest/plugins.html">`conftest.py`</a></span> shown below. This configuration file imports the common test fixtures used in the test scripts. @n
+@n
+`# Load common fixtures used throughout testing` @n
+`from qspypy.fixtures import *`
+
+
+@note
+The following test script performs the same tests as the <a href="http://www.throwtheswitch.org/white-papers/unity-intro.html" target="_blank" class="extern">Unity</a> test fixture `SprintfTest.c` from the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a>. The file `SprintfTest.c` is provided in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\TDDbook_Sprintf`</span>.
+
+
+@code{.py}
+ [1] # QUTEST test script corresponding to the test_Sprintf.c test fixture.
+     # see https://www.state-machine.com/qtools/qutest.html
+     #
+     # This example corresponds to SprintfTest.c from Chapter 2 "Test-Driving
+     # Tools and Conventions" of the book: "Test-Driven Development for Embedded
+     # Systems" by James W. Grenning
+
+ [2] import sys
+ [3] import pytest
+ [4] import struct
+ [5] from qspypy.qspy import *
+
+ [6] def test_No_format_operations(qutest):
+         qutest.glb_filter(FILTER.UA)
+         qutest.current_obj(QS_OBJ_KIND.AP,"format")
+         qutest.command(0)
+         qutest.poke(0,1,bytes("Hello World!\0",'ascii'))
+         qutest.expect("0000000001 SPRINTF_CALL 12 Hello World!")
+         qutest.expect("0000000002 Trg-Done QS_RX_COMMAND")
+
+ [6] def test_Insert_decimal(qutest_noreset):
+         qutest = qutest_noreset # name change
+         qutest.current_obj(QS_OBJ_KIND.AP,"format")
+         qutest.poke(0,1,bytes("dec=%d\0",'ascii'))
+         qutest.command(0,1234)
+         qutest.expect("0000000001 SPRINTF_CALL 8 dec=1234")
+         qutest.expect("0000000002 Trg-Done QS_RX_COMMAND")
+
+ [7] def test_Insert_decimal_and_string(qutest_noreset):
+         qutest = qutest_noreset # name change
+         qutest.current_obj(QS_OBJ_KIND.AP,"format")
+         qutest.poke(0,1,bytes("dec=%d, str=%s\0",'ascii'))
+         qutest.current_obj(QS_OBJ_KIND.AP,"string")
+         qutest.poke(0,1,bytes("Hello\0",'ascii'))
+         qutest.current_obj(QS_OBJ_KIND.AP,"output")
+         qutest.command(0,4321)
+         qutest.fill(0,1,100,0xAA)
+         qutest.expect("0000000001 SPRINTF_CALL 19 dec=4321, str=Hello")
+         qutest.expect("0000000002 Trg-Done QS_RX_COMMAND")
+
+     def test_Overflow_underflow(qutest_noreset):
+         qutest = qutest_noreset # name change
+         qutest.current_obj(QS_OBJ_KIND.AP,"output")
+         qutest.peek(26,1,4)
+         qutest.expect("%timestamp Trg-Peek Offs=26,Size=1,Num=4,Data=<6F,00,AA,AA>")
+         qutest.peek(0,1,10)
+         qutest.expect("%timestamp Trg-Peek Offs=0,Size=1,Num=10,Data=<AA,AA,AA,AA,AA,AA,AA,AA,*")
+
+
+     if __name__ == "__main__":
+         options = ['-x', '-v', '--tb=short']
+         options.extend(sys.argv)
+         pytest.main(options)
+@endcode
+
+<dl class="tag">
+  <dt>[1]</dt><dd> Lines starting with a pound sign ('#') or empty lines are comments which are ignored by QUTest.
+  </dd>
+</dl>
+<div style="clear:both;"></div>
 
 @next{qutest_tut_LedDriver}
 */
@@ -646,6 +672,7 @@ The following test script performs the same tests as the <a href="http://www.thr
 
 @note
 As you can see, the QUTest&trade; environment enables you to write *test scritps* entirely in terms of the symbols used in the *test fixture*. (You could use hex addesses, if you wished, but this is obviously not recommended.) The key is to generate appropriate @ref @ref qs_dict "QS dictionaries" from the *test fixture*.
+
 
 @next{qutest_tut_Mock}
 */
@@ -1429,7 +1456,10 @@ end
 
 @tableofcontents
 
+------------------------------------------------------------------------------
+@section qutest_qact-cut The Active Objects in Dining Philosophers Problem
 
-@next{qutest_time}
+
+@next{qutest_rtc}
 */
 

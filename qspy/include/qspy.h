@@ -4,12 +4,12 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.4
-* Last updated on  2018-08-16
+* Last updated for version 6.3.5
+* Last updated on  2018-09-17
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
 * Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
@@ -40,7 +40,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "6.3.4"
+#define QSPY_VER "6.3.5"
 
 #ifdef __cplusplus
 extern "C" {

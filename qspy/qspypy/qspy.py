@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.0
-# Last updated on: 2018-08-16
+# Last updated for version: 2.0.1
+# Last updated on: 2018-08-17
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -187,19 +187,65 @@ class QSpyRecords(IntEnum):
     QS_ASSERT_FAIL = 69,  # /*!< assertion failed in the code */
 
     # /* [70] Application-specific (User) QS records */
-    QS_USER1 = 70  # /*!< the first record available to QS users */
-    QS_USER2 = 71  # /*!< the first record available to QS users */
-    QS_USER3 = 72  # /*!< the first record available to QS users */
-    QS_USER4 = 73  # /*!< the first record available to QS users */
-    QS_USER5 = 74  # /*!< the first record available to QS users */
-    QS_USER6 = 75  # /*!< the first record available to QS users */
-    QS_USER7 = 76  # /*!< the first record available to QS users */
-    QS_USER8 = 77  # /*!< the first record available to QS users */
-    QS_USER9 = 78  # /*!< the first record available to QS users */
-    QS_USER10 = 79  # /*!< the first record available to QS users */
-    QS_USER11 = 80  # /*!< the first record available to QS users */
-    QS_USER12 = 81  # /*!< the first record available to QS users */
-    QS_USER13 = 82  # /*!< the first record available to QS users */
+    QS_USER0  = 70, # /*!< the first record available to QS users */
+    QS_USER01 = 71,
+    QS_USER02 = 72,
+    QS_USER03 = 73,
+    QS_USER04 = 74,
+    QS_USER05 = 75,
+    QS_USER06 = 76,
+    QS_USER07 = 77,
+    QS_USER08 = 78,
+    QS_USER09 = 79,
+
+    QS_USER1  = 80,
+    QS_USER11 = 81,
+    QS_USER12 = 82,
+    QS_USER13 = 83,
+    QS_USER14 = 84,
+    QS_USER15 = 85,
+    QS_USER16 = 86,
+    QS_USER17 = 87,
+    QS_USER18 = 88,
+    QS_USER19 = 89,
+
+    QS_USER2  = 90,
+    QS_USER21 = 91,
+    QS_USER22 = 92,
+    QS_USER23 = 93,
+    QS_USER24 = 94,
+    QS_USER25 = 95,
+    QS_USER26 = 96,
+    QS_USER27 = 97,
+    QS_USER28 = 98,
+    QS_USER29 = 99,
+
+    QS_USER3  = 100,
+    QS_USER31 = 101,
+    QS_USER32 = 102,
+    QS_USER33 = 103,
+    QS_USER34 = 104,
+    QS_USER35 = 105,
+    QS_USER36 = 106,
+    QS_USER37 = 107,
+    QS_USER38 = 108,
+    QS_USER39 = 109,
+
+    QS_USER4  = 110,
+    QS_USER41 = 111,
+    QS_USER42 = 112,
+    QS_USER43 = 113,
+    QS_USER44 = 114,
+    QS_USER45 = 115,
+    QS_USER46 = 116,
+    QS_USER47 = 117,
+    QS_USER48 = 118,
+    QS_USER49 = 119,
+    QS_USER4A = 120,
+    QS_USER4B = 121,
+    QS_USER4C = 122,
+    QS_USER4D = 123,
+    QUTEST_ON_POST = 124
 
 
 ## Enumeration for channel type, this must match enum in "be.c"
@@ -322,7 +368,7 @@ class qspy(threading.Thread):
         """ Returns a tuple of (record, line) of types QSpyRecords, string respectively
         """
         assert QSpyRecords(
-            packet[1]) == QSpyRecords.QS_TEXT, "Wronge record type for parser"
+            packet[1]) == QSpyRecords.QS_TEXT, "Wrong record type for parser"
         return (QSpyRecords(packet[2]), packet[3:].decode("utf-8"))
 
     def attach(self, client, host='localhost', port=7701, channels=QS_CHANNEL.TEXT, local_port=None):

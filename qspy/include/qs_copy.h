@@ -4,12 +4,12 @@
 * @ingroup qs qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.1
-* Last updated on  2018-05-24
+* Last updated for version 6.3.5
+* Last updated on  2018-09-16
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
 * Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
 *
@@ -189,7 +189,8 @@ enum QSpyUserRecords {
     QS_USER0 = QS_USER,       /*!< offset for User Group 0 */
     QS_USER1 = QS_USER0 + 10, /*!< offset for User Group 1 */
     QS_USER2 = QS_USER1 + 10, /*!< offset for User Group 2 */
-    QS_USER3 = QS_USER2 + 10  /*!< offset for User Group 3 */
+    QS_USER3 = QS_USER2 + 10, /*!< offset for User Group 3 */
+    QS_USER4 = QS_USER3 + 10  /*!< offset for User Group 4 */
 };
 
 #ifndef QS_TIME_SIZE
@@ -1191,8 +1192,12 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
     /*! callback to run the test loop */
     void QS_onTestLoop(void);
 
-    /*! callback to "massage" the test event, if neccessary */
+    /*! callback to "massage" the test event before dispatching/posting it */
     void QS_onTestEvt(QEvt *e);
+
+    /*! callback to examine an event that is about to be posted */
+    void QS_onTestPost(void const *sender, QActive *recipient,
+                       QEvt const *e, bool status);
 
     /*! QS internal function to process posted events during test */
     void QS_processTestEvts_(void);
@@ -1219,6 +1224,24 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
         QS_onTestLoop(); \
     } while (0)
 
+    enum QUTestUserRecords {
+        QUTEST_ON_POST = 124
+    };
+
+    /************************************************************************/
+    /*! QActiveDummy Object class */
+    /**
+    * @description
+    * QActiveDummy is a test double for the role of collaborating active
+    * objects in QUTest unit testing.
+    */
+    typedef struct {
+        QActive super; /* inherit QActive */
+    } QActiveDummy;
+
+    /*! Constructor of the QActiveDummy Active Object class */
+    void QActiveDummy_ctor(QActiveDummy * const me);
+
 #ifdef QP_IMPL
     #define QACTIVE_EQUEUE_WAIT_(me_) \
         Q_ASSERT_ID(0, (me_)->eQueue.frontEvt != (QEvt *)0)
@@ -1227,7 +1250,7 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
         QPSet_insert(&QS_rxPriv_.readySet, (uint_fast8_t)(me_)->prio)
 #endif /* QP_IMPL */
 
-#else
+#else /* Q_UTEST not defined */
     /* dummy definitions when not building for QUTEST */
     #define QS_TEST_PROBE_DEF(fun_)
     #define QS_TEST_PROBE(code_)
