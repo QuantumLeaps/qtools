@@ -15,12 +15,12 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.3.1
-# Last updated on  2018-05-24
+# Last updated for version 6.3.5
+# Last updated on  2018-09-18
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
 # Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
@@ -49,7 +49,7 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.3.1
+set VERSION 6.3.5
 
 package provide qutest 6.3
 
@@ -217,6 +217,40 @@ namespace eval ::qutest {
                 assert 0
             }
         }
+    }
+    #.........................................................................
+    ## @brief specifies to stop processing the rest of tests
+    proc stop {} {
+        variable theTestCount
+        variable theCurrState
+        switch $theCurrState {
+            PRE {
+            }
+            TEST {
+                # did the timeout occur? (all expected QSPY output arrived?)
+                if {[wait4input] == 0} {
+                    if {$theTestCount > 0} { ;# any tests executed?
+                        call_on_teardown
+                        test_passed
+                    }
+                }
+            }
+            FAIL -
+            SKIP {
+                while {[wait4input]} { ;# NOT timeout?
+                }
+            }
+            END -
+            DONE {
+            }
+            default {
+                assert 0
+            }
+        }
+        tran DONE
+        puts "!!! STOP !!!"
+        finish
+        exit
     }
 
     #.........................................................................
@@ -776,6 +810,7 @@ namespace eval ::qutest {
         #
         $theTestRunner alias test         ::qutest::test
         $theTestRunner alias end          ::qutest::end
+        $theTestRunner alias stop         ::qutest::stop
         $theTestRunner alias expect       ::qutest::expect
         $theTestRunner alias expect_pause ::qutest::expect_pause
         $theTestRunner alias command      ::qutest::command

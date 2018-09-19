@@ -10,7 +10,7 @@ If you already have the previous version of @ref qtools_qspypy "qspypy", you nee
 `pip install %%QTOOLS%\qspy`
 
 
-Also, this release modifies the @ref qspy "QSPY host utility" to automatically add a @ref qspy_dict "User Dictionary" entry for `QUTEST_ON_POST` @ref qs_app "application-specific trace record". This modification matches changes in QP/C/C++ 6.3.5.
+Also, this release adds the `stop` command to `qutest.tcl` and modifies the @ref qspy "QSPY host utility" to automatically add a @ref qspy_dict "User Dictionary" entry for `QUTEST_ON_POST` @ref qs_app "application-specific trace record". This modification matches changes in QP/C/C++ 6.3.5.
 
 
 ------------------------------------------------------
