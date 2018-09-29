@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.3.5
-* Last updated on  2018-09-16
+* Last updated on  2018-09-22
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -1201,6 +1201,9 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
 
     /*! QS internal function to process posted events during test */
     void QS_processTestEvts_(void);
+
+    /*! internal function to process armed time events during test */
+    void QS_tickX_(uint_fast8_t const tickRate, void const * const sender);
 
     /*! QS internal function to get the Test-Probe for a given API */
     uint32_t QS_getTestProbe_(void (* const api)(void));

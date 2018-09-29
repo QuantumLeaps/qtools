@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.1
-# Last updated on: 2018-09-17
+# Last updated for version: 2.0.2
+# Last updated on: 2018-09-28
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -49,9 +49,8 @@ from subprocess import Popen
 if sys.platform == 'win32':
     from subprocess import CREATE_NEW_CONSOLE
 
-from qspypy.qspy import qspy, QS_CHANNEL, QS_OBJ_KIND, FILTER, PRIO_COMMAND
+from qspypy.qspy import qspy, QS_CHANNEL, QS_OBJ_KIND, FILTER, PRIO_COMMAND, theFmt
 import qspypy.config as CONFIG
-
 
 class qutest_context():
     """ This class provides the main pytest based context."""
@@ -79,12 +78,16 @@ class qutest_context():
         self.qspy = qspy()
 
         self.attached_event.clear()
-        self.qspy.attach(self, host = CONFIG.QSPY_HOST, port = CONFIG.QSPY_UDP_PORT, local_port = CONFIG.QSPY_LOCAL_UDP_PORT)
+        self.qspy.attach(self, host = CONFIG.QSPY_HOST,
+            port = CONFIG.QSPY_UDP_PORT,
+            local_port = CONFIG.QSPY_LOCAL_UDP_PORT)
         # Wait for attach
         if not self.attached_event.wait(CONFIG.QSPY_ATTACH_TIMEOUT_SEC):
             __tracebackhide__ = True
+            self.qspy.detach()
             pytest.fail(
                 "Timeout waiting for Attach to QSpy (is QSpy running and QSPY_COM_PORT correct?)")
+
 
     def session_teardown(self):
         """ Teardown that runs at the end of a session. """
@@ -208,8 +211,10 @@ class qutest_context():
         self.have_target_event.clear()
 
         # Flush queue in case they miss an expect
-        while not self.text_queue.empty():
-            print("Flushing Text:", self.text_queue.get())
+        #if not self.text_queue.empty():
+        #    print("\nFlushing text queue:")
+        #while not self.text_queue.empty():
+        #    print(self.text_queue.get())
 
         # If running with a local target, kill and restart it
         if CONFIG.USE_LOCAL_TARGET:
@@ -448,12 +453,26 @@ class qutest_context():
 
         if not fnmatch.fnmatchcase(line,expected):
             __tracebackhide__ = True
-            pytest.fail('Expect Match Failed! \nExpected:\"{0}\"\nReceived:\"{1}\"'.format(
+            pytest.fail('Expect Match Failed!\nExpected:\"{0}\"\nReceived:\"{1}\"'.format(
                 expected, line))
 
-    ################### qspy backend callbacks #######################
 
+    ################### qspy backend callbacks #######################
     def OnRecord_QS_TARGET_INFO(self, packet):
+        fmt = 'xBHxLxxxQ'
+        theFmt['objPtr']  = fmt[packet[8] & 0x0F]
+        theFmt['funPtr']  = fmt[packet[8] >> 4]
+        theFmt['tstamp']  = fmt[packet[9] & 0x0F]
+        theFmt['sig']     = fmt[packet[5] & 0x0F]
+        theFmt['evtSize'] = fmt[packet[5] >> 4]
+        theFmt['queueCtr']= fmt[packet[6] & 0x0F]
+        theFmt['poolCtr'] = fmt[packet[7] >> 4]
+        theFmt['poolBlk'] = fmt[packet[7] & 0x0F]
+        theFmt['tevtCtr'] = fmt[packet[6] >> 4]
+        theFmt['target']  = '{0:02d}{1:02d}{2:02d}_{3:02d}{4:02d}{5:02d}'.format(
+                packet[17], packet[16], packet[15],
+                packet[14], packet[13], packet[12])
+        #print('******* Target: ', theFmt['target'], ' *******')
         self.have_target_event.set()
 
     def OnPacket_ATTACH(self, packet):
@@ -463,12 +482,14 @@ class qutest_context():
         # put packet in text queue
         self.text_queue.put(record)
         #recordId, line = self.qspy.parse_QS_TEXT(record)
-        #print('OnRecord_QS_TEXT record:{0}, line:"{1}"'.format(recordId.name, line) )
+        #print('OnRecord_QS_TEXT record:{0}, line:"{1}"'.format(
+        #    recordId.name, line) )
+
 
 def main():
     """ Main entry point for qutest """
 
-    options = ['-v', '--tb=short']
+    options = ['-s', '-v', '--tb=short']
 
     # Parse command line like Tcl script
     num_tests = 0
@@ -476,7 +497,7 @@ def main():
     num_args = len(args)
 
     if '-h' in args or '--help' in args or '?' in args:
-        print("Usage: qutest [test-scripts] [host_exe] [host[:port]] [local_port]")
+        print("\nUsage: qutest [test-scripts] [host_exe] [host[:port]] [local_port]")
         return
 
     if num_args >= 1: # 1 or more test scripts
@@ -510,7 +531,9 @@ def main():
         CONFIG.QSPY_LOCAL_UDP_PORT = int(local_port)
 
     # Run pytest with options
-    pytest.main(options)
+    return pytest.main(options)
 
 if __name__ == "__main__":
-    main()
+    pytestCode = main()
+    print('******* Target: ', theFmt['target'], ' *******')
+    sys.exit(pytestCode)

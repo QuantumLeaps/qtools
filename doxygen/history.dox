@@ -1,8 +1,15 @@
 /**
 @page history Revision History
 
-@section qtools_6_3_5 Version 6.3.5, 2018-09-17
-The main purpose of this release is to improve the @ref qutest "QUTest" support for Python scripting. Specifically, this release contains @ref qtools_qspypy "qspypy 2.0.1" with improved qutest.expect() implementation, so that it more closely matches the behavior of the expect() directive from Tcl scripting. The modified qutest.expect() compares correctly the `%timestamp` fields (as opposed to ignoring them) and also handles special character sequences '?', '*', and [chars] (like the Tcl `string match` command).
+@section qtools_6_3_5 Version 6.3.5, 2018-09-29
+The main purpose of this release is to improve the @ref qutest "QUTest" support for Python scripting. Specifically, this release contains @ref qtools_qspypy "qspypy 2.0.2" with the following bug fixes:
+
+- [bug#224 QUTest/Python implementation of qutest.expect() is incomplete](https://sourceforge.net/p/qpc/bugs/224). This improved `qutest.expect()` implementation more closely matches the behavior of the `expect()` directive from Tcl scripting. The modified `qutest.expect()` compares correctly the `%timestamp` fields (as opposed to ignoring them) and also handles special character sequences '?', '*', and [chars] (like the Tcl `string match` command).
+
+- [bug#225 QUTest/Python ignores the Target-info configuration](https://sourceforge.net/p/qpc/bugs/225).
+
+- [bug#223 QUTest/Python hangs when attaching to QSPY fails](https://sourceforge.net/p/qpc/bugs/223).
+
 
 @note
 If you already have the previous version of @ref qtools_qspypy "qspypy", you need to re-install it by means of the following command:@n

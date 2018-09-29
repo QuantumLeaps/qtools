@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.1
-# Last updated on: 2018-08-17
+# Last updated for version: 2.0.2
+# Last updated on: 2018-08-28
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -281,17 +281,18 @@ class FILTER (IntEnum):
     U4 = 14,  # User Group 110-124 records
     UA = 15   # All User records
 
-## Port specific formats used in struct.pack
+## Target specific formats used in struct.pack
 theFmt = {
-    'objPtr': 'I',
-    'funPtr': 'I',
-    'tstamp': 'I',
-    'sig': 'h',
-    'evtSize': 'h',
+    'objPtr': 'L',
+    'funPtr': 'L',
+    'tstamp': 'L',
+    'sig': 'H',
+    'evtSize': 'H',
     'queueCtr': 'B',
-    'poolCtr': 'h',
-    'poolBlk': 'h',
-    'tevtCtr': 'h'
+    'poolCtr': 'H',
+    'poolBlk': 'H',
+    'tevtCtr': 'H',
+    'target' : 'UNKNOWN'
 }
 
 ## Special priority values used to send commands
@@ -332,19 +333,17 @@ class qspy(threading.Thread):
                 if recordID < 128:
                     method_name = "OnRecord_" + QSpyRecords(recordID).name
                     if self.rx_record_seq != rx_sequence:
-                        print("Rx Record sequence error!")
+                        #print("Rx Record sequence error!")
                         self.rx_record_errors += 1
                         self.rx_record_seq = rx_sequence  # resync
-                    self.rx_record_seq += 1
-                    self.rx_record_seq &= 0xFF
+                    self.rx_record_seq = (self.rx_record_seq + 1) & 0xFF
                 else:
                     method_name = "OnPacket_" + QSPY(recordID).name
                     if self.rx_packet_seq != rx_sequence:
-                        print("Rx Packet sequence error!")
+                        #print("Rx Packet sequence error!")
                         self.rx_packet_errors += 1
                         self.rx_packet_seq = rx_sequence  # resync
-                    self.rx_packet_seq += 1
-                    self.rx_packet_seq &= 0xFF
+                    self.rx_packet_seq = (self.rx_packet_seq + 1) & 0xFF
 
                 #print("Seq:{0}, {1}({2})".format(rx_sequence, method_name, packet.hex()))
 
@@ -497,13 +496,12 @@ class qspy(threading.Thread):
 
     def sendFill(self, offset, size, num, item):
         """ Sends fill packet """
-
         if size == 1:
             item_fmt = 'B'
         elif size == 2:
             item_fmt = 'H'
         elif size == 4:
-            item_fmt = 'I'
+            item_fmt = 'L'
         else:
             assert False, "size for sendFill must be 1, 2, or 4!"
 
@@ -582,7 +580,7 @@ class qspy(threading.Thread):
             signal : signal string or value
             parameters : (optional) bytes or bytesarray of payload
         """
-        format_string = '<BB' + theFmt['sig'] + 'h'
+        format_string = '<BB' + theFmt['sig'] + 'H'
 
         if parameters is not None:
             length = len(parameters)

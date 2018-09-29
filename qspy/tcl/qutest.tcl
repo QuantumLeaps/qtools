@@ -16,7 +16,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
 # Last updated for version 6.3.5
-# Last updated on  2018-09-18
+# Last updated on  2018-09-27
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -932,7 +932,7 @@ namespace eval ::qutest {
             puts "Can't open the UDP socket.\n\
                   Check if another instance\n\
                   of qutest/qspview is already running."
-            exit -2
+            exit 3 ;# Internal error happened while executing tests
         }
         variable TIMEOUT_MS
         set id [after $TIMEOUT_MS "set ::qspy::theIsAttached 0"]
@@ -942,10 +942,10 @@ namespace eval ::qutest {
             after cancel $id
             puts "OK (UDP-Port=[::qspy::udp_port])"
             #puts "OK"
-        } else { ;# timeout
+        } else { ;# timeout while attaching to UDP-port of QSPY
             ::qspy::detach ;# detach from QSPY
             puts "FAILED!"
-            exit -3
+            exit 3 ;# Internal error happened while executing tests
         }
 
         variable theGroupCount 0
@@ -1009,7 +1009,7 @@ namespace eval ::qutest {
 
         if {$theErrCount} {
             puts "FAIL!"
-            exit -1
+            exit 1 ;# Tests were run but some of the tests failed
         } else {
             puts "OK"
         }
