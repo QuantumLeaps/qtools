@@ -19,6 +19,8 @@ If you already have the previous version of @ref qtools_qspypy "qspypy", you nee
 
 Also, this release adds the `stop` command to `qutest.tcl` and modifies the @ref qspy "QSPY host utility" to automatically add a @ref qspy_dict "User Dictionary" entry for `QUTEST_ON_POST` @ref qs_app "application-specific trace record". This modification matches changes in QP/C/C++ 6.3.5.
 
+Finally, this release of QTools collection contains the [Unity unit testing harness (framework)](https://github.com/ThrowTheSwitch/Unity).
+
 
 ------------------------------------------------------
 @section qtools_6_3_4 Version 6.3.4, 2018-08-16

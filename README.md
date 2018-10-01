@@ -10,64 +10,73 @@ QTools is a collection of various open source tools for working with the
 QP state machine frameworks on desktop platforms, such as Windows,
 Linux, and Mac OS X.
 
-The following open-source tools are currently provided by Quantum Leaps:
+The following open-source tools are currently provided (NOTE: tools
+starting with 'q' are contributed by Quantum Leaps)
 
 1. qspy     - host application for receiving and displaying the
               real-time data from embedded targets running the QS
               software tracing.
 
-2. qutest   - Tcl extension of the QSPY host application for uint testing
-              specifically designed for deeply embedded systems, but also
-              supports unit testing of embedded code on host computers
+2. qutest   - Tcl extension of the QSPY host application for **uint testing**
+              specifically designed for embedded systems, but also supports
+              unit testing of embedded code on host computers
               ("dual targeting").
 
-3. qspyview - Tcl/Tk extension of the QSPY host application for
+3. qspypy   - Python extension of the QSPY host application for **uint testing**
+              specifically designed for embedded systems, but also supports
+              unit testing of embedded code on host computers
+              ("dual targeting").
+
+4. qspyview - Tcl/Tk extension of the QSPY host application for
               visualization and monitoring of the QS real-time tracing
               data from embedded targets at real-time. QSpyView enables
               developers to rapidly build both GUI-based and "headless"
               scripts for their specific applications.
 
-4. qwin     - QWIN GUI toolkit for prototyping embedded systems on
+5. qwin     - QWIN GUI toolkit for prototyping embedded systems on
               Windows in the C programming language. QWIN allows you
               to build realistic embedded front panels consisting of
               LCD displays (both graphical and segmented), buttons,
               and LEDs. QWIN is based on the Win32 API.
 
-5. qclean   - for cleanup of source code files
+6. qclean   - for cleanup of source code files
 
-6. qfsgen   - for generating ROM-based file systems to be used
+7. qfsgen   - for generating ROM-based file systems to be used
               in embedded web pages served by the HTTP server
 
-7. qcalc    - programmer's calculator with C-syntax expressions
+8. qcalc    - programmer's calculator with C-syntax expressions
 
 8. qudp     - for testing UDP connections to the embedded targets
-9. qudps    - UDP server for testing UDP connections to the embedded
+10. qudps   - UDP server for testing UDP connections to the embedded
               targets.
+
+11. unity   - traditional unit testing harness (framework) for embedded C
+              (version 2.4.3)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-10. GNU-make for Windows (version 3.82)
+12. GNU-make for Windows (version 3.82)
 
-11. GNU C/C++ toolset for Windows (MinGW version 4.5.2)
+13. GNU C/C++ toolset for Windows (MinGW version 4.5.2)
 
-12. GNU C/C++ toolset for ARM-EABI (GCC version 7.2.0)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 7.2.0)
 
-13. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
+15. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
 
-14. ResEdit utility (version 1.6.6-x64)
+16. ResEdit utility (version 1.6.6-x64)
 
-15. AVRDUDE for Windows (version 6.1)
+17. AVRDUDE for Windows (version 6.1)
 
-16. LMFlash for Windows (build 1613)
+18. LMFlash for Windows (build 1613)
 
 
 Additionally, QTools for Windows contains the following PC-Lint option
 files various compilers (in sub-directory lint):
 
-15. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
+19. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
 
-16. co-iar-arm.* (PC-Lint option files for IAR-ARM)
+20. co-iar-arm.* (PC-Lint option files for IAR-ARM)
 
 
 ---------------------------------------------------------------------------
@@ -95,6 +104,9 @@ Software Foundation, either version 2 of the License, or (at your
 option) any later version. The text of GPL version 2 is included in the
 file GPLv2.txt in the licenses/ subdirectory of the QTools distribution.
 
+Some of the tools are distributed under the terms of the MIT open source
+license. The complete text of the MIT license is included in the comments.
+
 The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE
 AGREEMENT, included in the file TCL_LICENSE.txt in the licenses/
 subdirectory of the QTools distribution.
@@ -108,21 +120,30 @@ is distributed according to Section 2a "Demonstration License".
 ---------------------------------------------------------------------------
 # Documentation
 The documentation of the tools is provided in the <qtools>\doc\
-directory. Specifically, the PDF version of the make manual is included.
-A we-link to the TCL/TK documentation is provided in the shortcut
-tcl_tk_8.4.
+directory. Specifically, you can find ther the PDF version of the **Make Manual**.
 
-### QUTest Tcl Script
-The QUTest Tcl script for the QSPY utility are located in the
+### QUTest Python Scripting Support
+The QUTest Python scripting support for the QSPY utility are located in the
+`<qtools>\qspy\qspypy\` directory.
+
+### QUTest Tcl Scripting Support
+The QUTest Tcl scripting support for the QSPY utility are located in the
 `<qtools>\qspy\tcl\` directory.
+
+A web-link to the TCL/TK documentation is provided in the shortcut
+[tcl_tk_8.4](http://www.tcl.tk/man/tcl8.4/).
 
 ### QSPYView Tcl/Tk Scripts
 The QSpyView Tcl/Tk scripts for the QSPY utility are located in the
-<qtools>\qspy\tcl\ directory.
+`<qtools>\qspy\tcl\` directory.
 
 ### QSPY Matlab Scripts
 The Matlab/GNU Octave scripts for the QSPY utility are located in the
-<qtools>\qspy\matlab\ directory.
+`<qtools>\qspy\matlab\` directory.
+
+### Unity Unit Testing Framework
+The documentation of the Unity Testing Framework for Embedded C is located in
+the `<qtools>\unity\doc\` directory.
 
 
 ---------------------------------------------------------------------------
@@ -180,6 +201,9 @@ Have been taken from the UnixUtils project at SourceForge.net:
 (source/fileutils-3.16-src.zip) has been taken from:
 - http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
 
+### The Unity Unit Testing Harness for Embedded C
+Has been taken from the GitHub at:
+- https://github.com/ThrowTheSwitch/Unity
 
 ### The AVRDUDE utility
 Has been taken from:
