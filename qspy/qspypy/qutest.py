@@ -84,7 +84,7 @@ class qutest_context():
         # Wait for attach
         if not self.attached_event.wait(CONFIG.QSPY_ATTACH_TIMEOUT_SEC):
             __tracebackhide__ = True
-            self.qspy.detach()
+            self.session_teardown()
             pytest.fail(
                 "Timeout waiting for Attach to QSpy (is QSpy running and QSPY_COM_PORT correct?)")
 
