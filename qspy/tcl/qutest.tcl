@@ -15,8 +15,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.3.5
-# Last updated on  2018-09-27
+# Last updated for version 6.3.6
+# Last updated on  2018-10-03
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -49,7 +49,7 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.3.5
+set VERSION 6.3.6
 
 package provide qutest 6.3
 
@@ -611,6 +611,29 @@ namespace eval ::qutest {
         }
     }
     #.........................................................................
+    ## @brief query the "current object" in the Target
+    proc query_curr {kind} {
+        variable theCurrState
+        switch $theCurrState {
+            PRE {
+                before_test
+                tran SKIP
+            }
+            TEST {
+                ::qspy::sendQueryCurr $kind
+            }
+            FAIL -
+            SKIP {
+                ;# ignore
+            }
+            END -
+            DONE {
+                after_end
+            }
+            default { assert 0 }
+        }
+    }
+    #.........................................................................
     ## @brief sends a Test-Probe to the Target
     # @description
     # This function sends the Test-Probe data to the Target. The Target
@@ -672,7 +695,6 @@ namespace eval ::qutest {
                 tran SKIP
             }
             TEST {
-                variable ::qspy::QSPY
                 variable ::qspy::QS_RX
                 ::qspy::sendPkt \
                     [binary format cc $::qspy::QS_RX(TICK) $rate]
@@ -823,6 +845,7 @@ namespace eval ::qutest {
         $theTestRunner alias probe        ::qutest::probe
         $theTestRunner alias continue     ::qutest::continue
         $theTestRunner alias tick         ::qutest::tick
+        $theTestRunner alias query_curr   ::qutest::query_curr
         $theTestRunner alias dispatch     ::qutest::dispatch
         $theTestRunner alias post         ::qutest::post
         $theTestRunner alias publish      ::qutest::publish

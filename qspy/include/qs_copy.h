@@ -4,8 +4,8 @@
 * @ingroup qs qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.5
-* Last updated on  2018-09-22
+* Last updated for version 6.3.6
+* Last updated on  2018-10-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -158,7 +158,7 @@ enum QSpyRecords {
     QS_TARGET_INFO,       /*!< reports the Target information */
     QS_TARGET_DONE,       /*!< reports completion of a user callback */
     QS_RX_STATUS,         /*!< reports QS data receive status */
-    QS_MSC_RESERVED1,
+    QS_QUERY_DATA,        /*!< reports the data from "current object" query */
     QS_PEEK_DATA,         /*!< reports the data from the PEEK query */
     QS_ASSERT_FAIL,       /*!< assertion failed in the code */
 
@@ -781,11 +781,8 @@ QSTimeCtr QS_onGetTime(void);
     #define QS_FUN_(fun_)       (QS_u32_((uint32_t)(fun_)))
 #endif
 
-
-/*! Internal QS macro to output a zero-terminated ASCII string element */
-#define QS_STR_(msg_)           (QS_str_((msg_)))
-
-/* Macros for use in the client code .......................................*/
+/****************************************************************************/
+/* Macros for use in the client code */
 
 /*! Enumerates data formats recognized by QS */
 /**
@@ -1070,6 +1067,90 @@ enum {
 /*! get the current QS version number string of the form "X.Y.Z" */
 #define QS_getVersion() (QP_versionStr)
 
+
+/****************************************************************************/
+/* Macros for use in the internal implementation only */
+
+#ifdef QP_IMPL
+
+#if (QF_EQUEUE_CTR_SIZE == 1)
+
+    /*! Internal QS macro to output an unformatted event queue counter
+    * data element. */
+    /**
+    * @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
+    */
+    #define QS_EQC_(ctr_)       QS_u8_((uint8_t)(ctr_))
+#elif (QF_EQUEUE_CTR_SIZE == 2)
+    #define QS_EQC_(ctr_)       QS_u16_((uint16_t)(ctr_))
+#elif (QF_EQUEUE_CTR_SIZE == 4)
+    #define QS_EQC_(ctr_)       QS_u32_((uint32_t)(ctr_))
+#else
+    #error "QF_EQUEUE_CTR_SIZE not defined"
+#endif
+
+#if (QF_EVENT_SIZ_SIZE == 1)
+
+    /*! Internal QS macro to output an unformatted event size
+    * data element. */
+    /**
+    * @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
+    */
+    #define QS_EVS_(size_)      QS_u8_((uint8_t)(size_))
+#elif (QF_EVENT_SIZ_SIZE == 2)
+    #define QS_EVS_(size_)      QS_u16_((uint16_t)(size_))
+#elif (QF_EVENT_SIZ_SIZE == 4)
+    #define QS_EVS_(size_)      QS_u32_((uint32_t)(size_))
+#endif
+
+#if (QF_MPOOL_SIZ_SIZE == 1)
+
+    /*! Internal QS macro to output an unformatted memory pool
+    * block-size data element */
+    /**
+    * @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
+    */
+    #define QS_MPS_(size_)      QS_u8_((uint8_t)(size_))
+#elif (QF_MPOOL_SIZ_SIZE == 2)
+    #define QS_MPS_(size_)      QS_u16_((uint16_t)(size_))
+#elif (QF_MPOOL_SIZ_SIZE == 4)
+    #define QS_MPS_(size_)      QS_u32_((uint32_t)(size_))
+#endif
+
+#if (QF_MPOOL_CTR_SIZE == 1)
+
+    /*! Internal QS macro to output an unformatted memory pool
+    * block-counter data element. */
+    /**
+    * @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
+    */
+    #define QS_MPC_(ctr_)       QS_u8_((uint8_t)(ctr_))
+#elif (QF_MPOOL_CTR_SIZE == 2)
+    #define QS_MPC_(ctr_)       QS_u16_((uint16_t)(ctr_))
+#elif (QF_MPOOL_CTR_SIZE == 4)
+    #define QS_MPC_(ctr_)       QS_u32_((uint16_t)(ctr_))
+#endif
+
+#if (QF_TIMEEVT_CTR_SIZE == 1)
+
+    /*! Internal QS macro to output an unformatted time event
+    * tick-counter data element */
+    /**
+    * @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
+    */
+    #define QS_TEC_(ctr_)       QS_u8_((uint8_t)(ctr_))
+#elif (QF_TIMEEVT_CTR_SIZE == 2)
+    #define QS_TEC_(ctr_)       QS_u16_((uint16_t)(ctr_))
+#elif (QF_TIMEEVT_CTR_SIZE == 4)
+    #define QS_TEC_(ctr_)       QS_u32_((uint32_t)(ctr_))
+#endif
+
+/*! Internal QS macro to output a zero-terminated ASCII string element */
+#define QS_STR_(msg_)           (QS_str_((msg_)))
+
+#endif /* QP_IMPL */
+
+
 /****************************************************************************/
 /* QS private data (the transmit channel) */
 typedef uint_fast16_t QSCtr;  /*!< QS ring buffer counter and offset type */
@@ -1131,7 +1212,7 @@ enum QSpyRxRecords {
     QS_RX_AO_FILTER,      /*!< set local AO filter in the Target */
     QS_RX_CURR_OBJ,       /*!< set the "current-object" in the Target */
     QS_RX_TEST_CONTINUE,  /*!< continue a test after QS_TEST_PAUSE() */
-    QS_RX_RESERVED1,      /*!< reserved for future use */
+    QS_RX_QUERY_CURR,     /*!< query the "current object" in the Target */
     QS_RX_EVENT           /*!< inject an event to the Target */
 };
 
@@ -1141,7 +1222,9 @@ void QS_rxInitBuf(uint8_t sto[], uint16_t stoSize);
 /*! Parse all bytes present in the QS RX data buffer */
 void QS_rxParse(void);
 
-/*! Private QS-RX data to keep track of the lock-free buffer */
+/*! Private QS-RX data to keep track of the current objects and
+* the lock-free RX buffer
+*/
 typedef struct {
     void     *currObj[MAX_OBJ]; /*!< current objects */
     uint8_t  *buf;        /*!< pointer to the start of the ring buffer */

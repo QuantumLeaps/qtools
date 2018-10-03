@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.2
-# Last updated on: 2018-09-28
+# Last updated for version: 2.1.0
+# Last updated on: 2018-10-02
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -86,7 +86,8 @@ class qutest_context():
             __tracebackhide__ = True
             self.qspy.detach()
             pytest.fail(
-                "Timeout waiting for Attach to QSpy (is QSpy running and QSPY_COM_PORT correct?)")
+                "Timeout waiting for Attach to QSpy "
+                "(is QSPY running with the -u option?)")
 
 
     def session_teardown(self):
@@ -194,7 +195,8 @@ class qutest_context():
         """ Used to start a local target executable for dual targeting. """
 
         self.target_process = qutest_context.run_program(
-            [CONFIG.LOCAL_TARGET_EXECUTABLE, CONFIG.LOCAL_TARGET_QSPY_HOST], CONFIG.LOCAL_TARGET_USES_CONSOLE)
+            [CONFIG.LOCAL_TARGET_EXECUTABLE, CONFIG.LOCAL_TARGET_QSPY_HOST],
+            CONFIG.LOCAL_TARGET_USES_CONSOLE)
 
     def stop_local_target(self):
         """ Stops local target. """
@@ -284,7 +286,8 @@ class qutest_context():
 
         Args:
           object_kind : kind of object from qspy.QS_OBJ_KIND
-          object_id : the object which can be an address integer or a dictionary name string
+          object_id : the object which can be an address integer
+                      or a dictionary name string
         """
 
         self.qspy.sendLocalFilter(object_kind, object_id)
@@ -295,11 +298,18 @@ class qutest_context():
 
         Arguments:
         object_kind : kind of object from qspy.QS_OBJ_KIND
-        object_id : the object which can be an address integer or a dictionary name string
+        object_id : the object which can be an address integer
+                    or a dictionary name string
         """
 
         self.qspy.sendCurrentObject(object_kind, object_id)
         self.expect('           Trg-Ack  QS_RX_CURR_OBJ')
+
+    def query_curr(self, object_kind):
+        """ query the "current object" in the Target.
+        """
+
+        self.qspy.sendQueryCurr(object_kind)
 
     def post(self, signal, parameters=None):
         """ Posts an event to the object selected with current_obj().
@@ -331,7 +341,7 @@ class qutest_context():
           parameters : optional event payload defined using struct.pack
         """
 
-        self.qspy.sendEvent(PRIO_COMMAND.DISPATCH.value,  signal, parameters)
+        self.qspy.sendEvent(PRIO_COMMAND.DISPATCH.value, signal, parameters)
         self.expect('           Trg-Ack  QS_RX_EVENT')
 
     def init(self, signal=0, parameter=None):
@@ -343,9 +353,11 @@ class qutest_context():
     def probe(self, function, data_word):
         """ Sends a test probe to the target.
 
-        The Target collects these Test-Probe preserving the order in which they were sent.
-        Subsequently, whenever a given API is called inside the Target, it can
-        obtain the Test-Probe by means of the QS_TEST_PROBE_DEF() macro.
+        The Target collects these Test-Probe preserving the order in which
+        they were sent. Subsequently, whenever a given API is called inside
+        the Target, it can obtain the Test-Probe by means of the
+        QS_TEST_PROBE_DEF() macro.
+
         The QS_TEST_PROBE_DEF() macro returns the Test-Probes in the same
         order as they were received to the Target. If there are no more Test-
         Probes for a given API, the Test-Probe is initialized to zero.

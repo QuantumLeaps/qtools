@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.5
-* Last updated on  2018-09-17
+* Last updated for version 6.3.6
+* Last updated on  2018-10-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -230,11 +230,22 @@ static char const *  l_qs_rec[] = {
     "QS_TARGET_INFO",
     "QS_TARGET_DONE",
     "QS_RX_STATUS",
-    "QS_MSC_RESERVED1",
+    "QS_QUERY_DATA",
     "QS_PEEK_DATA",
     "QS_ASSERT_FAIL"
 
     /* [70] Application-specific records */
+};
+
+/* QS object kinds... NOTE: keep in synch with qs_copy.h */
+static char const *  l_qs_obj[] = {
+    "SM",
+    "AO",
+    "MP",
+    "EQ",
+    "TE",
+    "AP",
+    "SM_AO"
 };
 
 /* QS-RX record names... NOTE: keep in synch with qs_copy.h */
@@ -254,9 +265,10 @@ static char const *  l_qs_rx_rec[] = {
     "QS_RX_AO_FILTER",
     "QS_RX_CURR_OBJ",
     "QS_RX_TEST_CONTINUE",
-    "QS_RX_RESERVED1",
+    "QS_RX_QUERY_CURR",
     "QS_RX_EVENT"
 };
+
 
 #define FPRINF_MATFILE(format_, ...) \
     if (l_matFile != (FILE *)0) { \
@@ -1784,7 +1796,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        /* Miscallaneous QS records ........................................*/
+        /* Miscallaneous built-in QS records ...............................*/
         case QS_TEST_PAUSED: {
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("           TstPause");
@@ -2001,6 +2013,78 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     else {
                         SNPRINTF_LINE("           Trg-ERR  0x%02X", a);
                     }
+                }
+                QSPY_onPrintLn();
+            }
+            break;
+        }
+
+        case QS_QUERY_DATA: {
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, 1U);
+            p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+            switch (a) {
+                case SM_OBJ:
+                    q = QSpyRecord_getUint64(me, l_config.funPtrSize);
+                    break;
+                case AO_OBJ:
+                    b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                    c = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                    break;
+                case MP_OBJ:
+                    b = QSpyRecord_getUint32(me, l_config.poolCtrSize);
+                    c = QSpyRecord_getUint32(me, l_config.poolCtrSize);
+                    break;
+                case EQ_OBJ:
+                    b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                    c = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                    break;
+                case TE_OBJ:
+                    q = QSpyRecord_getUint64(me, l_config.objPtrSize);
+                    b = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
+                    c = QSpyRecord_getUint32(me, l_config.tevtCtrSize);
+                    d = QSpyRecord_getUint32(me, l_config.sigSize);
+                    e = QSpyRecord_getUint32(me, 1);
+                    break;
+                case AP_OBJ:
+                    break;
+                default:
+                    break;
+            }
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u Query-%s Obj=%s",
+                       t,
+                       l_qs_obj[a],
+                       Dictionary_get(&l_objDict, p, (char *)0));
+                switch (a) {
+                    case SM_OBJ:
+                        SNPRINTF_APPEND(",State=%s",
+                            Dictionary_get(&l_funDict, q, (char *)0));
+                        break;
+                    case AO_OBJ:
+                        SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
+                            b, c);
+                        break;
+                    case MP_OBJ:
+                        SNPRINTF_APPEND(",Free=%u,Min=%u",
+                            b, c);
+                        break;
+                    case EQ_OBJ:
+                        SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
+                            b, c);
+                        break;
+                    case TE_OBJ:
+                        SNPRINTF_APPEND(
+                            ",Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
+                            (e & 0x0FU),
+                            SigDictionary_get(&l_sigDict, d, q, (char *)0),
+                            b, c,
+                            (e & 0xF0U));
+                        break;
+                    case AP_OBJ:
+                        break;
+                    default:
+                        break;
                 }
                 QSPY_onPrintLn();
             }

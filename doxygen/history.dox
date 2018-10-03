@@ -1,8 +1,18 @@
 /**
 @page history Revision History
 
-@section qtools_6_3_5 Version 6.3.5, 2018-09-29
-The main purpose of this release is to improve the @ref qutest "QUTest" support for Python scripting. Specifically, this release contains @ref qtools_qspypy "qspypy 2.0.2" with the following bug fixes:
+@section qtools_6_3_6 Version 6.3.6, 2018-10-03
+The main purpose of this release is to improve the @ref qutest "QUTest" support. Specifically, this release adds a feature of querying and reporting the status of the @ref current_obj() "current objects", such as the current State-Machine (SM), Active-Object (AO), current Memory-Pool(MP), current Event-Queue (EQ), and current Time-Event (TE). The feature impacts the following facilities:
+
+- the @ref qspy "QSPY host utility" now processes new #QS_QUERY_DATA packet
+- the QUTest **Tcl** scripting implements new command command `query_curr()`
+- the QUTest **Python** scripting implements new command command `qutest.query_curr()`
+
+@note
+This feature requires matching QP/C/C++ 6.3.6.
+
+
+Also, the following bugs related to Python scripting have been fixed in the @ref qtools_qspypy "qspypy 6.3.6" included in this release:
 
 - [bug#224 QUTest/Python implementation of qutest.expect() is incomplete](https://sourceforge.net/p/qpc/bugs/224). This improved `qutest.expect()` implementation more closely matches the behavior of the `expect()` directive from Tcl scripting. The modified `qutest.expect()` compares correctly the `%timestamp` fields (as opposed to ignoring them) and also handles special character sequences '?', '*', and [chars] (like the Tcl `string match` command).
 
@@ -16,8 +26,6 @@ If you already have the previous version of @ref qtools_qspypy "qspypy", you nee
 @n
 `pip install %%QTOOLS%\qspy`
 
-
-Also, this release adds the `stop` command to `qutest.tcl` and modifies the @ref qspy "QSPY host utility" to automatically add a @ref qspy_dict "User Dictionary" entry for `QUTEST_ON_POST` @ref qs_app "application-specific trace record". This modification matches changes in QP/C/C++ 6.3.5.
 
 Finally, this release of QTools collection contains the [Unity unit testing harness (framework)](https://github.com/ThrowTheSwitch/Unity).
 

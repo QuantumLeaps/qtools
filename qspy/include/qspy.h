@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.5
-* Last updated on  2018-09-17
+* Last updated for version 6.3.6
+* Last updated on  2018-10-02
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -40,7 +40,7 @@
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "6.3.5"
+#define QSPY_VER "6.3.6"
 
 #ifdef __cplusplus
 extern "C" {

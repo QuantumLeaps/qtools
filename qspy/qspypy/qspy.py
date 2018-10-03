@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.0.2
-# Last updated on: 2018-08-28
+# Last updated for version: 2.1.0
+# Last updated on: 2018-10-03
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -77,7 +77,7 @@ class QS_RX(IntEnum):
     AO_FILTER = 12
     CURR_OBJ = 13
     CONTINUE = 14
-    RESERVED1 = 15
+    QUERY_CURR = 15
     EVENT = 16
 
 ## Records from client Must be kept in sync with qs_copy.h
@@ -182,7 +182,7 @@ class QSpyRecords(IntEnum):
     QS_TARGET_INFO = 64,  # /*!< reports the Target information */
     QS_TARGET_DONE = 65,  # /*!< reports completion of a user callback */
     QS_RX_STATUS = 66,  # /*!< reports QS data receive status */
-    QS_MSC_RESERVED1 = 67,
+    QS_QUERY_DATA = 67, # /*!< reports the data from "current object" query */
     QS_PEEK_DATA = 68,  # /*!< reports the data from the PEEK query */
     QS_ASSERT_FAIL = 69,  # /*!< assertion failed in the code */
 
@@ -552,6 +552,9 @@ class qspy(threading.Thread):
             packet.extend(qspy.string_to_binary(object_id))
         self.sendPacket(packet)
 
+    def sendQueryCurr(self, object_kind):
+        self.sendPacket(struct.pack('<BB', QS_RX.QUERY_CURR, object_kind.value))
+
     def sendTestProbe(self, function, data):
         format_string = '<BI' + theFmt['funPtr']
 
@@ -569,8 +572,7 @@ class qspy(threading.Thread):
         self.sendPacket(packet)
 
     def sendTick(self, rate):
-        packet = struct.pack('<BB', QS_RX.TICK, rate)
-        self.sendPacket(packet)
+        self.sendPacket(struct.pack('<BB', QS_RX.TICK, rate))
 
     def sendEvent(self, ao_priority, signal, parameters=None):
         """ Sends and event to an active object

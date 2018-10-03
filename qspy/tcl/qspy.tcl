@@ -9,8 +9,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 6.3.0
-# Last updated on  2018-05-10
+# Last updated for version 6.3.6
+# Last updated on  2018-10-03
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -122,7 +122,7 @@ namespace eval ::qspy {
         AO_FILTER        12
         CURR_OBJ         13
         CONTINUE         14
-        RESERVED1        15
+        QUERY_CURR       15
         EVENT            16
     }
 
@@ -362,6 +362,15 @@ proc ::qspy::sendCurrObj {kind obj} {
              $QSPY(SEND_CURR_OBJ) $QS_OBJ_KIND($kind) 0]$obj\0
     }
 }
+#.............................................................................
+## @brief send the query-current packet to the Target/QSPY
+proc ::qspy::sendQueryCurr {kind} {
+    variable QS_RX
+    variable QSPY
+    variable QS_OBJ_KIND
+    sendPkt [binary format cc $QS_RX(QUERY_CURR) $QS_OBJ_KIND($kind)]
+}
+
 #.............................................................................
 ## @brief send the current-object packet to the Target/QSPY
 proc ::qspy::sendTestProbe {fun data} {
