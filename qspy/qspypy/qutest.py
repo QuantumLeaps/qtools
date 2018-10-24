@@ -5,8 +5,8 @@
 
 ## @cond
 #-----------------------------------------------------------------------------
-# Last updated for version: 2.1.0
-# Last updated on: 2018-10-02
+# Last updated for version: 6.3.6
+# Last updated on: 2018-10-20
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC
@@ -206,6 +206,17 @@ class qutest_context():
             time.sleep(0.500)
             self.target_process = None
 
+    def _flush_queue(self):
+        try:
+            # Wait for any messages in flight
+            self.text_queue.get(timeout=CONFIG.EXPECT_TIMEOUT_SEC)
+        except:
+            pass
+        else:
+            #
+            while not self.text_queue.empty():
+                self.text_queue.get()
+
     def reset_target(self):
         """ Resets the target (local or remote). """
 
@@ -213,10 +224,8 @@ class qutest_context():
         self.have_target_event.clear()
 
         # Flush queue in case they miss an expect
-        #if not self.text_queue.empty():
-        #    print("\nFlushing text queue:")
-        #while not self.text_queue.empty():
-        #    print(self.text_queue.get())
+        while not self.text_queue.empty():
+            self.text_queue.get()
 
         # If running with a local target, kill and restart it
         if CONFIG.USE_LOCAL_TARGET:
@@ -252,7 +261,7 @@ class qutest_context():
 
     def call_on_teardown(self):
         """ Sends a teardown command to target."""
-
+        self._flush_queue()
         self.qspy.sendTeardown()
         self.expect('           Trg-Ack  QS_RX_TEST_TEARDOWN')
         if self.on_teardown_callback is not None:

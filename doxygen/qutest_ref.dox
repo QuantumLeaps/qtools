@@ -16,7 +16,7 @@ The QP API implementation linked with the *test fixture* is **not** the actual Q
 ------------------------------------------------------------------------------
 @section qutest_stub QUTest&trade; Stub
 
-(see <a href="https://state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">`qutest.c`</a>)
+(see <a href="https://www.state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">`qutest.c`</a>)
 
 
 @next{qutest_script}
@@ -27,7 +27,7 @@ The QP API implementation linked with the *test fixture* is **not** the actual Q
 
 @tableofcontents
 
-<p>A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qqtest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the tests.
+<p>A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qqtest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the tests.
 </p>
 
 The QUTest *test scripts* are executed in the host by the "QUTest front-end" that communicates with the @ref qspy "QSPY" host application via the @ref qspy_udp "UDP interface". The "QUTest front-end" is itself implemented in [Tcl](https://en.wikipedia.org/wiki/Tcl) (see <span class="img file_tcl">`qutest.tcl`</span>). This qutest.tcl file defines a small Domain Specific Language (DSL) for writing QUTest *test scripts*.

@@ -3,7 +3,7 @@
 @image html qtools_banner.jpg
 
 @section qtools_about What is it?
-QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://state-machine.com/">Quantum Leaps</a>:
+QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://www.state-machine.com/">Quantum Leaps</a>:
 
 - @ref qpspy "QP/Spy software tracing and testing for embedded systems", which includes:
   + @ref qspy     "QSPY&trade; Host Application"
@@ -92,13 +92,13 @@ http://www.gnu.org/software/make
 @subsection qtools_util The file and diff utilities
 Have been taken from the UnixUtils project at SourceForge.net:
 
-http://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
+https://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
 
 
 The file and diff utilities source (source/fileutils-3.16-src.zip) has
 been taken from:
 
-http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
+https://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
 
 
 ------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ Please post any **technical questions** to the <a class="extern" target="_blank"
 
 Direct **Commercial Support** is available to the commercial licensees. Every commercial license includes one year of Technical Support for the licensed software. The support term can be extended annually.
 
-Training and consulting services are also available from Quantum Leaps. Please refer to the <a class="extern" target="_blank" href="https://state-machine.com/support/">Support web-page</a> for more information.
+Training and consulting services are also available from Quantum Leaps. Please refer to the <a class="extern" target="_blank" href="https://www.state-machine.com/support/">Support web-page</a> for more information.
 
 @image html logo_ql_TM.jpg
 

@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.3.6
-* Last updated on  2018-10-03
+* Last updated on  2018-10-14
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -732,6 +732,9 @@ QSTimeCtr QS_onGetTime(void);
 /*! Internal QS macro to output an unformatted uint32_t data element */
 #define QS_U32_(data_)          (QS_u32_((uint32_t)(data_)))
 
+/*! Internal QS macro to output a zero-terminated ASCII string element */
+#define QS_STR_(msg_)           (QS_str_((msg_)))
+
 
 #if (Q_SIGNAL_SIZE == 1)
     /*! Internal macro to output an unformatted event signal data element */
@@ -1069,89 +1072,6 @@ enum {
 
 
 /****************************************************************************/
-/* Macros for use in the internal implementation only */
-
-#ifdef QP_IMPL
-
-#if (QF_EQUEUE_CTR_SIZE == 1)
-
-    /*! Internal QS macro to output an unformatted event queue counter
-    * data element. */
-    /**
-    * @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
-    */
-    #define QS_EQC_(ctr_)       QS_u8_((uint8_t)(ctr_))
-#elif (QF_EQUEUE_CTR_SIZE == 2)
-    #define QS_EQC_(ctr_)       QS_u16_((uint16_t)(ctr_))
-#elif (QF_EQUEUE_CTR_SIZE == 4)
-    #define QS_EQC_(ctr_)       QS_u32_((uint32_t)(ctr_))
-#else
-    #error "QF_EQUEUE_CTR_SIZE not defined"
-#endif
-
-#if (QF_EVENT_SIZ_SIZE == 1)
-
-    /*! Internal QS macro to output an unformatted event size
-    * data element. */
-    /**
-    * @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
-    */
-    #define QS_EVS_(size_)      QS_u8_((uint8_t)(size_))
-#elif (QF_EVENT_SIZ_SIZE == 2)
-    #define QS_EVS_(size_)      QS_u16_((uint16_t)(size_))
-#elif (QF_EVENT_SIZ_SIZE == 4)
-    #define QS_EVS_(size_)      QS_u32_((uint32_t)(size_))
-#endif
-
-#if (QF_MPOOL_SIZ_SIZE == 1)
-
-    /*! Internal QS macro to output an unformatted memory pool
-    * block-size data element */
-    /**
-    * @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
-    */
-    #define QS_MPS_(size_)      QS_u8_((uint8_t)(size_))
-#elif (QF_MPOOL_SIZ_SIZE == 2)
-    #define QS_MPS_(size_)      QS_u16_((uint16_t)(size_))
-#elif (QF_MPOOL_SIZ_SIZE == 4)
-    #define QS_MPS_(size_)      QS_u32_((uint32_t)(size_))
-#endif
-
-#if (QF_MPOOL_CTR_SIZE == 1)
-
-    /*! Internal QS macro to output an unformatted memory pool
-    * block-counter data element. */
-    /**
-    * @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
-    */
-    #define QS_MPC_(ctr_)       QS_u8_((uint8_t)(ctr_))
-#elif (QF_MPOOL_CTR_SIZE == 2)
-    #define QS_MPC_(ctr_)       QS_u16_((uint16_t)(ctr_))
-#elif (QF_MPOOL_CTR_SIZE == 4)
-    #define QS_MPC_(ctr_)       QS_u32_((uint16_t)(ctr_))
-#endif
-
-#if (QF_TIMEEVT_CTR_SIZE == 1)
-
-    /*! Internal QS macro to output an unformatted time event
-    * tick-counter data element */
-    /**
-    * @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
-    */
-    #define QS_TEC_(ctr_)       QS_u8_((uint8_t)(ctr_))
-#elif (QF_TIMEEVT_CTR_SIZE == 2)
-    #define QS_TEC_(ctr_)       QS_u16_((uint16_t)(ctr_))
-#elif (QF_TIMEEVT_CTR_SIZE == 4)
-    #define QS_TEC_(ctr_)       QS_u32_((uint32_t)(ctr_))
-#endif
-
-/*! Internal QS macro to output a zero-terminated ASCII string element */
-#define QS_STR_(msg_)           (QS_str_((msg_)))
-
-#endif /* QP_IMPL */
-
-
-/****************************************************************************/
 /* QS private data (the transmit channel) */
 typedef uint_fast16_t QSCtr;  /*!< QS ring buffer counter and offset type */
 
@@ -1265,6 +1185,18 @@ void QS_onReset(void);
 void QS_onCommand(uint8_t cmdId,   uint32_t param1,
                   uint32_t param2, uint32_t param3);
 
+/*! macro to handle the QS output from the application
+* NOTE: if this macro is used, the application must define QS_output().
+*/
+#define QS_OUTPUT()   (QS_output())
+
+/*! macro to handle the QS-RX input to the application
+* NOTE: if this macro is used, the application must define QS_rx_input().
+*/
+#define QS_RX_INPUT() (QS_rx_input())
+
+/****************************************************************************/
+/* Facilities for use in QUTest only */
 #ifdef Q_UTEST
     /*! callback to setup a unit test inside the Target */
     void QS_onTestSetup(void);
@@ -1328,20 +1260,14 @@ void QS_onCommand(uint8_t cmdId,   uint32_t param1,
     /*! Constructor of the QActiveDummy Active Object class */
     void QActiveDummy_ctor(QActiveDummy * const me);
 
-#ifdef QP_IMPL
-    #define QACTIVE_EQUEUE_WAIT_(me_) \
-        Q_ASSERT_ID(0, (me_)->eQueue.frontEvt != (QEvt *)0)
-
-    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
-        QPSet_insert(&QS_rxPriv_.readySet, (uint_fast8_t)(me_)->prio)
-#endif /* QP_IMPL */
-
 #else /* Q_UTEST not defined */
+
     /* dummy definitions when not building for QUTEST */
     #define QS_TEST_PROBE_DEF(fun_)
     #define QS_TEST_PROBE(code_)
     #define QS_TEST_PROBE_ID(id_, code_)
     #define QS_TEST_PAUSE()  ((void)0)
+
 #endif /* Q_UTEST */
 
 #endif /* qs_h  */

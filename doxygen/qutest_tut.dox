@@ -1,6 +1,6 @@
 /*! @page qutest_tut QUTest&trade; Tutorial
 
-<p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first couple of examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests described in the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. Later examples in this Tutorial show how to test <a href="https://state-machine.com/doc/concepts#HSM" target="_blank" class="extern">hierarchical state machines</a> and <a href="https://state-machine.com/doc/concepts#Active" target="_blank" class="extern">active objects</a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
+<p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first couple of examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests described in the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. Later examples in this Tutorial show how to test <a href="https://www.state-machine.com/doc/concepts#HSM" target="_blank" class="extern">hierarchical state machines</a> and <a href="https://www.state-machine.com/doc/concepts#Active" target="_blank" class="extern">active objects</a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
 </p>
 
 As mentioned in the Section \"@ref qutest_how "How it works?"\", testing with QUTest&trade; always involves two components: (1) a @ref qutest_fixture "test fixture" code written in C (or C++) that runs on the Target and (2) a @ref qutest_script "test scipt(s)" that run on the host. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
@@ -61,7 +61,7 @@ This will build the @ref qutest_sprintf-fixture "Sprintf test fixture" as a Wind
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-fixture Test Fixture
-The job of a @ref qutest_fixture "test fixture" is to exercise the <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (the `sprintf()` function in this case) and report the results back to the @ref qspy "QSPY host application". Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-tcl "test script"(s). A properly written test fixture can be typically used for many tests (implemented in test scripts).
+The job of a @ref qutest_fixture "test fixture" is to exercise the <a href="https://www.state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (the `sprintf()` function in this case) and report the results back to the @ref qspy "QSPY host application". Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_sprintf-tcl "test script"(s). A properly written test fixture can be typically used for many tests (implemented in test scripts).
 
 @remark
 Coming up with a "good" *test fixture* requires some practice, but when you study the examples in this Tutorial, you will see examples of flexible *test fixtures* that allow you to to run a wide variety of tests on them.
@@ -137,7 +137,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </dd>
   <dt>[2]</dt><dd> You also need to include the interface to the CUT, which is `<stdio.h>` in case of the `sprintf()` CUT.
   </dd>
-  <dt>[3]</dt><dd> The macro `Q_DEFINE_THIS_FILE` is needed for <a href="https://state-machine.com/glossary#assertion" class="extern"><b>DbC assertions</b></a> (they have nothing to do with <a href="https://state-machine.com/glossary#test_assertion" class="extern">test assertions</a>). Later in this file, a <a href="https://state-machine.com/glossary#assertion" class="extern">DbC assertion</a> is used to guard against failure in the initialization of the @ref qs "QS" target-resident component (see step [10]).
+  <dt>[3]</dt><dd> The macro `Q_DEFINE_THIS_FILE` is needed for <a href="https://www.state-machine.com/glossary#assertion" class="extern"><b>DbC assertions</b></a> (they have nothing to do with <a href="https://www.state-machine.com/glossary#test_assertion" class="extern">test assertions</a>). Later in this file, a <a href="https://www.state-machine.com/glossary#assertion" class="extern">DbC assertion</a> is used to guard against failure in the initialization of the @ref qs "QS" target-resident component (see step [10]).
   </dd>
   <dt>[4]</dt><dd> The static (local) `char` array `format[]` will be used to provide the format string to the `sprintf()` CUT.
   </dd>
@@ -152,7 +152,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
   </dd>
   <dt>[9]</dt><dd> The `main()` function must start with calling `QF_init()` to initialize the QP framework.
   </dd>
-  <dt>[10]</dt><dd> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails. (In which case continuationon of the test makes no sense).
+  <dt>[10]</dt><dd> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://www.state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails. (In which case continuationon of the test makes no sense).
   </dd>
   <dt>[11]</dt><dd> Next, you produce @ref qs_dict "QS dictionaries" for all objects and @ref qs_app "application-specific" (user) trace records that the upcoming @ref qutest_sprintf-tcl "test scripts" need to know about.
 > <b>NOTE:</b> you need to do this, so that the test scripts can refer to the objects by the same symbolic names as the *test fixture*.
@@ -187,7 +187,7 @@ The following listing shows the complete *test fixture* for the `sprintf()` test
 
 ------------------------------------------------------------------------------
 @section qutest_sprintf-tcl Test Script (Tcl)
-A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send commands to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" with the <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the test. The following listing shows the *test script* for the Sprintf tests (file <span class="img file_tcl">`test_Sprintf.tcl`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @remark
 Even though a *test script* uses Tcl under the hood, you don't need to know Tcl to write effective tests. The actual set of commands that you use and need to know about forms a small "Domain Specific Language" (DSL) for unit testing, which just happens to be implemented with Tcl as a command interpreter.
@@ -266,7 +266,7 @@ The following test script performs the same tests as the <a href="http://www.thr
   <dt>[6]</dt><dd> The @ref command() "command" command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_sprintf-fixture "test-fixture"[16])
 > **NOTE:** The first parameter of @ref command() "command" here is just a number (0), but it is also possible to use a **symbolic name** for the first parameter. This symbolic name will be looked up in the user dictionary (QS_USR_DICTIONARY()) produced by the Target, as illustrated in @ref qutest_leddriver-script "LedDriver Test Script"[2].
   </dd>
-  <dt>[7]</dt><dd> The @ref expect() "expect" command represents an <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test (a.k.a. <a href="https://state-machine.com/glossary#test_assertion">test assertion</a>). This is the expected output generated by the `command 0` command.
+  <dt>[7]</dt><dd> The @ref expect() "expect" command represents an <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test (a.k.a. <a href="https://www.state-machine.com/glossary#test_assertion">test assertion</a>). This is the expected output generated by the `command 0` command.
 > <b>NOTE:</b> the expected string starts with a number `0000000001`, which is the @ref qs_tstamp "Target Time-Stamp". In QUTest, the @ref qutest_tstamp "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost. In the later tests you will see how you can count the steps <b>automatically</b> with the `%timestamp` variable.
   </dd>
   <dt>[8]</dt><dd> The test finishes with the expectation for "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
@@ -285,7 +285,7 @@ The following test script performs the same tests as the <a href="http://www.thr
   </dd>
   <dt>[12]</dt><dd> The @ref command() "command" command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_sprintf-fixture "test-fixture"[16]).
   </dd>
-  <dt>[13]</dt><dd> The @ref expect() "expect" command represents an <a href="https://state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test. This is the expected output generated by the `command 0 1234` command.
+  <dt>[13]</dt><dd> The @ref expect() "expect" command represents an <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectation</b></a> of this test. This is the expected output generated by the `command 0 1234` command.
   </dd>
   <dt>[14]</dt><dd> The test finishes with the expectation for the "Trg-Done" trace record, which means that all output generated by `command 0` has been generated.
   </dd>
@@ -434,7 +434,7 @@ The following test script performs the same tests as the <a href="http://www.thr
 <img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/tddbook.gif" title="TDD Book">
 @endhtmlonly
 
-<p>This example is an adaptation of the tests described in Chapters 2 and 3 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip. The <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> for this example is located in the file <span class="img file_c">`LedDriver.c`</span> in the same directory as the rest of this test.
+<p>This example is an adaptation of the tests described in Chapters 2 and 3 of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a simple "LED Driver" that turns on and off several LEDs in a LED strip. The <a href="https://www.state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> for this example is located in the file <span class="img file_c">`LedDriver.c`</span> in the same directory as the rest of this test.
 </p>
 
 
@@ -688,11 +688,11 @@ As you can see, the QUTest&trade; environment enables you to write *test scritps
 
 <p>This example is an adaptation of the Flash-memory unit tests described in Chapter 10 "The Mock Object" of the book <a href="https://wingman-sw.com/test-driven-development-for-embedded-c-book" target="_blank" class="extern">"Test-Driven Development for Embedded C"</a> by James W. Grenning. The example tests a Flash-memory driver (for the M28W160ECT Flash Memory device from Micron Technology).
 
-In case of the Flash memory driver (the <a href="https://state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> in this case), it collaborates with the low-level IO (input/output) code, which is responsible for reading and writing data to raw memory addresses. Hence, the most important aspect of this example is the use of a **Mock Object** for simulating the low-level input/output interface to the Flash memory. The <b>CUT</b> for this example is located in the file <span class="img file_c">`Flash.c`</span> in the same directory as the rest of this test.
+In case of the Flash memory driver (the <a href="https://www.state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> in this case), it collaborates with the low-level IO (input/output) code, which is responsible for reading and writing data to raw memory addresses. Hence, the most important aspect of this example is the use of a **Mock Object** for simulating the low-level input/output interface to the Flash memory. The <b>CUT</b> for this example is located in the file <span class="img file_c">`Flash.c`</span> in the same directory as the rest of this test.
 </p>
 
 @remarks
-In the classic unit testing harnesses based on the xUnit principles, a mock object is a specific variant of a <a href="https://state-machine.com/glossary#test_double" class="extern"><b>test double</b></a> that is needed to verify complex, multi-stage interactions between the CUT and the collaborator impersonated by the mock test double (test-script -> CUT -> mock-object).
+In the classic unit testing harnesses based on the xUnit principles, a mock object is a specific variant of a <a href="https://www.state-machine.com/glossary#test_double" class="extern"><b>test double</b></a> that is needed to verify complex, multi-stage interactions between the CUT and the collaborator impersonated by the mock test double (test-script -> CUT -> mock-object).
 
 @note
 Because of the different design philosophy of QUTest, which is *not* based on xUnit, the classic "mock object" is actually not needed and can be replaced with a simpler "spy" test double. To dynamically alter the behavior of this "spy" test double, this example applies @ref qutest_probe "QUTest Test Probes". Test Probes can be changed interactively from the @ref qutest_flash-script "test script".

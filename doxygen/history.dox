@@ -165,7 +165,7 @@ Also, the @ref qspyview "QSpyView" Visualization extension has been moved to the
 The other Quantum Leaps utilities, like @ref qclean "QClean", @ref qfsgen "QFSGen", and @ref qcalc "QCalc" have been updated and greatly improved.
 
 Finally, all utilities in the QTools collection have been documented in the new QTools Manual available online at:
-https://state-machine.com/qtools
+https://www.state-machine.com/qtools
 
 
 ------------------------------------------------------

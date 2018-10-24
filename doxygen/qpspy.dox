@@ -11,7 +11,7 @@ Techniques based on **software tracing** can answer many of these questions. Sof
 
 @anchor qpspy_framework
 @note
-Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://state-machine.com/products/#QP">QP&trade; real-time frameworks</a>. Due to the inversion of a control, a real-time framework controls almost all interesting interactions in the system, so an instrumented real-time framework can provide much more comprehensive and detailed information than any traditional RTOS.
+Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://www.state-machine.com/products/#QP">QP&trade; real-time frameworks</a>. Due to the inversion of a control, a real-time framework controls almost all interesting interactions in the system, so an instrumented real-time framework can provide much more comprehensive and detailed information than any traditional RTOS.
 
 
 ------------------------------------------------------------------------------
