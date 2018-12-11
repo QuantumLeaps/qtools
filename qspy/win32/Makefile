@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 5.9.0
-# Last updated on  2017-05-09
+# Last updated for version 6.3.7
+# Last updated on  2018-11-06
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,17 +28,17 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
 # make
-# make CONF=rel
+# make CONF=dbg
 #
 # cleaning configurations: Debug (default), Release, and Spy
 # make clean
-# make CONF=rel clean
+# make CONF=dbg clean
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
@@ -49,28 +49,23 @@
 #-----------------------------------------------------------------------------
 # project name
 #
-PROJECT     := qspy
+PROJECT := qspy
 
 #-----------------------------------------------------------------------------
-# project directories
+# project directories:
 #
 
 # list of all source directories used by this project
-VPATH = \
-	. \
-	../source \
+VPATH := . \
+	../source
 
 # list of all include directories needed by this project
-INCLUDES  = \
-	-I. \
+INCLUDES := -I. \
 	-I../include
-
-# list of resource include directories needed by this project
-RCINCLUDES =
 
 
 #-----------------------------------------------------------------------------
-# files
+# project files:
 #
 
 # C source files...
@@ -83,13 +78,10 @@ C_SRCS := \
 	qspy.c
 
 # C++ source files...
-CPP_SRCS :=	
-
-# Resource files...
-RC_SRCS :=
+CPP_SRCS :=
 
 LIB_DIRS  :=
-LIBS      := -lwsock32
+LIBS      := -lws2_32
 
 #-----------------------------------------------------------------------------
 # MinGW toolset (NOTE: assumed to be on your PATH)
@@ -106,7 +98,6 @@ CC    := gcc
 CPP   := g++
 LINK  := gcc    # for C programs
 #LINK  := g++   # for C++ programs
-RC    := windres
 
 # basic utilities (included in Qtools for Windows), see:
 #    http://sourceforge.net/projects/qpc/files/Qtools
@@ -115,38 +106,32 @@ MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build options for various configurations
+# build configurations...
 #
 
 ifeq (dbg, $(CONF)) # Debug configuration ....................................
 
 BIN_DIR := dbg
 
-CFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+CFLAGS = -c -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
-CFLAGS = -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+CFLAGS = -c -ffunction-sections -fdata-sections \
+	-Os -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+CPPFLAGS = -c -ffunction-sections -fdata-sections \
+	-Os -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 
 LINKFLAGS := -Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
-
-# is it a GUI application (any GUI resources provided?) ...
-ifneq (,$(RC_SRCS))
-LINKFLAGS += -mwindows
-DEFINES += -DWIN32_GUI
-endif
 
 #-----------------------------------------------------------------------------
 
@@ -172,10 +157,6 @@ endif
 #
 
 all: $(TARGET_EXE)
-#all: $(TARGET_BIN)
-
-$(TARGET_BIN): $(TARGET_EXE)
-	$(BIN) -O binary $< $@
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
@@ -187,13 +168,10 @@ $(BIN_DIR)/%.d : %.c
 	$(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $< > $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BIN_DIR)/%.o : %.rc
-	$(RC) $(RCINCLUDES) -i $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)
@@ -202,23 +180,26 @@ ifneq ($(MAKECMDGOALS),clean)
   endif
 endif
 
-.PHONY : clean
+.PHONY : clean show
+
 clean:
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \
-	$(BIN_DIR)/*.exe \
-	$(BIN_DIR)/*.map
-	
+	$(BIN_DIR)/*.map \
+	$(TARGET_EXE)
+
 show:
-	@echo PROJECT  = $(PROJECT)
-	@echo CONF     = $(CONF)
-	@echo VPATH    = $(VPATH)
-	@echo C_SRCS   = $(C_SRCS)
-	@echo CPP_SRCS = $(CPP_SRCS)
+	@echo PROJECT      = $(PROJECT)
+	@echo TARGET_EXE   = $(TARGET_EXE)
+	@echo VPATH        = $(VPATH)
+	@echo C_SRCS       = $(C_SRCS)
+	@echo CPP_SRCS     = $(CPP_SRCS)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
 	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
 	@echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
-	@echo RC_OBJS_EXT  = $(RC_OBJS_EXT)
-	@echo LIB_DIRS = $(LIB_DIRS)
-	@echo LIBS     = $(LIBS)
+	@echo LIB_DIRS     = $(LIB_DIRS)
+	@echo LIBS         = $(LIBS)
+	@echo DEFINES      = $(DEFINES)
+

@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.0
-* Last updated on  2017-05-09
+* Last updated for version 6.3.7
+* Last updated on  2018-11-09
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -43,10 +43,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <conio.h>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>  /* for Windows serial communication facilities */
-#include <winsock2.h> /* for Windows network facilities */
+#include <ws2tcpip.h> /* for Windows socket facilities */
 
 #include "qspy.h"     /* QSPY data parser */
 #include "be.h"       /* Back-End interface */
@@ -103,7 +100,7 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
 
     /* open serial port (use \\.\COM<num> name to allow large <num>)... */
     SNPRINTF_S(comPortName, sizeof(comPortName), "\\\\.\\%s", comName);
-    l_serHNDL = CreateFile(comPortName,
+    l_serHNDL = CreateFile((LPCSTR)comPortName,
                        GENERIC_READ | GENERIC_WRITE,
                        0U,            /* exclusive access */
                        NULL,          /* no security attrs */
@@ -131,7 +128,7 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
 
     /* drill in the DCB... */
     dcb.fAbortOnError = 0U; /* don't abort on error */
-    if (!BuildCommDCB(comSettings, &dcb)) {
+    if (!BuildCommDCB((LPCSTR)comSettings, &dcb)) {
         SNPRINTF_LINE("   <COMMS> ERROR    Parsing COM port settings");
         QSPY_printError();
         return QSPY_ERROR;
@@ -270,6 +267,7 @@ static struct sockaddr_in l_clientAddr;
 QSpyStatus PAL_openTargetTcp(int portNum) {
     struct sockaddr_in local;
     u_long sockmode;
+    WSADATA wsaData;
 
     /* setup the PAL virtual table for the TCP/IP Target connection... */
     PAL_vtbl.getEvt      = &tcp_getEvt;
@@ -282,7 +280,6 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
     * NOTE: It's OK to call WSAStartup() multiple times, as long as
     * the cleanup is performed equal number of times.
     */
-    static WSADATA wsaData;
     int wsaErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaErr == SOCKET_ERROR) {
         SNPRINTF_LINE("   <COMMS> ERROR    Init Windows Sockets Err=%d",
@@ -293,7 +290,7 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
 
     /* create TCP socket */
     l_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (l_serverSock == INVALID_SOCKET){
+    if (l_serverSock == INVALID_SOCKET) {
         SNPRINTF_LINE("   <COMMS> ERROR    Server socket create Err=%d",
                       WSAGetLastError());
         QSPY_printError();
@@ -350,6 +347,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     fd_set readSet;
     int status;
     int nrec;
+    char client_hostname[128];
 
     /* try to receive data from keyboard... */
     evt = kbd_receive(buf, pBytes);
@@ -403,17 +401,18 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                 return QSPY_ERROR_EVT;
             }
 
-            /* disable the Nagle algorithm (good for small messages) */
-            //sockopt_bool = TRUE;
-            //setsockopt(l_clientSock, IPPROTO_TCP, TCP_NODELAY,
-            //           (const char *)&sockopt_bool, sizeof(sockopt_bool));
-
             QSPY_reset();   /* reset the QSPY parser to start over cleanly */
             QSPY_txReset(); /* reset the QSPY transmitter */
 
+#ifdef _MSC_VER
+            inet_ntop(l_clientAddr.sin_family, &l_clientAddr.sin_addr,
+                      client_hostname, sizeof(client_hostname));
+#else
+            strncpy(client_hostname, inet_ntoa(l_clientAddr.sin_addr),
+                    sizeof(client_hostname));
+#endif
             SNPRINTF_LINE("   <COMMS> TCP-IP   Connected to Host=%s,Port=%d",
-                          inet_ntoa(l_clientAddr.sin_addr),
-                          (int)ntohs(l_clientAddr.sin_port));
+                      client_hostname, (int)ntohs(l_clientAddr.sin_port));
             QSPY_printInfo();
         }
     }
@@ -431,24 +430,18 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
             return QSPY_ERROR_EVT;
         } else if (FD_ISSET(l_clientSock, &readSet)) {
             nrec = recv(l_clientSock, (char *)buf, (int)(*pBytes), 0);
-            /* socket error or the client hang up... */
-            if (nrec == SOCKET_ERROR) {
-                SNPRINTF_LINE("   <COMMS> ERROR    Client socket Err=%d",
-                              WSAGetLastError());
-                QSPY_printError();
-                /* go back to waiting for a client */
-                closesocket(l_clientSock);
-                l_clientSock = INVALID_SOCKET;
-            }
-            else if (nrec <= 0) { /* the client hang up */
+            if (nrec <= 0) { /* the client hang up */
+#ifdef _MSC_VER
+                inet_ntop(l_clientAddr.sin_family, &l_clientAddr.sin_addr,
+                    client_hostname, sizeof(client_hostname));
+#else
+                strncpy(client_hostname, inet_ntoa(l_clientAddr.sin_addr),
+                    sizeof(client_hostname));
+#endif
                 SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
-                              "Host=%s,Port=%d",
-                              inet_ntoa(l_clientAddr.sin_addr),
-                              (int)ntohs(l_clientAddr.sin_port));
-                QSPY_printInfo();
-
-                SNPRINTF_LINE(
-                "----------------------------------------------------------");
+                    "Host=%s,Port=%d"
+            "\n----------------------------------------------------------",
+                    client_hostname, (int)ntohs(l_clientAddr.sin_port));
                 QSPY_printInfo();
 
                 /* go back to waiting for a client */
@@ -518,11 +511,14 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
         return evt;
     }
 
+    /* try to receive data from the File... */
     nBytes = fread(buf, 1, (int)(*pBytes), l_file);
     if (nBytes > 0) {
         *pBytes = nBytes;
         return QSPY_TARGET_INPUT_EVT;
     }
+
+    /* no more input available from the file, QSPY is done */
     return QSPY_DONE_EVT;
 }
 /*..........................................................................*/
@@ -545,13 +541,14 @@ static void file_cleanup(void) {
 QSpyStatus PAL_openBE(int portNum) {
     struct sockaddr_in local;
     u_long sockmode;
+    WSADATA wsaData;
+    int wsaErr;
 
     /* itialize Windows sockets version 2.2)... */
     /* NOTE: assuming that PAL_openBE() is always called before initialzing
     * the target connection, including the TCP/IP connection, the
     */
-    static WSADATA wsaData;
-    int wsaErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    wsaErr = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaErr == SOCKET_ERROR) {
         SNPRINTF_LINE("   <F-END> ERROR    Windows Sockets Init Err=%d",
                       wsaErr);
@@ -611,8 +608,8 @@ void PAL_closeBE(void) {
             /* block until the packet comes out... */
             FD_ZERO(&writeSet);
             FD_SET(l_beSock, &writeSet);
-            delay.tv_sec  = 0U;
-            delay.tv_usec = 2000 * 1000U; /* delay for up to 2 seconds */
+            delay.tv_sec  = 2U; /* delay for up to 2 seconds */
+            delay.tv_usec = 0U;
             if (select(0, (fd_set *)0, &writeSet, (fd_set *)0, &delay)
                 == SOCKET_ERROR)
             {

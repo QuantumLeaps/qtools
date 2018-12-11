@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: Makefile for QWIN Demo, MinGW
-# Last updated for version 5.6.5
-# Last updated on  2016-05-02
+# Product: Makefile for QWIN Demo, GNU GCC
+# Last updated for version 6.3.7
+# Last updated on  2018-11-06
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://state-machine.com
+# https://www.state-machine.com
 # mailto:info@state-machine.com
 ##############################################################################
 # examples of invoking this Makefile:
@@ -44,14 +44,14 @@
 #
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
-# is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+# is included in the QTools collection for Windows, see:
+#    http://sourceforge.net/projects/qpc/files/QTools/
 #
 
 #-----------------------------------------------------------------------------
 # project name
 #
-PROJECT     := qwin_demo
+PROJECT := qwin_demo
 
 #-----------------------------------------------------------------------------
 # project directories
@@ -81,7 +81,7 @@ C_SRCS := \
 	qwin_gui.c
 
 # C++ source files...
-CPP_SRCS :=	
+CPP_SRCS :=
 
 # Resource files...
 RC_SRCS := \
@@ -124,56 +124,54 @@ ifeq (rel, $(CONF)) # Release configuration ..................................
 
 BIN_DIR := rel
 
-CFLAGS = -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+CFLAGS = -c -ffunction-sections -fdata-sections \
+	-O1 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+CPPFLAGS = -c -ffunction-sections -fdata-sections \
+	-O1 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 else ifeq (spy, $(CONF))  # Spy configuration ................................
 
-BIN_DIR := spy
+BIN_DIR := build_spy
 
-LIBS    += -lwsock32
+LIBS    += -lws2_32
 
-CFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES) -DQ_SPY
+CFLAGS = -c -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES) -DQ_SPY
 
-CPPFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES) -DQ_SPY
+CPPFLAGS =-c  -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES) -DQ_SPY
 
 else  # default Debug configuration ..........................................
 
-BIN_DIR := dbg
+BIN_DIR := build
 
-CFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+CFLAGS = -c -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 endif  # .....................................................................
 
-LINKFLAGS := -Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
+LINKFLAGS :=
 
 # is it a GUI application (any GUI resources provided?) ...
 ifneq (,$(RC_SRCS))
 LINKFLAGS += -mwindows
-DEFINES += -DWIN32_GUI
+DEFINES += -DQWIN_GUI
 endif
 
 #-----------------------------------------------------------------------------
-
-C_OBJS       := $(patsubst %.c,   %.o, $(C_SRCS))
-CPP_OBJS     := $(patsubst %.cpp, %.o, $(CPP_SRCS))
+C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
+CPP_OBJS     := $(patsubst %.cpp,%.o, $(CPP_SRCS))
 RC_OBJS      := $(patsubst %.rc,  %.o, $(RC_SRCS))
 
-TARGET_BIN   := $(BIN_DIR)/$(PROJECT).bin
-TARGET_EXE   := $(BIN_DIR)/$(PROJECT).exe
+TARGET_EXE   := $(BIN_DIR)/$(PROJECT)$(TARGET_EXT)
 C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
-C_DEPS_EXT   := $(patsubst %.o, %.d, $(C_OBJS_EXT))
+C_DEPS_EXT   := $(patsubst %.o,%.d, $(C_OBJS_EXT))
 CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
-CPP_DEPS_EXT := $(patsubst %.o, %.d, $(CPP_OBJS_EXT))
+CPP_DEPS_EXT := $(patsubst %.o,%.d, $(CPP_OBJS_EXT))
 RC_OBJS_EXT  := $(addprefix $(BIN_DIR)/, $(RC_OBJS))
 
 # create $(BIN_DIR) if it does not exist
@@ -186,10 +184,6 @@ endif
 #
 
 all: $(TARGET_EXE)
-#all: $(TARGET_BIN)
-
-$(TARGET_BIN): $(TARGET_EXE)
-	$(BIN) -O binary $< $@
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
@@ -201,10 +195,10 @@ $(BIN_DIR)/%.d : %.c
 	$(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $< > $@
 
 $(BIN_DIR)/%.o : %.cpp
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 $(BIN_DIR)/%.o : %.rc
 	$(RC) $(RCINCLUDES) -i $< -o $@
@@ -216,23 +210,26 @@ ifneq ($(MAKECMDGOALS),clean)
   endif
 endif
 
-.PHONY : clean
-clean:
+.PHONY : clean show
+
+clean :
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \
-	$(BIN_DIR)/*.exe \
-	$(BIN_DIR)/*.map
-	
-show:
-	@echo PROJECT  = $(PROJECT)
-	@echo CONF     = $(CONF)
-	@echo VPATH    = $(VPATH)
-	@echo C_SRCS   = $(C_SRCS)
-	@echo CPP_SRCS = $(CPP_SRCS)
+	$(TARGET_EXE)
+
+show :
+	@echo PROJECT      = $(PROJECT)
+	@echo TARGET_EXE   = $(TARGET_EXE)
+	@echo VPATH        = $(VPATH)
+	@echo C_SRCS       = $(C_SRCS)
+	@echo CPP_SRCS     = $(CPP_SRCS)
+	@echo RC_SRCS      = $(RC_SRCS)
+	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo C_OBJS_EXT   = $(C_OBJS_EXT)
 	@echo C_DEPS_EXT   = $(C_DEPS_EXT)
 	@echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
 	@echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
 	@echo RC_OBJS_EXT  = $(RC_OBJS_EXT)
-	@echo LIB_DIRS = $(LIB_DIRS)
-	@echo LIBS     = $(LIBS)
+	@echo LIB_DIRS     = $(LIB_DIRS)
+	@echo LIBS         = $(LIBS)
+	@echo DEFINES      = $(DEFINES)

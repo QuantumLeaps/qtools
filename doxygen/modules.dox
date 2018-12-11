@@ -3,7 +3,16 @@
 @brief
 Software tracing and testing system
 
-QEP is a universal, UML-compliant event processor that enables developers to code UML state machines in highly readable ANSI-C, in which every state machine element is mapped to code precisely, unambiguously, and exactly once (traceability). QEP fully supports hierarchical state nesting, which is the fundamental mechanism for reusing behavior across many states instead of repeating the same actions and transitions over and over again.
+QP/Spy&trade; is a software tracing and testing system specifically designed for embedded systems, such as single chip microcontrollers. The job of QP/Spy is to capture information about an embedded code's execution and send it to the host computer with minimal impact on the real-time performance of the embedded code.
+*/
+
+/*###########################################################################*/
+/*! @defgroup qutest QUTest
+
+@brief
+Unit Testing Harness (Framework)
+
+QUTest&trade; (pronounced 'cutest') is a unit testing harness (a.k.a. unit testing framework), which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest is the fundamental tooling for Test-Driven Development (TDD) of QP/C/C++ applications, which is a highly recommended best-practice.
 */
 
 /*###########################################################################*/

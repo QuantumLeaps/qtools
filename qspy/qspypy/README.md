@@ -2,11 +2,15 @@ About this Directory
 ====================
 This directory contains the Python package "qspypy" that supports 
 writing Python test scripts for the QUTest unit testing harness.
-
-NOTE:
 "qspypy" has been originally contributed by Dominic Valentino from
 Lotus Engineering LLC (https://lotusengineeringllc.weebly.com/).
-The package is licensed under the MIT open source license.
+
+NOTE:
+The "qspypy" Python interface to the QUTest unit testing harness
+has been superseded by the new, simpler "py/qutest.py" interface.
+"qspypy" is provided only for compatibility with existing Python 
+test scripts, but it is going to be phased out in the future and
+is NOT RECOMMENDED for writing new test scripts.
 
 
 General Requirements
@@ -48,13 +52,14 @@ python -m qspypy.qutest *.py mingw\dpp.exe 192.168.1.100:7705
 
 More Information
 ================
+More information about the QUTest unit testing harness is available
+online at:
+
+https://www.state-machine.com/qtools/qutest.html
+
 More information about the QP/QSPY software tracing system is available
 online at:
 
 https://www.state-machine.com/qtools/qpspy.html
 
-More information about the QUTest unit testing harness is available
-online at:
-
-https://www.state-machine.com/qtools/qutest.html
 

@@ -521,6 +521,9 @@ def main():
         print("\nUsage: qutest [test-scripts] [host_exe] [host[:port]] [local_port]")
         return
 
+    print("\n>>NOTE<<: This Python interface to QUTest is obsolete."
+          "\nPlease use py/qutest.py for writing new test scripts.")
+
     if num_args >= 1: # 1 or more test scripts
         test_scripts = []
         for arg in args:

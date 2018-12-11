@@ -20,7 +20,7 @@ QTools&trade; is a collection of open source tools for embedded software develop
 The QTools Collection for Windows contains additionally the following open-source, third-party tools:
 
 - GNU-make for Windows (version 3.82)
-- GNU C/C++ toolchain for Windows (MinGW)
+- GNU C/C++ toolchain for Windows (MinGW version 6.3.0)
 - GNU C/C++ toolchain for ARM-EABI ([Prebuilt GNU toolchain for arm-eabi](http://gnutoolchains.com/arm-eabi))
 - TCL/TK for Windows (version 8.4) with **UDP sockets extension**
 - ResEdit utility (version 1.6.6-x64)
@@ -51,17 +51,17 @@ have been developed and are copyrighted by Quantum Leaps.
 
 <div class="separate"></div>
 @subsection qtools_mingw The MinGW C and C++ compilers for Windows
-Have been taken from the MinGW project at SourceForge.net:
+Have been taken from the MinGW project at:
 
-https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+http://www.mingw.org/
 
-The installer `mingw-get-inst-20110211.exe` has been used and after the
+The installer `mingw-get-setup.exe` has been used and after the
 installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
 <div class="separate"></div>
 @subsection qtools_gnu-arm The GNU-ARM (EABI) compilers for Windows
-Have been takend from:
+Have been taken from:
 
 http://gnutoolchains.com/arm-eabi/
 
@@ -73,14 +73,9 @@ project for the source code.
 
 <div class="separate"></div>
 @subsection qtools_make The GNU make executable for Windows
-Has been taken from the MinGW project at SourceForge.net:
+Has been taken from the MinGW project at:
 
-https://sourceforge.net/projects/mingw/files/MinGW/make/
-make-3.82-mingw32/make-3.82-5-mingw32-bin.tar.lzma
-
-The GNU make source (make-3.82-src.zip) has been taken from:
-https://sourceforge.net/projects/mingw/files/MinGW/make/
-make-3.82-mingw32/make-3.82-5-mingw32-src.tar.lzma
+http://www.mingw.org/
 
 The "GNU Make" manual (make.pdf) has been copied from the GNU make
 project at:

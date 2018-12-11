@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
-:: Last Updated for Version: 6.3.6
-:: Date of the Last Update:  2018-10-02
+:: Last Updated for Version: 6.3.7
+:: Date of the Last Update:  2018-11-12
 ::
 ::                    Q u a n t u m  L e a P s
 ::                    ------------------------
@@ -38,7 +38,7 @@ echo usage:
 echo make
 echo make -CHM
 
-set VERSION=6.3.6
+set VERSION=6.3.7
 
 set DOXHOME="C:\tools\doxygen\bin"
 

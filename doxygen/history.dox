@@ -1,6 +1,26 @@
 /**
 @page history Revision History
 
+@section qtools_6_3_7 Version 6.3.7, 2018-11-19
+This release brings a completely re-designed and simplified Python interface for @ref qutest "QUTest unit testing harness". Specifically, this release adds a new scripting engine called simply @ref qutest_script "qutest.py", which replaces the previous "qspypy".
+
+@note
+The new scripting interface @ref qutest_script "qutest.py" is now the primary supported QUTest scripting interface. The older interfaces, such as TCL ("qutest.tcl") and "qspypy" are still provided in this release, but they are considered *obsolete* and are **not recommended** for writing new test scripts.
+
+
+The new @ref qutest_script "qutest.py Python interface" is a simple single-threaded application that no longer requires PyTest or other such external Python packages, as did "qspypy" previously. The new Python interface is now also compatible with both Python 2 (2.7+) and Python 3 (3.4+), which means that virtually any contemporary Python version without extensions can be used for running QUTest Python scripts.
+
+@note
+The new Python interface "qutest.py" implements a **different** (simpler) structure of @ref qutest_script "QUTest test scripts" than "qspypy" before. Examples of the new Python @ref qutest_tut "test scripts" are provided in the matching QP/C/C++ release <b>6.3.7</b>.
+
+
+Additionally, this release fixes the problem in the @ref "QSPY host utility" to correctly format signed integers (I8, I16, I32), which didn't work correctly on 64-bit Linux platforms. Also, the QSPY utility on Windows now uses the newer Windows socket library "ws2_32", which replaced the old "wsock32".
+
+Finally, the QTools release for Windows updates the provided MinGW GNU-C/C++ compiler to version 6.3.0.
+
+
+
+------------------------------------------------------
 @section qtools_6_3_6 Version 6.3.6, 2018-10-03
 The main purpose of this release is to improve the @ref qutest "QUTest" support. Specifically, this release adds a feature of querying and reporting the status of the @ref current_obj() "current objects", such as the current State-Machine (SM), Active-Object (AO), current Memory-Pool(MP), current Event-Queue (EQ), and current Time-Event (TE). The feature impacts the following facilities:
 
@@ -9,7 +29,7 @@ The main purpose of this release is to improve the @ref qutest "QUTest" support.
 - the QUTest **Python** scripting implements new command command `qutest.query_curr()`
 
 @note
-This feature requires matching QP/C/C++ 6.3.6.
+This feature requires matching QP/C/C++ <b>6.3.6</b>.
 
 
 Also, the following bugs related to Python scripting have been fixed in the @ref qtools_qspypy "qspypy 6.3.6" included in this release:

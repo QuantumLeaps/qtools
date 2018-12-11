@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.6
-* Last updated on  2018-10-03
+* Last updated for version 6.3.7
+* Last updated on  2018-11-14
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -268,7 +268,6 @@ static char const *  l_qs_rx_rec[] = {
     "QS_RX_QUERY_CURR",
     "QS_RX_EVENT"
 };
-
 
 #define FPRINF_MATFILE(format_, ...) \
     if (l_matFile != (FILE *)0) { \
@@ -723,44 +722,44 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         switch (fmt & 0x0F) {
             case QS_I8_T: {
                 i32 = QSpyRecord_getInt32(me, 1);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (int)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (int)i32);
+                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
+                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
                 break;
             }
             case QS_U8_T: {
                 u32 = QSpyRecord_getUint32(me, 1);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned)u32);
+                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
                 break;
             }
             case QS_I16_T: {
                 i32 = QSpyRecord_getInt32(me, 2);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (int)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (int)i32);
+                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
+                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
                 break;
             }
             case QS_U16_T: {
                 u32 = QSpyRecord_getUint32(me, 2);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned)u32);
+                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
                 break;
             }
             case QS_I32_T: {
                 i32 = QSpyRecord_getInt32(me, 4);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (int)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (int)i32);
+                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
+                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
                 break;
             }
             case QS_U32_T: {
                 u32 = QSpyRecord_getUint32(me, 4);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned)u32);
+                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
                 break;
             }
             case QS_U32_HEX_T: {
                 u32 = QSpyRecord_getUint32(me, 4);
-                SNPRINTF_APPEND(uhfmt[fmt >> 4], (unsigned)u32);
-                FPRINF_MATFILE(uhfmt[fmt >> 4], (unsigned)u32);
+                SNPRINTF_APPEND(uhfmt[fmt >> 4], (unsigned long)u32);
+                FPRINF_MATFILE(uhfmt[fmt >> 4], (unsigned long)u32);
                 break;
             }
             case QS_F32_T: {
@@ -792,8 +791,8 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             case QS_MEM_T: {
                 uint8_t const *mem = QSpyRecord_getMem(me, 1, &u32);
                 for (; u32 > (uint32_t)0; --u32, ++mem) {
-                    SNPRINTF_APPEND(" %02X", (int)*mem);
-                    FPRINF_MATFILE(" %03d", (int)*mem);
+                    SNPRINTF_APPEND(" %02X", (unsigned int)*mem);
+                    FPRINF_MATFILE(" %03d", (unsigned int)*mem);
                 }
                 break;
             }
@@ -2022,7 +2021,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QUERY_DATA: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             a = QSpyRecord_getUint32(me, 1U);
+            b = 0;
+            c = 0;
+            d = 0;
+            e = 0;
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
+            q = 0;
             switch (a) {
                 case SM_OBJ:
                     q = QSpyRecord_getUint64(me, l_config.funPtrSize);

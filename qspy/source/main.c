@@ -4,12 +4,12 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.2.0
-* Last updated on  2018-03-13
+* Last updated for version 6.3.7
+* Last updated on  2018-11-06
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
 * Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
@@ -144,7 +144,7 @@ static char const l_kbdHelpStr[] =
 static QSpyStatus configure(int argc, char *argv[]);
 static void cleanup(void);
 static char const *tstampStr(void);
-static uint8_t l_buf[1024]; /* process input in 1K chunks */
+static uint8_t l_buf[8*1024]; /* process input in 8K chunks */
 
 /*..........................................................................*/
 int main(int argc, char *argv[]) {

@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.0
-* Last updated on  2018-05-10
+* Last updated for version 6.3.7
+* Last updated on  2018-11-06
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -59,11 +59,11 @@ typedef void     QEvt;
 #include "qs_copy.h" /* copy of the target-resident QS interface */
 
 /*..........................................................................*/
-static uint8_t  l_buf[1024]; /* the output buffer [bytes] */
-static uint8_t *l_pos;       /* current position in the output buffer */
-static uint8_t  l_rxBeSeq;   /* receive  Back-End  sequence number */
-static uint8_t  l_txBeSeq;   /* transmit Back-End sequence number */
-static uint8_t  l_channels;  /* channels of the output (bitmask) */
+static uint8_t  l_buf[8*1024]; /* the output buffer [bytes] */
+static uint8_t *l_pos;         /* current position in the output buffer */
+static uint8_t  l_rxBeSeq;     /* receive  Back-End  sequence number */
+static uint8_t  l_txBeSeq;     /* transmit Back-End sequence number */
+static uint8_t  l_channels;    /* channels of the output (bitmask) */
 
 enum Channels {
     BINARY_CH = (1 << 0),
@@ -187,7 +187,8 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
         case QSPY_DETACH: {   /* detach from the Front-End */
             PAL_detachFE();
             l_channels = 0U; /* detached from a Front-End */
-            SNPRINTF_LINE("   <F-END> Detached");
+            SNPRINTF_LINE(
+            "   <F-END> Detached ######################################");
             QSPY_printInfo();
             break;
         }

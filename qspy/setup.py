@@ -1,6 +1,13 @@
 # Setup script for the "qspypy" package
-# Last updated for version: 6.3.6
-# Last updated on: 2018-10-03
+# Last updated for version: 6.3.7
+# Last updated on: 2018-11-03
+#
+# NOTE:
+# The "qspypy" Python interface to the QUTest unit testing harness
+# has been superseded by the new, simpler "py/qutest.py" interface.
+# "qspypy" is provided only for compatibility with existing Python
+# test scripts, but it is going to be phased out in the future and
+#is NOT RECOMMENDED for writing new test scripts.
 #
 # Copyright (c) 2018 Lotus Engineering, LLC
 # Copyright (c) 2018 Quantum Leaps, LLC

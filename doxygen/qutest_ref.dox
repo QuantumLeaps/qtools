@@ -3,20 +3,68 @@
 
 @tableofcontents
 
-A QUTest *test fixture* is a regular C or C++ program that contains the @c %main() function as well as a few @ref qs "QS" callback functions (to implement test commands as well as test startup and teardown). The main job of a *test fixture* is to exercise the CUT (Code Under Test).
+<p>A QUTest *test fixture* is a regular C or C++ program that contains the @c %main() function as well as a few @ref qs "QS" callback functions (to implement test commands as well as test startup and teardown). The main job of a *test fixture* is to exercise the CUT (Code Under Test).
+</p>
 
-The CUT called from a *test fixture* can be any code you wish to unit-test and does **not** need to be based on the [QP framework](https://www.state-machine.com/products/#QP). That way of applying QUTest is illustrated in the first three lessons of the @ref qutest_tut "QUTest Tutorial".
+The CUT called from a *test fixture* can be any code you wish to unit-test and does **not** need to be based on the [QP framework](https://www.state-machine.com/products/#QP). That way of applying QUTest is illustrated in the first lessons of the @ref qutest_tut "QUTest Tutorial".
 
-However, QUTest is particularly useful for testing QP applications, which is illustrated in the last two lessons of the @ref qutest_tut "QUTest Tutorial". In this case, the *test fixture* needs to initialize all used QP services, such as event pools to dispatch/post events to your state machines and active objects.
-
-@note
-The QP API implementation linked with the *test fixture* is **not** the actual QP framework, but instead just a  @ref qutest_stub "QUTest stub" described below.
+However, QUTest is particularly useful for testing QP applications, which is illustrated in the later lessons of the @ref qutest_tut "QUTest Tutorial". In this case, the *test fixture* needs to initialize all used QP services, such as event pools to dispatch/post events to your state machines and active objects.
 
 
 ------------------------------------------------------------------------------
-@section qutest_stub QUTest&trade; Stub
+@section qutest_stub QUTest&trade; QP Stub
+The QP API implementation linked with the *test fixture* is **not** the actual QP framework, but instead just a **QUTest QP Stub**, which differs from the real QP implementation in the following aspects:
 
-(see <a href="https://www.state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">`qutest.c`</a>)
+- the `QActive_start()` implementation initializes the event queue for the AO and registers it with the QP framework, but it does **not** start a new thread for the AO.
+- the `QF_run()` implementation calls the `QS_onTestLoop()` to wait for the commands from the @qutest_script "test script"
+- the stub provides `QActiveDummy` class for instantiating "dummy" active objects for testing
+
+@note
+The **QUTest QP Stub** is implemented in the file <a href="https://www.state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">qutest.c</a> as well as Target-specific QUTest port `qutest_port.c`.
+
+
+------------------------------------------------------------------------------
+@section qutest_fixture-callbacks QUTest&trade; Fixture Callbacks
+
+- QS_onTestSetup()
+- QS_onTestTeardown()
+- QS_onCommand()
+- QS_onTestEvt()
+- QS_onTestPost()
+- QS_onFlush()
+- QS_onTestLoop()
+
+
+------------------------------------------------------------------------------
+@section qutest_fixture-pause Pausing Test Fixtures
+
+- QS_TEST_PAUSE()
+
+
+------------------------------------------------------------------------------
+@section qutest_fixture-probe Test Probes
+QUTest "Test Probes" are a very flexible mechanism to alter the behavior of code from the @ref qutest_script "test scripts". This alteration of behavior can be used for a variety of reasons:
+
+- to alter the flow of control to execute paths through the code otherwise hard to reach (to improve the test coverage of the code)
+- to cause various error conditions
+- to alter return values from functions
+- many others
+
+
+The "Test Probes" are just 32-bit values (`uint32_t`) sent from the test script to the Target (see the probe() command), where they are stored in the FIFO (First-In-First-Out) data structure. The "Test Probes" can be then retrieved from C or C++ code on the Target, by means of the following macros:
+
+- @ref QS_TEST_PROBE_DEF() "QS_TEST_PROBE_DEF( function_pointer )"
+- @ref QS_TEST_PROBE() "QS_TEST_PROBE( code )"
+- @ref QS_TEST_PROBE_ID() "QS_TEST_PROBE_ID( ID, code )"
+
+@note
+The QUTest Test Probes macros can be used both in **production code** and in **test code** (intended for testing only). These macros are active only when #Q_UTEST is defined, and otherwise resolve to nothing, which means that you can **leave** the Test Probe macros in your production code.
+
+The typical use of the "Test Probe" macros is as follows:
+
+A C or C++ function calls the macro QS_TEST_PROBE_DEF(), which defines the test-probe variable `qs_tp_` of type `uint32_t`. If any test probes **for this function** have been sent from the test script, the test-probe is retrieved and assigned to the test-probe variable. Otherwise the test-probe variable is initialized to zero.
+
+Once the the test-probe variable is defined and initialized, it can be tested with the QS_TEST_PROBE() and QS_TEST_PROBE_ID() macros. The QS_TEST_PROBE() macro executes the code snippet specified as the parameter to the macro when the test probe is not zero. The QS_TEST_PROBE_ID() executes the specified code snippet only when the test-probe has a given ID value.
 
 
 @next{qutest_script}
@@ -27,13 +75,56 @@ The QP API implementation linked with the *test fixture* is **not** the actual Q
 
 @tableofcontents
 
-<p>A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qqtest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the tests.
+<p>A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qutest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the tests.
 </p>
 
-The QUTest *test scripts* are executed in the host by the "QUTest front-end" that communicates with the @ref qspy "QSPY" host application via the @ref qspy_udp "UDP interface". The "QUTest front-end" is itself implemented in [Tcl](https://en.wikipedia.org/wiki/Tcl) (see <span class="img file_tcl">`qutest.tcl`</span>). This qutest.tcl file defines a small Domain Specific Language (DSL) for writing QUTest *test scripts*.
+The QUTest *test scripts* are executed in the host by the "QUTest front-end" that communicates with the @ref qspy "QSPY" host application via the @ref qspy_udp "UDP interface". The "QUTest front-end" is itself implemented in [<b>Python</b>](https://www.python.org/) (both Python 2+ and Python 3+ can be used).
 
-@remark
-[Tcl (Tool Command Language)](https://en.wikipedia.org/wiki/Tcl) has been used to implement the small "QUTest DSL" for unit testing, because Tcl has been specifically designed as a tool for creating such "command languages".
+![](logo_python27-python3.gif)
+
+
+------------------------------------------------------------------------------
+@section qutest_dsl QUTest&trade; Testing DSL
+The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defines a small Domain Specific Language (DSL) for writing test scripts in Python. The structure of this DSL is very simple. Each test script consists of two sections:
+
+<div class="separate"></div>
+@subsection qutest_dsl-preamble Preamble
+The "preamble" section of a test script file defines callback functions common to all tests in this file. It can contain the following callback functions:
+
+- on_reset()
+- on_setup()
+- on_teardown()
+
+These callback functions can call any of the @ref qutest_dsl-commands "test commands".
+
+
+<div class="separate"></div>
+@subsection qutest_dsl-tests Tests
+The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
+
+
+<div class="separate"></div>
+@subsection qutest_dsl-commands Commands
+The commands that you can place in the tests (as well as inside the callback functions) are:
+
+- expect()
+- glb_filter()
+- loc_filter()
+- current_obj()
+- query_curr()
+- tick()
+- expect_pause()
+- continue_test()
+- command()
+- init()
+- dispatch()
+- post()
+- publish()
+- probe()
+- peek()
+- poke()
+- fill()
+- pack()
 
 
 ------------------------------------------------------------------------------
@@ -53,7 +144,6 @@ To write effective *test scripts* you need to understand the main categories of 
   </dd>
 </dl>
 <div style="clear:both;"></div>
-
 
 @next{qspyview}
 */

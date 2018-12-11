@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.1.1
-* Last updated on  2018-02-27
+* Last updated for version 6.3.7
+* Last updated on  2018-11-06
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -87,6 +87,7 @@ static void updateReadySet(int targetConn);
 
 /*..........................................................................*/
 #define INVALID_SOCKET -1
+#define SOCKET_ERROR   -1
 
 static int l_serFD      = 0;  /* Serial port file descriptor */
 static int l_serverSock = INVALID_SOCKET;
@@ -103,7 +104,7 @@ static socklen_t       l_beReturnAddrSize;
 
 static FILE *l_file = (FILE *)0;
 
-/* PAL timeout determines how long to wait for an event */
+/* PAL timeout determines how long to wait for an event [ms] */
 #define PAL_TOUT_MS 100
 
 /*==========================================================================*/
@@ -330,7 +331,8 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
         return QSPY_ERROR;
     }
 
-    l_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); /* TCP socket */
+    /* create TCP socket */
+    l_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (l_serverSock == INVALID_SOCKET) {
         SNPRINTF_LINE("   <COMMS> ERROR    server socket open errno=%d",
                       errno);
@@ -347,13 +349,15 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
     * socket just created. This is most useful when the application is a
     * server that has a well-known port that clients know about in advance.
     */
-    if (bind(l_serverSock, (struct sockaddr *)&local, sizeof(local)) == -1) {
+    if (bind(l_serverSock, (struct sockaddr *)&local, sizeof(local))
+        == SOCKET_ERROR)
+    {
         SNPRINTF_LINE("   <COMMS> ERROR    socket binding errno=%d", errno);
         QSPY_printError();
         return QSPY_ERROR;
     }
 
-    if (listen(l_serverSock, 1) == -1) {
+    if (listen(l_serverSock, 1) == SOCKET_ERROR) {
         SNPRINTF_LINE("   <COMMS> ERROR    socket listen errno=%d", errno);
         QSPY_printError();
         return QSPY_ERROR;
@@ -413,6 +417,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                 QSPY_printError();
                 return QSPY_ERROR_EVT;
             }
+
             QSPY_reset();   /* reset the QSPY parser to start over cleanly */
             QSPY_txReset(); /* reset the QSPY transmitter */
 
@@ -428,19 +433,18 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     else {
         if (FD_ISSET(l_clientSock, &readSet)) {
             nrec = recv(l_clientSock, (char *)buf, *pBytes, 0);
-            if (nrec == -1) {
-                SNPRINTF_LINE("   <COMMS> ERROR    client socket errno=%d", errno);
-                QSPY_printError();
-            }
+
             if (nrec <= 0) { /* the client hang up */
                 SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
-                              "Host=%s,Port=%d",
+                    "Host=%s,Port=%d"
+            "\n----------------------------------------------------------",
                               inet_ntoa(l_clientAddr.sin_addr),
                               (int)ntohs(l_clientAddr.sin_port));
                 QSPY_printInfo();
+
                 /* go back to waiting for a client */
                 close(l_clientSock);
-                l_clientSock = INVALID_SOCKET;  /* invalidate client socket */
+                l_clientSock = INVALID_SOCKET;
 
                 /* re-evaluate the ready set and max FD for select() */
                 updateReadySet(l_serverSock);
@@ -456,13 +460,14 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
 }
 /*..........................................................................*/
 static QSpyStatus tcp_send2Target(unsigned char *buf, size_t nBytes) {
-    if (l_clientSock != INVALID_SOCKET) {
-        if (send(l_clientSock, (char *)buf, (int)nBytes, 0) == -1) {
-            SNPRINTF_LINE("   <COMMS> ERROR    Writing to TCP socket failed"
-                          " errno=%d", errno);
-            QSPY_printError();
-            return QSPY_ERROR;
-        }
+    if (l_clientSock == INVALID_SOCKET) {
+        return QSPY_ERROR;
+    }
+    if (send(l_clientSock, buf, nBytes, 0) == SOCKET_ERROR) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Writing to TCP socket errno=%d",
+                      errno);
+        QSPY_printError();
+        return QSPY_ERROR;
     }
     return QSPY_SUCCESS;
 }
@@ -518,19 +523,19 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* any input available from the keyboard? */
+    /* try to receive data from keyboard... */
     evt = kbd_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
     }
 
-    /* any input available from the Back-End socket? */
+    /* try to receive data from the Back-End socket... */
     evt = be_receive(&readSet, buf, pBytes);
     if (evt != QSPY_NO_EVT) {
         return evt;
     }
 
-    /* any input available from the File? */
+    /* try to receive data from the File... */
     nBytes = fread(buf, 1, (int)(*pBytes), l_file);
     if (nBytes > 0) {
         *pBytes = nBytes;
@@ -556,6 +561,7 @@ static void file_cleanup(void) {
     }
 }
 
+
 /*==========================================================================*/
 /* Front-End interface  */
 QSpyStatus PAL_openBE(int portNum) {
@@ -564,7 +570,8 @@ QSpyStatus PAL_openBE(int portNum) {
 
     l_beSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); /* UDP socket */
     if (l_beSock == INVALID_SOCKET){
-        SNPRINTF_LINE("   <F-END> ERROR    UDP socket create errno=%d", errno);
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket create errno=%d",
+                      errno);
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -578,16 +585,20 @@ QSpyStatus PAL_openBE(int portNum) {
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = INADDR_ANY;
     local.sin_port = htons((unsigned short)portNum);
-    if (bind(l_beSock, (struct sockaddr *)&local, sizeof(local)) == -1) {
-        SNPRINTF_LINE("   <F-END> ERROR    UDP socket binding errno=%d", errno);
+    if (bind(l_beSock, (struct sockaddr *)&local, sizeof(local))
+        == SOCKET_ERROR)
+    {
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket binding errno=%d",
+                      errno);
         QSPY_printError();
         return QSPY_ERROR;
     }
 
     /* put the socket into NON-BLOCKING mode... */
     flags = fcntl(l_beSock, F_GETFL, 0);
-    if (flags < 0) {
-        SNPRINTF_LINE("   <F-END> ERROR    UDP socket fcntl() get errno=%d", errno);
+    if (flags == SOCKET_ERROR) {
+        SNPRINTF_LINE("   <F-END> ERROR    UDP socket fcntl() get errno=%d",
+                      errno);
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -624,15 +635,15 @@ void PAL_closeBE(void) {
             /* block until the packet comes out... */
             FD_ZERO(&writeSet);
             FD_SET(l_beSock, &writeSet);
-            delay.tv_sec  = 0U;
-            delay.tv_usec = 2000 * 1000U; /* delay for up to 2 seconds */
+            delay.tv_sec  = 2U; /* delay for up to 2 seconds */
+            delay.tv_usec = 0U;
             if (select(l_beSock + 1, (fd_set *)0,
-                       &writeSet, (fd_set *)0, &delay) == -1)
+                       &writeSet, (fd_set *)0, &delay)
+                == SOCKET_ERROR)
             {
                 SNPRINTF_LINE("   <F-END> ERROR    UDP socket select errno=%d",
-                              errno);
+                        errno);
                 QSPY_printError();
-
             }
         }
 
@@ -644,7 +655,7 @@ void PAL_closeBE(void) {
 void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
     if (l_beReturnAddrSize > 0) { /* front-end attached? */
         if (sendto(l_beSock, (char *)buf, (int)nBytes, 0,
-                   &l_beReturnAddr, l_beReturnAddrSize) == -1)
+                   &l_beReturnAddr, l_beReturnAddrSize) == SOCKET_ERROR)
         {
             PAL_detachFE(); /* detach the Front-End */
 

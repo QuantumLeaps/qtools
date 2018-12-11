@@ -1,13 +1,14 @@
 ##
 # @file
-# @ingroup qpspy
-# @brief QSPY Unit Testing (QUTEST) front-end main script.
+# @ingroup qutest
+# @brief QUTest Unit Testing harness support for Tcl scripting.
 #
 # @description
-# QUTEST is a Unit Testing framework for embedded systems.
-# This script defines a small Domain Specific Language (DSL) for writing
-# user tests. This script also implements a console-based ("headless")
-# front-end to the QSPY back-and for running such user tests.
+# QUTest is a Unit Testing harness (framework) for embedded systems.
+# This Tcl module defines a small Domain Specific Language (DSL) for
+# writing test scripts in Tcl. This script also implements a
+# console-based ("headless") front-end to the QSPY back-and for running
+# such user tests.
 #
 # @usage
 # tclsh qutest.tcl [test-scripts] [host_exe] [host[:port]] [local_port]
@@ -15,8 +16,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.3.6
-# Last updated on  2018-10-03
+# Last updated for version 6.3.7
+# Last updated on  2018-11-17
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -81,7 +82,6 @@ namespace eval ::qutest {
         variable theCurrState
         variable theNeedReset
         variable theTestMs
-        set theTestMs [clock clicks -milliseconds]
 
         #puts "test $name"
 
@@ -106,6 +106,8 @@ namespace eval ::qutest {
                     call_on_teardown
                     test_passed
                 }
+
+                set theTestMs [clock clicks -milliseconds]
                 incr theTestCount
                 if {$opt_skip} {
                     puts "$name : SKIPPED"
@@ -275,7 +277,8 @@ namespace eval ::qutest {
                 tran SKIP
             }
             TEST {
-                if {[string first %timestamp $match] == 0} {
+                if {([string first @timestamp $match] == 0) || \
+                    ([string first %timestamp $match] == 0)} {
                     incr theTimestamp
                     set theNextMatch \
                         [format %010d $theTimestamp][string range \
@@ -896,7 +899,7 @@ namespace eval ::qutest {
     proc start {{channels 0x02}} {
         # set defaults for communication with the QSPY back-end
         # NOTE (all these can be overridden by command-line options)
-        set qspy_host  "localhost"
+        set qspy_host  "localhost:7701"
         set local_port 0 ;# the system will choose the local UDP port
 
         # command-line optional arguments processing...
@@ -949,7 +952,8 @@ namespace eval ::qutest {
         # attach to QSPY...
         variable ::qspy::theIsAttached 0
         if {[::qspy::attach $qspy_host $local_port $channels]} {
-            puts -nonewline "Attaching to QSPY..."
+            puts -nonewline \
+                "Attaching to QSPY ($qspy_host) ... "
             flush stdout
         } else {  ;# failed to attach
             puts "Can't open the UDP socket.\n\
@@ -963,11 +967,10 @@ namespace eval ::qutest {
 
         if {$::qspy::theIsAttached} { ;# NO time out?
             after cancel $id
-            puts "OK (UDP-Port=[::qspy::udp_port])"
-            #puts "OK"
+            puts "OK"
         } else { ;# timeout while attaching to UDP-port of QSPY
             ::qspy::detach ;# detach from QSPY
-            puts "FAILED!"
+            puts "FAIL!"
             exit 3 ;# Internal error happened while executing tests
         }
 
@@ -1020,12 +1023,12 @@ namespace eval ::qutest {
         }
 
         if {$theTargetTstamp != ""} {
-            puts "=========== $theTargetTstamp ============"
+            puts "============= $theTargetTstamp =============="
         } else {
-            puts "=============================================="
+            puts "================= (no target ) ==================="
         }
-        puts "$theGroupCount Groups $theTestCount Tests\
-              $theErrCount Failures $theSkipCount Skipped\
+        puts "$theGroupCount Groups, $theTestCount Tests,\
+              $theErrCount Failures, $theSkipCount Skipped\
               ([expr ([clock clicks -milliseconds] - $theStartMs)*0.001]s)"
         variable TIMEOUT_MS
         after $TIMEOUT_MS
@@ -1178,7 +1181,7 @@ namespace eval ::qutest {
     ## @brief internal proc for reporting a passing test
     proc test_passed {} {
         variable theTestMs
-        puts "passed ([expr ([clock clicks -milliseconds] \
+        puts "PASS ([expr ([clock clicks -milliseconds] \
                              - $theTestMs)*0.001]s)"
     }
     #.........................................................................
@@ -1188,7 +1191,7 @@ namespace eval ::qutest {
         incr theErrCount
 
         variable theTestMs
-        puts "====> FAILED ([expr ([clock clicks -milliseconds] \
+        puts "====> FAIL ([expr ([clock clicks -milliseconds] \
                              - $theTestMs)*0.001]s) <===="
     }
     #.........................................................................

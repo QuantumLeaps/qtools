@@ -28,33 +28,23 @@ Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTes
 
 
 <div class="separate"></div>
+@subsection qtools_py Enabling Python Support in QUTest&trade; Unit Testing
+If you wish to write your @ref qutest_script "QUTest test scripts" in Python, you need to install Python on your machine and ensure that `python` is added to your `PATH`.
+
+@note
+QUTest&trade; supports both <b>Python 2</b> (2.7+) and <b>Python 3</b> (3.4+).
+
+
+<div class="separate"></div>
 @subsection qtools_tcl Enabling UDP Sockets in Tcl for QUTest&trade; Unit Testing
 If you wish to write your @ref qutest_script "QUTest test scripts" in Tcl, you need make sure that your Tcl interpreter is configured to support UDP sockets to communicate with the QSPY host application.
 
 - **Windows hosts:** The QTools&trade; collection for Windows contains the Tcl interpreter (`tclsh` version 8.4), which has been already extended with the @ref qspy_udp "UDP-Sockets" for Tcl, so on Windows you can use the `tclsh` and `wish` interpreters "as is" without any additional modifications.
 
-- **Linux hosts:** On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/Tk distribution with the UDP Sockets for Tcl.
+- **Linux hosts:** On Linux, Tcl/Tk is usually installed, but you need to augment the standard Tcl/Tk distribution with the UDP Sockets for Tcl. Instructions of adding UDP Sockets to Tcl are included in the QTools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
 
 @note
-Instructions of adding UDP Sockets to Tcl are included in the QTools collection for Linux, in the <span class="img folder">tcludp</span> folder (see @ref qspy_files "QSPY directories and files")
-
-
-<div class="separate"></div>
-@subsection qtools_qspypy Enabling Python Support in QUTest&trade; Unit Testing
-If you wish to write your @ref qutest_script "QUTest test scripts" in Python, you need to add the **qspypy** package to your Python installation. Assuming that you have already installed Python on your machine (and Python is available in your `PATH`), you can add the @ref qspypy "qspypy" package by typing the following command at a command-prompt.
-
-- **Windows hosts:**
-
-@verbatim
-pip install %QTOOLS%\qspy
-@endverbatim
-
-
-- **Linux hosts:**
-
-@verbatim
-pip install $QTOOLS/qspy
-@endverbatim
+The support for Tcl scripting in QUTest will be phased out in the future and developing new tests in Tcl is **not recommended**.
 
 
 ------------------------------------------------------------------------------

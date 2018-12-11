@@ -58,7 +58,7 @@ Additionally, QTools for Windows contains the following open-source,
 
 12. GNU-make for Windows (version 3.82)
 
-13. GNU C/C++ toolset for Windows (MinGW version 4.5.2)
+13. GNU C/C++ toolset for Windows (MinGW version 6.3.0)
 
 14. GNU C/C++ toolset for ARM-EABI (GCC version 7.2.0)
 
@@ -124,7 +124,7 @@ directory. Specifically, you can find ther the PDF version of the **Make Manual*
 
 ### QUTest Python Scripting Support
 The QUTest Python scripting support for the QSPY utility are located in the
-`<qtools>\qspy\qspypy\` directory.
+`<qtools>\qspy\py\` directory.
 
 ### QUTest Tcl Scripting Support
 The QUTest Tcl scripting support for the QSPY utility are located in the
@@ -162,10 +162,10 @@ subdirectory, except for the QSPY source code, which is provided in the
 have been developed and are copyrighted by Quantum Leaps.
 
 ### The GCC C and C++ compilers for Windows
-Have been taken from the MinGW project at SourceForge.net:
-- https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+Have been taken from the MinGW project at:
+- http://www.mingw.org/
 
-The installer mingw-get-inst-20110211.exe has been used and after the
+The installer mingw-get-setup.exe has been used and after the
 installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
@@ -173,7 +173,7 @@ distribution. Please refer to the MinGW project for the source code.
 Have been takend from:
 - http://gnutoolchains.com/arm-eabi/
 
-The installer arm-eabi-gcc6.2.0-r3.exe has been used and after the
+The installer arm-eabi-gcc7.2.0-r3.exe has been used and after the
 installation, the libraries for Cortex-A and Cortex-R5 have been pruned
 to reduce the size of the distribution. Please refer to the GnuToolchains
 project for the source code.
