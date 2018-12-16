@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
 # Last updated for version 6.3.7
-# Last updated on  2018-11-24
+# Last updated on  2018-12-16
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -183,7 +183,9 @@ class qutest:
 
     # expect DSL command .....................................................
     def expect(self, match):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('expect')
         elif self._state == qutest._TEST:
 
@@ -216,7 +218,9 @@ class qutest:
 
     # glb_filter DSL command .................................................
     def glb_filter(self, *args):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('glb_filter')
         elif self._state == qutest._TEST:
             filter = [0, 0, 0, 0]
@@ -282,7 +286,9 @@ class qutest:
 
     # loc_filter DSL command .................................................
     def loc_filter(self, obj_kind, obj_id):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('loc_filter')
         elif self._state == qutest._TEST:
             fmt = '<BB' + qspy._target_info['objPtr']
@@ -306,7 +312,9 @@ class qutest:
 
     # current_obj DSL command ................................................
     def current_obj(self, obj_kind, obj_id):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('current_obj')
         elif self._state == qutest._TEST:
             fmt = '<BB' + qspy._target_info['objPtr']
@@ -330,7 +338,9 @@ class qutest:
 
     # query_curr DSL command .................................................
     def query_curr(self, obj_kind):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('query_curr')
         elif self._state == qutest._TEST:
             qspy._sendTo(struct.pack('<BB', qspy._TRGT_QUERY_CURR, obj_kind))
@@ -342,7 +352,9 @@ class qutest:
 
     # expect_pause DSL command ...............................................
     def expect_pause(self):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('expect_pause')
         elif self._state == qutest._TEST:
             self.expect('           TstPause')
@@ -353,7 +365,9 @@ class qutest:
 
     # continue_test DSL command ..............................................
     def continue_test(self):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('continue_test')
         elif self._state == qutest._TEST:
             qspy._sendTo(struct.pack('<B', qspy._TRGT_CONTINUE))
@@ -365,6 +379,8 @@ class qutest:
 
     # command DSL command ....................................................
     def command(self, cmdId, param1 = 0, param2 = 0, param3 = 0):
+        if self._to_skip > 0:
+            pass # ignore
         if self._state == qutest._INIT:
             self._before_test('command')
         elif self._state == qutest._TEST:
@@ -386,7 +402,9 @@ class qutest:
 
     # init DSL command .......................................................
     def init(self, signal = 0, params = None):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('init')
         elif self._state == qutest._TEST:
             qspy._sendEvt(qspy._EVT_INIT, signal, params)
@@ -398,7 +416,9 @@ class qutest:
 
     # dispatch DSL command ...................................................
     def dispatch(self, signal, params = None):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('dispatch')
         elif self._state == qutest._TEST:
             qspy._sendEvt(qspy._EVT_DISPATCH, signal, params)
@@ -410,7 +430,9 @@ class qutest:
 
     # post DSL command .......................................................
     def post(self, signal, params = None):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('post')
         elif self._state == qutest._TEST:
             qspy._sendEvt(qspy._EVT_POST, signal, params)
@@ -422,7 +444,9 @@ class qutest:
 
     # publish DSL command ....................................................
     def publish(self, signal, params = None):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('publish')
         elif self._state == qutest._TEST:
             qspy._sendEvt(qspy._EVT_PUBLISH, signal, params)
@@ -434,7 +458,9 @@ class qutest:
 
     # probe DSL command ......................................................
     def probe(self, func, data):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('probe')
         elif self._state == qutest._TEST:
             fmt = '<BI' + qspy._target_info['funPtr']
@@ -457,7 +483,9 @@ class qutest:
 
     # tick DSL command .......................................................
     def tick(self, tick_rate = 0):
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('tick')
         elif self._state == qutest._TEST:
             qspy._sendTo(struct.pack('<BB', qspy._TRGT_TICK, tick_rate))
@@ -471,7 +499,9 @@ class qutest:
     def peek(self, offset, size, num):
         assert size == 1 or size == 2 or size == 4, \
             'Size must be 1, 2, or 4'
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('peek')
         elif self._state == qutest._TEST:
             qspy._sendTo(struct.pack('<BHBB', qspy._TRGT_PEEK,
@@ -486,7 +516,9 @@ class qutest:
     def poke(self, offset, size, data):
         assert size == 1 or size == 2 or size == 4, \
             'Size must be 1, 2, or 4'
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('poke')
         elif self._state == qutest._TEST:
             length = len(data)
@@ -505,7 +537,9 @@ class qutest:
     def fill(self, offset, size, num, item = 0):
         assert size == 1 or size == 2 or size == 4, \
             'Size must be 1, 2, or 4'
-        if self._state == qutest._INIT:
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == qutest._INIT:
             self._before_test('fill')
         elif self._state == qutest._TEST:
             if size == 1:
