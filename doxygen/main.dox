@@ -21,7 +21,7 @@ The QTools Collection for Windows contains additionally the following open-sourc
 
 - GNU-make for Windows (version 3.82)
 - GNU C/C++ toolchain for Windows (MinGW version 6.3.0)
-- GNU C/C++ toolchain for ARM-EABI ([Prebuilt GNU toolchain for arm-eabi](http://gnutoolchains.com/arm-eabi))
+- GNU C/C++ toolchain for ARM Cortex-M and Cortex-R ([GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/))
 - TCL/TK for Windows (version 8.4) with **UDP sockets extension**
 - ResEdit utility (version 1.6.6-x64)
 - AVRDUDE for Windows (version 6.1)
@@ -60,15 +60,12 @@ installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
 <div class="separate"></div>
-@subsection qtools_gnu-arm The GNU-ARM (EABI) compilers for Windows
+@subsection qtools_gnu-arm The GNU-ARM (NONE-EABI) compilers for Windows
 Have been taken from:
 
-http://gnutoolchains.com/arm-eabi/
+https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 
-The installer arm-eabi-gcc6.2.0-r3.exe has been used and after the
-installation, the libraries for Cortex-A and Cortex-R5 have been pruned
-to reduce the size of the distribution. Please refer to the GnuToolchains
-project for the source code.
+The source code is available from the download page under "Source Invariant".
 
 
 <div class="separate"></div>
@@ -107,7 +104,7 @@ Training and consulting services are also available from Quantum Leaps. Please r
 
 @image html logo_ql_TM.jpg
 
-Copyright &copy; 2002-2018 Quantum Leaps, LLC. All Rights Reserved.@n
+Copyright &copy; 2005-2019 Quantum Leaps, LLC. All Rights Reserved.@n
 
 @next{start}
 */

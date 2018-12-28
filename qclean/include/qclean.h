@@ -4,12 +4,12 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.1
-* Last updated on  2018-05-24
+* Last updated for version 6.3.8
+* Last updated on  2018-12-26
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
 * Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
 *
@@ -40,7 +40,7 @@
 #ifndef qclean_h
 #define qclean_h
 
-#define VERSION "6.3.1"
+#define VERSION "6.3.8"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);

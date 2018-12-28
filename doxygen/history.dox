@@ -1,6 +1,17 @@
 /**
 @page history Revision History
 
+@section qtools_6_3_8 Version 6.3.8, 2018-12-31
+The main purpose of this release is the update of the GNU-ARM toolchain (included in QTools for Windows) to the latest GCC 8. Specifically, this QTools release switches to the official [GNU-ARM Embedded Toolchain for Arm Cortex-M and Cortex-R processors maintained by ARM Ltd.](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm).
+
+@note
+For consistency with the [GNU-ARM Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm), the toolchain is now located in the directory `qtools\gnu_arm-none-eabi` and contains tools with the prefix **arm-none-eabi-**. This is *different* than the GNU-ARM toolchain used previously (which was located in `qtools\gnu_arm-eabi` and used the tools prefix **arm-eabi-**). This change requires adjusting the existing `Makefiles` and other build commands for the GNU-ARM toolchain, which has been done in the matching <b>QP/C/C++/nano release 6.3.8</b>.
+
+
+Additionally, this release makes further improvements to the "qutest.py" Python interface. Specifically, the skip() command can now be used anywhere in the test scripts to skip the commands. (Previously, the skip() command could only be legitimately used right before the test() command).
+
+
+------------------------------------------------------
 @section qtools_6_3_7 Version 6.3.7, 2018-11-19
 This release brings a completely re-designed and simplified Python interface for @ref qutest "QUTest unit testing harness". Specifically, this release adds a new scripting engine called simply @ref qutest_script "qutest.py", which replaces the previous "qspypy".
 
@@ -11,13 +22,12 @@ The new scripting interface @ref qutest_script "qutest.py" is now the primary su
 The new @ref qutest_script "qutest.py Python interface" is a simple single-threaded application that no longer requires PyTest or other such external Python packages, as did "qspypy" previously. The new Python interface is now also compatible with both Python 2 (2.7+) and Python 3 (3.4+), which means that virtually any contemporary Python version without extensions can be used for running QUTest Python scripts.
 
 @note
-The new Python interface "qutest.py" implements a **different** (simpler) structure of @ref qutest_script "QUTest test scripts" than "qspypy" before. Examples of the new Python @ref qutest_tut "test scripts" are provided in the matching QP/C/C++ release <b>6.3.7</b>.
+The new Python interface "qutest.py" implements a **different** (simpler) structure of @ref qutest_script "QUTest test scripts" than "qspypy" before. Examples of the new Python @ref qutest_tut "test scripts" are provided in the matching <b>QP/C/C++ release 6.3.7</b>.
 
 
 Additionally, this release fixes the problem in the @ref "QSPY host utility" to correctly format signed integers (I8, I16, I32), which didn't work correctly on 64-bit Linux platforms. Also, the QSPY utility on Windows now uses the newer Windows socket library "ws2_32", which replaced the old "wsock32".
 
 Finally, the QTools release for Windows updates the provided MinGW GNU-C/C++ compiler to version 6.3.0.
-
 
 
 ------------------------------------------------------

@@ -60,7 +60,7 @@ Additionally, QTools for Windows contains the following open-source,
 
 13. GNU C/C++ toolset for Windows (MinGW version 6.3.0)
 
-14. GNU C/C++ toolset for ARM-EABI (GCC version 7.2.0)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 8.2.1)
 
 15. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
 
@@ -169,14 +169,12 @@ The installer mingw-get-setup.exe has been used and after the
 installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
-### The GNU-ARM (EABI) compilers for Windows
+### The GNU Arm Embedded Toolchain for Windows
 Have been takend from:
-- http://gnutoolchains.com/arm-eabi/
+- https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 
-The installer arm-eabi-gcc7.2.0-r3.exe has been used and after the
-installation, the libraries for Cortex-A and Cortex-R5 have been pruned
-to reduce the size of the distribution. Please refer to the GnuToolchains
-project for the source code.
+The installer gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe has been used.
+(Version 8-2018-q4-major Released: December 20, 2018)
 
 ### The GNU make executable for Windows
 Has been taken from the MinGW project at SourceForge.net:
