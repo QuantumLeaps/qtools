@@ -1,6 +1,11 @@
 /**
 @page history Revision History
 
+@section qtools_6_4_0 Version 6.4.0, 2019-02-10
+This release speeds up the QSPY host application by tweaking the timing constants in the TCP and UDP communication interfaces. The resulting QSPY 6.4.0 runs QUTest tests significantly faster (at least twice as fast) as before.
+
+
+------------------------------------------------------
 @section qtools_6_3_8 Version 6.3.8, 2018-12-31
 The main purpose of this release is the update of the GNU-ARM toolchain (included in QTools for Windows) to the latest GCC 8. Specifically, this QTools release switches to the official [GNU-ARM Embedded Toolchain for Arm Cortex-M and Cortex-R processors maintained by ARM Ltd.](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm).
 

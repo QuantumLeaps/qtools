@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 6.3.7
-# Last updated on  2018-11-06
+# Last updated for version 6.4.0
+# Last updated on  2019-01-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -124,10 +124,10 @@ else  # default Release configuration ........................................
 BIN_DIR := rel
 
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 

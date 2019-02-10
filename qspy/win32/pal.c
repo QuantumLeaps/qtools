@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.7
-* Last updated on  2018-11-09
+* Last updated for version 6.4.0
+* Last updated on  2019-02-08
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -84,7 +84,7 @@ static SOCKET l_clientSock = INVALID_SOCKET;
 static FILE *l_file = (FILE *)0;
 
 /* PAL timeout determines how long to wait for an event [ms] */
-#define PAL_TOUT_MS 100
+#define PAL_TOUT_MS 10
 
 /*==========================================================================*/
 /* Win32 serial communication with the Target */
