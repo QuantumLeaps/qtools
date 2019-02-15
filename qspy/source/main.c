@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.7
-* Last updated on  2018-11-06
+* Last updated for version 6.4.0
+* Last updated on  2019-02-10
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -85,7 +85,7 @@ static int   l_tcpPort  = 6601;
 static int   l_baudRate = 115200;
 
 static char const l_introStr[] =
-    "QSPY %s Copyright (c) 2005-2018 Quantum Leaps\n"
+    "QSPY %s Copyright (c) 2005-2019 Quantum Leaps\n"
     "Documentation: https://www.state-machine.com/qtools/qspy.html\n"
     "Current timestamp: %s\n";
 

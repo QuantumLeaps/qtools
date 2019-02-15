@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
     char const *rootDir = ".";
     int optChar;
 
-    printf("QClean " VERSION " Copyright (c) 2005-2018 Quantum Leaps\n"
+    printf("QClean " VERSION " Copyright (c) 2005-2019 Quantum Leaps\n"
            "Documentation: https://www.state-machine.com/qtools/qclean.html\n");
     printf("Usage: qclean [root-dir] [options]\n"
     "       root-dir root directory for recursive cleanup (default is .)\n"

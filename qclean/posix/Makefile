@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QCLEAN console, POSIX(Linux/Mac-OS), GNU compiler
-# Last updated for version 6.3.7
-# Last updated on  2018-11-02
+# Last updated for version 6.4.0
+# Last updated on  2019-02-15
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -107,10 +107,10 @@ else  # default Release configuration ........................................
 BIN_DIR := rel
 
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \
-	-Os -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 

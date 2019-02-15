@@ -16,14 +16,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.3.7
-# Last updated on  2018-11-17
+# Last updated for version 6.4.0
+# Last updated on  2019-02-15
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -50,9 +50,9 @@
 # @endcond
 
 # this version of qutest
-set VERSION 6.3.6
+set VERSION 6.4.0
 
-package provide qutest 6.3
+package provide qutest 6.4
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
 
@@ -489,55 +489,59 @@ namespace eval ::qutest {
                 tran SKIP
             }
             TEST {
-                set filter0 0
-                set filter1 0
-                set filter2 0
-                set filter3 0
+                set filter(0) 0
+                set filter(1) 0
+                set filter(2) 0
+                set filter(3) 0
 
-                foreach filter $args {
-                    if {$filter == {OFF}} { ;# all filters off
+                foreach arg $args {
+                    if {$arg == {OFF}} { ;# all filters off
                         ;
-                    } elseif {$filter == {ON}} { ;# all filters on
-                        set filter0 0xFFFFFFFF
-                        set filter1 0xFFFFFFFF
-                        set filter2 0xFFFFFFFF
-                        set filter3 0x1FFFFFFF
+                    } elseif {$arg == {ON}} { ;# all filters on
+                        set filter(0) 0xFFFFFFFF
+                        set filter(1) 0xFFFFFFFF
+                        set filter(2) 0xFFFFFFFF
+                        set filter(3) 0x1FFFFFFF
                         break ;# no point in continuing
-                    } elseif {$filter == {SM}} { ;# state machines
-                        set filter0 [expr $filter0 | 0x000003FE]
-                        set filter1 [expr $filter1 | 0x03800000]
-                    } elseif {$filter == {AO}} { ;# active objects
-                        set filter0 [expr $filter0 | 0x0007FC00]
-                        set filter2 [expr $filter1 | 0x00002000]
-                    } elseif {$filter == {EQ}} { ;# raw queues (for deferral)
-                        set filter0 [expr $filter0 | 0x00780000]
-                        set filter2 [expr $filter2 | 0x00004000]
-                    } elseif {$filter == {MP}} { ;# raw memory pools
-                        set filter0 [expr $filter0 | 0x03000000]
-                        set filter2 [expr $filter2 | 0x00008000]
-                    } elseif {$filter == {QF}} { ;# framework
-                        set filter0 [expr $filter0 | 0xFC000000]
-                        set filter1 [expr $filter1 | 0x00001FC0]
-                    } elseif {$filter == {TE}} { ;# time events
-                        set filter1 [expr $filter1 | 0x0000007F]
-                    } elseif {$filter == {SC}} { ;# scheduler
-                        set filter1 [expr $filter1 | 0x007F0000]
-                    } elseif {$filter == {U0}} { ;# user 70-79
-                        set filter2 [expr $filter2 | 0x0000FFC0]
-                    } elseif {$filter == {U1}} { ;# user 80-89
-                        set filter2 [expr $filter2 | 0x03FF0000]
-                    } elseif {$filter == {U2}} { ;# user 90-99
-                        set filter2 [expr $filter2 | 0xFC000000]
-                        set filter3 [expr $filter3 | 0x0000000F]
-                    } elseif {$filter == {U3}} { ;# user 100-109
-                        set filter3 [expr $filter3 | 0x00003FF0]
-                    } elseif {$filter == {U4}} { ;# user 110-124
-                        set filter3 [expr $filter3 | 0x1FFFC000]
-                    } elseif {$filter == {UA}} { ;# user 70-124 (all)
-                        set filter2 [expr $filter2 | 0xFFFFFFC0]
-                        set filter3 [expr $filter3 | 0x1FFFFFFF]
+                    } elseif {$arg == {SM}} { ;# state machines
+                        set filter(0) [expr $filter(0) | 0x000003FE]
+                        set filter(1) [expr $filter(1) | 0x03800000]
+                    } elseif {$arg == {AO}} { ;# active objects
+                        set filter(0) [expr $filter(0) | 0x0007FC00]
+                        set filter(2) [expr $filter(1) | 0x00002000]
+                    } elseif {$arg == {EQ}} { ;# raw queues (for deferral)
+                        set filter(0) [expr $filter(0) | 0x00780000]
+                        set filter(2) [expr $filter(2) | 0x00004000]
+                    } elseif {$arg == {MP}} { ;# raw memory pools
+                        set filter(0) [expr $filter(0) | 0x03000000]
+                        set filter(2) [expr $filter(2) | 0x00008000]
+                    } elseif {$arg == {QF}} { ;# framework
+                        set filter(0) [expr $filter(0) | 0xFC000000]
+                        set filter(1) [expr $filter(1) | 0x00001FC0]
+                    } elseif {$arg == {TE}} { ;# time events
+                        set filter(1) [expr $filter(1) | 0x0000007F]
+                    } elseif {$arg == {SC}} { ;# scheduler
+                        set filter(1) [expr $filter(1) | 0x007F0000]
+                    } elseif {$arg == {U0}} { ;# user 70-79
+                        set filter(2) [expr $filter(2) | 0x0000FFC0]
+                    } elseif {$arg == {U1}} { ;# user 80-89
+                        set filter(2) [expr $filter(2) | 0x03FF0000]
+                    } elseif {$arg == {U2}} { ;# user 90-99
+                        set filter(2) [expr $filter(2) | 0xFC000000]
+                        set filter(3) [expr $filter(3) | 0x0000000F]
+                    } elseif {$arg == {U3}} { ;# user 100-109
+                        set filter(3) [expr $filter(3) | 0x00003FF0]
+                    } elseif {$arg == {U4}} { ;# user 110-124
+                        set filter(3) [expr $filter(3) | 0x1FFFC000]
+                    } elseif {$arg == {UA}} { ;# user 70-124 (all)
+                        set filter(2) [expr $filter(2) | 0xFFFFFFC0]
+                        set filter(3) [expr $filter(3) | 0x1FFFFFFF]
+                    } elseif {[string is integer -strict $arg] \
+                              && ($arg < 0x7F)} { ;# numeric value
+                        set i [expr $arg / 32]
+                        set filter($i) [expr $filter($i) | (1 << ($arg % 32))]
                     } else {
-                        assert 0 ;# invalid filter group
+                        assert 0 ;# invalid filter
                     }
                 }
 
@@ -545,7 +549,7 @@ namespace eval ::qutest {
                 variable ::qspy::QS_RX
                 ::qspy::sendPkt \
                     [binary format cciiii $::qspy::QS_RX(GLB_FILTER) 16 \
-                                          $filter0 $filter1 $filter2 $filter3]
+                            $filter(0) $filter(1) $filter(2) $filter(3)]
                 expect "           Trg-Ack  QS_RX_GLB_FILTER"
             }
             FAIL -
@@ -946,7 +950,7 @@ namespace eval ::qutest {
 
         global VERSION
         puts "QUTEST unit testing front-end $VERSION"
-        puts "Copyright (c) 2005-2018 Quantum Leaps"
+        puts "Copyright (c) 2005-2019 Quantum Leaps"
         puts "help at: https://state-machine.com/qtools/qutest.html"
 
         # attach to QSPY...

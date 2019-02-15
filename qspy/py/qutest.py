@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.3.8
-# Last updated on  2018-12-26
+# Last updated for version 6.4.0
+# Last updated on  2019-02-14
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -50,7 +50,7 @@ import traceback
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 638
+    _VERSION = 640
 
     # class variables
     _host_exe = ''
@@ -229,7 +229,7 @@ class qutest:
                 if arg == 0:
                     pass
                 elif arg < 0x7F:
-                    filter[arg // 32] = 1 << (arg % 32)
+                    filter[arg // 32] |= 1 << (arg % 32)
                 elif arg == qspy._GRP_ON:
                     # all filters on
                     filter[0] = 0xFFFFFFFF
