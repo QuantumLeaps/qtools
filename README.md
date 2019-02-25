@@ -1,4 +1,4 @@
-![QTools Collection](https://state-machine.com/img/qtools_banner.jpg)
+![QTools Collection](https://www.state-machine.com/img/qtools_banner.jpg)
 
 # What's New?
 View QTools Revision History at: 
@@ -7,8 +7,8 @@ https://www.state-machine.com/qtools/history.html
 ---------------------------------------------------------------------------
 # About QTools
 QTools is a collection of various open source tools for working with the
-QP state machine frameworks on desktop platforms, such as Windows,
-Linux, and Mac OS X.
+[QP Real-Time Embedded Frameworks (RTEFs)][QP] on desktop platforms, such
+as Windows, Linux, and Mac OS X.
 
 The following open-source tools are currently provided (NOTE: tools
 starting with 'q' are contributed by Quantum Leaps)
@@ -169,7 +169,7 @@ The installer mingw-get-setup.exe has been used and after the
 installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
-### The GNU Arm Embedded Toolchain for Windows
+### The GNU-ARM Embedded Toolchain for Windows
 Have been takend from:
 - https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 
@@ -215,4 +215,6 @@ Has been taken from:
 # Contact information:
 - https://www.state-machine.com
 - mailto:info@state-machine.com
+
+   [QP]: <https://www.state-machine.com/products/#QP>
 
