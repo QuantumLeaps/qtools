@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.4.0
-# Last updated on  2019-02-14
+# Last updated for version 6.5.0
+# Last updated on  2019-03-28
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -40,6 +40,7 @@ from fnmatch import fnmatchcase
 from glob import glob
 from platform import python_version
 from subprocess import Popen
+from inspect import getframeinfo, stack
 
 import struct
 import socket
@@ -50,7 +51,7 @@ import traceback
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 640
+    _VERSION = 650
 
     # class variables
     _host_exe = ''
@@ -691,7 +692,9 @@ class qutest:
         raise SyntaxError(msg)
 
     def _fail(self, msg1 = '', msg2 = ''):
-        print('FAIL (%.3fs):' %(qutest._time() - self._startTime))
+        print('FAIL @line:%d (%.3fs):' %(
+            getframeinfo(stack()[-4][0]).lineno,
+            qutest._time() - self._startTime))
         if msg1 != '':
             print(' ', msg1)
         if msg2 != '':
@@ -953,7 +956,7 @@ def _main(argv):
         %(qutest._VERSION//100,
             (qutest._VERSION//10) % 10,
             qutest._VERSION % 10, python_version()))
-    print('Copyright (c) 2005-2018 Quantum Leaps, www.state-machine.com')
+    print('Copyright (c) 2005-2019 Quantum Leaps, www.state-machine.com')
 
     # list of scripts to exectute...
     scripts = []

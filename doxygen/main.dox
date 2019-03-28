@@ -2,6 +2,11 @@
 
 @image html qtools_banner.jpg
 
+@section ab_new What's new?
+To check what's new in QTools, please see @ref history "QTools Revision History".
+
+
+------------------------------------------------------------------------------
 @section qtools_about What is it?
 QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://www.state-machine.com/">Quantum Leaps</a>:
 
