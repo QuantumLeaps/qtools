@@ -40,6 +40,7 @@ from fnmatch import fnmatchcase
 from glob import glob
 from platform import python_version
 from subprocess import Popen
+from inspect import getframeinfo, stack
 
 import struct
 import socket
@@ -691,7 +692,7 @@ class qutest:
         raise SyntaxError(msg)
 
     def _fail(self, msg1 = '', msg2 = ''):
-        print('FAIL (%.3fs):' %(qutest._time() - self._startTime))
+        print('FAIL (%.3fs):%d' %(qutest._time() - self._startTime, getframeinfo(stack()[-4][0]).lineno))
         if msg1 != '':
             print(' ', msg1)
         if msg2 != '':
