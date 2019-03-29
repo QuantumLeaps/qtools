@@ -9,9 +9,8 @@ Note about Obsolescence
 =======================
 The "qspypy" Python interface to the QUTest unit testing harness
 is now considered obsolete and has been superseded by the new, simpler
-"py/qutest.py" interface. "qspypy" is no longer provided provided or
-supported by Quantum Leaps and is NOT RECOMMENDED for writing new
-test scripts.
+"py/qutest.py" interface. "qspypy" is no longer provided or supported
+by Quantum Leaps and is NOT RECOMMENDED for writing new test scripts.
 
 Quantum Leaps
 February 25, 2019

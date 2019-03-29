@@ -258,14 +258,14 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
 A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send inputs to the *test fixture* running in the Target and to compare the produced @ref qspy_text "QSPY textual output" with the <b>expectations</b> of the test. The following listing shows the *test script* (Python) for the Unity basic tests (file <span class="img file_py">`test_ProductionCode.py`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @remark
-Even though a *test script* uses <b>Python</b> under the hood, you don't need to be a Python expert to write effective test scripts. The actual set of commands that you use and need to know about forms a small @ref qutest_script "Domain Specific Language (DSL) for unit testing", which just happens to be implemented with Python as a command interpreter.
+Even though a *test script* uses <b>Python</b> under the hood, you don"t need to be a Python expert to write effective test scripts. The actual set of commands that you use and need to know about forms a small @ref qutest_script "Domain Specific Language (DSL) for unit testing", which just happens to be implemented with Python as a command interpreter.
 
 
 @note
 The following test script performs the same tests as the Unity test fixture <span class="img file_c">`TestProductionCode.c`</span> in the directory <span class="img folder">`qpc\examples\qutest\unity_basic\test_unity`</span>.
 
 
-@code
+@code{py}
  [1] # QUTEST script corresponding to the test_ProductionCode.c test fixture.
      # This test fixture corresponds to ../test_unity/TestProductionCode.c fixture.
      # see https://www.state-machine.com/qtools/qutest.html
@@ -274,7 +274,7 @@ The following test script performs the same tests as the Unity test fixture <spa
  [2] def on_setup():
          # This is run before EACH TEST
  [3]     current_obj(OBJ_AP, "Counter")
- [4]     poke(0, 4, pack('<L', 0x5A5A))
+ [4]     poke(0, 4, pack("<L", 0x5A5A))
 
      # tests...
  [5] test("FindFunction_WhichIsBroken() Should Return Zero If Item Is Not In List, Which Works Even In Our Broken Code")
@@ -298,7 +298,7 @@ The following test script performs the same tests as the Unity test fixture <spa
 [11] test("FindFunction_WhichIsBroken() Should Return The Index For Items In List, Which Will Fail Because Our Function Under Test Is Broken")
 [12] command(0, 34)
 [13] expect("@timestamp USER+000 FindFunction_WhichIsBroken 1 34")
-     # Notice the rest of these didn't get a chance to run because the line above failed.
+     # Notice the rest of these didn"t get a chance to run because the line above failed.
      # Unit tests abort each test on the first sign of trouble.
      # Then NEXT test runs as normal.
      expect("@timestamp Trg-Done QS_RX_COMMAND")
@@ -311,7 +311,7 @@ The following test script performs the same tests as the Unity test fixture <spa
      expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x5A5A")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
      # This should be true because we can still change our answer
-[16] poke(0, 4, pack('<L', 0x1234))
+[16] poke(0, 4, pack("<L", 0x1234))
      command(1)
      expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x1234")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
@@ -339,11 +339,11 @@ The following test script performs the same tests as the Unity test fixture <spa
 <div class="separate"></div>
 <strong>"preamble"</strong> defines the startup code common to all tests in the group:
 <dl class="tag">
-  <dt>[2]</dt><dd> The function on_setup() is executed at the beginning of each test in the group (see test()), including both tests that reset and don't reset the Target.
+  <dt>[2]</dt><dd> The function on_setup() is executed at the beginning of each test in the group (see test()), including both tests that reset and do not reset the Target.
   </dd>
   <dt>[3]</dt><dd> The current_obj() command sets the "current object" of the application-specific kind (`OBJ_AP`) in the Target. Subsequent commands (such as poke() in the next step) will act on this "current object".
   </dd>
-  <dt>[4]</dt><dd> The poke() command pokes the specified "Application Current Object" starting with the specified offset from the beginning of the object in memory (here 0) with the data elements of size 4 (the second argument) with the data provided in the third argument @ref pack() "pack('<L', 0x5A5A)" into the previously established "Application Current Object".
+  <dt>[4]</dt><dd> The poke() command pokes the specified "Application Current Object" starting with the specified offset from the beginning of the object in memory (here 0) with the data elements of size 4 (the second argument) with the data provided in the third argument @ref pack() "pack("<L", 0x5A5A)" into the previously established "Application Current Object".
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -783,7 +783,7 @@ The following listing shows the *test script* for the LedBar tests (file <span c
 @note
 The following test script performs the same tests as the `TestLedBar.c` Unity test fixture. Compared to the mock-object approach, however, the QUTest test script has the more intuitive structure in which a command triggering CUT is **followed** by the expecations. In contrast, the traditional @ref qutest_mock-unity "Unity tests with mock-object" were structured "backwards" (the expectations **preceeded** the call to CUT).
 
-@code
+@code{py}
  [1] # preambe...
 
      # tests...
@@ -828,8 +828,8 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
      expect("@timestamp Trg-Done QS_RX_COMMAND")
 
 [19] test("LedBar 50% two on", NORESET)
-[20] current_obj(OBJ_AP, 'led_power')
-[21] poke(0, 4, pack('<LL', 25, 15))
+[20] current_obj(OBJ_AP, "led_power")
+[21] poke(0, 4, pack("<LL", 25, 15))
 [22] command(0, 50)
      expect("@timestamp LED_MOD Led_on 25 0")
      expect("@timestamp LED_MOD Led_on 15 1")
@@ -840,8 +840,8 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
      expect("@timestamp Trg-Done QS_RX_COMMAND")
 
 [24] test("LedBar 99% four on", NORESET)
-[25] probe('Led_on', 17)
-[26] probe('Led_on', 13)
+[25] probe("Led_on", 17)
+[26] probe("Led_on", 13)
 [27] command(0, 99)
 [28] expect("@timestamp TstProbe Fun=Led_on,Data=17")
 [29] expect("@timestamp LED_MOD Led_on 17 0")
@@ -921,11 +921,11 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 <dl class="tag">
   <dt>[19]</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
   </dd>
-  <dt>[20]</dt><dd> The @ref current_obj() "current_obj(OBJ_AP, 'led_power')" command sets the "current application object" to "led_power" (see @ref qutest_mock-spy "spy-object"[4]).
+  <dt>[20]</dt><dd> The @ref current_obj() "current_obj(OBJ_AP, "led_power")" command sets the "current application object" to "led_power" (see @ref qutest_mock-spy "spy-object"[4]).
   </dd>
   <dt>[21]</dt>
 @anchor qutest_mock-script21
-  <dd> The @ref poke() "poke(0, 4, pack('<LL', 25, 15))" command pokes the given data into the "current application object". Specifically, this poke() command pokes the data starting from offset 0, data-size 4, binary-data `pack('<LL', 25, 15)`.
+  <dd> The @ref poke() "poke(0, 4, pack("<LL", 25, 15))" command pokes the given data into the "current application object". Specifically, this poke() command pokes the data starting from offset 0, data-size 4, binary-data `pack("<LL", 25, 15)`.
   </dd>
   <dt>[22]</dt><dd> The @ref command() "command(0, 50)" calls the `LedBar_setPercent()` CUT with the 50 percent argument.
   </dd>
@@ -941,9 +941,9 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
   </dd>
   <dt>[25]</dt>
 @anchor qutest_mock-script25
-  <dd> The @ref probe() "probe('Led_on', 17)" command sends the @ref qutest_fixture-probe "test-probe" value 17 for function `Led_on`
+  <dd> The @ref probe() "probe("Led_on", 17)" command sends the @ref qutest_fixture-probe "test-probe" value 17 for function `Led_on`
   </dd>
-  <dt>[26]</dt><dd> The @ref probe() "probe('Led_on', 13)" command sends another the @ref qutest_fixture-probe "test-probe" value 13 for function `Led_on`
+  <dt>[26]</dt><dd> The @ref probe() "probe("Led_on", 13)" command sends another the @ref qutest_fixture-probe "test-probe" value 13 for function `Led_on`
   </dd>
   <dt>[27]</dt><dd> The @ref command() "command(0, 99)" calls the `LedBar_setPercent()` CUT with the 99 percent argument.
   </dd>
@@ -1130,7 +1130,7 @@ For functional testing, which is focused on the **actions** performed by a state
 @n
 
 @remark
-In practice, you will likely use both functional and structural testing at the same time. Simple actions that don't perform any hardware-specific operations could be instrumented (with @ref qs_app "QS application-specific trace records") directly in the CUT (your state machines). The hardware-specific actions need to be abstracted anyway (in the BSP for "dual targeting"), in which case you can place the QS instrumentation in the BSP only.
+In practice, you will likely use both functional and structural testing at the same time. Simple actions that do not perform any hardware-specific operations could be instrumented (with @ref qs_app "QS application-specific trace records") directly in the CUT (your state machines). The hardware-specific actions need to be abstracted anyway (in the BSP for "dual targeting"), in which case you can place the QS instrumentation in the BSP only.
 
 
 ------------------------------------------------------------------------------
@@ -1179,7 +1179,7 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
   </dd>
   <dt>[2]</dt><dd> The @ref qs_global "global filter" is set to `GRP_UA`, which means &laquo;<b>group-user-all</b>&raquo; trace records. This filter setting determines the character of the test to be a **functional** test, because the focus is on the trace records produced by actions (@ref qs_app "user-defined" records) rather than the @ref qs_pre "pre-defined records" generated by executing a state machine.
   </dd>
-  <dt>[3]</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which don't call on_reset()).
+  <dt>[3]</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -1262,7 +1262,7 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
   </dd>
   <dt>[2]</dt><dd> The @ref qs_global "global filter" is set to `GRP_SM`, which means &laquo;<b>group-state-machine</b>&raquo; trace records. This filter setting determines the character of the test to be a **structural** test, because the focus is on the @ref qs_pre "pre-defined records" generated by executing a state machine, rather than trace records produced by actions (user trace records).
   </dd>
-  <dt>[3]</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which don't call on_reset()).
+  <dt>[3]</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -1379,9 +1379,7 @@ The provided `Makefile` will also work on Linux and MacOS. The only difference f
 
 This will build the @ref qutest_blinky-fixture "test fixture" as a host executable and then it will run the @ref qutest_blinky-script "test script" (in Python). The screen shot below shows the output produced in these two command-prompt windows.
 
-![DPP test build and run with QUTest (left) and QSPY output (right).](test_blinky.png)
-
-
+![DPP test build and run with QUTest (left) and QSPY output (right).](test_dpp.png)
 
 
 @next{qutest_rtc}
