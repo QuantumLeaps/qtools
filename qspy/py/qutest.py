@@ -141,6 +141,10 @@ class qutest:
             'GRP_UA': qspy._GRP_UA
         }
 
+        # Make a copy of _DSL_dict that will not include functions defined in the
+        # user script after exec'ing.
+        self._DSL_dict_orig = dict(self._DSL_dict)
+
     def __del__(self):
         #print('~qutest', self)
         pass
@@ -691,8 +695,29 @@ class qutest:
         msg = '"' + command + '" before any test'
         raise SyntaxError(msg)
 
+    def _traceback_lines(self):
+        lines = ''
+
+        # get first user script function from stack
+        caller_index = -4
+        if abs(caller_index) > len(stack()): return ''
+        caller = getframeinfo(stack()[caller_index][0])
+
+        # while the caller is not a DSL function
+        # (a DSL function call will be the last in the traceback)
+        DSL_functions = [elm.__name__ for elm in list(self._DSL_dict_orig.values()) if callable(elm)]
+        while (caller.function.split()[-1] not in DSL_functions):
+            lines += str(caller.lineno) + ':'
+            caller_index -= 1
+            if abs(caller_index) > len(stack()): return ''
+            caller = getframeinfo(stack()[caller_index][0])
+
+        return lines[0:-1]
+
     def _fail(self, msg1 = '', msg2 = ''):
-        print('FAIL (%.3fs):%d' %(qutest._time() - self._startTime, getframeinfo(stack()[-4][0]).lineno))
+        print('FAIL @line:%s (%.3fs):' %(
+            self._traceback_lines(),
+            qutest._time() - self._startTime))
         if msg1 != '':
             print(' ', msg1)
         if msg2 != '':
