@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.4.0
-# Last updated on  2019-02-14
+# Last updated for version 6.5.0
+# Last updated on  2019-03-28
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -51,7 +51,7 @@ import traceback
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 640
+    _VERSION = 650
 
     # class variables
     _host_exe = ''
@@ -979,7 +979,7 @@ def _main(argv):
         %(qutest._VERSION//100,
             (qutest._VERSION//10) % 10,
             qutest._VERSION % 10, python_version()))
-    print('Copyright (c) 2005-2018 Quantum Leaps, www.state-machine.com')
+    print('Copyright (c) 2005-2019 Quantum Leaps, www.state-machine.com')
 
     # list of scripts to exectute...
     scripts = []
