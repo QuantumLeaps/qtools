@@ -1,6 +1,13 @@
 /**
 @page history Revision History
 
+@section qtools_6_5_1 Version 6.5.1, 2019-05-24
+This release adds the **debug mode** to the @ref qutest_script "QUTest scripting" (in Python). Specifically, you can now provide a special value `DEBUG` to the `qutest.py` Python script launcher, in which case `qutest.py` will start in the **debug mode**, in which it will **not** launch the host executable and will **not** reset the Target. Instead, `qutest.py` will wait for the Target reset and other responses from the Target.
+
+Additionally, this release improves the @ref install_win32 "QTools installation on Windows". Specifically the Windows installer has been re-designed to automatically setup the `QTOOLS` environment variable and to add `%QTOOLS%\bin` to the PATH. The uninstaller reverses these changes.
+
+
+------------------------------------------------------
 @section qtools_6_4_0 Version 6.4.0, 2019-02-10
 This release speeds up the QSPY host application by tweaking the timing constants in the TCP and UDP communication interfaces. The resulting QSPY 6.4.0 runs QUTest tests significantly faster (at least twice as fast) as before.
 

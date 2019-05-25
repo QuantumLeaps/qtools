@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.5.0
-# Last updated on  2019-03-28
+# Last updated for version 6.5.1
+# Last updated on  2019-05-24
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -48,13 +48,20 @@ import time
 import sys
 import traceback
 
+import os
+if os.name == 'nt':
+    import msvcrt
+else:
+    import select
+
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 650
+    _VERSION = 651
 
     # class variables
     _host_exe = ''
+    _is_debug = False
     _exit_on_fail = False
     _have_target = False
     _have_info   = False
@@ -655,7 +662,8 @@ class qutest:
         else: # running an embedded target
             qutest._have_target = True
             qutest._have_info = False
-            qspy._sendTo(struct.pack('<B', qspy._TRGT_RESET))
+            if not qutest._is_debug:
+                qspy._sendTo(struct.pack('<B', qspy._TRGT_RESET))
 
         # ignore all input until a timeout (False)
         while qspy._receive():
@@ -846,12 +854,32 @@ class qspy:
     def _receive():
         '''returns True if packet received, False if timed out'''
 
-        try:
-            data = qspy._sock.recv(4096)
-        except socket.timeout:
-            qutest._last_record = qspy._EMPTY_RECORD
-            return False # timeout
-        # don't catch OSError
+        if not qutest._is_debug:
+            try:
+                data = qspy._sock.recv(4096)
+            except socket.timeout:
+                qutest._last_record = qspy._EMPTY_RECORD
+                return False # timeout
+            # don't catch OSError
+        else:
+            while True:
+                try:
+                    data = qspy._sock.recv(4096)
+                    break
+                except socket.timeout:
+                    print("\nwaiting for Target (press Enter to skip this test)...", end='')
+                    if os.name == 'nt':
+                        if msvcrt.kbhit():
+                            if msvcrt.getch() == '\r':
+                                print()
+                                return False; # timeout
+                    else:
+                        dr,dw,de = select.select([sys.stdin], [], [], 0)
+                        if dr != []:
+                            sys.stdin.readline() # consue the Return key
+                            print()
+                            return False; # timeout
+                # don't catch OSError
 
         dlen = len(data)
         if dlen < 2:
@@ -992,6 +1020,9 @@ def _main(argv):
         argc = len(new_args)
         if argc > 0:
             qutest._host_exe = new_args[0]
+            if qutest._host_exe == 'DEBUG':
+                qutest._host_exe = ''
+                qutest._is_debug = True
         if argc > 1:
             host_port = new_args[1].split(':')
             if len(host_port) > 0:

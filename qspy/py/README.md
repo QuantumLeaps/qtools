@@ -32,9 +32,13 @@ where:
                  If not specified, qutest will try to run all *.py files
                  in the current directory as test scripts
 
-[target_exe]   - optional specification of the target executable to
+[host_exe]     - optional specification of the host executable to
                  launch for testing embedded code on the host computer.
-                 If not specified, an embedded target is assumed.
+                 The special value DEBUG means that qutest.py will start
+                 in the 'debug' mode, in which it will NOT launch the
+                 host executables and it will wait for the Target reset
+                 and other responses from the Target.
+                 If host_exe is not specified, an embedded target is assumed.
 
 [qspy_host[:udp_port]] - optional host-name/IP-address:port for the host
                  running the QSpy utility. If not specified, the default
@@ -49,6 +53,9 @@ python %QTOOLS%\qspy\py\qutest.py *.py
 python %QTOOLS%\qspy\py\qutest.py *.py build\dpp.exe
 python %QTOOLS%\qspy\py\qutest.py *.py build\dpp.exe 192.168.1.100:7705
 python %QTOOLS%\qspy\py\qutest.py *.py build\dpp.exe localhost:7701 6605
+python %QTOOLS%\qspy\py\qutest.py *.py DEBUG
+python %QTOOLS%\qspy\py\qutest.py *.py DEBUG localhost:7701 6605
+
 
 Examples (for Linux/MacOS):
 python $(QTOOLS)/qspy/py/qutest.py
@@ -56,6 +63,8 @@ python $(QTOOLS)/qspy/py/qutest.py *.py
 python $(QTOOLS)/qspy/py/qutest.py *.py build/dpp
 python $(QTOOLS)/qspy/py/qutest.py *.py build/dpp 192.168.1.100:7705
 python $(QTOOLS)/qspy/py/qutest.py *.py build/dpp localhost:7701 6605
+python %QTOOLS%\qspy\py\qutest.py *.py DEBUG
+python %QTOOLS%\qspy\py\qutest.py *.py DEBUG localhost:7701 6605
 
 
 More Information

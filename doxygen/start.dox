@@ -2,41 +2,52 @@
 
 @tableofcontents
 
-@section install Downloading and Installing QTools&trade;
-The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="https://sourceforge.net/projects/qpc/files/Qtools">SourceForge</a> as well as from <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools/releases">GitHub</a>. The QTools&trade; download is provided as a Windows EXE (for Windows) or as a ZIP file for POSIX (Linux). The EXE installer is recommended, because it is <b>digitally signed by Quantum Leaps</b> and provides an uninstaller. Either way, uninstalling QTools is easy and requires only deleting the `qtools` directory from your disk.
+@section install Downloading QTools&trade;
+The <b>QTools&trade;</b> collection is available for download from <a class="extern" target="_blank" href="https://sourceforge.net/projects/qpc/files/QTools/">SourceForge</a> as well as from <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools/releases">GitHub</a>. The QTools&trade; download is provided as a Windows EXE (for Windows) or as a ZIP file for POSIX (Linux).
 
-@image html qtools_install.png "QTools installer on Windows"
+Uninstalling QTools is easy. On Windows, the uninstaller is provided. On POSIX (Linx), you just need to delete the `qtools` directory from your disk.
+
+
+------------------------------------------------------------------------------
+@section install_win32 Installing QTools&trade; on Windows
+On Windows, you install QTools with the provided installer `qtools-win32_<x.y.z>.zip`, which is **digitally signed by Quantum Leaps**. It is recommended to install QTools into the <strong>C:\\qp</strong> directory, or at least a directory that has <strong>no spaces or special characters</strong> in the name (e.g., "Program Files" or "Program Files (x86)" are poor choices).
+
+![QTools installer on Windows](qtools_install.jpg)
+
+@n
+@attention
+The Windows installer adds the `<qtools>\bin` directory to the system `PATH` and also defines the `QTOOLS` environment variable. Therefore no additional steps are required after running the setup. These steps are cleanly reversed by the QTools uninstaller.
+
+
+------------------------------------------------------------------------------
+@section install_posix Installing QTools&trade; on POSIX (Linux)
+On POSIX (Linux), you simply unzip the `qtools-posix_<x.y.z>.zip` file to the installation folder of your choice (`~/qp/qtools` is the recommended default). After the installation, you still need to:
+
+- add the `<qtools>/bin` directory to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (e.g., `~/qp/qtools`).
 
 @note
-It is recommended to install QTools into the <strong>C:\\qp</strong> directory, or at least a directory that has <strong>no spaces or special characters</strong> in the name (e.g., "Program Files" or "Program Files (x86)" are poor choices).
+Adding `<qtools>/bin` to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>/bin` directory.
 
+- define the `QTOOLS` environment variable, for example:
 
-<div class="separate"></div>
-@subsection qtools_path Setting PATH
-To use the QTools&trade;, it is highly recommended to add the `<qtools>\bin` directory to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (default are `C:\qp\qtools` on Windows and `~/qp/qtools` on Linux).
-
-@note
-Adding `<qtools>\bin` to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>\bin` directory.
-
-
-<div class="separate"></div>
-@subsection qtools_env Setting QTOOLS Environment Variable
-To use certain QTools utilities, such as @ref qutest "QUTest" or @ref qspyview "QSpyView", it is highly recommended to define the environment variable `QTOOLS` to point to the @ref files "installation directory" of QTools&trade;.
+@verbatim
+export QTOOLS=~/qp/qtools
+@endverbatim
 
 @note
 Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
 
 
-<div class="separate"></div>
-@subsection qtools_py Enabling Python Support in QUTest&trade; Unit Testing
+------------------------------------------------------------------------------
+@section qtools_py Enabling Python Support in QUTest&trade; Unit Testing
 If you wish to write your @ref qutest_script "QUTest test scripts" in Python, you need to install Python on your machine and ensure that `python` is added to your `PATH`.
 
 @note
 QUTest&trade; supports both <b>Python 2</b> (2.7+) and <b>Python 3</b> (3.4+).
 
 
-<div class="separate"></div>
-@subsection qtools_tcl Enabling UDP Sockets in Tcl for QUTest&trade; Unit Testing
+------------------------------------------------------------------------------
+@section qtools_tcl Enabling UDP Sockets in Tcl for QUTest&trade; Unit Testing
 If you wish to write your @ref qutest_script "QUTest test scripts" in Tcl, you need make sure that your Tcl interpreter is configured to support UDP sockets to communicate with the QSPY host application.
 
 - **Windows hosts:** The QTools&trade; collection for Windows contains the Tcl interpreter (`tclsh` version 8.4), which has been already extended with the @ref qspy_udp "UDP-Sockets" for Tcl, so on Windows you can use the `tclsh` and `wish` interpreters "as is" without any additional modifications.
