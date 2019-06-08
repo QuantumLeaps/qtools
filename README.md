@@ -62,26 +62,35 @@ Additionally, QTools for Windows contains the following open-source,
 
 14. GNU C/C++ toolset for ARM-EABI (GCC version 8.2.1)
 
-15. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
+15. Python for Windows (version 3.7.3 for x86)
 
-16. ResEdit utility (version 1.6.6-x64)
+16. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
 
-17. AVRDUDE for Windows (version 6.1)
+17. ResEdit utility (version 1.6.6-x64)
 
-18. LMFlash for Windows (build 1613)
+18. AVRDUDE for Windows (version 6.1)
+
+19. LMFlash for Windows (build 1613)
 
 
 Additionally, QTools for Windows contains the following PC-Lint option
 files various compilers (in sub-directory lint):
 
-19. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
+20. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
 
-20. co-iar-arm.* (PC-Lint option files for IAR-ARM)
+21. co-iar-arm.* (PC-Lint option files for IAR-ARM)
 
 
 ---------------------------------------------------------------------------
 # Installation
-Installation of QTools is trivial and consists merely of unzipping the
+On Windows, QTools is installed with the installer, digitally signed
+by Quantum Leaps. The installer offers standard and custom installation
+options.
+
+The Windows installer also defines the QTOOLS environment variable
+and adds <qtools>\bin and <qtools>\python directories to the PATH.
+
+On Linux/MacOS, installation of QTools consists of unzipping the
 qtools_<ver>.zip archive into a directory of your choice.
 
 > NOTE: To use the QTools, you should add the <qtools>\bin directory to
@@ -107,7 +116,11 @@ file GPLv2.txt in the licenses/ subdirectory of the QTools distribution.
 Some of the tools are distributed under the terms of the MIT open source
 license. The complete text of the MIT license is included in the comments.
 
-The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE
+The Python package is distributed under the terms of the PYTHON LICENSE
+AGREEMENT, included in the file PYTHON_LICENSE.txt in the licenses/
+subdirectory of the QTools distribution.
+
+The TCL/TK package is distributed under the terms of the TCL LICENSE
 AGREEMENT, included in the file TCL_LICENSE.txt in the licenses/
 subdirectory of the QTools distribution.
 
@@ -119,8 +132,8 @@ is distributed according to Section 2a "Demonstration License".
 
 ---------------------------------------------------------------------------
 # Documentation
-The documentation of the tools is provided in the <qtools>\doc\
-directory. Specifically, you can find ther the PDF version of the **Make Manual**.
+The links to the documentation of the tools are provided in the <qtools>\doc\
+directory.
 
 ### QUTest Python Scripting Support
 The QUTest Python scripting support for the QSPY utility are located in the
