@@ -112,7 +112,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = \
     main.dox \
-    start.dox \
+    gs.dox \
     qpspy.dox \
     qs.dox \
     qspy.dox \
@@ -134,6 +134,7 @@ INPUT                  = \
     ../qwin/qwin_gui.c \
     ../qclean/source/main.cpp \
     ../qfsgen/source/main.cpp \
+    ../../doxygen/help.dox \
     ../../doxygen/glossary.dox
 
 INPUT_ENCODING         = UTF-8

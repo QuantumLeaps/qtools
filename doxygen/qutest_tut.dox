@@ -450,13 +450,15 @@ To run the tests on the TivaC LaunchPad (TM4C123 board), you use the `make_tm4c1
 To better understand this QUTest example, it is highly recommended to watch the <a href="https://vimeo.com/256590562" target="_blank" class="extern"><b>Chernosky's video blog</b></a>.
 
 
-The main purpose of this example is to show the traditional approach (with the mock object) and contrast it with the much simpler solution enabled by the QUTest approach.
+The main purpose of this example is to show the traditional approach (with the mock object) and contrast it with the much simpler solution enabled by the QUTest approach. Of course, to  make comparisons meaningfull, both approaches test the @ref qutest_mock-cut "same CUT".
 
 @note
 Because of the different design philosophy of QUTest, which is *not* based on xUnit, the classic "mock object" is actually not needed and can be replaced with a simpler "spy" <a href="https://en.wikipedia.org/wiki/Test_double" target="_blank" target="_blank" class="extern"><b>test double</b></a>. To dynamically alter the behavior of this "spy" test double, this example applies @ref qutest_fixture-probe "QUTest Test Probes". Test Probes can be changed interactively from the @ref qutest_mock-script "test script".
 
 
 @remark
+Since the @ref qutest_mock-cut "CUT" is in C, the Mock Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc) (and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp)).@n
+@n
 This example runs QUTest tests on the host (Windows, Linux, or MacOS) for both Unity and QUTest. The QUTest version also runs on embedded boards (TivaC LaunchPad from Texas Instruments and EFM32 Pearl-Gecko board from Silicon Labs). The instructions for building and running the code on the embedded boards are located at the end of this lesson.
 @n
 ![](platforms.png)
@@ -465,11 +467,7 @@ This example runs QUTest tests on the host (Windows, Linux, or MacOS) for both U
 ------------------------------------------------------------------------------
 @section qutest_mock-cut Code Under Test (CUT)
 
-@note
-Because it uses pure C code, the Basic Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc) (and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp)).
-
-
-This CUT in this example implements a simple bar of 5 LEDs that display percentage, as shown in the animation below. The "LedBar device" interacts with the discrete LEDs by turning them on and off, to achieve the desired effect. The main objective of this example is to demonstrate how to verify the **collaboration** with the discrete LEDs, even without the actual hardware.
+The CUT in this example implements a simple bar of 5 LEDs that display percentage, as shown in the animation below. The "LedBar device" interacts with the discrete LEDs by turning them on and off, to achieve the desired effect. The main objective of this example is to demonstrate how to verify the **collaboration** with the discrete LEDs, even without the actual hardware.
 
 ![Bar of 5 LEDs displaying the percentage.](ledbar5.gif)
 

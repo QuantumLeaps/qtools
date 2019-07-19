@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
-:: Last Updated for Version: 6.5.0
-:: Date of the Last Update:  2019-03-28
+:: Last Updated for Version: 6.5.1
+:: Date of the Last Update:  2019-06-11
 ::
 ::                    Q u a n t u m  L e a P s
 ::                    ------------------------
@@ -38,7 +38,7 @@ echo usage:
 echo make
 echo make -CHM
 
-set VERSION=6.5.0
+set VERSION=6.5.1
 
 set DOXHOME="C:\tools\doxygen\bin"
 
@@ -58,7 +58,7 @@ if "%1"=="-CHM" (
     
     echo Cleanup...
     rmdir /S /Q  tmp
-    echo CHM file generated in ..\..\doxygen\qtools\
+    echo CHM file generated in ..\..\uploads\qtools\
 
 ) else (
     echo Cleanup...

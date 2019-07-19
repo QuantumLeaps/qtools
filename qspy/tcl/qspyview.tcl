@@ -14,14 +14,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 6.3.1
-# Last updated on  2018-05-24
+# Last updated for version 6.5.1
+# Last updated on  2019-07-19
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -47,7 +47,10 @@
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspyview 6.3
+# this version of qspyview
+set VERSION 6.5.1
+
+package provide qspyview 6.5
 
 package require Tcl  8.4     ;# need at least Tcl 8.4
 package require Tk   8.4     ;# need at least Tk  8.4
@@ -56,9 +59,6 @@ package require Tk   8.4     ;# need at least Tk  8.4
 set HOME [file dirname [file normalize [info script]]]
 
 source $HOME/qspy.tcl        ;# QSPY interface
-
-# this version of qspyview
-set VERSION 6.3.1
 
 # command procedures =========================================================
 ## @brief main entry point to the QSpyView front-end application
@@ -134,12 +134,6 @@ proc main {} {
     global theAoFilter
     set theAoFilter       0 ;# filter open to all AOs
 
-    global thePeek
-    array set thePeek {
-        addr 0
-        len  0
-    }
-
     global theCommand
     array set theCommand {
         cmdId  0
@@ -164,10 +158,20 @@ proc main {} {
         fmt10  ""   dat10  ""
     }
 
+    global thePeek
+    array set thePeek {
+        obj  0
+        offs 0
+        size 1
+        len  0
+    }
+
     global thePoke
     array set thePoke {
-        addr   0
-        fmt    ""   data ""
+        obj   0
+        offs  0
+        fmt   c
+        data  0
     }
 }
 #.............................................................................
@@ -596,8 +600,10 @@ proc onCommand {} {
     set done [::dialog::wait $top]
 
     if {$done == 1} { ;# dialog accepted?
-        set theCommand(cmdId) [$form.entry1 get]
-        set theCommand(param) [$form.entry2 get]
+        set theCommand(cmdId)  [$form.entry1 get]
+        set theCommand(param1) [$form.entry2 get]
+        set theCommand(param2) [$form.entry3 get]
+        set theCommand(param3) [$form.entry4 get]
 
         variable ::qspy::QS_RX
         ::qspy::sendPkt [binary format cciii \
@@ -613,8 +619,10 @@ proc onPeek {} {
     set form $top.form
 
     global thePeek
-    ::dialog::addEntry  $top "address:" 16 $thePeek(addr)
-    ::dialog::addEntry  $top "bytes:"   6  $thePeek(len)
+    ::dialog::addEntry  $top "obj/addr:"    16 $thePeek(obj)
+    ::dialog::addEntry  $top "offset:"      16 $thePeek(offs)
+    ::dialog::addEntry  $top "size(1/2/4):"  6 $thePeek(size)
+    ::dialog::addEntry  $top "n-units:"      6 $thePeek(len)
 
     variable ::dialog::done
     button $top.controls.btn0 -text " Cancel " -command {set ::dialog::done 0}
@@ -624,18 +632,21 @@ proc onPeek {} {
     bind $top <KeyPress-Escape> {set ::dialog::done 0}
     bind $top <KeyPress-Return> {set ::dialog::done 1}
 
-    focus $form.entry1 ;# so that the user can immediately edit the addr
+    focus $form.entry1 ;# so that the user can immediately edit the obj/addr
 
     set done [::dialog::wait $top]
 
     if {$done == 1} { ;# dialog accepted?
-        set thePeek(addr) [$form.entry1 get]
-        set thePeek(len)  [$form.entry2 get]
+        set thePeek(obj)  [$form.entry1 get]
+        set thePeek(offs) [$form.entry2 get]
+        set thePeek(size) [$form.entry3 get]
+        set thePeek(len)  [$form.entry4 get]
 
+        ::qspy::sendCurrObj AP $thePeek(obj)
         variable ::qspy::QS_RX
-        global ::qspy::theFmt
-        ::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)c \
-                $::qspy::QS_RX(PEEK) $thePeek(addr) $thePeek(len)]
+        ::qspy::sendPkt \
+            [binary format cscc $::qspy::QS_RX(PEEK) \
+            $thePeek(offs) $thePeek(size) $thePeek(len)]
     }
     destroy $top
 }
@@ -646,9 +657,10 @@ proc onPoke {} {
     set form $top.form
 
     global thePoke
-    ::dialog::addEntry  $top "address:" 16 $thePoke(addr)
-    ::dialog::addEntry  $top "format:"   6 $thePoke(fmt)
-    ::dialog::addEntry  $top "data:"    16 $thePoke(data)
+    ::dialog::addEntry  $top "obj/addr:"    16 $thePoke(obj)
+    ::dialog::addEntry  $top "offset:"      16 $thePoke(offs)
+    ::dialog::addEntry  $top "fmt(c/s/S/i/I):" 6 $thePoke(fmt)
+    ::dialog::addEntry  $top "data:"        16 $thePoke(data)
 
     variable ::dialog::done
     button $top.controls.btn0 -text " Cancel " -command {set ::dialog::done 0}
@@ -658,22 +670,22 @@ proc onPoke {} {
     bind $top <KeyPress-Escape> {set ::dialog::done 0}
     bind $top <KeyPress-Return> {set ::dialog::done 1}
 
-    focus $form.entry1 ;# so that the user can immediately edit the addr
+    focus $form.entry1  ;# so that the user can immediately edit the addr
 
     set done [::dialog::wait $top]
 
     if {$done == 1} { ;# dialog accepted?
-        set thePoke(addr) [$form.entry1 get]
-        set thePoke(fmt)  [$form.entry2 get]
-        set thePoke(data) [$form.entry3 get]
+        set thePoke(obj)  [$form.entry1 get]
+        set thePoke(offs) [$form.entry2 get]
+        set thePoke(fmt)  [$form.entry3 get]
+        set thePoke(data) [$form.entry4 get]
 
-        set data [binary format $thePoke(fmt) $thePoke(data)]
-        set len [string length $data]
-
+        ::qspy::sendCurrObj AP $thePoke(obj)
         variable ::qspy::QS_RX
-        global ::qspy::theFmt
-        ::qspy::sendPkt [binary format c$::qspy::theFmt(objPtr)c \
-                $::qspy::QS_RX(POKE) $thePoke(addr) $len]$data
+        set data [binary format $thePoke(fmt) $thePoke(data)]
+        set size [string length $data]
+        ::qspy::sendPkt [binary format cscc $::qspy::QS_RX(POKE) \
+                         $thePoke(offs) $size 1]$data
     }
     destroy $top
 }
@@ -904,9 +916,9 @@ bind . <Control-u> { .mbar.commands invoke 3 }
     -command onCommand
 bind . <Control-c> { .mbar.commands invoke 4 }
 # 5
-.mbar.commands add command -label "Peek Address..." -command onPeek
+.mbar.commands add command -label "Peek Obj/Addr..." -command onPeek
 # 6
-.mbar.commands add command -label "Poke Address..." -command onPoke
+.mbar.commands add command -label "Poke Obj/Addr..." -command onPoke
 # 7
 .mbar.commands add separator
 

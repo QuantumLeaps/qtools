@@ -201,46 +201,41 @@ The dialog box accepts the addresses of the objects in decimal and in hexadecima
 @subsection qspyview_ao Setting Active Object Filter
 The "Active Object" filter is a shortcut to setting the @ref qspy_local "Q-SPY local filter" for a given active object in the Target. Specifically, the "Active Object" filter sets the two local filters ::QS_FILTER_AO_OBJ and ::QS_FILTER_SM_OBJ to the same Active Object with the specified priority (<strong>NOTE:</strong> Each Active Object has a unique priority in QP).
 
-@image html qspyview_ao.png "setting Active Object filter to AO with priority 6"
+![setting Active Object filter to AO with priority 6](qspyview_ao.png)
 
 
 -------------------------------------------------------------------------------
 @section qspyview_commands Commands Menu
 The Commands menu allows you to execute simple commands (without parameters) in the Target, such as Reset the Target, Query the Target, and clock Tick at rate 0 and rate 1. Also, this menu allows you to execute commands with parameters, which are quickly discussed below
 
-@image html qspyview_commands.gif
+![](qspyview_commands.png)
 
 <div class="separate"></div>
 @subsection qspyview_user Executing User Command
-The "User Command..." menu allows you to invoke a command in the Target and pass a parameter to this command. (**NOTE:** a command is an application-specific callback function that the QS-RX component executes in the Target).
+The "User Command..." menu allows you to invoke a command in the Target and pass up to three parameters to this command. (**NOTE:** a command is an application-specific callback function that the QS-RX component executes in the Target).
 
-The following screen shot shows how to execute User Command number `10` with the parameter `1234`. Both the command number and the parameter can be specified in hexadecimal (with the `0x` prefix).
+The following screen shot shows how to execute User Command number `21` with the parameters: `111`, `0x222` and `333`. Both the command number and the parameters can be specified in hexadecimal (with the `0x` prefix).
 
-@image html qspyview_cmd.png
+![](qspyview_cmd.png)
 
 
 <div class="separate"></div>
 @subsection qspyview_peek Peek Command
-The Peek Address... command opens a dialog box, in which you can provide the Target address (RAM or ROM), and the number of bytes (1..255) you wish to "peek".
+The Peek Obj/Addr... command opens a dialog box, in which you can provide the Target object or address (RAM or ROM) (**NOTE:** You can provide either the object name, which must be known by its object-dictionary, or numerical address, which **must** be a valid RAM/ROM address, or the Target might crash.)
 
-@image html qspyview_peek.png
+As shown in the screen shot below, the PEEK command takes additionally the offset into the object [bytes], the size of the item [1/2/4 bytes] and the number of units (1..255) you wish to "peek".
+
+![](qspyview_peek.png)
+@n
 
 The Target responds with a ::QS_PEEK_DATA trace record, which you can view in QSPY human-readable output (the packet is also sent to QSpyView, where you can react to it in your @ref qspyview_cust "customization".)
 
 @verbatim
-0424502345 ==>Tran: Obj=l_philo[0] Sig=TIMEOUT_SIG Source=Philo_thinking New=Phi
-lo_hungry
-0424503315 Disp==>: Obj=l_table Sig=HUNGRY_SIG Active=Table_serving
-0424504021 PHILO_STAT: 0 hungry
-0424504625 Intern : Obj=l_table Sig=HUNGRY_SIG Source=Table_serving
-0435085797 PEEK: Addr=0000000020000000 len=64
-           0F 4B 00 29 14 BF 4F F4 00 31 00 21 1A 60 4A F6
-           55 22 5A 61 01 22 1A 65 0A 4B 0B 4A 41 EA 03 03
-           13 60 0A 4B 18 60 0A 4B 1B 68 00 2B FB D0 07 4B
-           08 4A 18 68 43 F8 08 2C 00 22 43 F8 40 2C 70 47
-
-0438500795 Disp==>: Obj=l_philo[1] Sig=TIMEOUT_SIG Active=Philo_thinking
+           Trg-Ack  QS_RX_CURR_OBJ
+3558939043 Trg-Peek Offs=0,Size=4,Num=10,Data=<00012345,00000000,00000000,00000000,0000000
+0,00000000,00000000,00000000,00000000,00000000>
 @endverbatim
+
 
 @note
 The Peek Command can be used to view any **readable** address, such as ROM, RAM, and also **peripheral registers** in your Target.
@@ -248,11 +243,22 @@ The Peek Command can be used to view any **readable** address, such as ROM, RAM,
 
 <div class="separate"></div>
 @subsection qspyview_poke Poke Command
-The "Poke Address..." command allows you to write data to the specified address in Target's RAM (**NOTE:** the provided address **must** be a valid RAM address, or the Target might crash.)
+The "Poke Obj/Addr..." command allows you to write data to the specified object or address in Target's RAM (**NOTE:** You can provide either the object name, which must be known by its object-dictionary, or numerical address, which **must** be a valid RAM address, or the Target might crash.)
 
-As shown in the screen shot below, the POKE command takes a writable address (might be hex), the **format** of the data and the data (might be in hex). The format is any valid specification of the format for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary format</a> Tcl command (the total number of bytes to poke must not exceed <strong>8</strong>). For example, here the format `i` means that the `data` should be encoded as 32-bit integer in little-endian byte order. (<strong>NOTE:</strong> The endianness you specify in the `format` field must match the endianness of the Target.)
+As shown in the screen shot below, the POKE command takes additionally the  offset into the object [bytes], the **format** of the data (c for byte, s for little-endian uint16_t, S for big-endian uint16_t, i for little-endian uint32_t and I for big-endian uint32_t) and the data (might be in hex).
 
-@image html qspyview_poke.png
+![](qspyview_poke.png)
+@n
+
+The Target responds with `Trg-Ack  QS_RX_CURR_OBJ` and `Trg-Ack  QS_RX_POKE`. The qspy output below shows additionally an output generated by the PEEK command that verifies that the value `0xDEAD` has been poked into the object.
+
+@verbatim
+           Trg-Ack  QS_RX_CURR_OBJ
+           Trg-Ack  QS_RX_POKE
+           Trg-Ack  QS_RX_CURR_OBJ
+3953414540 Trg-Peek Offs=0,Size=4,Num=10,Data=<00012345,0000DEAD,00000000,00000000,0000000
+0,00000000,00000000,00000000,00000000,00000000>
+@endverbatim
 
 @note
 The Poke Command can be used to change any **writable** address, such as RAM, but also **peripheral registers** in your Target.
@@ -264,7 +270,7 @@ The "Generate Event..." menu allows you to send an arbitrary event (with up to 1
 
 As shown in the screen-shot below, you need to provide the `prio` of the recipient active object. (If `prio` is greater than zero, the event will be posted directly to the AO with that priority, otherwise the event will be published). You also need to specify the numerical value of the event signal (`sig`).
 
-@image html qspyview_event.png
+![](qspyview_event.png)
 
 The optional "Event Parameters" section allows you to specify up to 10 arbitrary parameters. Each parameter is specified as a pair of **format** followed by data.  The format is any valid specification of the format for the <a href="http://www.tcl.tk/man/tcl8.4/TclCmd/binary.htm" target="_blank" class="extern">binary format</a> Tcl command. For example, here the format `c` means a byte, while the format `i` means that the `data` should be encoded as 32-bit integer in little-endian byte order. (<strong>NOTE:</strong> The endianness you specify in the `format` field must match the endianness of the Target.
 
