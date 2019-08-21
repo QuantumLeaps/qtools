@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.5.1
-* Last updated on  2019-05-24
+* Last updated for version 6.6.0
+* Last updated on  2019-07-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -32,15 +32,15 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
 #ifndef qspy_h
 #define qspy_h
 
-#define QSPY_VER "6.5.1"
+#define QSPY_VER "6.6.0"
 
 #ifdef __cplusplus
 extern "C" {

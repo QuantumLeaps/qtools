@@ -1,14 +1,14 @@
 @echo off
 :: ==========================================================================
 :: Product: qfsgen buld script for Win32 port with GNU (MinGW)
-:: Last Updated for Version: 5.9.0
-:: Date of the Last Update:  2017-04-26
+:: Last updated for version 6.6.0
+:: Last updated on  2019-07-29
 ::
-::                    Q u a n t u m     L e a P s
-::                    ---------------------------
-::                    innovating embedded systems
+::                    Q u a n t u m  L e a P s
+::                    ------------------------
+::                    Modern Embedded Software
 ::
-:: Copyright (C) 2005-2017 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -26,11 +26,11 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <http://www.gnu.org/licenses/>.
+:: along with this program. If not, see <www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: https://state-machine.com
-:: mailto:info@state-machine.com
+:: <www.state-machine.com>
+:: <info@state-machine.com>
 :: ==========================================================================
 setlocal
 
@@ -41,8 +41,8 @@ setlocal
 :: so if you have added the Qtools\bin\ directory to your PATH,
 :: you should be covered.
 
-set CC=gcc
-set LINK=gcc
+set CC=%QTOOLS%\MinGW\bin\gcc
+set LINK=%QTOOLS%\MinGW\bin\gcc
 
 :: ==========================================================================
 if "%1"=="" (

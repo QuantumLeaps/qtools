@@ -6,7 +6,7 @@ unit testing and "qspyview" GUI front-ends for the QSPY software tracing
 
 General Requirements
 ====================
-The QSPY "front-end" scripts require Tcl/Tk 8.4 with the UDP extension,
+The QSPY "front-end" scripts require Tcl/Tk with the UDP extension,
 which is available in the Qtools collection for Windows.
 
 To launch any of the scripts in this directory, you need to first run

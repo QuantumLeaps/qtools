@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.5.1
-# Last updated on  2019-05-24
+# Last updated for version 6.6.0
+# Last updated on  2019-07-30
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -28,8 +28,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# www.state-machine.com
+# info@state-machine.com
 #-----------------------------------------------------------------------------
 
 # for compatibility from Python 2
@@ -57,7 +57,7 @@ else:
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 651
+    _VERSION = 660
 
     # class variables
     _host_exe = ''

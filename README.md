@@ -50,35 +50,33 @@ starting with 'q' are contributed by Quantum Leaps)
 10. qudps   - UDP server for testing UDP connections to the embedded
               targets.
 
-11. unity   - traditional unit testing harness (framework) for embedded C
+11. Unity   - traditional unit testing harness (framework) for embedded C
               (version 2.4.3)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-12. GNU-make for Windows (version 3.82)
+12. GNU-make for Windows (32-bit version 3.82)
 
-13. GNU C/C++ toolset for Windows (MinGW version 6.3.0)
+13. GNU C/C++ toolset for Windows (MinGW-32bit version 8.2.0)
 
 14. GNU C/C++ toolset for ARM-EABI (GCC version 8.2.1)
 
-15. Python for Windows (version 3.7.3 for x86)
+15. Python for Windows (32-bit version 3.7.3 for x86)
 
-16. Tcl/Tk for Windows (version 8.4) with UDP sockets extension
+16. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
 
-17. ResEdit utility (version 1.6.6-x64)
+17. ResEdit utility (32-bit version 1.6.6-x64)
 
-18. AVRDUDE for Windows (version 6.1)
-
-19. LMFlash for Windows (build 1613)
+18. LMFlash for Windows (32-bit build 1613)
 
 
 Additionally, QTools for Windows contains the following PC-Lint option
 files various compilers (in sub-directory lint):
 
-20. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
+19. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
 
-21. co-iar-arm.* (PC-Lint option files for IAR-ARM)
+20. co-iar-arm.* (PC-Lint option files for IAR-ARM)
 
 
 ---------------------------------------------------------------------------
@@ -215,10 +213,6 @@ Have been taken from the UnixUtils project at SourceForge.net:
 ### The Unity Unit Testing Harness for Embedded C
 Has been taken from the GitHub at:
 - https://github.com/ThrowTheSwitch/Unity
-
-### The AVRDUDE utility
-Has been taken from:
-- http://download.savannah.gnu.org/releases/avrdude/
 
 ### The Mscgen utility has been taken from the Mscgen project at:
 - http://www.mcternan.me.uk/mscgen/

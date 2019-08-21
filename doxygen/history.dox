@@ -1,6 +1,22 @@
 /**
 @page history Revision History
 
+@section qtools_6_6_0 Version 6.6.0, 2019-08-30
+This release affects mostly the QTools distribution for Windows. Specifically, the location of the MinGW compiler and Tcl/Tk have been moved to separate directories (as opposed to being co-located in the `qtools/bin` directory). This facilitates easier upgrades of these 3-rd party tools, and indeed, they have been upgraded in this QTools/Windows release as follows:
+
+- MinGW-32-bit **8.2.0**
+- Tcl/Tk **8.6**
+
+@note
+The directory re-organization means that the MinGW compiler is no longer available in the `qtools/bin` directory and therefore the QTools installer for Windows adds to the PATH both `qtools/bin` and `qtools/MinGW/bin` directories.
+
+Also, this release makes the following changes to the @ref qspy "QSPY host application":
+
+- The @ref qspy_command "command-line" defaults have been changed such that `qspy` is equivalent to the former `qspy -u -t`. In other words, QSPY by default opens the UDP port and opens the TCP/IP port for Target connection.
+- The QSPY host application now supports a new QP-compatibility version 6.6.0, in which the @ref qs_app "Application-Specific QS Trace Records" start at offset 100 instead of 70. This is only activated with the `-v 660` @ref qspy_command "command-line" option, but is in preparation for the future changes in QP/C and QP/C++ frameworks (the upcoming QP/C/C++ 6.6.0).
+
+
+------------------------------------------------------
 @section qtools_6_5_1 Version 6.5.1, 2019-06-08
 This release adds the **debug mode** to the @ref qutest_script "QUTest scripting" (in Python). Specifically, you can now provide a special value `DEBUG` to the `qutest.py` Python script launcher, in which case `qutest.py` will start in the **debug mode**, in which it will **not** launch the host executable and will **not** reset the Target. Instead, `qutest.py` will wait for the Target reset and other responses from the Target.
 

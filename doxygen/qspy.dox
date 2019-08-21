@@ -58,19 +58,19 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
-    <TD>-u [UDP_port]</TD>
+    <TD>-u [UDP_port|0]</TD>
     <TD>-u</TD>
     <TD>7701</TD>
     <TD></TD>
-    <TD>UDP socket for "Front-Ends"</TD>
+    <TD>UDP socket for "Front-Ends".@n`-u0` suppresses opening the UPD socket </TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
     <TD>-v &lt;QS_version&gt;</TD>
     <TD>-v 5.0</TD>
-    <TD>6.0</TD>
+    <TD>6.2</TD>
     <TD></TD>
-    <TD>Compatility with QS version</TD>
+    <TD>Enforce backwards-compatibility with the specific QS version</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
@@ -107,6 +107,14 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
+    <TD>-t [TCP-port]</TD>
+    <TD>-t </TD>
+    <TD>6601</TD>
+    <TD></TD>
+    <TD>TCP/IP input selection. Not compatible with -c, -b, -f</TD>
+  </TR>
+
+  <TR bgColor="#c0c0c0">
     <TD>-c &lt;port&gt;</TD>
     <TD>-c COM2</TD>
     <TD>COM1</TD>
@@ -114,20 +122,12 @@ ALIGN="center" VALIGN="middle">
     <TD>COM port selection. Not compatible with -t, -p, -f</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>-b &lt;baud&gt;</TD>
     <TD>-b 38400</TD>
     <TD>115200</TD>
     <TD></TD>
     <TD>Baud rate selection. Not compatible with -t, -p, -f</TD>
-  </TR>
-
-  <TR bgColor="#f0f0f0">
-    <TD>-t [TCP-port]</TD>
-    <TD>-t </TD>
-    <TD>6601</TD>
-    <TD></TD>
-    <TD>TCP/IP input selection. Not compatible with -c, -b, -f</TD>
   </TR>
 
   <TR bgColor="#c0c0c0">
@@ -250,6 +250,41 @@ mismatched trace records and will start generating the following errors:@n
 The name after `Rec=` indicates the <a href="qs__copy_8h.html#acdb495c1e5524b5d95aaff82c47f6db5"><strong>Record ID</strong></a> of the trace record that failed to be parsed.
 
 
+<div class="separate"></div>
+@subsection qspy_default Default Configuration
+The QSPY application invoked **without any parameters** defaults to the following configuration:
+
+@verbatim
+C:\tmp>qspy
+QSPY 6.6.0 Copyright (c) 2005-2019 Quantum Leaps
+Documentation: https://www.state-machine.com/qtools/qspy.html
+Current timestamp: 190811_124028
+-u 7701
+-t 6601
+-v 620
+-T 4
+-O 4
+-F 4
+-S 2
+-E 2
+-Q 1
+-P 2
+-B 2
+-C 2
+@endverbatim
+
+Specifically, by default QSPY **opens the UDP socket** at the default port (`-u 7701`) for "back-ends" (such as @ref qutest "QUTest") and **opens the TCP/IP socket** at the default port (`-t 6601`) for communication with the Targets.
+
+
+The other parameters correspond to 32-bit Target CPUs, such as ARM and x86 compiled in 32-bit mode. The x86 is relevant for running the embedded software on host machines based on the x86 processors.
+
+@remark
+The default QSPY configuration is specifically designed for running @ref qutest "QUTest" tests on the x86-based hosts with target executables compiled in the 32-bit x86 mode. This default configuration also matches 32-bit ARM CPUs, but typically requires the single `-c <COM>` parameter to communicate with the embedded Target via a serial port.@n
+@n
+The default QSPY configuration (without any parameters) is also backwards-compatible with the following invocation: `qspy -u -t`, which is recommended for running QUTest tests on the host computer. Starting with QSPY version 7.x.y, you can use the simpler `qspy` invocation.
+
+
+
 -------------------------------------------------------------------------------
 @section qspy_keyboard QSPY Keyboard Commands
 The QSPY console application accepts keyboard input. The following table shows the currently supported key-strokes:
@@ -283,9 +318,9 @@ QSPY currently provides the following communication links to the @ref qs "QS tar
 
 Communication Link | Command-Line Option
 :------------------|:--------------------
-Serial port        | `-c<COM_port>` and `-b<baud_rate>`
-Binaly File        | `-f<file_name>`
-TCP/IP             | `-t[TCP_port]`
+TCP/IP             | `-t [TCP_port]` (default)
+Serial port        | `-c <COM_port>` and `-b<baud_rate>`
+Binaly File        | `-f <file_name>`
 Other link@n(e.g., JTAG debug probe) | can be added to the QSPY Platform Abstraction Layer
 
 

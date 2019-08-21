@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.4.0
-* Last updated on  2019-02-10
+* Last updated for version 6.6.0
+* Last updated on  2019-07-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -32,8 +32,8 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* www.state-machine.com
+* info@state-machine.com
 ******************************************************************************
 * @endcond
 */
@@ -80,9 +80,9 @@ static char  l_dicFileName[FNAME_SIZE];
 
 static char  l_tstampStr  [16];
 
-static int   l_bePort   = 0;
-static int   l_tcpPort  = 6601;
-static int   l_baudRate = 115200;
+static int   l_bePort   = 7701;   /* default UDP port  */
+static int   l_tcpPort  = 6601;   /* default TCP port */
+static int   l_baudRate = 115200; /* default serial baudrate */
 
 static char const l_introStr[] =
     "QSPY %s Copyright (c) 2005-2019 Quantum Leaps\n"
@@ -97,19 +97,19 @@ static char const l_helpStr[] =
     "---------------------------------------------------------------\n"
     "-h                        help (show this message)\n"
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
-    "-u [UDP_port]     7701    UDP socket with optional port\n"
+    "-u [UDP_port|0]   7701    UDP socket with optional port, 0-no UDP\n"
     "-v <QS_version>   6.2     compatibility with QS version\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
     "-g                        produce MscGen output to a file\n"
+    "-t [TCP_port]     6601    TCP/IP input with optional port\n"
 #ifdef _WIN32
     "-c <COM_port>     COM1    com port input (default)\n"
 #elif (defined __linux) || (defined __linux__) || (defined __posix)
     "-c <serial_port>  /dev/ttyS0 serial port input (default)\n"
 #endif
     "-b <baud_rate>    115200  baud rate for the com port\n"
-    "-t [TCP_port]     6601    TCP/IP input with optional port\n"
     "-f <file_name>            file input (postprocessing)\n"
     "-d [file_name]            dictionary files\n"
     "-T <tstamp_size>  4       QS timestamp size     (bytes)\n"
@@ -293,20 +293,20 @@ static QSpyStatus configure(int argc, char *argv[]) {
     uint8_t tevtCtrSize  = 2U;
     int     optChar;
 
-    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
-    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
-    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
-    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
-    STRNCPY_S(l_dicFileName, "OFF", sizeof(l_dicFileName));
+    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName) - 1U);
+    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName) - 1U);
+    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName) - 1U);
+    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName) - 1U);
+    STRNCPY_S(l_dicFileName, "OFF", sizeof(l_dicFileName) - 1U);
 
     (void)tstampStr();
     printf(l_introStr, QSPY_VER, l_tstampStr);
 
-    STRNCPY_S(l_inpFileName, "qs.bin", sizeof(l_inpFileName));
+    STRNCPY_S(l_inpFileName, "qs.bin", sizeof(l_inpFileName) - 1U);
 #ifdef _WIN32
-    STRNCPY_S(l_comPort, "COM1", sizeof(l_comPort));
+    STRNCPY_S(l_comPort, "COM1", sizeof(l_comPort) - 1U);
 #elif (defined __linux) || (defined __linux__) || (defined __posix)
-    STRNCPY_S(l_comPort, "/dev/ttyS0", sizeof(l_comPort));
+    STRNCPY_S(l_comPort, "/dev/ttyS0", sizeof(l_comPort) - 1U);
 #endif
 
     /* parse the command-line parameters ...................................*/
@@ -328,7 +328,6 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 else { /* apply the default */
                     l_bePort = 7701;
                 }
-                printf("-u %d\n", l_bePort);
                 break;
             }
             case 'v': { /* compatibility with QS version */
@@ -347,26 +346,26 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 break;
             }
             case 'o': { /* save screen output to a file */
-                SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
+                SNPRINTF_S(l_outFileName, sizeof(l_outFileName) - 1U,
                            "qspy%s.txt", l_tstampStr);
                 printf("-o (%s)\n", l_outFileName);
                 break;
             }
             case 's': { /* save binary data to a file */
-                SNPRINTF_S(l_savFileName, sizeof(l_savFileName), "qspy%s.bin",
-                           l_tstampStr);
+                SNPRINTF_S(l_savFileName, sizeof(l_savFileName) - 1U,
+                           "qspy%s.bin", l_tstampStr);
                 printf("-s (%s)\n", l_savFileName);
                 break;
             }
             case 'm': { /* Matlab/Octave file output */
-                SNPRINTF_S(l_matFileName, sizeof(l_matFileName), "qspy%s.mat",
-                           l_tstampStr);
+                SNPRINTF_S(l_matFileName, sizeof(l_matFileName) - 1U,
+                           "qspy%s.mat", l_tstampStr);
                 printf("-m (%s)\n", l_matFileName);
                 break;
             }
             case 'g': { /* MscGen file output */
-                SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName), "qspy%s.msc",
-                           l_tstampStr);
+                SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName) - 1U,
+                           "qspy%s.msc", l_tstampStr);
                 printf("-g (%s)\n", l_mscFileName);
                 break;
             }
@@ -376,7 +375,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                             "The -c option is incompatible with -t/-f\n");
                     return QSPY_ERROR;
                 }
-                STRNCPY_S(l_comPort, optarg, sizeof(l_comPort));
+                STRNCPY_S(l_comPort, optarg, sizeof(l_comPort) - 1U);
                 printf("-c %s\n", l_comPort);
                 l_link = SERIAL_LINK;
                 break;
@@ -401,14 +400,15 @@ static QSpyStatus configure(int argc, char *argv[]) {
                             "The -f option is incompatible with -c/-b/-t\n");
                     return QSPY_ERROR;
                 }
-                STRNCPY_S(l_inpFileName, optarg, sizeof(l_inpFileName));
+                STRNCPY_S(l_inpFileName, optarg, sizeof(l_inpFileName) - 1U);
                 printf("-f %s\n", l_inpFileName);
                 l_link = FILE_LINK;
                 break;
             }
             case 'd': { /* Dictionary file */
                 if (optarg != NULL) { /* is optional argument provided? */
-                    STRNCPY_S(l_dicFileName, optarg, sizeof(l_dicFileName));
+                    STRNCPY_S(l_dicFileName, optarg,
+                              sizeof(l_dicFileName) - 1U);
                     printf("-d %s\n", l_dicFileName);
                 }
                 else { /* apply the default */
@@ -494,6 +494,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     /* configure QSPY ......................................................*/
     /* open Back-End link. NOTE: must happen *before* opening Target link */
     if (l_bePort != 0) {
+        printf("-u %d\n", l_bePort);
         if (PAL_openBE(l_bePort) == QSPY_ERROR) {
             return QSPY_ERROR;
         }
@@ -501,18 +502,17 @@ static QSpyStatus configure(int argc, char *argv[]) {
 
     /* open Target link... */
     switch (l_link) {
-        case NO_LINK: {
-            printf("-c %s\n", l_comPort);
-            /* intentionally fall through */
-        }
-        case SERIAL_LINK: { /* connect to the target via the serial port */
-            if (PAL_openTargetSer(l_comPort, l_baudRate) != QSPY_SUCCESS) {
+        case NO_LINK:
+            printf("-t %d\n", l_tcpPort); /* -t is the default link */
+            /* fall through */
+        case TCP_LINK: {    /* connect to the Target via TCP socket */
+            if (PAL_openTargetTcp(l_tcpPort) != QSPY_SUCCESS) {
                 return QSPY_ERROR;
             }
             break;
         }
-        case TCP_LINK: {    /* connect to the target via the TCP socket */
-            if (PAL_openTargetTcp(l_tcpPort) != QSPY_SUCCESS) {
+        case SERIAL_LINK: { /* connect to the Target via serial port */
+            if (PAL_openTargetSer(l_comPort, l_baudRate) != QSPY_SUCCESS) {
                 return QSPY_ERROR;
             }
             break;

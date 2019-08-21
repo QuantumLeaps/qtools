@@ -4,8 +4,8 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 6.4.0
-* Last updated on  2019-02-15
+* Last updated for version 6.6.0
+* Last updated on  2019-07-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -32,15 +32,15 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* www.state-machine.com
+* info@state-machine.com
 ******************************************************************************
 * @endcond
 */
 #ifndef qclean_h
 #define qclean_h
 
-#define VERSION "6.4.0"
+#define VERSION "6.6.0"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);

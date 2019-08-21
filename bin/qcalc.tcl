@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: QCalc -- Desktop Calculator with C syntax and hex/binary displays
-# Last updated for version 6.0.3
-# Last updated on  2017-12-12
+# Last updated for version 6.6.0
+# Last updated on  2019-07-30
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
 #                    innovating embedded systems
 #
-# Copyright (C) 2005-2017 Quantum Leaps, LLC, All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -23,11 +23,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Documentation:
-# https://state-machine.com/qtools/qcalc.html
+# https://www.state-machine.com/qtools/qcalc.html
 #
 # Contact information:
-# https://state-machine.com
-# mailto:info@state-machine.com
+# www.state-machine.com
+# info@state-machine.com
 #-----------------------------------------------------------------------------
 
 # the input and answer variables

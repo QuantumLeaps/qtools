@@ -16,8 +16,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QUTEST package
-# Last updated for version 6.4.0
-# Last updated on  2019-02-15
+# Last updated for version 6.6.0
+# Last updated on  2019-07-30
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -41,18 +41,18 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com>
+# <info@state-machine.com>
 #-----------------------------------------------------------------------------
 # @endcond
 
 # this version of qutest
-set VERSION 6.4.0
+set VERSION 6.6.0
 
-package provide qutest 6.4
+package provide qutest 6.6
 
 package require Tcl  8.4  ;# need at least Tcl 8.4
 

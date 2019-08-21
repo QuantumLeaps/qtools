@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.4.0
-* Last updated on  2019-02-08
+* Last updated for version 6.6.0
+* Last updated on  2019-07-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -29,11 +29,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
@@ -409,7 +409,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                       client_hostname, sizeof(client_hostname));
 #else
             strncpy(client_hostname, inet_ntoa(l_clientAddr.sin_addr),
-                    sizeof(client_hostname));
+                    sizeof(client_hostname) - 1U);
 #endif
             SNPRINTF_LINE("   <COMMS> TCP-IP   Connected to Host=%s,Port=%d",
                       client_hostname, (int)ntohs(l_clientAddr.sin_port));
@@ -436,7 +436,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                     client_hostname, sizeof(client_hostname));
 #else
                 strncpy(client_hostname, inet_ntoa(l_clientAddr.sin_addr),
-                    sizeof(client_hostname));
+                    sizeof(client_hostname) - 1U);
 #endif
                 SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
                     "Host=%s,Port=%d"

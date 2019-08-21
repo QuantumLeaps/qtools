@@ -55,7 +55,7 @@ Unlike other existing unit testing harnesses for embedded systems (e.g., <a href
 
 - QUTest&trade; is a unique test harness on the embedded market that supports **scripting**. QUTest @ref qutest_script "test scripts" run on the Host, which skips compilation and uploading the code to the Target and thus shortens the TDD micro-cycle.
 
-> **NOTE:** QUTest&trade; supports *test scripts* written either in [Tcl](https://en.wikipedia.org/wiki/Tcl) or [Python](https://docs.pytest.org)</span>.
+> **NOTE:** QUTest&trade; supports *test scripts* written either in [Python](https://www.python.org) (2.7 or 3.x) or [Tcl](http://www.tcl.tk)</span>.
 
 
 - QUTest&trade; supports **resetting the Target** for each individual test, if needed. This goes far beyond providing test `setup()` and `teardown()` functions that other test fixtures offer (and of course QUTest supports as well). Clean reset of the Target avoids erroneous tests that implicitly rely on side effects from previously executed code. This is particularly important for embedded systems and for state machines, so that each test can start from a known reset condition.
@@ -124,11 +124,10 @@ Most individual tests in a *test script*, start with a clean **target reset**. T
   </dd>
   <dt>[1]</dt><dd> By default, each test starts with calling an internal function reset() to reset the Target. This reset() function sends the `QS_RX_RESET` request to the *test fixture*. After this, the *test script* enters a wait state in which it waits for `QS_TARGET_INFO` reply from the Target.
   </dd>
-> **NOTE:** The *test script* enters the Tcl event loop ([vwait](https://www.tcl.tk/man/tcl8.4/TclCmd/vwait.htm)) after **every command**.@n
 > **NOTE:** The Target reset can be suppressed by the `-noreset` option given after the reset() command, which is illustrated in the @ref qutest_noreset "-noreset Tests" sequence diagram. Please note, however, that the first test in a *test script* (test group) and any test immediately following an @ref qutuest_assert "assertion-test" **must** cleanly reset the Target (so it cannot use the `-noreset` option).
   <dt>[2]</dt><dd> The *test fixture* processes the `QS_RX_RESET` request immediately by calling the QS_onReset() callback inside the Target.
   </dd>
-> **NOTE:** Embedded Targets reboot automatically after resetting. In case of a **host executable**, however, QUTest&trade; (qutest.tcl) launches it again.@n
+> **NOTE:** Embedded Targets reboot automatically after resetting. In case of a **host executable**, however, QUTest&trade; (qutest.py) launches it again.@n
   <dt>[3]</dt><dd> The Target starts executing the *test fixture* code from the beginning. After QS gets initialized (QS_INIT()), the *test fixture* sends the `QS_TARGET_INFO` reply to the *test script*.
   </dd>
   <dt>[4]</dt><dd> Upon reception of the awaited `QS_TARGET_INFO` reply, the *test script* attempts to execute the `on_reset()` procedure. If `on_reset()` is defined in the script, it runs at this time. (This scenario assumes that `on_reset()` is defined and runs until step [8]).

@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.7
-* Last updated on  2018-11-14
+* Last updated for version 6.6.0
+* Last updated on  2019-07-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -29,11 +29,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
@@ -67,7 +67,8 @@ QSPY_LastOutput QSPY_output;
 
 enum {
     DNAME_SIZE = 64,  /* dictionary name length (longer names truncated) */
-    FNAME_SIZE = 256  /* file name length (longer names truncated) */
+    FNAME_SIZE = 256, /* file name length (longer names truncated) */
+    OLD_QS_USER = 70  /* old QS_USER used in before QS 6.6.0 */
 };
 
 /*..........................................................................*/
@@ -135,7 +136,7 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream);
 static DictEntry     l_funSto[512];
 static DictEntry     l_objSto[256];
 static DictEntry     l_mscSto[64];
-static DictEntry     l_usrSto[128 + 1 - QS_USER];
+static DictEntry     l_usrSto[128 + 1 - OLD_QS_USER];
 static SigDictEntry  l_sigSto[512];
 static Dictionary    l_funDict;
 static Dictionary    l_objDict;
@@ -148,6 +149,7 @@ static char          l_dictFileName[FNAME_SIZE]; /* dictionary file name */
 static QSpyConfig    l_config;
 static FILE         *l_matFile;
 static FILE         *l_mscFile;
+static uint32_t      l_userRec;
 static QSPY_CustParseFun l_custParseFun;
 static QSPY_resetFun     l_txResetFun;
 
@@ -234,7 +236,39 @@ static char const *  l_qs_rec[] = {
     "QS_PEEK_DATA",
     "QS_ASSERT_FAIL"
 
-    /* [70] Application-specific records */
+    /* [70] Reserved QS records */
+    "QS_RESERVED_70",
+    "QS_RESERVED_71",
+    "QS_RESERVED_72",
+    "QS_RESERVED_73",
+    "QS_RESERVED_74",
+    "QS_RESERVED_75",
+    "QS_RESERVED_76",
+    "QS_RESERVED_77",
+    "QS_RESERVED_78",
+    "QS_RESERVED_79",
+    "QS_RESERVED_80",
+    "QS_RESERVED_81",
+    "QS_RESERVED_82",
+    "QS_RESERVED_83",
+    "QS_RESERVED_84",
+    "QS_RESERVED_85",
+    "QS_RESERVED_86",
+    "QS_RESERVED_87",
+    "QS_RESERVED_88",
+    "QS_RESERVED_89",
+    "QS_RESERVED_90",
+    "QS_RESERVED_91",
+    "QS_RESERVED_92",
+    "QS_RESERVED_93",
+    "QS_RESERVED_94",
+    "QS_RESERVED_95",
+    "QS_RESERVED_96",
+    "QS_RESERVED_97",
+    "QS_RESERVED_98",
+    "QS_RESERVED_99",
+
+    /* [100] Application-specific (User) QS records */
 };
 
 /* QS object kinds... NOTE: keep in synch with qs_copy.h */
@@ -353,6 +387,8 @@ void QSPY_config(uint16_t version,
     SNPRINTF_LINE("-B %d", (unsigned)poolBlkSize);   QSPY_onPrintLn();
     SNPRINTF_LINE("-C %d", (unsigned)tevtCtrSize);   QSPY_onPrintLn();
     QSPY_line[0] = '\0'; QSPY_onPrintLn();
+
+    l_userRec = ((l_config.version < 660U) ? OLD_QS_USER : QS_USER);
 }
 /*..........................................................................*/
 void QSPY_configTxReset(QSPY_resetFun txResetFun) {
@@ -421,7 +457,7 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
             SNPRINTF_APPEND("Rec=%s", l_qs_rec[me->rec]);
         }
         else { /* USER-specific record */
-            SNPRINTF_APPEND("Rec=USER+%3d", (int)(me->rec - QS_USER));
+            SNPRINTF_APPEND("Rec=USER+%3d", (int)(me->rec - l_userRec));
         }
         QSPY_onPrintLn();
         return QSPY_ERROR;
@@ -707,7 +743,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         SNPRINTF_LINE("%010u %s", u32, Dictionary_at(&l_usrDict, i32));
     }
     else {
-        SNPRINTF_LINE("%010u USER+%03d", u32, (int)(me->rec - QS_USER));
+        SNPRINTF_LINE("%010u USER+%03d", u32, (int)(me->rec - l_userRec));
     }
 
     FPRINF_MATFILE("%d %u", (int)me->rec, u32);
@@ -880,6 +916,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* QEP records .....................................................*/
         case QS_QEP_STATE_ENTRY:
             s = "St-Entry";
+            /* fall through */
         case QS_QEP_STATE_EXIT: {
             if (s == 0) s = "St-Exit ";
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
@@ -897,10 +934,13 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QEP_STATE_INIT:
             s = "St-Init ";
+            /* fall through */
         case QS_QEP_TRAN_HIST:
             if (s == 0) s = "St-Hist ";
+            /* fall through */
         case QS_QEP_TRAN_EP:
             if (s == 0) s = "St-EP   ";
+            /* fall through */
         case QS_QEP_TRAN_XP: {
             if (s == 0) s = "St-XP   ";
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
@@ -1038,6 +1078,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             else { /* former QS_QF_ACTIVE_ADD */
                 s = "Add  ";
             }
+            /* fall through */
         case QS_QF_ACTIVE_RECALL: {
             if (l_config.version >= 620U) {
                 if (s == 0) s = "RCall";
@@ -1112,6 +1153,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         case QS_QF_ACTIVE_SUBSCRIBE:
             s = "Subsc";
+            /* fall through */
         case QS_QF_ACTIVE_UNSUBSCRIBE: {
             if (s == 0) s = "Unsub";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1131,6 +1173,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_POST_FIFO:
             s = "Post ";
+            /* fall through */
         case QS_QF_ACTIVE_POST_ATTEMPT: {
             if (s == 0) s = "PostA";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1230,6 +1273,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_GET:
             s = "AO-Get  ";
+            /* fall through */
         case QS_QF_EQUEUE_GET: {
             if (s == 0) s = "EQ-Get  ";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1261,6 +1305,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_GET_LAST:
             s = "AO-GetL ";
+            /* fall through */
         case QS_QF_EQUEUE_GET_LAST: {
             if (s == 0) s = "EQ-GetL ";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1292,9 +1337,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_EQUEUE_POST_FIFO:
             s = "Post ";
             w = "Min";
+            /* fall through */
         case QS_QF_EQUEUE_POST_ATTEMPT:
             if (s == 0) s = "PostA";
             if (w == 0) w = "Mar";
+            /* fall through */
         case QS_QF_EQUEUE_POST_LIFO: {
             if (s == 0) s = "LIFO";
             if (w == 0) w = "Min";
@@ -1353,6 +1400,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_MPOOL_GET:
             s = "Get  ";
             w = "Min";
+            /* fall through */
         case QS_QF_MPOOL_GET_ATTEMPT: {
             if (s == 0) s = "GetA ";
             if (w == 0) w = "Mar";
@@ -1512,6 +1560,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         case QS_QF_GC_ATTEMPT:
             s = "QF-gcA  ";
+            /* fall through */
         case QS_QF_GC: {
             if (s == 0) s = "QF-gc   ";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1563,6 +1612,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_TIMEEVT_ARM:
             s = "Arm ";
+            /* fall through */
         case QS_QF_TIMEEVT_DISARM: {
             if (s == 0) s = "Dis ";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1685,6 +1735,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_CRIT_ENTRY:
             s = "QF-CritE";
+            /* fall through */
         case QS_QF_CRIT_EXIT: {
             if (s == 0) s = "QF-CritX";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1702,6 +1753,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ISR_ENTRY:
             s = "QF-IsrE";
+            /* fall through */
         case QS_QF_ISR_EXIT: {
             if (s == 0) s = "QF-IsrX";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1722,6 +1774,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* built-in scheduler records ......................................*/
         case QS_SCHED_LOCK:
             if (s == 0) s = "Sch-Lock";
+            /* fall through */
         case QS_SCHED_UNLOCK: {
             if (s == 0) s = "Sch-Unlk";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -1778,6 +1831,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_MUTEX_LOCK:
             if (s == 0) s = "Mtx-Lock";
+            /* fall through */
         case QS_MUTEX_UNLOCK: {
             if (s == 0) s = "Mtx-Unlk";
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
@@ -2150,7 +2204,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         /* User records ....................................................*/
         default: {
-            if (me->rec >= QS_USER) {
+            if (me->rec >= l_userRec) {
                 QSpyRecord_processUser(me);
             }
             else {
@@ -2212,7 +2266,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 }
                 else { /* this is a USER-specific record */
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
-                               (unsigned)(l_record[1] - QS_USER));
+                               (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
                 l_chksum = (uint8_t)0;
@@ -2233,7 +2287,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                     }
                     else {
                         SNPRINTF_APPEND("Rec=USER+%u(?),",
-                            (unsigned)(l_record[1] - QS_USER));
+                            (unsigned)(l_record[1] - l_userRec));
                     }
                     SNPRINTF_APPEND("Seq=%u", (unsigned)l_seq);
                     QSPY_printError();
@@ -2256,7 +2310,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
-                               (unsigned)(l_record[1] - QS_USER));
+                               (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
                 if (l_mscFile != (FILE *)0) {
@@ -2333,7 +2387,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%3u",
-                               (unsigned)(l_record[1] - QS_USER));
+                               (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
                 l_chksum = (uint8_t)0;

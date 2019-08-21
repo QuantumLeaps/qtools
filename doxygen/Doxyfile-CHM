@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "QTools"
-PROJECT_NUMBER         = "6.5.1"
+PROJECT_NUMBER         = "6.6.0"
 PROJECT_BRIEF          =
 PROJECT_LOGO           = images/header_logo_ql.png
 OUTPUT_DIRECTORY       =
@@ -129,6 +129,7 @@ INPUT                  = \
     macros.h \
     ../qspy/include/qs_copy.h \
     ../qspy/include/qspy.h \
+    ../qspy/py/qutest.py \
     ../qspy/py/qutest_dsl.py \
     ../qwin/qwin_gui.h \
     ../qwin/qwin_gui.c \
@@ -153,7 +154,8 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = \
+    snippets 
 
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO

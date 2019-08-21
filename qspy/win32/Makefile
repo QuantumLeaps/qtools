@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 6.4.0
-# Last updated on  2019-01-09
+# Last updated for version 6.6.0
+# Last updated on  2019-07-29
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com>
+# <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -43,11 +43,11 @@
 # NOTE:
 # To use this Makefile on Windows, you will need the GNU make utility, which
 # is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
+#    https://github.com/QuantumLeaps/qtools/releases
 #
 
 #-----------------------------------------------------------------------------
-# project name
+# project name:
 #
 PROJECT := qspy
 
@@ -88,25 +88,24 @@ LIBS      := -lws2_32
 #
 # NOTE:
 # MinGW toolset is included in the Qtools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/Qtools/
-#
-# NOTE:
-# This Makefile assumes that the windres utility is available on the
-# PATH (NOTE: windres is available in the Qtools collection for Windows)
-#
-CC    := gcc
-CPP   := g++
-LINK  := gcc    # for C programs
-#LINK  := g++   # for C++ programs
+#    https://github.com/QuantumLeaps/qtools/releases
 
-# basic utilities (included in Qtools for Windows), see:
-#    http://sourceforge.net/projects/qpc/files/Qtools
+CC    := $(QTOOLS)\MinGW\bin\gcc
+CPP   := $(QTOOLS)\MinGW\bin\g++
+LINK  := $(QTOOLS)\MinGW\bin\gcc
+
+
+##############################################################################
+# Typically, you should not need to change anything below this line
+
+# basic utilities (included in QTools for Windows), see:
+#    https://github.com/QuantumLeaps/qtools/releases
 
 MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build configurations...
+# build options for various configurations
 #
 
 ifeq (dbg, $(CONF)) # Debug configuration ....................................
