@@ -142,7 +142,7 @@ The QUTest Tcl scripting support for the QSPY utility are located in the
 `<qtools>\qspy\tcl\` directory.
 
 A web-link to the TCL/TK documentation is provided in the shortcut
-[tcl_tk_8.4](http://www.tcl.tk/man/tcl8.4/).
+[tcl_tk_8.6](https://www.tcl.tk/man/tcl8.6/).
 
 ### QSPYView Tcl/Tk Scripts
 The QSpyView Tcl/Tk scripts for the QSPY utility are located in the

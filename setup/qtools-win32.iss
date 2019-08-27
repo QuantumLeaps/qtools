@@ -108,24 +108,24 @@ Source: "..\bin\*.dll";          DestDir: "{app}\bin";
 Source: "..\bin\*.exe";          DestDir: "{app}\bin";
 
 ; MinGW
-Source: "\tools\MinGW\*";        DestDir: "{app}\MinGW"; Flags: recursesubdirs; Components: MinGW
+Source: "\tools\MinGW\*";        DestDir: "{app}\MinGW"; Flags: recursesubdirs;    Components: MinGW
 
 ; GNUARM
 Source: "\tools\gnu_arm-none-eabi\*";   DestDir: "{app}\gnu_arm-none-eabi"; Flags: recursesubdirs; Components: GNUARM
 
 ; Unity
-Source: "\tools\Unity\*";        DestDir: "{app}\Unity"; Flags: recursesubdirs; Components: Unity
+Source: "\tools\Unity\*";        DestDir: "{app}\Unity"; Flags: recursesubdirs;    Components: Unity
 
 ; Python
 Source: "\tools\Python37\*";     DestDir: "{app}\Python37"; Flags: recursesubdirs; Components: Python
-Source: "..\bin\python.bat";     DestDir: "{app}\bin"; Components: Python
+Source: "..\bin\python.bat";     DestDir: "{app}\bin";                             Components: Python
 
 ; Tcl/Tk
-Source: "\tools\tcl_8.6\*";      DestDir: "{app}\tcl_8.6"; Flags: recursesubdirs; Components: TclTk
-Source: "..\bin\tclsh.bat";      DestDir: "{app}\bin";      Components: TclTk
-Source: "..\bin\wish.bat";       DestDir: "{app}\bin";      Components: TclTk
-Source: "..\bin\*.tcl";          DestDir: "{app}\bin";      Components: TclTk
-Source: "..\qspy\tcl\*";         DestDir: "{app}\qspy\tcl"; Components: TclTk
+Source: "\tools\tcl_8.6\*";      DestDir: "{app}\tcl_8.6"; Flags: recursesubdirs;  Components: TclTk
+Source: "..\bin\tclsh.bat";      DestDir: "{app}\bin";                             Components: TclTk
+Source: "..\bin\wish.bat";       DestDir: "{app}\bin";                             Components: TclTk
+Source: "..\bin\*.tcl";          DestDir: "{app}\bin";                             Components: TclTk
+Source: "..\qspy\tcl\*";         DestDir: "{app}\qspy\tcl"; Flags: recursesubdirs; Components: TclTk
 
 ;.............................................................................
 [Code]
