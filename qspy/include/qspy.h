@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.6.0
-* Last updated on  2019-07-30
+* Last updated on  2019-09-12
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -37,8 +37,8 @@
 ******************************************************************************
 * @endcond
 */
-#ifndef qspy_h
-#define qspy_h
+#ifndef QSPY_H
+#define QSPY_H
 
 #define QSPY_VER "6.6.0"
 
@@ -181,29 +181,29 @@ extern QSPY_LastOutput QSPY_output;
 
 void QSPY_onPrintLn(void); /* callback to print the last line of output */
 
-#define SNPRINTF_LINE(format_, ...) do { \
-    int n = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET], \
-                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET), \
-                format_,  ##__VA_ARGS__); \
+#define SNPRINTF_LINE(format_, ...) do {                        \
+    int n = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],        \
+                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET),          \
+                format_,  ##__VA_ARGS__);                       \
     if ((0 < n) && (n < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET)) { \
-        QSPY_output.len = n; \
-    } \
-    else { \
-        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET; \
-    } \
+        QSPY_output.len = n;                                    \
+    }                                                           \
+    else {                                                      \
+        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;  \
+    }                                                           \
 } while (0)
 
-#define SNPRINTF_APPEND(format_, ...) do { \
+#define SNPRINTF_APPEND(format_, ...) do {                                 \
     int n = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len], \
-                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len), \
-                format_, ##__VA_ARGS__); \
-    if ((0 < n) \
-        && (n < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len)) { \
-        QSPY_output.len += n; \
-    } \
-    else { \
-        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET; \
-    } \
+                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len),   \
+                format_, ##__VA_ARGS__);                                   \
+    if ((0 < n)                                                            \
+        && (n < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len)) {  \
+        QSPY_output.len += n;                                              \
+    }                                                                      \
+    else {                                                                 \
+        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;             \
+    }                                                                      \
 } while (0)
 
 /* prints information message to the QSPY output (without sending it to FE) */
@@ -219,4 +219,4 @@ void QSPY_printError(void);
 }
 #endif
 
-#endif /* qspy_h */
+#endif /* QSPY_H */

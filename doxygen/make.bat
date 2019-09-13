@@ -2,13 +2,13 @@
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
 :: Last Updated for Version: 6.6.0
-:: Date of the Last Update:  2019-08-21
+:: Date of the Last Update:  2019-08-30
 ::
 ::                    Q u a n t u m  L e a P s
 ::                    ------------------------
 ::                    Modern Embedded Software
 ::
-:: Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -26,7 +26,7 @@
 :: GNU General Public License for more details.
 ::
 :: You should have received a copy of the GNU General Public License
-:: along with this program. If not, see <www.gnu.org/licenses/>.
+:: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
 :: <www.state-machine.com>
@@ -53,21 +53,23 @@ if "%1"=="-CHM" (
     xcopy img tmp\img\
     echo img\img.htm >> tmp\index.hhp
 
-    echo Generate CHM...
+    echo Generating CHM...
     "C:\tools\HTML Help Workshop\hhc.exe" tmp\index.hhp
     
+    echo.
     echo Cleanup...
     rmdir /S /Q  tmp
-    echo CHM file generated in ..\..\uploads\qtools\
+    echo CHM file generated in C:\qp\uploads\qtools\
 
 ) else (
+    echo.
     echo Cleanup...
-    rmdir /S /Q  ..\..\doxygen\qtools
+    rmdir /S /Q  C:\qp\uploads\qtools\qtools
     
     echo Adding custom images...
-    xcopy preview.js ..\..\doxygen\qtools\
-    xcopy img ..\..\doxygen\qtools\img\
-    copy images\favicon.ico ..\..\doxygen\qtools
+    xcopy preview.js C:\qp\uploads\qtools\qtools\
+    xcopy img C:\qp\uploads\qtools\qtools\img\
+    copy images\favicon.ico C:\qp\uploads\qtools\qtools
 
     echo Generating HTML...
     %DOXHOME%\doxygen.exe Doxyfile

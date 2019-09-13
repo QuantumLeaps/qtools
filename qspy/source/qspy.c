@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.6.0
-* Last updated on  2019-07-30
+* Last updated on  2019-09-12
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -820,8 +820,8 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             }
             case QS_STR_T: {
                 s = QSpyRecord_getStr(me);
-                SNPRINTF_APPEND(s);
-                FPRINF_MATFILE(s);
+                SNPRINTF_APPEND("%s", s);
+                FPRINF_MATFILE("%s", s);
                 break;
             }
             case QS_MEM_T: {
