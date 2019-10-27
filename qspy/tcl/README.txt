@@ -1,12 +1,11 @@
 About this Directory
 ====================
-This directory contains the Tcl/Tk scripts that implement the "qutest"
-unit testing and "qspyview" GUI front-ends for the QSPY software tracing
-"back-end" utility.
+This directory contains the Tcl/Tk scripts that implement the "qspyview"
+GUI front-end for the QSPY software tracing "back-end" utility.
 
 General Requirements
 ====================
-The QSPY "front-end" scripts require Tcl/Tk with the UDP extension,
+The "front-end" Tcl scripts require Tcl/Tk with the UDP extension,
 which is available in the Qtools collection for Windows.
 
 To launch any of the scripts in this directory, you need to first run
@@ -16,38 +15,8 @@ Once QSPY is running, you can "attach" to the UDP socket and start
 communicating with the QSPY back-end or to the Target (through QSPY).
 
 
-Using qutest.tcl
-================
-The "qutest.tcl" script is an example of a "headless" front-end that
-runs in console without a GUI. The purpose of this script is to support
-unit testing of embedded software on embedded targets and on the host
-computer (Windows, Linux, MacOS).
-
-The usage of the "qutest.tcl" script is as follows:
-
-tclsh qutest.tcl [test_script] [host_exe] [host_ip]
-
-where:
-[test_scripts] - optional specification of the Python test scripts to run.
-                 If not specified, the scripts are chosen by the general
-                 rules of the PyTest framework.
-
-[target_exe]   - optional specification of the target executable to
-                 launch for testing embedded code on the host computer.
-                 If not specified, an embedded target is assumed.
-
-[host_ip]      - optional IP-address:port for the host running the QSpy
-                 utility. If not specified, the default is localhost:7701.
-
-Examples:
-tclsh C:\qp\qtools\qspy\tcl\qutest.tcl
-tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl
-tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl mingw\dpp.exe
-tclsh C:\qp\qtools\qspy\tcl\qutest.tcl *.tcl mingw\dpp.exe 192.168.1.100:7705
-
-
 Using qspyview.tcl
-------------------
+==================
 The "qspyview.tcl" script is an example of a GUI front-end. The purpose
 of this script is to provide a GUI for your embedded application runnin
 on the host computer (Windows, Linux, MacOS).
@@ -98,8 +67,8 @@ online at:
 
 https://www.state-machine.com/qtools/qpspy.html
 
-More information about the QUTest unit testing harness is available
-online at:
+More information about the QSpyView visualization and monitoring
+is available online at:
 
-https://www.state-machine.com/qtools/qutest.html
+https://www.state-machine.com/qtools/qspyview.html
 

@@ -1,11 +1,5 @@
-![QTools Collection](https://www.state-machine.com/img/qtools_banner.jpg)
-
-# What's New?
-View QTools Revision History at: 
-https://www.state-machine.com/qtools/history.html
-
----------------------------------------------------------------------------
-# About QTools
+About QTools
+============
 QTools is a collection of various open source tools for working with the
 [QP Real-Time Embedded Frameworks (RTEFs)][QP] on desktop platforms, such
 as Windows, Linux, and Mac OS X.
@@ -66,7 +60,7 @@ Additionally, QTools for Windows contains the following open-source,
 
 16. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
 
-17. ResEdit utility (32-bit version 1.6.6-x64)
+17. ResEdit utility (64-bit and 32-bit versions 1.6.6-x64)
 
 18. LMFlash for Windows (32-bit build 1613)
 
@@ -79,8 +73,11 @@ files various compilers (in sub-directory lint):
 20. co-iar-arm.* (PC-Lint option files for IAR-ARM)
 
 
----------------------------------------------------------------------------
-# Installation
+Installation
+============
+
+Windows
+-------
 On Windows, QTools is installed with the installer, digitally signed
 by Quantum Leaps. The installer offers standard and custom installation
 options.
@@ -88,6 +85,8 @@ options.
 The Windows installer also defines the QTOOLS environment variable
 and adds <qtools>\bin and <qtools>\python directories to the PATH.
 
+Linux and MacOS
+---------------
 On Linux/MacOS, installation of QTools consists of unzipping the
 qtools_<ver>.zip archive into a directory of your choice.
 
@@ -103,8 +102,8 @@ On Linux you must additionally make sure that the executables, such as
 qspy, qclean, etc. have the 'executable' property set.
 
 
----------------------------------------------------------------------------
-# Licensing
+Licensing
+=========
 Most tools included in this collection are distributed under the terms
 of the GNU General Public License (GPL) as published by the Free
 Software Foundation, either version 2 of the License, or (at your
