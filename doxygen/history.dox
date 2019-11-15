@@ -2,7 +2,9 @@
 @page history Revision History
 
 @section qtools_6_6_0 Version 6.6.0, 2019-08-30
-This release affects mostly the QTools distribution for Windows. Specifically, the location of the MinGW compiler and Tcl/Tk have been moved to separate directories (as opposed to being co-located in the `qtools/bin` directory). This facilitates easier upgrades of these 3-rd party tools, and indeed, they have been upgraded in this QTools/Windows release as follows:
+The main purpose of this release is the change in distribution of the QTools collection, which is now bundled together with the QP frameworks (QP/C, QP/C++ and QP-nano) as well as QM into "QP-bundle". This "QP-bundle" provides a single, streamlined and simplified download and installation of all QP frameworks and all the accompanying tools.
+
+Also this release brings significant changes to QTools for Windows. Specifically, the location of the MinGW compiler and Tcl/Tk have been moved to separate directories (as opposed to being co-located in the `qtools/bin` directory). This facilitates easier upgrades of these 3-rd party tools, and indeed, they have been upgraded in this QTools/Windows release as follows:
 
 - MinGW-32-bit **8.2.0**
 - Tcl/Tk **8.6**

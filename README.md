@@ -60,9 +60,9 @@ Additionally, QTools for Windows contains the following open-source,
 
 13. GNU C/C++ toolset for Windows (MinGW-32bit version 8.2.0)
 
-14. GNU C/C++ toolset for ARM-EABI (GCC version 8.2.1)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
 
-15. Python for Windows (32-bit version 3.7.3 for x86)
+15. Python for Windows (32-bit version 3.8.0 for x86)
 
 16. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
 

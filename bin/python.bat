@@ -1,1 +1,1 @@
-%~dp0..\Python37\python.exe %1 %2 %3 %4 %5 %6 %7 %8
+%~dp0..\Python38\python.exe %1 %2 %3 %4 %5 %6 %7 %8

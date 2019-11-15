@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.6.0
-* Last updated on  2019-09-12
+* Last updated on  2019-11-15
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -1976,6 +1976,9 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 CONFIG_UPDATE(poolCtrSize, (uint8_t)((buf[2] >> 4) & 0xFU),d);
                 CONFIG_UPDATE(poolBlkSize, (uint8_t)(buf[2] & 0xFU), d);
                 CONFIG_UPDATE(tevtCtrSize, (uint8_t)((buf[1] >> 4) & 0xFU),d);
+
+                /* update the user record offset */
+                l_userRec = ((l_config.version < 660U) ? OLD_QS_USER : QS_USER);
 
                 for (e = 0U; e < sizeof(l_config.tstamp); ++e) {
                     CONFIG_UPDATE(tstamp[e], (uint8_t)buf[7U + e], d);
