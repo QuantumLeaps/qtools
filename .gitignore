@@ -24,6 +24,7 @@
 *.avrsuo
 version-*
 
+html/
 bin/*.exe
 bin/*.dll
 bin/*.conf

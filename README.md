@@ -4,6 +4,17 @@
 View QTools Revision History at: 
 https://www.state-machine.com/qtools/history.html
 
+
+---------------------------------------------------------------------------
+# Documentation
+The offline HTML documentation for **this** particular version of QTools
+is located in the folder html/. To view the offline documentation, open
+the file html/index.html in your web browser.
+
+The online HTML documention for the **latest** version of QTools is located
+at: https://www.state-machine.com/qtools/
+
+
 ---------------------------------------------------------------------------
 # About QTools
 QTools is a collection of various open source tools for working with the
@@ -22,61 +33,52 @@ starting with 'q' are contributed by Quantum Leaps)
               unit testing of embedded code on host computers
               ("dual targeting").
 
-3. qspypy   - Python extension of the QSPY host application for **uint testing**
-              specifically designed for embedded systems, but also supports
-              unit testing of embedded code on host computers
-              ("dual targeting").
-
-4. qspyview - Tcl/Tk extension of the QSPY host application for
+3. qspyview - Tcl/Tk extension of the QSPY host application for
               visualization and monitoring of the QS real-time tracing
               data from embedded targets at real-time. QSpyView enables
               developers to rapidly build both GUI-based and "headless"
               scripts for their specific applications.
 
-5. qwin     - QWIN GUI toolkit for prototyping embedded systems on
+4. qwin     - QWIN GUI toolkit for prototyping embedded systems on
               Windows in the C programming language. QWIN allows you
               to build realistic embedded front panels consisting of
               LCD displays (both graphical and segmented), buttons,
               and LEDs. QWIN is based on the Win32 API.
 
-6. qclean   - for cleanup of source code files
+5. qclean   - for cleanup of source code files
 
-7. qfsgen   - for generating ROM-based file systems to be used
+6. qfsgen   - for generating ROM-based file systems to be used
               in embedded web pages served by the HTTP server
 
-8. qcalc    - programmer's calculator with C-syntax expressions
+7. qcalc    - programmer's calculator with C-syntax expressions
 
-8. qudp     - for testing UDP connections to the embedded targets
-10. qudps   - UDP server for testing UDP connections to the embedded
-              targets.
-
-11. Unity   - traditional unit testing harness (framework) for embedded C
+8. Unity    - traditional unit testing harness (framework) for embedded C
               (version 2.4.3)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-12. GNU-make for Windows (32-bit version 4.2.1)
+10. GNU-make for Windows (32-bit version 4.2.1)
 
-13. GNU C/C++ toolset for Windows (MinGW-32bit version 8.2.0)
+11. GNU C/C++ toolset for Windows (MinGW-32bit version 8.2.0)
 
-14. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
+12. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
 
-15. Python for Windows (32-bit version 3.8.0 for x86)
+13. Python for Windows (32-bit version 3.8.0 for x86)
 
-16. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
+14. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
 
-17. ResEdit utility (32-bit version 1.6.6-x64)
+15. ResEdit utility (32-bit version 1.6.6-x64)
 
-18. LMFlash for Windows (32-bit build 1613)
+16. LMFlash for Windows (32-bit build 1613)
 
 
 Additionally, QTools for Windows contains the following PC-Lint option
 files various compilers (in sub-directory lint):
 
-19. co-gnu-arm.* (PC-Lint option files for GNU-ARM)
+17. co-gnu-arm.* (PC-Lint version-9 option files for GNU-ARM)
 
-20. co-iar-arm.* (PC-Lint option files for IAR-ARM)
+18. co-iar-arm.* (PC-Lint version-9 option files for IAR-ARM)
 
 
 ---------------------------------------------------------------------------

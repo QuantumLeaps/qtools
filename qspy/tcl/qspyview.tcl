@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
 # Last updated for version 6.6.0
-# Last updated on  2019-07-30
+# Last updated on  2019-11-30
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -345,7 +345,7 @@ proc onGlbFilters {} {
             $pane.f$i select
         }
     }
-    for {set i 70} {$i < 125} {incr i} {
+    for {set i 100} {$i < 125} {incr i} {
         checkbutton $pane.f$i -variable filter($i) \
             -text "QS_USER($i)"
         if {[string index $theGlbFilter $i]} {
@@ -385,27 +385,17 @@ proc onGlbFilters {} {
     label $pane.u3  -text "U3 records..."
     label $pane.u4  -text "U4 records..."
     grid $pane.ua -columnspan 5
-    grid $pane.u0  $pane.u1  $pane.u2  $pane.u3   $pane.u4
-    grid $pane.f70 $pane.f80 $pane.f90 $pane.f100 $pane.f110
-    grid $pane.f71 $pane.f81 $pane.f91 $pane.f101 $pane.f111
-    grid $pane.f72 $pane.f82 $pane.f92 $pane.f102 $pane.f112
-    grid $pane.f73 $pane.f83 $pane.f93 $pane.f103 $pane.f113
-    grid $pane.f74 $pane.f84 $pane.f94 $pane.f104 $pane.f114
-    grid $pane.f75 $pane.f85 $pane.f95 $pane.f105 $pane.f115
-    grid $pane.f76 $pane.f86 $pane.f96 $pane.f106 $pane.f116
-    grid $pane.f77 $pane.f87 $pane.f97 $pane.f107 $pane.f117
-    grid $pane.f78 $pane.f88 $pane.f98 $pane.f108 $pane.f118
-    grid $pane.f79 $pane.f89 $pane.f99 $pane.f109 $pane.f119
-    grid x         x         x         x          $pane.f120
-    grid x         x         x         x          $pane.f121
-    grid x         x         x         x          $pane.f122
-    grid x         x         x         x          $pane.f123
-    grid x         x         x         x          $pane.f124
+    grid $pane.u0   $pane.u1  $pane.u2  $pane.u3   $pane.u4
+    grid $pane.f100 $pane.f105 $pane.f110 $pane.f115 $pane.f120
+    grid $pane.f101 $pane.f106 $pane.f111 $pane.f116 $pane.f121
+    grid $pane.f102 $pane.f107 $pane.f112 $pane.f117 $pane.f122
+    grid $pane.f103 $pane.f108 $pane.f113 $pane.f118 $pane.f123
+    grid $pane.f104 $pane.f109 $pane.f114 $pane.f119 $pane.f124
 
     for {set i 1} {$i < 60} {incr i} {
         grid configure $pane.f$i -sticky w
     }
-    for {set i 70} {$i < 125} {incr i} {
+    for {set i 100} {$i < 125} {incr i} {
         grid configure $pane.f$i -sticky w
     }
     grid configure $pane.sm -sticky w

@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual C++ 2017
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qwin_demo", "qwin_demo.vcxproj", "{79027B25-0949-4F66-9765-4EFBCBBEFB94}"
 EndProject
 Global
