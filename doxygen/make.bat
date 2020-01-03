@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
-:: Last Updated for Version: 6.6.0
-:: Date of the Last Update:  2019-12-12
+:: Last Updated for Version: 6.7.0
+:: Date of the Last Update:  2019-12-31
 ::
 ::                    Q u a n t u m  L e a P s
 ::                    ------------------------
@@ -38,7 +38,7 @@
 @echo make
 @echo make -CHM
 
-@set VERSION=6.6.0
+@set VERSION=6.7.0
 
 @set DOXHOME="C:\tools\doxygen\bin"
 
@@ -72,6 +72,7 @@ if "%1"=="-CHM" (
 
     @echo Generating HTML...
     %DOXHOME%\doxygen.exe Doxyfile
+    @qclean C:\qp_lab\qtools\html
 )
 
 @endlocal

@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, POSIX (Linux/Mac-OS), GNU compiler
-# Last updated for version 6.4.0
-# Last updated on  2019-01-09
+# Last updated for version 6.7.0
+# Last updated on  2019-12-31
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -117,7 +117,7 @@ CPPFLAGS = -c -ffunction-sections -fdata-sections \
 
 endif  # .....................................................................
 
-LINKFLAGS :=
+LINKFLAGS := -no-pie
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -142,6 +142,7 @@ all: $(TARGET_EXE)
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
+	cp $@ ../../bin
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
@@ -154,6 +155,8 @@ $(BIN_DIR)/%.o : %.cpp
 
 $(BIN_DIR)/%.o : %.c
 	$(CC) $(CFLAGS) $< -o $@
+
+.PHONY : clean show
 
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)

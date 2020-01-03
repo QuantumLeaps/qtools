@@ -73,16 +73,25 @@ Additionally, QTools for Windows contains the following open-source,
 16. LMFlash for Windows (32-bit build 1613)
 
 
-Additionally, QTools for Windows contains the following PC-Lint option
-files various compilers (in sub-directory lint):
-
-17. co-gnu-arm.* (PC-Lint version-9 option files for GNU-ARM)
-
-18. co-iar-arm.* (PC-Lint version-9 option files for IAR-ARM)
-
-
 ---------------------------------------------------------------------------
-# Installation
+# Downloading and Installation
+The most recommended way of obtaining QTools is by downloading the
+[QP-bundle](https://www.state-machine.com/#Downloads), which includes QTools
+and also all [QP frameworks](https://www.state-machine.com/products/) and
+the [QM modeling tool](https://www.state-machine.com/qm/). The main advantage
+of obtaining QTools bundled together like that is that you get all components,
+tools and examples ready to go.
+
+> NOTE: [QP-bundle](https://www.state-machine.com/#Downloads) is the most
+recommended way of downloading and installing QTools. However,
+if you are allergic to installers and GUIs or don't have administrator
+privileges you can also **download and install QM separately**
+as described below.
+
+Alternatively, you can download QTools **separately** as described below:
+
+--------------------
+## QTools on Windows
 On Windows, QTools is installed with the installer, digitally signed
 by Quantum Leaps. The installer offers standard and custom installation
 options.
@@ -90,19 +99,24 @@ options.
 The Windows installer also defines the QTOOLS environment variable
 and adds <qtools>\bin and <qtools>\python directories to the PATH.
 
+--------------------
+## QTools on Linux/MacOS
 On Linux/MacOS, installation of QTools consists of unzipping the
 qtools_<ver>.zip archive into a directory of your choice.
 
-> NOTE: To use the QTools, you should add the <qtools>\bin directory to
-the PATH, where <qtools> denotes the directory where you have unzipped
-the qtools_<ver>.zip archive.
+> NOTE: To use the QTools, you first need to **build** the tools on
+your machine.
 
-> NOTE: To use the QTools source code (such as parts of the QSPY) in
-builds of the QP library, you need to define the environment variable
-QTOOLS to point to the installation directory of QTools.
+For example, to build the QSPY host application, you need to go to the
+directory qtools/qspy/posix and type make to build the executable.
+The provided Makefile will automatically copy the qspy executable to
+the qtools/bin directory.
 
-On Linux you must additionally make sure that the executables, such as
-qspy, qclean, etc. have the 'executable' property set.
+Simiarly, you need to build the QCLEAN and QFSGEN utilities.
+
+> NOTE: To use the [QUTest unit testing][QUTest] you need to
+define the environment variable `QTOOLS` to point to the
+installation directory of QTools.
 
 
 ---------------------------------------------------------------------------
@@ -132,8 +146,8 @@ is distributed according to Section 2a "Demonstration License".
 
 ---------------------------------------------------------------------------
 # Documentation
-The links to the documentation of the tools are provided in the <qtools>\doc\
-directory.
+The links to the documentation of the tools are provided in the
+`<qtools>\doc\` directory.
 
 ### QUTest Python Scripting Support
 The QUTest Python scripting support for the QSPY utility are located in the
@@ -155,15 +169,8 @@ The Matlab/GNU Octave scripts for the QSPY utility are located in the
 `<qtools>\qspy\matlab\` directory.
 
 ### Unity Unit Testing Framework
-The documentation of the Unity Testing Framework for Embedded C is located in
-the `<qtools>\unity\doc\` directory.
-
-
----------------------------------------------------------------------------
-# QSPY Sequence Diagrams Examples
-The sequence diagram input files for the MSCgen utility and the
-generated sequence diagrams (in the SVG format) are located in the
-<qtools>\qspy\mscgen\ directory.
+The documentation of the Unity Testing Framework for Embedded C is
+located in the `<qtools>\unity\doc\` directory.
 
 
 ---------------------------------------------------------------------------
@@ -216,14 +223,11 @@ Have been taken from the UnixUtils project at SourceForge.net:
 Has been taken from the GitHub at:
 - https://github.com/ThrowTheSwitch/Unity
 
-### The Mscgen utility has been taken from the Mscgen project at:
-- http://www.mcternan.me.uk/mscgen/
-
 
 ---------------------------------------------------------------------------
 # Contact information:
 - https://www.state-machine.com
-- mailto:info@state-machine.com
+- info@state-machine.com
 
    [QP]: <https://www.state-machine.com/products/#QP>
-
+   [QUTest]: <https://www.state-machine.com/qtools/qutest.html>

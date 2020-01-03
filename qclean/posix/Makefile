@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QCLEAN console, POSIX(Linux/Mac-OS), GNU compiler
-# Last updated for version 6.4.0
-# Last updated on  2019-02-15
+# Last updated for version 6.7.0
+# Last updated on  2019-12-31
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
 # building configurations: Debug (default), Release, and Spy
@@ -97,24 +97,24 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 BIN_DIR := dbg
 
 CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O -Wall -W $(INCLUDES) $(DEFINES)
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
 CFLAGS = -c -ffunction-sections -fdata-sections \
-	-O3 -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \
-	-O3 -Wall -W $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 
-LINKFLAGS :=
+#LINKFLAGS := -no-pie
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -139,6 +139,7 @@ all: $(TARGET_EXE)
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
+	cp $@ ../../bin
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
@@ -163,12 +164,12 @@ endif
 
 .PHONY : clean show
 
-clean :
+clean:
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \
 	$(TARGET_EXE)
 
-show :
+show:
 	@echo PROJECT      = $(PROJECT)
 	@echo TARGET_EXE   = $(TARGET_EXE)
 	@echo VPATH        = $(VPATH)

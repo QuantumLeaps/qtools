@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 6.6.0
-# Last updated on  2019-07-29
+# Last updated for version 6.7.0
+# Last updated on  2019-12-30
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -90,9 +90,9 @@ LIBS      := -lws2_32
 # MinGW toolset is included in the Qtools collection for Windows, see:
 #    https://github.com/QuantumLeaps/qtools/releases
 
-CC    := $(QTOOLS)\MinGW\bin\gcc
-CPP   := $(QTOOLS)\MinGW\bin\g++
-LINK  := $(QTOOLS)\MinGW\bin\gcc
+CC    := gcc
+CPP   := g++
+LINK  := gcc
 
 
 ##############################################################################

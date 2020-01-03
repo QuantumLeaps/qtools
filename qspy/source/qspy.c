@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.0
-* Last updated on  2019-11-15
+* Last updated for version 6.7.0
+* Last updated on  2019-12-31
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond
@@ -52,6 +52,7 @@ typedef char     char_t;
 typedef float    float32_t;
 typedef double   float64_t;
 typedef int      enum_t;
+typedef int      int_t;
 typedef unsigned uint_t;
 typedef void     QEvt;
 
@@ -2886,14 +2887,14 @@ static bool Dictionary_read(Dictionary * const me, FILE *stream) {
         }
         if (me->keySize <= 4) {
             unsigned k;
-            if (SSCANF_S(dictLine, "0x%08X %s\n", &k, name) != 2) {
+            if (SSCANF_S(dictLine, "0x%08X %s\n", &k, name, sizeof(name)) != 2) {
                 goto error;
             }
             key = k;
         }
         else {
             if (SSCANF_S(dictLine, "0x%016"PRIX64" %s\n",
-                         &key, name) != 2)
+                         &key, name, sizeof(name)) != 2)
             {
                 goto error;
             }
@@ -3107,7 +3108,7 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
         if (me->ptrSize <= 4) {
             unsigned o;
             if (SSCANF_S(dictLine, "%08d 0x%08X %s\n",
-                         &sig, &o, name) != 3)
+                         &sig, &o, name, sizeof(name)) != 3)
             {
                 goto error;
             }
@@ -3115,7 +3116,7 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
         }
         else {
             if (SSCANF_S(dictLine, "%08X %016"PRIX64" %s\n",
-                         &sig, &obj, name) != 3)
+                         &sig, &obj, name, sizeof(name)) != 3)
             {
                 goto error;
             }

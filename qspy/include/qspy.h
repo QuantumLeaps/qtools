@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.0
-* Last updated on  2019-09-12
+* Last updated for version 6.7.0
+* Last updated on  2019-01-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -29,10 +29,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond
@@ -40,7 +40,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.6.0"
+#define QSPY_VER "6.7.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,25 +181,25 @@ extern QSPY_LastOutput QSPY_output;
 
 void QSPY_onPrintLn(void); /* callback to print the last line of output */
 
-#define SNPRINTF_LINE(format_, ...) do {                        \
-    int n = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],        \
-                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET),          \
-                format_,  ##__VA_ARGS__);                       \
-    if ((0 < n) && (n < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET)) { \
-        QSPY_output.len = n;                                    \
-    }                                                           \
-    else {                                                      \
-        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;  \
-    }                                                           \
+#define SNPRINTF_LINE(format_, ...) do {                         \
+    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],        \
+                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET),           \
+                format_,  ##__VA_ARGS__);                        \
+    if ((0 < n_) && (n_ < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET)) {\
+        QSPY_output.len = n_;                                    \
+    }                                                            \
+    else {                                                       \
+        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;   \
+    }                                                            \
 } while (0)
 
 #define SNPRINTF_APPEND(format_, ...) do {                                 \
-    int n = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len], \
+    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
                 (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len),   \
                 format_, ##__VA_ARGS__);                                   \
-    if ((0 < n)                                                            \
-        && (n < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len)) {  \
-        QSPY_output.len += n;                                              \
+    if ((0 < n_)                                                           \
+        && (n_ < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len)) { \
+        QSPY_output.len += n_;                                             \
     }                                                                      \
     else {                                                                 \
         QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;             \

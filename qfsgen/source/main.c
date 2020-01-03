@@ -4,14 +4,14 @@
 * @ingroup qfsgen
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.0
-* Last updated on  2019-07-30
+* Last updated for version 6.7.0
+* Last updated on  2020-12-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -29,10 +29,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond
@@ -222,7 +222,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     len = 0;
     i = 0;
     while ((nBytes = fread(buf, 1, sizeof(buf), fin)) != 0) {
-        char const *s = buf;
+        char const *pc = buf;
         int n = nBytes;
         while (n-- != 0) {
             if (i == 0) { /* new line? */
@@ -242,8 +242,8 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
                 i = 0;
                 fprintf(l_file, ", ");
             }
-            fprintf(l_file, "0x%02X", ((unsigned)*s & 0xFF));
-            ++s;
+            fprintf(l_file, "0x%02X", ((unsigned)*pc & 0xFF));
+            ++pc;
             len += nBytes;
         }
     }
@@ -265,7 +265,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
 int main(int argc, char *argv[]) {
     char const *fileName = "fsdata.h";
 
-    printf("QFSGen " VERSION " Copyright (c) 2005-2017 Quantum Leaps\n"
+    printf("QFSGen " VERSION " Copyright (c) 2005-2020 Quantum Leaps\n"
            "Documentation: https://state-machine.com/qtools/qfsgen.html\n");
     printf("Usage: qfsgen fs-dir [output-file] [-h]\n"
            "       fs-dir      file-system directory (must be provided)\n"

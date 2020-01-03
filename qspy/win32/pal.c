@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.0
-* Last updated on  2019-07-30
+* Last updated for version 6.7.0
+* Last updated on  2019-01-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -29,10 +29,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond
@@ -682,11 +682,11 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
 
 /*..........................................................................*/
 static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes) {
-    int ch = 0;
+    wint_t ch = 0;
     while (_kbhit()) {
-        ch = _getch();
+        ch = _getwch();
         if ((ch == 0x00) || (ch == 0xE0)) {
-            ch = _getch();
+            ch = _getwch();
         }
     }
     if (ch != 0) {

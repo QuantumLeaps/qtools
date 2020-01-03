@@ -1,6 +1,13 @@
 /**
 @page history Revision History
 
+@section qtools_6_7_0 Version 6.7.0, 2019-12-30
+This QTools release changes the build process for the QSPY, QCLEAN, and QFSGEN utilities on Windows. Specifically, these programs are now built using Visual Studio 2017 instead of the MinGW compiler for Windows. This change was made to avoid the malware warnings that were issued by some anti-virus sofware against executables built with MinGW.
+
+Also, this release adapts the QSPY, QCLEAN, and QFSGEN host applications to cleanly build with Visual Studio 2017 and also to match QP version 6.7.0.
+
+
+------------------------------------------------------
 @section qtools_6_6_0 Version 6.6.0, 2019-08-30
 The main purpose of this release is the change in distribution of the QTools collection, which is now bundled together with the QP frameworks (QP/C, QP/C++ and QP-nano) as well as QM into "QP-bundle". This "QP-bundle" provides a single, streamlined and simplified download and installation of all QP frameworks and all the accompanying tools.
 
