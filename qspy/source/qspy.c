@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-12-31
+* Last updated on  2019-01-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -2867,17 +2867,16 @@ static bool Dictionary_read(Dictionary * const me, FILE *stream) {
     if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
         goto error;
     }
-    if (SSCANF_S(dictLine, "%d\n", &me->keySize) != 1) {
-        goto error;
-    }
-    if (me->keySize > 8) {
+    me->keySize = (int)strtol(dictLine, NULL, 10);
+    if ((me->keySize == 0) || (me->keySize > 8)) {
         goto error;
     }
 
     Dictionary_reset(me);
     while (me->entries < me->capacity) {
-        uint64_t key;
-        char name[DNAME_SIZE];
+        uint64_t key = 0;
+        char *name = NULL;
+        char *str_end = NULL;
 
         if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
             break;
@@ -2886,19 +2885,20 @@ static bool Dictionary_read(Dictionary * const me, FILE *stream) {
             break;
         }
         if (me->keySize <= 4) {
-            unsigned k;
-            if (SSCANF_S(dictLine, "0x%08X %s\n", &k, name, sizeof(name)) != 2) {
-                goto error;
-            }
-            key = k;
+            dictLine[10] = '\0';
+            name = &dictLine[11];
+            key = (uint64_t)strtoul(dictLine, &str_end, 16);
         }
         else {
-            if (SSCANF_S(dictLine, "0x%016"PRIX64" %s\n",
-                         &key, name, sizeof(name)) != 2)
-            {
-                goto error;
-            }
+            dictLine[18] = '\0';
+            key = strtoull(dictLine, &str_end, 16);
+            name = &dictLine[19];
         }
+        if (str_end == dictLine) {
+            goto error;
+        }
+        /* remove the '\n' from the end of the name string */
+        name[strlen(name) - 1] = '\0';
         Dictionary_put(me, key, name);
     }
     return true;
@@ -3086,18 +3086,17 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
     if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
         goto error;
     }
-    if (SSCANF_S(dictLine, "%d\n", &me->ptrSize) != 1) {
-        goto error;
-    }
-    if (me->ptrSize > 8) {
+    me->ptrSize = (int)strtol(dictLine, NULL, 10);
+    if ((me->ptrSize == 0) || (me->ptrSize > 8)) {
         goto error;
     }
 
     SigDictionary_reset(me);
     while (me->entries < me->capacity) {
-        uint32_t sig;
-        uint64_t obj;
-        char name[DNAME_SIZE];
+        uint32_t sig = 0;
+        uint64_t obj = 0;
+        char *name = NULL;
+        char *str_end = NULL;
 
         if (fgets(dictLine, sizeof(dictLine), stream) == (char *)0) {
             break;
@@ -3105,22 +3104,29 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
         if (dictLine[0] != '0') {
             break;
         }
+
+        /* parse the sig */
+        dictLine[8] = '\0';
+        sig = strtoul(dictLine, NULL, 10);
+        if (sig == 0) {
+            goto error;
+        }
+        /* parse the obj and name */
         if (me->ptrSize <= 4) {
-            unsigned o;
-            if (SSCANF_S(dictLine, "%08d 0x%08X %s\n",
-                         &sig, &o, name, sizeof(name)) != 3)
-            {
-                goto error;
-            }
-            obj = o;
+            dictLine[19] = '\0';
+            name = &dictLine[20];
+            obj = (uint64_t)strtoul(&dictLine[9], &str_end, 16);
         }
         else {
-            if (SSCANF_S(dictLine, "%08X %016"PRIX64" %s\n",
-                         &sig, &obj, name, sizeof(name)) != 3)
-            {
-                goto error;
-            }
+            dictLine[27] = '\0';
+            name = &dictLine[28];
+            obj = strtoull(&dictLine[9], &str_end, 16);
         }
+        if (str_end == &dictLine[9]) {
+            goto error;
+        }
+        /* remove the '\n' from the end of the name string */
+        name[strlen(name) - 1] = '\0';
         SigDictionary_put(me, sig, obj, name);
     }
     return true;

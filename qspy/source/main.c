@@ -386,7 +386,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
                         "The -b option is incompatible with -t/-f\n");
                     return QSPY_ERROR;
                 }
-                if (SSCANF_S(optarg, "%d", &l_baudRate) != 1) {
+                l_baudRate = (int)strtol(optarg, NULL, 10);
+                if (l_baudRate == 0) {
                     fprintf(stderr, "incorrect baud rate: %s\n", optarg);
                     return QSPY_ERROR;
                 }

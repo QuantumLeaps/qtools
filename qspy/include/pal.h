@@ -5,13 +5,13 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-12-31
+* Last updated on  2020-01-04
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -98,7 +98,7 @@ extern PAL_VtblType PAL_vtbl;
 #endif
 
 /* portable "safe" facilities from <stdio.h> and <string.h> ................*/
-#ifdef _MSC_VER /* Microsoft C/C++ compiler? */
+#ifdef _WIN32 /* Windows OS? */
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
     _snprintf_s(buf_, len_, _TRUNCATE, format_, ##__VA_ARGS__)
@@ -114,10 +114,7 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
 #define LOCALTIME_S(tm_, time_) \
     localtime_s(tm_, time_)
 
-#define SSCANF_S(buf_, format_, ...) \
-    sscanf_s(buf_, format_, ##__VA_ARGS__)
-
-#else /* other C/C++ compilers (GNU, etc.) */
+#else /* other OS (Linux, MacOS, etc.) */
 
 #define SNPRINTF_S(buf_, len_, format_, ...) \
     snprintf(buf_, len_, format_, ##__VA_ARGS__)
@@ -130,9 +127,6 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
 #define LOCALTIME_S(tm_, time_) \
     memcpy(tm_, localtime(time_), sizeof(struct tm))
 
-#define SSCANF_S(buf_, format_, ...) \
-    sscanf(buf_, format_, ##__VA_ARGS__)
-
-#endif /* _MSC_VER */
+#endif /* _WIN32 */
 
 #endif /* pal_h */

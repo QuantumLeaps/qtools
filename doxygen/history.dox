@@ -4,7 +4,7 @@
 @section qtools_6_7_0 Version 6.7.0, 2019-12-30
 This QTools release changes the build process for the QSPY, QCLEAN, and QFSGEN utilities on Windows. Specifically, these programs are now built using Visual Studio 2017 instead of the MinGW compiler for Windows. This change was made to avoid the malware warnings that were issued by some anti-virus sofware against executables built with MinGW.
 
-Also, this release adapts the QSPY, QCLEAN, and QFSGEN host applications to cleanly build with Visual Studio 2017 and also to match QP version 6.7.0.
+This release also replaces the MinGW toolchain (8.2.0) with the latest mingw32 (9.2.0) installed with MSYS2.
 
 
 ------------------------------------------------------

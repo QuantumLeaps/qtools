@@ -343,7 +343,7 @@ static void tcp_cleanup(void) {
 /*..........................................................................*/
 static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     QSPYEvtType evt;
-    static struct timeval const timeout = {(long)0, (long)(PAL_TOUT_MS*1000)};
+    struct timeval timeout = {(long)0, (long)(PAL_TOUT_MS*1000)};
     fd_set readSet;
     int status;
     int nrec;

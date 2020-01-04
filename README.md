@@ -92,17 +92,26 @@ Alternatively, you can download QTools **separately** as described below:
 
 --------------------
 ## QTools on Windows
-On Windows, QTools is installed with the installer, digitally signed
-by Quantum Leaps. The installer offers standard and custom installation
-options.
+On Windows, installation of QTools consists of unzipping the
+`qtools-windows_<ver>.zip` archive into a directory of your choice,
+although the recommended default is `C:\qp`.
+ 
+After unzipping the archive, you need to add the following directories
+to the PATH:
 
-The Windows installer also defines the QTOOLS environment variable
-and adds <qtools>\bin and <qtools>\python directories to the PATH.
+- <qp>\qtools\bin
+- <qp>\qtools\mingw32\bin
+
+Also, to use the [QUTest unit testing][QUTest] you need to
+define the environment variable `QTOOLS` to point to the
+installation directory of QTools.
+
 
 --------------------
 ## QTools on Linux/MacOS
 On Linux/MacOS, installation of QTools consists of unzipping the
-qtools_<ver>.zip archive into a directory of your choice.
+`qtools-posix_<ver>.zip` archive into a directory of your choice,
+although the recommended default is `~/qp`.
 
 > NOTE: To use the QTools, you first need to **build** the tools on
 your machine.
