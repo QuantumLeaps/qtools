@@ -2,9 +2,11 @@
 @page history Revision History
 
 @section qtools_6_7_0 Version 6.7.0, 2019-12-30
-This QTools release changes the build process for the QSPY, QCLEAN, and QFSGEN utilities on Windows. Specifically, these programs are now built using Visual Studio 2017 instead of the MinGW compiler for Windows. This change was made to avoid the malware warnings that were issued by some anti-virus sofware against executables built with MinGW.
+This QTools release changes the build process for the QSPY, QCLEAN, and QFSGEN utilities on Windows. Specifically, these programs are now built using Visual Studio 2019 instead of the MinGW compiler for Windows. Also, the source code of all Quantum Leaps utilities has been reviewed and all "unsafe" calls to stanadrd C library have been replaced with their "safe" counterparts (e.g., strcpy()->strcpy_s(), strcat()->strcat_s(),fprintf()->fprintf_s(), etc.) All these changes were made to avoid the malware warnings that were issued by some anti-virus sofware against executables built with MinGW.
 
 This release also replaces the MinGW toolchain (8.2.0) with the latest mingw32 (9.2.0) installed with MSYS2.
+
+Finally, this release updates the QWIN Prototyping Toolkit (`qtools\qwin` directory) to work with the latest Visual Studio 2019 and specifically with the Resource Editor now available. Specifically here, the qwin-demo example has been updated to build with the Visual Studio 2019.
 
 
 ------------------------------------------------------

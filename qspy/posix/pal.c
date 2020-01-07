@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.4.0
-* Last updated on  2019-02-08
+* Last updated for version 6.7.0
+* Last updated on  2020-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -29,11 +29,11 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
@@ -41,8 +41,6 @@
 #include <stdlib.h>  /* for system() */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -55,6 +53,7 @@
 #include <errno.h>
 #include <time.h>
 
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"    /* QSPY data parser */
 #include "be.h"      /* Back-End interface */
 #include "pal.h"     /* Platform Abstraction Layer */
@@ -536,7 +535,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     }
 
     /* try to receive data from the File... */
-    nBytes = fread(buf, 1, (int)(*pBytes), l_file);
+    nBytes = FREAD_S(buf, sizeof(buf), 1U, (int)(*pBytes), l_file);
     if (nBytes > 0) {
         *pBytes = nBytes;
         return QSPY_TARGET_INPUT_EVT;

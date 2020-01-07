@@ -28,9 +28,8 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "getopt.h"
 
 char const *optarg = NULL;
@@ -163,7 +162,7 @@ int getopt(int argc, char *argv[], char const *optstr) {
         /* Invalid argument */
         if (!opt_ptr) {
             if (opterr) {
-                fprintf(stderr, "%s: invalid option: -%c\n", argv[0], c);
+                FPRINTF_S(stderr, "%s: invalid option: -%c\n", argv[0], c);
             }
             optopt = c;
             c = '?';
@@ -219,7 +218,7 @@ int getopt(int argc, char *argv[], char const *optstr) {
                 c = '?';
 
                 if (opterr) {
-                    fprintf(stderr,"%s: option requires an argument: -%c\n",
+                    FPRINTF_S(stderr,"%s: option requires an argument: -%c\n",
                             argv[0], optopt);
                 }
             }

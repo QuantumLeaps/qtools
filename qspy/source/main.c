@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-01-03
+* Last updated on  2019-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -39,17 +39,15 @@
 */
 #include <stdint.h>
 #include <stddef.h>
-
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
 
-#include "qspy.h"   /* QSPY data parser */
-#include "be.h"     /* Back-End interface */
-#include "pal.h"    /* Platform Abstraction Layer */
-#include "getopt.h" /* command-line option processor */
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"    /* QSPY data parser */
+#include "be.h"      /* Back-End interface */
+#include "pal.h"     /* Platform Abstraction Layer */
+#include "getopt.h"  /* command-line option processor */
 
 /*..........................................................................*/
 enum { FNAME_SIZE = 256 };
@@ -202,7 +200,7 @@ int main(int argc, char *argv[]) {
     }
     /* cleanup .............................................................*/
     cleanup();
-    printf("\nQSPY Done\n");
+    PRINTF_S("\nQSPY Done\n");
     return status;
 }
 
@@ -228,7 +226,7 @@ static void cleanup(void) {
 
 /*..........................................................................*/
 void Q_onAssert(char const * const module, int loc) {
-    printf("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
+    PRINTF_S("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
            module, loc);
     cleanup();
     exit(-1);
@@ -293,20 +291,20 @@ static QSpyStatus configure(int argc, char *argv[]) {
     uint8_t tevtCtrSize  = 2U;
     int     optChar;
 
-    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName) - 1U);
-    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName) - 1U);
-    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName) - 1U);
-    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName) - 1U);
-    STRNCPY_S(l_dicFileName, "OFF", sizeof(l_dicFileName) - 1U);
+    STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
+    STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
+    STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
+    STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
+    STRCPY_S(l_dicFileName, sizeof(l_dicFileName), "OFF");
 
     (void)tstampStr();
-    printf(l_introStr, QSPY_VER, l_tstampStr);
+    PRINTF_S(l_introStr, QSPY_VER, l_tstampStr);
 
-    STRNCPY_S(l_inpFileName, "qs.bin", sizeof(l_inpFileName) - 1U);
+    STRCPY_S(l_inpFileName, sizeof(l_inpFileName), "qs.bin");
 #ifdef _WIN32
-    STRNCPY_S(l_comPort, "COM1", sizeof(l_comPort) - 1U);
+    STRCPY_S(l_comPort, sizeof(l_comPort), "COM1");
 #elif (defined __linux) || (defined __linux__) || (defined __posix)
-    STRNCPY_S(l_comPort, "/dev/ttyS0", sizeof(l_comPort) - 1U);
+    STRCPY_S(l_comPort, sizeof(l_comPort), "/dev/ttyS0");
 #endif
 
     /* parse the command-line parameters ...................................*/
@@ -337,10 +335,10 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 {
                     version = (((optarg[0] - '0') * 10)
                               + (optarg[2] - '0')) * 10;
-                    printf("-v %c.%c\n", optarg[0], optarg[2]);
+                    PRINTF_S("-v %c.%c\n", optarg[0], optarg[2]);
                 }
                 else {
-                    fprintf(stderr, "Incorrect version number: %s", optarg);
+                    FPRINTF_S(stderr, "Incorrect version number: %s", optarg);
                     return QSPY_ERROR;
                 }
                 break;
@@ -348,92 +346,91 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 'o': { /* save screen output to a file */
                 SNPRINTF_S(l_outFileName, sizeof(l_outFileName) - 1U,
                            "qspy%s.txt", l_tstampStr);
-                printf("-o (%s)\n", l_outFileName);
+                PRINTF_S("-o (%s)\n", l_outFileName);
                 break;
             }
             case 's': { /* save binary data to a file */
                 SNPRINTF_S(l_savFileName, sizeof(l_savFileName) - 1U,
                            "qspy%s.bin", l_tstampStr);
-                printf("-s (%s)\n", l_savFileName);
+                PRINTF_S("-s (%s)\n", l_savFileName);
                 break;
             }
             case 'm': { /* Matlab/Octave file output */
                 SNPRINTF_S(l_matFileName, sizeof(l_matFileName) - 1U,
                            "qspy%s.mat", l_tstampStr);
-                printf("-m (%s)\n", l_matFileName);
+                PRINTF_S("-m (%s)\n", l_matFileName);
                 break;
             }
             case 'g': { /* MscGen file output */
                 SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName) - 1U,
                            "qspy%s.msc", l_tstampStr);
-                printf("-g (%s)\n", l_mscFileName);
+                PRINTF_S("-g (%s)\n", l_mscFileName);
                 break;
             }
             case 'c': { /* COM port */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
-                    fprintf(stderr,
+                    FPRINTF_S(stderr,
                             "The -c option is incompatible with -t/-f\n");
                     return QSPY_ERROR;
                 }
-                STRNCPY_S(l_comPort, optarg, sizeof(l_comPort) - 1U);
-                printf("-c %s\n", l_comPort);
+                STRCPY_S(l_comPort, sizeof(l_comPort), optarg);
+                PRINTF_S("-c %s\n", l_comPort);
                 l_link = SERIAL_LINK;
                 break;
             }
             case 'b': { /* baud rate */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
-                    fprintf(stderr,
+                    FPRINTF_S(stderr,
                         "The -b option is incompatible with -t/-f\n");
                     return QSPY_ERROR;
                 }
                 l_baudRate = (int)strtol(optarg, NULL, 10);
                 if (l_baudRate == 0) {
-                    fprintf(stderr, "incorrect baud rate: %s\n", optarg);
+                    FPRINTF_S(stderr, "incorrect baud rate: %s\n", optarg);
                     return QSPY_ERROR;
                 }
-                printf("-b %d\n", l_baudRate);
+                PRINTF_S("-b %d\n", l_baudRate);
                 l_link = SERIAL_LINK;
                 break;
             }
             case 'f': { /* File input */
                 if (l_link != NO_LINK) {
-                    fprintf(stderr,
+                    FPRINTF_S(stderr,
                             "The -f option is incompatible with -c/-b/-t\n");
                     return QSPY_ERROR;
                 }
-                STRNCPY_S(l_inpFileName, optarg, sizeof(l_inpFileName) - 1U);
-                printf("-f %s\n", l_inpFileName);
+                STRCPY_S(l_inpFileName, sizeof(l_inpFileName), optarg);
+                PRINTF_S("-f %s\n", l_inpFileName);
                 l_link = FILE_LINK;
                 break;
             }
             case 'd': { /* Dictionary file */
                 if (optarg != NULL) { /* is optional argument provided? */
-                    STRNCPY_S(l_dicFileName, optarg,
-                              sizeof(l_dicFileName) - 1U);
-                    printf("-d %s\n", l_dicFileName);
+                    STRCPY_S(l_dicFileName, sizeof(l_dicFileName), optarg);
+                    PRINTF_S("-d %s\n", l_dicFileName);
                 }
                 else { /* apply the default */
                     l_dicFileName[0] = '?';
                     l_dicFileName[1] = '\0';
-                    printf("-d\n");
+                    PRINTF_S("-d\n");
                 }
                 break;
             }
             case 't': { /* TCP/IP input */
                 if ((l_link != NO_LINK) && (l_link != TCP_LINK)) {
-                    fprintf(stderr,
+                    FPRINTF_S(stderr,
                             "The -t option is incompatible with -c/-b/-f\n");
                     return QSPY_ERROR;
                 }
                 if (optarg != NULL) { /* is optional argument provided? */
                     l_tcpPort = (int)strtoul(optarg, NULL, 10);
                 }
-                printf("-t %d\n", l_tcpPort);
+                PRINTF_S("-t %d\n", l_tcpPort);
                 l_link = TCP_LINK;
                 break;
             }
             case 'p': { /* TCP/IP port number */
-                fprintf(stderr,
+                FPRINTF_S(stderr,
                         "The -p option is obsolete, use -t[port]\n");
                 return QSPY_ERROR;
                 break;
@@ -475,27 +472,27 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 break;
             }
             case 'h': { /* help */
-                printf("\n%s\n%s", l_helpStr, l_kbdHelpStr);
+                PRINTF_S("\n%s\n%s", l_helpStr, l_kbdHelpStr);
                 return QSPY_ERROR;
             }
             default: { /* unknown option */
-                fprintf(stderr, "Unknown option -%c\n", (char)optChar);
-                printf("\n%s\n%s", l_helpStr, l_kbdHelpStr);
+                FPRINTF_S(stderr, "Unknown option -%c\n", (char)optChar);
+                PRINTF_S("\n%s\n%s", l_helpStr, l_kbdHelpStr);
                 return QSPY_ERROR;
             }
         }
     }
     if (argc != optind) {
-        fprintf(stderr,
+        FPRINTF_S(stderr,
             "%d command-line options were not processed\n", (argc - optind));
-        printf("\n%s\n%s", l_helpStr, l_kbdHelpStr);
+        PRINTF_S("\n%s\n%s", l_helpStr, l_kbdHelpStr);
         return QSPY_ERROR;
     }
 
     /* configure QSPY ......................................................*/
     /* open Back-End link. NOTE: must happen *before* opening Target link */
     if (l_bePort != 0) {
-        printf("-u %d\n", l_bePort);
+        PRINTF_S("-u %d\n", l_bePort);
         if (PAL_openBE(l_bePort) == QSPY_ERROR) {
             return QSPY_ERROR;
         }
@@ -504,7 +501,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     /* open Target link... */
     switch (l_link) {
         case NO_LINK:
-            printf("-t %d\n", l_tcpPort); /* -t is the default link */
+            PRINTF_S("-t %d\n", l_tcpPort); /* -t is the default link */
             /* fall through */
         case TCP_LINK: {    /* connect to the Target via TCP socket */
             if (PAL_openTargetTcp(l_tcpPort) != QSPY_SUCCESS) {
@@ -530,31 +527,31 @@ static QSpyStatus configure(int argc, char *argv[]) {
     if (l_outFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_outFile, l_outFileName, "w");
         if (l_outFile != (FILE *)0) {
-            fprintf(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
+            FPRINTF_S(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
         }
         else {
-            printf("   <QSPY-> Cannot open File=%s\n", l_outFileName);
+            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_outFileName);
             return QSPY_ERROR;
         }
     }
     if (l_savFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_savFile, l_savFileName, "wb"); /* open for writing binary */
         if (l_savFile == (FILE *)0) {
-            printf("   <QSPY-> Cannot open File=%s\n", l_savFileName);
+            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_savFileName);
             return QSPY_ERROR;
         }
     }
     if (l_matFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_matFile, l_matFileName, "w");
         if (l_matFile == (FILE *)0) {
-            printf("   <QSPY-> Cannot open File=%s\n", l_matFileName);
+            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_matFileName);
             return QSPY_ERROR;
         }
     }
     if (l_mscFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_mscFile, l_mscFileName, "w");
         if (l_mscFile == (FILE *)0) {
-            printf("   <QSPY-> Cannot open File=%s\n", l_mscFileName);
+            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_mscFileName);
             return QSPY_ERROR;
         }
     }
@@ -591,49 +588,49 @@ bool QSPY_command(uint8_t cmdId) {
 
     switch (cmdId) {
         default:
-            printf("   <QSPY-> Unrecognized keyboard Command=%c",
+            PRINTF_S("   <QSPY-> Unrecognized keyboard Command=%c",
                    (char)cmdId);
             /* intentionally fall-through... */
 
         case 'h':  /* keyboard help */
-            printf("\n%s\n", l_kbdHelpStr);
+            PRINTF_S("\n%s\n", l_kbdHelpStr);
             if (l_quiet < 0) {
-                printf("Quiet Mode    [q]: OFF\n");
+                PRINTF_S("Quiet Mode    [q]: OFF\n");
             }
             else {
-                printf("Quiet Mode    [q]: %d\n", l_quiet);
+                PRINTF_S("Quiet Mode    [q]: %d\n", l_quiet);
             }
-            printf("Screen Output [o]: %s\n", l_outFileName);
-            printf("Binary Output [s]: %s\n", l_savFileName);
-            printf("Matlab Output [m]: %s\n", l_matFileName);
-            printf("MscGen Output [g]: %s\n", l_mscFileName);
+            PRINTF_S("Screen Output [o]: %s\n", l_outFileName);
+            PRINTF_S("Binary Output [s]: %s\n", l_savFileName);
+            PRINTF_S("Matlab Output [m]: %s\n", l_matFileName);
+            PRINTF_S("MscGen Output [g]: %s\n", l_mscFileName);
             break;
 
         case 'r':  /* send RESET command to the Target */
             nBytes = QSPY_encodeResetCmd(l_buf, sizeof(l_buf));
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
-            printf("   <USER-> Sending RESET to the Target Stat=%s\n",
+            PRINTF_S("   <USER-> Sending RESET to the Target Stat=%s\n",
                           (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 't':  /* send TICK[0] command to the Target */
             nBytes = QSPY_encodeTickCmd(l_buf, sizeof(l_buf), 0U);
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
-            printf("   <USER-> Sending TICK-0 to the Target Stat=%s\n",
+            PRINTF_S("   <USER-> Sending TICK-0 to the Target Stat=%s\n",
                           (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'u':  /* send TICK[1] command to the Target */
             nBytes = QSPY_encodeTickCmd(l_buf, sizeof(l_buf), 1U);
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
-            printf("   <USER-> Sending TICK-1 to the Target Stat=%s\n",
+            PRINTF_S("   <USER-> Sending TICK-1 to the Target Stat=%s\n",
                    (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
         case 'i':  /* send INFO request command to the Target */
             nBytes = QSPY_encodeInfoCmd(l_buf, sizeof(l_buf));
             stat = (*PAL_vtbl.send2Target)(l_buf, nBytes);
-            printf("   <USER-> Sending INFO to the Target Stat=%s\n",
+            PRINTF_S("   <USER-> Sending INFO to the Target Stat=%s\n",
                    (stat == QSPY_ERROR) ? "ERROR" : "OK");
             break;
 
@@ -648,12 +645,12 @@ bool QSPY_command(uint8_t cmdId) {
         case 'q':  /* quiet */
             if (l_quiet < 0) {
                 l_quiet = l_quiet_ctr;
-                printf("   <USER-> Quiet Mode [q] Mode=%d\n", l_quiet);
+                PRINTF_S("   <USER-> Quiet Mode [q] Mode=%d\n", l_quiet);
             }
             else {
                 l_quiet_ctr = l_quiet;
                 l_quiet = -1;
-                printf("   <USER-> Quiet Mode [q] Mode=OFF\n");
+                PRINTF_S("   <USER-> Quiet Mode [q] Mode=OFF\n");
             }
             break;
 
@@ -661,23 +658,23 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_outFile != (FILE *)0) {
                 fclose(l_outFile);
                 l_outFile = (FILE *)0;
-                STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
+                STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
                            "qspy%s.txt", tstampStr());
                 FOPEN_S(l_outFile, l_outFileName, "w");
                 if (l_outFile != (FILE *)0) {
-                    fprintf(l_outFile, l_introStr, QSPY_VER,
+                    FPRINTF_S(l_outFile, l_introStr, QSPY_VER,
                             l_tstampStr);
                 }
                 else {
-                    printf("   <QSPY-> Cannot open File=%s for writing\n",
+                    PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
                            l_outFileName);
-                    STRNCPY_S(l_outFileName, "OFF", sizeof(l_outFileName));
+                    STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
                 }
             }
-            printf("   <USER-> Screen Output [o] File=%s\n", l_outFileName);
+            PRINTF_S("   <USER-> Screen Output [o] File=%s\n", l_outFileName);
             break;
 
         case 'b':
@@ -685,19 +682,19 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_savFile != (FILE *)0) {
                 fclose(l_savFile);
                 l_savFile = (FILE *)0;
-                STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
+                STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_savFileName, sizeof(l_savFileName),
                            "qspy%s.bin", tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
                 if (l_savFile == (FILE *)0) {
-                    printf("   <QSPY-> Cannot open File=%s for writing\n",
+                    PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
                            l_savFileName);
-                    STRNCPY_S(l_savFileName, "OFF", sizeof(l_savFileName));
+                    STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
                 }
             }
-            printf("   <USER-> Binary Output [s] File=%s\n",
+            PRINTF_S("   <USER-> Binary Output [s] File=%s\n",
                    l_savFileName);
             break;
 
@@ -705,7 +702,7 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_matFile != (FILE *)0) {
                 QSPY_configMatFile((void *)0); /* close the Matlab file */
                 l_matFile = (FILE *)0;
-                STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
+                STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_matFileName, sizeof(l_matFileName),
@@ -715,12 +712,12 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMatFile(l_matFile);
                 }
                 else {
-                    printf("   <QSPY-> Cannot open File=%s for writing\n",
+                    PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
                            l_matFileName);
-                    STRNCPY_S(l_matFileName, "OFF", sizeof(l_matFileName));
+                    STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
                 }
             }
-            printf("   <USER-> Matlab Output [m] File=%s\n",
+            PRINTF_S("   <USER-> Matlab Output [m] File=%s\n",
                    l_matFileName);
             break;
 
@@ -728,7 +725,7 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_mscFile != (FILE *)0) {
                 QSPY_configMscFile((void *)0); /* close the MscGen file */
                 l_mscFile = (FILE *)0;
-                STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
+                STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName),
@@ -738,12 +735,12 @@ bool QSPY_command(uint8_t cmdId) {
                     QSPY_configMscFile(l_mscFile);
                 }
                 else {
-                    printf("   <QSPY-> Cannot open File=%s for writing\n",
+                    PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
                            l_mscFileName);
-                    STRNCPY_S(l_mscFileName, "OFF", sizeof(l_mscFileName));
+                    STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
                 }
             }
-            printf("   <USER-> MscGen Output [g] File=%s\n",
+            PRINTF_S("   <USER-> MscGen Output [g] File=%s\n",
                    l_mscFileName);
             break;
 

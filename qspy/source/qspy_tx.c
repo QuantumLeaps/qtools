@@ -5,13 +5,13 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-12-31
+* Last updated on  2020-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -39,14 +39,13 @@
 */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <inttypes.h>
 
-#include "qspy.h"
-#include "pal.h"
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"    /* QSPY data parser */
+#include "pal.h"     /* Platform Abstraction Layer */
 
 typedef char     char_t;
 typedef float    float32_t;

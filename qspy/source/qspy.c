@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-01-03
+* Last updated on  2019-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -39,14 +39,13 @@
 */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <inttypes.h>
 
-#include "qspy.h"
-#include "pal.h"
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"    /* QSPY data parser */
+#include "pal.h"     /* Platform Abstraction Layer */
 
 typedef char     char_t;
 typedef float    float32_t;
@@ -306,7 +305,7 @@ static char const *  l_qs_rx_rec[] = {
 
 #define FPRINF_MATFILE(format_, ...) \
     if (l_matFile != (FILE *)0) { \
-        fprintf(l_matFile, format_, ##__VA_ARGS__); \
+        FPRINTF_S(l_matFile, format_, ##__VA_ARGS__); \
     } else (void)0
 
 #define CONFIG_UPDATE(member_, new_, diff_) \
@@ -348,7 +347,7 @@ void QSPY_config(uint16_t version,
         /* reserve space at the beginning of the MscGen file for the header,
         * which is known only at the end of the run in qsStop().
         */
-        fprintf(l_mscFile,
+        FPRINTF_S(l_mscFile,
             "                                        \n"
             "                                        \n"
             "                                        \n"
@@ -406,24 +405,24 @@ void QSPY_configMatFile(void *matFile) {
 void QSPY_configMscFile(void *mscFile) {
     if (l_mscFile != (FILE *)0) {
         int i;
-        fprintf(l_mscFile, "}\n");
+        FPRINTF_S(l_mscFile, "}\n");
         rewind(l_mscFile);
-        fprintf(l_mscFile, "msc {\n");
+        FPRINTF_S(l_mscFile, "msc {\n");
         for (i = 0; ; ++i) {
             char const *entry = Dictionary_at(&l_mscDict, i);
             if (entry[0] != '\0') {
                 if (i == 0) {
-                    fprintf(l_mscFile, "\"%s\"", entry);
+                    FPRINTF_S(l_mscFile, "\"%s\"", entry);
                 }
                 else {
-                    fprintf(l_mscFile, ",\"%s\"", entry);
+                    FPRINTF_S(l_mscFile, ",\"%s\"", entry);
                 }
             }
             else {
                 break;
             }
         }
-        fprintf(l_mscFile, ";\n");
+        FPRINTF_S(l_mscFile, ";\n");
         fclose(l_mscFile);
     }
     l_mscFile = (FILE *)mscFile;
@@ -1011,7 +1010,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                (int)me->rec, t, a, p, q, r);
                 if (l_mscFile != (FILE *)0) {
                     if (Dictionary_find(&l_mscDict, p) >= 0) { /* found? */
-                        fprintf(l_mscFile,
+                        FPRINTF_S(l_mscFile,
                                 "\"%s\" rbox \"%s\" [label=\"%s\"];\n",
                                 Dictionary_get(&l_mscDict, p, (char *)0),
                                 Dictionary_get(&l_mscDict, p, buf),
@@ -1221,7 +1220,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         Dictionary_put(&l_mscDict, p,
                             Dictionary_get(&l_objDict, p, (char *)0));
                     }
-                    fprintf(l_mscFile,
+                    FPRINTF_S(l_mscFile,
                             "\"%s\"->\"%s\" [label=\"%u:%s\"];\n",
                             Dictionary_get(&l_mscDict, q, (char *)0),
                             Dictionary_get(&l_mscDict, p, buf),
@@ -1262,7 +1261,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         Dictionary_put(&l_mscDict, p,
                             Dictionary_get(&l_objDict, p, (char *)0));
                     }
-                    fprintf(l_mscFile,
+                    FPRINTF_S(l_mscFile,
                             "\"%s\"->\"%s\" [label=\"%u:%s-LIFO\"];\n",
                             Dictionary_get(&l_mscDict, p, (char *)0),
                             Dictionary_get(&l_mscDict, p, buf),
@@ -1470,7 +1469,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         Dictionary_put(&l_mscDict, p,
                             Dictionary_get(&l_objDict, p, (char *)0));
                     }
-                    fprintf(l_mscFile,
+                    FPRINTF_S(l_mscFile,
                             "\"%s\"->* [label=\"%u:%s\""
                             ",textcolour=\"#0000ff\""
                             ",linecolour=\"#0000ff\"];\n",
@@ -1602,7 +1601,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u\n", (int)me->rec, a);
                 if (l_mscFile != (FILE *)0) {
-                    fprintf(l_mscFile,
+                    FPRINTF_S(l_mscFile,
                             "--- [label=\"tick %u\""
                             ",textcolour=\"#ff0000\""
                             ",linecolour=\"#ff0000\"];\n",
@@ -2297,7 +2296,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                     QSPY_printError();
 
                     if (l_mscFile != (FILE *)0) {
-                        fprintf(l_mscFile, "...;\n"
+                        FPRINTF_S(l_mscFile, "...;\n"
                             "--- [label=\"Bad checksum at Seq=%u,Id=%u(?)\""
                             ",textbgcolour=\"#ffff00\""
                             ",linecolour=\"#ff0000\"];\n",
@@ -2318,7 +2317,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 }
                 QSPY_printError();
                 if (l_mscFile != (FILE *)0) {
-                    fprintf(l_mscFile, "...;\n"
+                    FPRINTF_S(l_mscFile, "...;\n"
                         "--- [label=\"Record too short at Seq=%u,Id=%u(?)\""
                         ",textbgcolour=\"#ffff00\""
                         ",linecolour=\"#ff0000\"];\n",
@@ -2342,7 +2341,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                             (unsigned)(l_seq - 1), (unsigned)l_record[0]);
                         QSPY_printError();
                         if (l_mscFile != (FILE *)0) {
-                            fprintf(l_mscFile,
+                            FPRINTF_S(l_mscFile,
                                 "--- [label=\""
                                 "Data discontinuity Seq=%u->%u\""
                                 ",textbgcolour=\"#ffff00\""
@@ -2444,17 +2443,17 @@ QSpyStatus QSPY_writeDict(void) {
         return QSPY_ERROR;
     }
 
-    fprintf(dictFile, "-v%03d\n", (int)l_config.version);
-    fprintf(dictFile, "-T%01d\n", (int)l_config.tstampSize);
-    fprintf(dictFile, "-O%01d\n", (int)l_config.objPtrSize);
-    fprintf(dictFile, "-F%01d\n", (int)l_config.funPtrSize);
-    fprintf(dictFile, "-S%01d\n", (int)l_config.sigSize);
-    fprintf(dictFile, "-E%01d\n", (int)l_config.evtSize);
-    fprintf(dictFile, "-Q%01d\n", (int)l_config.queueCtrSize);
-    fprintf(dictFile, "-P%01d\n", (int)l_config.poolCtrSize);
-    fprintf(dictFile, "-B%01d\n", (int)l_config.poolBlkSize);
-    fprintf(dictFile, "-C%01d\n", (int)l_config.tevtCtrSize);
-    fprintf(dictFile, "-t%02d%02d%02d_%02d%02d%02d\n\n",
+    FPRINTF_S(dictFile, "-v%03d\n", (int)l_config.version);
+    FPRINTF_S(dictFile, "-T%01d\n", (int)l_config.tstampSize);
+    FPRINTF_S(dictFile, "-O%01d\n", (int)l_config.objPtrSize);
+    FPRINTF_S(dictFile, "-F%01d\n", (int)l_config.funPtrSize);
+    FPRINTF_S(dictFile, "-S%01d\n", (int)l_config.sigSize);
+    FPRINTF_S(dictFile, "-E%01d\n", (int)l_config.evtSize);
+    FPRINTF_S(dictFile, "-Q%01d\n", (int)l_config.queueCtrSize);
+    FPRINTF_S(dictFile, "-P%01d\n", (int)l_config.poolCtrSize);
+    FPRINTF_S(dictFile, "-B%01d\n", (int)l_config.poolBlkSize);
+    FPRINTF_S(dictFile, "-C%01d\n", (int)l_config.tevtCtrSize);
+    FPRINTF_S(dictFile, "-t%02d%02d%02d_%02d%02d%02d\n\n",
            (int)l_config.tstamp[5],
            (int)l_config.tstamp[4],
            (int)l_config.tstamp[3],
@@ -2462,19 +2461,19 @@ QSpyStatus QSPY_writeDict(void) {
            (int)l_config.tstamp[1],
            (int)l_config.tstamp[0]);
 
-    fprintf(dictFile, "Obj-Dic:\n");
+    FPRINTF_S(dictFile, "Obj-Dic:\n");
     Dictionary_write(&l_objDict, dictFile);
 
-    fprintf(dictFile, "Fun-Dic:\n");
+    FPRINTF_S(dictFile, "Fun-Dic:\n");
     Dictionary_write(&l_funDict, dictFile);
 
-    fprintf(dictFile, "Usr-Dic:\n");
+    FPRINTF_S(dictFile, "Usr-Dic:\n");
     Dictionary_write(&l_usrDict, dictFile);
 
-    fprintf(dictFile, "Sig-Dic:\n");
+    FPRINTF_S(dictFile, "Sig-Dic:\n");
     SigDictionary_write(&l_sigDict, dictFile);
 
-    fprintf(dictFile, "Msc-Dic:\n");
+    FPRINTF_S(dictFile, "Msc-Dic:\n");
     Dictionary_write(&l_mscDict, dictFile);
 
     fclose(dictFile);
@@ -2763,13 +2762,13 @@ static void Dictionary_put(Dictionary * const me,
     if (idx >= 0) { /* the key found? */
         Q_ASSERT((idx <= n) || (n == 0));
         dst = me->sto[idx].name;
-        STRNCPY_S(dst, name, sizeof(me->sto[idx].name) - 1);
+        STRCPY_S(dst, sizeof(me->sto[idx].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
     }
     else if (n < me->capacity - 1) {
         me->sto[n].key = key;
         dst = me->sto[n].name;
-        STRNCPY_S(dst, name, sizeof(me->sto[n].name) - 1);
+        STRCPY_S(dst, sizeof(me->sto[n].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
         ++me->entries;
         /* keep the entries sorted by the key */
@@ -2848,17 +2847,17 @@ static void Dictionary_reset(Dictionary * const me) {
 static void Dictionary_write(Dictionary const * const me, FILE *stream) {
     int i;
 
-    fprintf(stream, "%d\n", me->keySize);
+    FPRINTF_S(stream, "%d\n", me->keySize);
     for (i = 0; i < me->entries; ++i) {
         DictEntry const *e = &me->sto[i];
         if (me->keySize <= 4) {
-            fprintf(stream, "0x%08X %s\n", (unsigned)e->key, e->name);
+            FPRINTF_S(stream, "0x%08X %s\n", (unsigned)e->key, e->name);
         }
         else {
-            fprintf(stream, "0x%016"PRIX64" %s\n", e->key, e->name);
+            FPRINTF_S(stream, "0x%016"PRIX64" %s\n", e->key, e->name);
         }
     }
-    fprintf(stream, "***\n"); /* close marker for a dictionary */
+    FPRINTF_S(stream, "***\n"); /* close marker for a dictionary */
 }
 /*..........................................................................*/
 static bool Dictionary_read(Dictionary * const me, FILE *stream) {
@@ -2946,14 +2945,14 @@ static void SigDictionary_put(SigDictionary * const me,
         Q_ASSERT((idx <= n) || (n == 0));
         me->sto[idx].obj = obj;
         dst = me->sto[idx].name;
-        STRNCPY_S(dst, name, sizeof(me->sto[idx].name) - 1);
+        STRCPY_S(dst, sizeof(me->sto[idx].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
     }
     else if (n < me->capacity - 1) {
         me->sto[n].sig = sig;
         me->sto[n].obj = obj;
         dst = me->sto[n].name;
-        STRNCPY_S(dst, name, sizeof(me->sto[n].name) - 1);
+        STRCPY_S(dst, sizeof(me->sto[n].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
         ++me->entries;
         /* keep the entries sorted by the sig */
@@ -3065,19 +3064,19 @@ static void SigDictionary_write(SigDictionary const * const me,
 {
     int i;
 
-    fprintf(stream, "%d\n", me->ptrSize);
+    FPRINTF_S(stream, "%d\n", me->ptrSize);
     for (i = 0; i < me->entries; ++i) {
         SigDictEntry const *e = &me->sto[i];
         if (me->ptrSize <= 4) {
-            fprintf(stream, "%08d 0x%08X %s\n",
+            FPRINTF_S(stream, "%08d 0x%08X %s\n",
                     e->sig, (unsigned)e->obj, e->name);
         }
         else {
-            fprintf(stream, "%08d 0x%016"PRIX64" %s\n",
+            FPRINTF_S(stream, "%08d 0x%016"PRIX64" %s\n",
                     e->sig, e->obj, e->name);
         }
     }
-    fprintf(stream, "***\n"); /* close marker for a dictionary */
+    FPRINTF_S(stream, "***\n"); /* close marker for a dictionary */
 }
 /*..........................................................................*/
 static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {

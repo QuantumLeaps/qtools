@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-01-03
+* Last updated on  2019-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -37,14 +37,13 @@
 ******************************************************************************
 * @endcond
 */
-#include <string.h>   /* for size_t */
 #include <stdlib.h>   /* for system() */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <conio.h>
 #include <ws2tcpip.h> /* for Windows socket facilities */
 
+#include "safe_io.h"  /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
 #include "be.h"       /* Back-End interface */
 #include "pal.h"      /* Platform Abstraction Layer */
@@ -512,7 +511,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     }
 
     /* try to receive data from the File... */
-    nBytes = fread(buf, 1, (int)(*pBytes), l_file);
+    nBytes = FREAD_S(buf, sizeof(buf), 1U, (int)(*pBytes), l_file);
     if (nBytes > 0) {
         *pBytes = nBytes;
         return QSPY_TARGET_INPUT_EVT;

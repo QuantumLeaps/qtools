@@ -60,7 +60,7 @@ Additionally, QTools for Windows contains the following open-source,
 
 10. GNU-make for Windows (32-bit version 4.2.1)
 
-11. GNU C/C++ toolset for Windows (MinGW-32bit version 8.2.0)
+11. GNU C/C++ toolset for Windows (mingw32 version 9.2.0)
 
 12. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
 
@@ -191,8 +191,8 @@ subdirectory, except for the QSPY source code, which is provided in the
 have been developed and are copyrighted by Quantum Leaps.
 
 ### The GCC C and C++ compilers for Windows
-Have been taken from the MinGW project at:
-- http://www.mingw.org/
+Have been taken from the MSYS2 project at
+- https://www.msys2.org/
 
 The installer mingw-get-setup.exe has been used and after the
 installation, the files have been pruned to reduce the size of the
@@ -207,18 +207,6 @@ The installer gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe has been used.
 
 ### The GNU make executable for Windows
 Has been taken from the MinGW project at SourceForge.net:
-
-- https://sourceforge.net/projects/mingw/files/MinGW/make/
-make-3.82-mingw32/make-3.82-5-mingw32-bin.tar.lzma
-
-The GNU make source (make-3.82-src.zip) has been taken from:
-- https://sourceforge.net/projects/mingw/files/MinGW/make/
-make-3.82-mingw32/make-3.82-5-mingw32-src.tar.lzma
-
-The "GNU Make" manual (make.pdf) has been copied from the GNU make
-project at:
-- http://www.gnu.org/software/make
-
 
 ### The file and diff utilities
 Have been taken from the UnixUtils project at SourceForge.net:

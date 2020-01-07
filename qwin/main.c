@@ -30,8 +30,8 @@
 * DEALINGS IN THE SOFTWARE.
 *
 * Contact information:
-* https://state-machine.com
-* mailto:info@state-machine.com
+* www.state-machine.com
+* info@state-machine.com
 *****************************************************************************/
 #include <stdint.h>
 #include <string.h>  /* for memset(), memmove() */

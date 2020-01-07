@@ -1,13 +1,13 @@
 ##############################################################################
-# Product: Makefile for QFSGEN console, POSIX (Linux/Mac-OS), GNU compiler
+# Product: Makefile for qfsgen console, Win32, MinGW
 # Last updated for version 6.7.0
-# Last updated on  2019-12-31
+# Last updated on  2020-01-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -28,7 +28,7 @@
 # along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# <www.state-machine.com/licensing>
+# <www.state-machine.com>
 # <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
@@ -39,9 +39,15 @@
 # cleaning configurations: Debug (default), Release, and Spy
 # make clean
 # make CONF=dbg clean
+#
+# NOTE:
+# To use this Makefile on Windows, you will need the GNU make utility, which
+# is included in the Qtools collection for Windows, see:
+#    https://github.com/QuantumLeaps/qtools/releases
+#
 
 #-----------------------------------------------------------------------------
-# project name
+# project name:
 #
 PROJECT := qfsgen
 
@@ -74,21 +80,28 @@ LIB_DIRS  :=
 LIBS      :=
 
 #-----------------------------------------------------------------------------
-# GNU toolset:
+# MinGW toolset (NOTE: assumed to be on your PATH)
 #
+# NOTE:
+# MinGW toolset is included in the Qtools collection for Windows, see:
+#    https://github.com/QuantumLeaps/qtools/releases
+
 CC    := gcc
 CPP   := g++
-LINK  := gcc    # for C programs
-#LINK  := g++   # for C++ programs
+LINK  := gcc
 
-#-----------------------------------------------------------------------------
-# basic utilities:
-#
-MKDIR := mkdir -p
+
+##############################################################################
+# Typically, you should not need to change anything below this line
+
+# basic utilities (included in QTools for Windows), see:
+#    https://github.com/QuantumLeaps/qtools/releases
+
+MKDIR := mkdir
 RM    := rm
 
 #-----------------------------------------------------------------------------
-# build configurations...
+# build options for various configurations
 #
 
 ifeq (dbg, $(CONF)) # Debug configuration ....................................
@@ -96,7 +109,7 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 BIN_DIR := dbg
 
 CFLAGS = -c -g -std=c11 -ffunction-sections -fdata-sections \
-	-O -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES)
+	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
 	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
@@ -106,24 +119,28 @@ else  # default Release configuration ........................................
 BIN_DIR := rel
 
 CFLAGS = -c -std=c11 -ffunction-sections -fdata-sections \
-	-O3 -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES) -DNDEBUG
+	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \
 	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 
-#LINKFLAGS := -no-pie
+LINKFLAGS := -Wl,-Map,$(BIN_DIR)/$(PROJECT).map,--cref,--gc-sections
 
 #-----------------------------------------------------------------------------
-C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
-CPP_OBJS     := $(patsubst %.cpp,%.o, $(CPP_SRCS))
 
-TARGET_EXE   := $(BIN_DIR)/$(PROJECT)$(TARGET_EXT)
+C_OBJS       := $(patsubst %.c,   %.o, $(C_SRCS))
+CPP_OBJS     := $(patsubst %.cpp, %.o, $(CPP_SRCS))
+RC_OBJS      := $(patsubst %.rc,  %.o, $(RC_SRCS))
+
+TARGET_BIN   := $(BIN_DIR)/$(PROJECT).bin
+TARGET_EXE   := $(BIN_DIR)/$(PROJECT).exe
 C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
-C_DEPS_EXT   := $(patsubst %.o,%.d, $(C_OBJS_EXT))
+C_DEPS_EXT   := $(patsubst %.o, %.d, $(C_OBJS_EXT))
 CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
-CPP_DEPS_EXT := $(patsubst %.o,%.d, $(CPP_OBJS_EXT))
+CPP_DEPS_EXT := $(patsubst %.o, %.d, $(CPP_OBJS_EXT))
+RC_OBJS_EXT  := $(addprefix $(BIN_DIR)/, $(RC_OBJS))
 
 # create $(BIN_DIR) if it does not exist
 ifeq ("$(wildcard $(BIN_DIR))","")
@@ -138,7 +155,6 @@ all: $(TARGET_EXE)
 
 $(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
-	cp $@ ../../bin
 
 $(BIN_DIR)/%.d : %.cpp
 	$(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $< > $@
@@ -152,8 +168,6 @@ $(BIN_DIR)/%.o : %.cpp
 $(BIN_DIR)/%.o : %.c
 	$(CC) $(CFLAGS) $< -o $@
 
-.PHONY : clean show
-
 # include dependency files only if our goal depends on their existence
 ifneq ($(MAKECMDGOALS),clean)
   ifneq ($(MAKECMDGOALS),show)
@@ -166,6 +180,7 @@ endif
 clean:
 	-$(RM) $(BIN_DIR)/*.o \
 	$(BIN_DIR)/*.d \
+	$(BIN_DIR)/*.map \
 	$(TARGET_EXE)
 
 show:

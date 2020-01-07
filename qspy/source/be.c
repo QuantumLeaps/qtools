@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-12-31
+* Last updated on  2020-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -37,11 +37,10 @@
 ******************************************************************************
 * @endcond
 */
-#include <string.h>  /* for size_t */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"    /* QSPY data parser */
 #include "be.h"      /* Back-End interface */
 #include "pal.h"     /* Platform Abstraction Layer */

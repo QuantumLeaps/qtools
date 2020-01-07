@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2020-01-04
+* Last updated on  2020-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -96,37 +96,5 @@ extern PAL_VtblType PAL_vtbl;
 #ifdef __cplusplus
 }
 #endif
-
-/* portable "safe" facilities from <stdio.h> and <string.h> ................*/
-#ifdef _WIN32 /* Windows OS? */
-
-#define SNPRINTF_S(buf_, len_, format_, ...) \
-    _snprintf_s(buf_, len_, _TRUNCATE, format_, ##__VA_ARGS__)
-
-#define STRNCPY_S(dest_, src_, len_) \
-    strncpy_s(dest_, len_, src_, _TRUNCATE)
-
-#define FOPEN_S(fp_, fName_, mode_) \
-if (fopen_s(&fp_, fName_, mode_) != 0) { \
-    fp_ = (FILE *)0; \
-} else (void)0
-
-#define LOCALTIME_S(tm_, time_) \
-    localtime_s(tm_, time_)
-
-#else /* other OS (Linux, MacOS, etc.) */
-
-#define SNPRINTF_S(buf_, len_, format_, ...) \
-    snprintf(buf_, len_, format_, ##__VA_ARGS__)
-
-#define STRNCPY_S(dest_, src_, len_) strncpy(dest_, src_, len_)
-
-#define FOPEN_S(fp_, fName_, mode_) \
-    (fp_ = fopen(fName_, mode_))
-
-#define LOCALTIME_S(tm_, time_) \
-    memcpy(tm_, localtime(time_), sizeof(struct tm))
-
-#endif /* _WIN32 */
 
 #endif /* pal_h */

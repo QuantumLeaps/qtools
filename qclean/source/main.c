@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2020-01-03
+* Last updated on  2020-01-05
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -37,12 +37,11 @@
 ******************************************************************************
 * @endcond
 */
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qclean.h"
 #include "getopt.h"
 
@@ -155,7 +154,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     bool isReadOnly = false;
 
     ++l_nFiles;
-    printf(".");
+    PRINTF_S("%c", '.');
 
     if (ro_info >= 0) { /* read-only information available right away? */
         if (ro_info > 0) {
@@ -164,7 +163,8 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         }
     }
     else { /* read-only information not available */
-        f = fopen(fname, "r+"); /*open for reading/writing (non destructive)*/
+        /* open for reading/writing (non destructive) */
+        FOPEN_S(f, fname, "r+");
         if (f == (FILE*)0) { /* can't write */
             isReadOnly = true;
             ++l_nReadOnly;
@@ -177,15 +177,15 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         return;
     }
 
-    f = fopen(fname, "rb"); /* open for reading */
+    FOPEN_S(f, fname, "rb"); /* open for reading */
     if (f == (FILE*)0) {
         return;
     }
 
-    nBytes = fread(l_src, 1, sizeof(l_src), f);
+    nBytes = FREAD_S(l_src, sizeof(l_src), 1U, sizeof(l_src), f);
     fclose(f);
     if (nBytes == sizeof(l_src)) { /* full buffer? */
-        printf("\n%s(too big -- skipped)\n", fname);
+        PRINTF_S("\n%s(too big -- skipped)\n", fname);
         return;
     }
     for (; nBytes > 0; --nBytes, ++src) {
@@ -214,9 +214,8 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 ++lineCtr;
 
                 /* always cleanup trailing blanks... */
-                while (*(dst - 1) == ' ') {
+                for (; (*(dst - 1) == ' ') && (dst > l_dst); --dst) {
                     found |= TRAIL_WS_FLG; /* removed trailing blank */
-                    --dst;
                 }
 
                 if (((flags & CR_FLG) == 0) /* don't clean CRLF? */
@@ -247,47 +246,48 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         }
         prev = *src;
         if (dst >= &l_dst[sizeof(l_dst)]) {
-            printf("\nError: too big!\n");
+            PRINTF_S("\n%s\n", "Error: too big!");
             return;
         }
     }
     if (found) { /* anything found? */
-        printf("\n%s", fname);
+        PRINTF_S("\n%s", fname);
         if (!l_noCleanup && !isReadOnly) { /* not read-only? */
             ++l_nCleaned;
-            f = fopen(fname, "wb"); /* binary to use LF EOL convention */
+            /* binary to use LF EOL convention */
+            FOPEN_S(f, fname, "wb");
             if (f == 0) {
-                printf(" ERROR: cannot modify!\n");
+                PRINTF_S(" %s\n", "ERROR: cannot modify!");
                 return;
             }
             fwrite(l_dst, 1, dst - l_dst, f);
             fclose(f);
-            printf(" CLEANED(");
+            PRINTF_S(" %s", "CLEANED(");
         }
         else {
             ++l_nDirty;
-            printf(" FOUND(");
+            PRINTF_S(" %s", "FOUND(");
         }
-        if (isReadOnly)                   printf("Read-only,");
-        if ((found  & TRAIL_WS_FLG) != 0) printf("Trail-WS,");
-        if ((found  & TAB_FLG     ) != 0) printf("TABs,");
-        if ((found  & CR_FLG      ) != 0) printf("CRs,");
-        if ((found  & LF_FLG      ) != 0) printf("LFs,");
+        if (isReadOnly)                   PRINTF_S("%s", "Read-only,");
+        if ((found  & TRAIL_WS_FLG) != 0) PRINTF_S("%s", "Trail-WS,");
+        if ((found  & TAB_FLG     ) != 0) PRINTF_S("%s", "TABs,");
+        if ((found  & CR_FLG      ) != 0) PRINTF_S("%s", "CRs,");
+        if ((found  & LF_FLG      ) != 0) PRINTF_S("%s", "LFs,");
     }
     if (foundLLs) {
         ++l_nDirty;
         if (found == 0) {
-            printf("\n%s FOUND(Long-lines", fname);
+            PRINTF_S("\n%s FOUND(Long-lines", fname);
         }
         else if (!isReadOnly) {
-            printf(") FOUND(Long-lines");
+            PRINTF_S(") %s", "FOUND(Long-lines");
         }
         else {
-            printf("Long-lines");
+            PRINTF_S("%s", "Long-lines");
         }
     }
     if (found || foundLLs) {
-        printf(")\n");
+        PRINTF_S("%s\n", ")");
     }
 
     fflush(stdout);
@@ -312,9 +312,9 @@ int main(int argc, char *argv[]) {
     char const *rootDir = ".";
     int optChar;
 
-    printf("QClean " VERSION " Copyright (c) 2005-2020 Quantum Leaps\n"
+    PRINTF_S("%s", "QClean " VERSION " Copyright (c) 2005-2020 Quantum Leaps\n"
            "Documentation: https://www.state-machine.com/qtools/qclean.html\n");
-    printf("Usage: qclean [root-dir] [options]\n"
+    PRINTF_S("%s", "Usage: qclean [root-dir] [options]\n"
     "       root-dir root directory for recursive cleanup (default is .)\n"
     "       options  control the cleanup, -h prints the help\n");
 
@@ -322,21 +322,21 @@ int main(int argc, char *argv[]) {
     if ((argc > 1) && (argv[1][0] != '-')) { /* root directory */
         rootDir = argv[1];
     }
-    printf("root-directory: %s\n", rootDir);
+    PRINTF_S("root-directory: %s\n", rootDir);
     while ((optChar = getopt(argc, argv, ":hqrl::")) != -1) {
          switch (optChar) {
              case 'h': { /* help */
-                 printf(l_helpStr, LINE_LIMIT);
+                 PRINTF_S(l_helpStr, LINE_LIMIT);
                  return 0;
              }
              case 'q': { /* query only (no cleanup) */
                  l_noCleanup = true;
-                 printf("-q query-only\n");
+                 PRINTF_S("%s\n", "-q query-only");
                  break;
              }
              case 'r': { /* check also read-only files */
                  l_doReadOnly = true;
-                 printf("-r check also read-only files\n");
+                 PRINTF_S("%s\n", "-r check also read-only files");
                  break;
              }
              case 'l': { /* check long lines */
@@ -346,11 +346,11 @@ int main(int argc, char *argv[]) {
                  else { /* apply the default */
                      l_lineLimit = LINE_LIMIT;
                  }
-                 printf("-l line-length:%d\n", l_lineLimit);
+                 PRINTF_S("-l line-length:%d\n", l_lineLimit);
                  break;
              }
              default: { /* unknown option */
-                 printf(l_helpStr, LINE_LIMIT);
+                 PRINTF_S(l_helpStr, LINE_LIMIT);
                  return -1;
              }
          }
@@ -358,16 +358,16 @@ int main(int argc, char *argv[]) {
 
     l_nFiles = 0;
     filesearch(rootDir);
-    printf("\n---------------------------------------"
+    PRINTF_S("\n---------------------------------------"
            "----------------------------------------\n"
            "Files processed:%d ", l_nFiles);
     if (l_noCleanup) {
-        printf("read-only:%d%s, nothing-cleaned(-q), still-dirty:%d\n",
+        PRINTF_S("read-only:%d%s, nothing-cleaned(-q), still-dirty:%d\n",
                l_nReadOnly, (l_doReadOnly ? "(checked)" : "(skipped)"),
                l_nDirty);
     }
     else {
-        printf("read-only:%d%s, cleaned:%d, still-dirty:%d\n",
+        PRINTF_S("read-only:%d%s, cleaned:%d, still-dirty:%d\n",
                l_nReadOnly, (l_doReadOnly ? "(checked)" : "(skipped)"),
                l_nCleaned,
                l_nDirty);
