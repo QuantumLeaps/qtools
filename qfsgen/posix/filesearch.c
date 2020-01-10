@@ -44,7 +44,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qfsgen.h"
 
 /*..........................................................................*/

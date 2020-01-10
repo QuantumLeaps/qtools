@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-01-03
+* Last updated on  2019-01-08
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -108,7 +108,7 @@ typedef int (*QSPY_CustParseFun)(QSpyRecord * const me);
 typedef void (*QSPY_resetFun)(void);
 
 void        QSpyRecord_init     (QSpyRecord * const me,
-                                 uint8_t const *start, uint32_t tot_len);
+                                 uint8_t const *start, size_t tot_len);
 QSpyStatus  QSpyRecord_OK       (QSpyRecord * const me);
 uint32_t    QSpyRecord_getUint32(QSpyRecord * const me, uint8_t size);
 int32_t     QSpyRecord_getInt32 (QSpyRecord * const me, uint8_t size);
@@ -154,11 +154,11 @@ void QSPY_sendObj(QSpyRecord const * const qrec);
 void QSPY_sendCmd(QSpyRecord const * const qrec);
 void QSPY_sendTP (QSpyRecord const * const qrec);
 
-uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
-                     uint8_t const *srcBuf, uint32_t srcBytes);
-uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize);
-uint32_t QSPY_encodeInfoCmd (uint8_t *dstBuf, uint32_t dstSize);
-uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate);
+size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
+                   uint8_t const *srcBuf, size_t srcBytes);
+size_t QSPY_encodeResetCmd(uint8_t *dstBuf, size_t dstSize);
+size_t QSPY_encodeInfoCmd (uint8_t *dstBuf, size_t dstSize);
+size_t QSPY_encodeTickCmd (uint8_t *dstBuf, size_t dstSize, uint8_t rate);
 
 SigType QSPY_findSig(char const *name, ObjType obj);
 KeyType QSPY_findObj(char const *name);

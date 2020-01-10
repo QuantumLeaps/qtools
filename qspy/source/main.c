@@ -43,11 +43,11 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"    /* QSPY data parser */
-#include "be.h"      /* Back-End interface */
-#include "pal.h"     /* Platform Abstraction Layer */
-#include "getopt.h"  /* command-line option processor */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"     /* QSPY data parser */
+#include "be.h"       /* Back-End interface */
+#include "pal.h"      /* Platform Abstraction Layer */
+#include "getopt.h"   /* command-line option processor */
 
 /*..........................................................................*/
 enum { FNAME_SIZE = 256 };

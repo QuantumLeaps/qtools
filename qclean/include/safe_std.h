@@ -37,8 +37,8 @@
 ******************************************************************************
 * @endcond
 */
-#ifndef SAFE_IO_H
-#define SAFE_IO_H
+#ifndef SAFE_STD_H
+#define SAFE_STD_H
 
 #include <stdio.h>
 #include <string.h>
@@ -105,4 +105,4 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
 
 #endif /* _WIN32 */
 
-#endif /* SAFE_IO_H */
+#endif /* SAFE_STD_H */

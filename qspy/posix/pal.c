@@ -53,10 +53,10 @@
 #include <errno.h>
 #include <time.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"    /* QSPY data parser */
-#include "be.h"      /* Back-End interface */
-#include "pal.h"     /* Platform Abstraction Layer */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"     /* QSPY data parser */
+#include "be.h"       /* Back-End interface */
+#include "pal.h"      /* Platform Abstraction Layer */
 
 /*..........................................................................*/
 PAL_VtblType PAL_vtbl;   /* global PAL virtual table */

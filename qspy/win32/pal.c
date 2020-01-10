@@ -43,7 +43,7 @@
 #include <conio.h>
 #include <ws2tcpip.h> /* for Windows socket facilities */
 
-#include "safe_io.h"  /* "safe" <stdio.h> and <string.h> facilities */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
 #include "be.h"       /* Back-End interface */
 #include "pal.h"      /* Platform Abstraction Layer */
@@ -658,7 +658,7 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
 
     /* attempt to receive packet from the Back-End socket (non-blocking) */
     beReturnAddrSize = sizeof(l_beReturnAddr);
-    status = recvfrom(l_beSock, (char *)buf, *pBytes, 0,
+    status = recvfrom(l_beSock, (char *)buf, (int)*pBytes, 0,
                       &l_beReturnAddr, &beReturnAddrSize);
     if (status != SOCKET_ERROR) {  /* reception succeeded? */
         l_beReturnAddrSize = beReturnAddrSize; /* attach connection */

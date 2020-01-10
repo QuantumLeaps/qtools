@@ -43,9 +43,9 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"    /* QSPY data parser */
-#include "pal.h"     /* Platform Abstraction Layer */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"     /* QSPY data parser */
+#include "pal.h"      /* Platform Abstraction Layer */
 
 typedef char     char_t;
 typedef float    float32_t;
@@ -85,8 +85,8 @@ static ObjType       l_currSM;  /* Current State Machine Object from FE */
     }
 
 /*..........................................................................*/
-uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
-                     uint8_t const *srcBuf, uint32_t srcBytes)
+size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
+                   uint8_t const *srcBuf, size_t srcBytes)
 {
     uint8_t chksum = 0U;
     uint8_t b;
@@ -114,19 +114,19 @@ uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
     return dst - &dstBuf[0];  /* number of bytes in the destination */
 }
 /*..........................................................................*/
-uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize) {
+size_t QSPY_encodeResetCmd(uint8_t *dstBuf, size_t dstSize) {
     static uint8_t const s_QS_RX_RESET[] = { 0x00U, QS_RX_RESET };
     return QSPY_encode(dstBuf, dstSize,
                        s_QS_RX_RESET, sizeof(s_QS_RX_RESET));
 }
 /*..........................................................................*/
-uint32_t QSPY_encodeInfoCmd(uint8_t *dstBuf, uint32_t dstSize) {
+size_t QSPY_encodeInfoCmd(uint8_t *dstBuf, size_t dstSize) {
     static uint8_t const s_QS_RX_INFO[] = { 0x00U, QS_RX_INFO };
     return QSPY_encode(dstBuf, dstSize,
                        s_QS_RX_INFO, sizeof(s_QS_RX_INFO));
 }
 /*..........................................................................*/
-uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate){
+size_t QSPY_encodeTickCmd (uint8_t *dstBuf, size_t dstSize, uint8_t rate){
     uint8_t a_QS_RX_TICK[] = { 0x00U, QS_RX_TICK, 0U };
     a_QS_RX_TICK[2] = rate;
     return QSPY_encode(dstBuf, dstSize,
@@ -155,7 +155,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
             QSPY_printError();
         }
         else {
-            uint32_t nBytes;
+            size_t nBytes;
             uint8_t *evtPkt = (uint8_t *)&qrec->start[0]; /*cast const away*/
 
             evtPkt[0] = (uint8_t)0;
@@ -201,7 +201,7 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        uint32_t nBytes;
+        size_t nBytes;
         uint8_t *objPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         objPkt[0] = (uint8_t)0;
@@ -273,7 +273,7 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        uint32_t nBytes;
+        size_t nBytes;
         uint8_t *cmdPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         cmdPkt[0] = (uint8_t)0;
@@ -305,7 +305,7 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        uint32_t nBytes;
+        size_t nBytes;
         uint8_t *tpPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         tpPkt[0] = (uint8_t)0;

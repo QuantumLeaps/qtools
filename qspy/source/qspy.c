@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2019-01-05
+* Last updated on  2019-01-08
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -43,9 +43,9 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"    /* QSPY data parser */
-#include "pal.h"     /* Platform Abstraction Layer */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"     /* QSPY data parser */
+#include "pal.h"      /* Platform Abstraction Layer */
 
 typedef char     char_t;
 typedef float    float32_t;
@@ -433,12 +433,12 @@ QSpyConfig const *QSPY_getConfig(void) {
 }
 /*..........................................................................*/
 void QSpyRecord_init(QSpyRecord * const me,
-                     uint8_t const *start, uint32_t tot_len)
+                     uint8_t const *start, size_t tot_len)
 {
     me->start   = start;
-    me->tot_len = tot_len;
+    me->tot_len = (uint32_t)tot_len;
+    me->len     = (uint32_t)(tot_len - 3U);
     me->pos     = start + 2;
-    me->len     = tot_len - 3U;
     me->rec     = start[1];
 }
 /*..........................................................................*/
@@ -2403,7 +2403,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
 
 /*..........................................................................*/
 void QSPY_setExternDict(char const *dictName) {
-    SNPRINTF_S(l_dictFileName, sizeof(l_dictFileName), dictName);
+    SNPRINTF_S(l_dictFileName, sizeof(l_dictFileName), "%s", dictName);
 }
 /*..........................................................................*/
 QSpyStatus QSPY_writeDict(void) {
@@ -2521,7 +2521,7 @@ QSpyStatus QSPY_readDict(void) {
                (unsigned)l_config.tstamp[0]);
     }
     else { /* manual dictionaries */
-        SNPRINTF_S(name, sizeof(name), l_dictFileName);
+        SNPRINTF_S(name, sizeof(name), "%s", l_dictFileName);
     }
 
     FOPEN_S(dictFile, name, "r");

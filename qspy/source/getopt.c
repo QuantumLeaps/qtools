@@ -3,8 +3,8 @@
 *
 * Copyright (c) 2002-2003, Mark K. Kim
 * Copyright (c) 2012-2017, Kim Grasman <kim.grasman@gmail.com>
+* Copyright (c) 2018-2020, Quantum Leaps 2018 <https://www.state-machine.com>
 *
-* Modified by Quantum Leaps 2018 <https://www.state-machine.com>
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 #include <stdlib.h>
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "getopt.h"
 
 char const *optarg = NULL;

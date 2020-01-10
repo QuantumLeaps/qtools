@@ -45,7 +45,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>  /* Win32 API */
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qclean.h"
 
 /*..........................................................................*/

@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.6.0
-# Last updated on  2019-07-30
+# Last updated for version 6.7.0
+# Last updated on  2020-01-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -25,11 +25,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# www.state-machine.com
-# info@state-machine.com
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
 #-----------------------------------------------------------------------------
 
 # for compatibility from Python 2
@@ -57,7 +57,7 @@ else:
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 660
+    _VERSION = 670
 
     # class variables
     _host_exe = ''
@@ -980,6 +980,10 @@ class qspy:
 def _main(argv):
     startTime = qutest._time()
 
+    # on Windows enable color escape characters in the console...
+    if os.name == 'nt':
+        os.system('color')
+
     print('QUTest unit testing front-end %d.%d.%d running on Python %s' \
         %(qutest._VERSION//100,
             (qutest._VERSION//10) % 10,
@@ -1049,9 +1053,12 @@ def _main(argv):
             break
 
     if qutest._num_failed == 0:
-        status = 'OK'
+        # print 'OK' in GREEN
+        status = '\033[92mOK\033[0m'
     else:
-        status = 'FAIL!'
+        # print 'FAIL!' in RED
+        status = '\033[91mFAIL!\033[0m'
+
     if qutest._have_info:
         print('============= Target:',
                qspy._target_info['target'], '==============')

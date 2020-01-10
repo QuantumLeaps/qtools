@@ -40,10 +40,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "safe_io.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"    /* QSPY data parser */
-#include "be.h"      /* Back-End interface */
-#include "pal.h"     /* Platform Abstraction Layer */
+#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"     /* QSPY data parser */
+#include "be.h"       /* Back-End interface */
+#include "pal.h"      /* Platform Abstraction Layer */
 
 typedef char     char_t;
 typedef float    float32_t;
@@ -130,10 +130,9 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
     /* check if this is a packet to be forwarded directly to the Target */
     if (buf[1] < 128) {
         static uint8_t qbuf[QS_MAX_RECORD_SIZE]; /* encoded QS record */
-        uint32_t len;
 
         /* encode the packet according to the QS/QSPY protocol */
-        len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
+        size_t len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
         if (len > 0U) {
             if ((*PAL_vtbl.send2Target)(qbuf, len) != QSPY_SUCCESS) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Sedning Data "
