@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated on  2020-02-06
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -535,7 +535,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     }
 
     /* try to receive data from the File... */
-    nBytes = FREAD_S(buf, sizeof(buf), 1U, (int)(*pBytes), l_file);
+    nBytes = FREAD_S(buf, *pBytes, 1U, *pBytes, l_file);
     if (nBytes > 0) {
         *pBytes = nBytes;
         return QSPY_TARGET_INPUT_EVT;

@@ -25,6 +25,7 @@
 version-*
 
 html/
+test_priv/
 bin/*.exe
 bin/*.dll
 bin/*.conf
