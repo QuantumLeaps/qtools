@@ -14,14 +14,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 6.6.0
-# Last updated on  2019-11-30
+# Last updated for version 6.8.0
+# Last updated on  2020-03-17
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -42,7 +42,7 @@
 # along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# <www.state-machine.com>
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 #-----------------------------------------------------------------------------
 # @endcond

@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.8.0
+* Last updated on  2020-01-20
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -58,30 +58,30 @@ typedef void     QEvt;
 #ifndef Q_SPY
 #define Q_SPY 1
 #endif
-#include "qs_copy.h" /* copy of the target-resident QS interface */
+#include "qs_copy.h"     /* copy of the target-resident QS interface */
 
 /*..........................................................................*/
-static uint8_t       l_dstBuf[1024]; /* for encoding from FE to Target */
-static uint8_t       l_txTargetSeq;  /* transmit Target sequence number */
-static ObjType       l_currSM;  /* Current State Machine Object from FE */
+static uint8_t   l_dstBuf[1024]; /* for encoding from FE to Target */
+static uint8_t   l_txTargetSeq;  /* transmit Target sequence number */
+static ObjType   l_currSM;       /* current State Machine Object from FE */
 
 /****************************************************************************/
-/*! helper macro to insert an un-escaped byte into the QS buffer */
-#define QS_INSERT_BYTE(b_) \
-    *dst++ = (b_); \
+/*! helper macro to insert an un-escaped byte into the QSPY buffer */
+#define QSPY_INSERT_BYTE(b_)                      \
+    *dst++ = (b_);                                \
     if ((uint8_t)(dst - &dstBuf[0]) >= dstSize) { \
-        return 0U; \
+        return 0U;                                \
     }
 
 /*! helper macro to insert an escaped byte into the QS buffer */
-#define QS_INSERT_ESC_BYTE(b_) \
-    chksum = (uint8_t)(chksum + (b_)); \
+#define QSPY_INSERT_ESC_BYTE(b_)                  \
+    chksum = (uint8_t)(chksum + (b_));            \
     if (((b_) != QS_FRAME) && ((b_) != QS_ESC)) { \
-        QS_INSERT_BYTE(b_) \
-    } \
-    else { \
-        QS_INSERT_BYTE(QS_ESC) \
-        QS_INSERT_BYTE((uint8_t)((b_) ^ QS_ESC_XOR)) \
+        QSPY_INSERT_BYTE(b_)                      \
+    }                                             \
+    else {                                        \
+        QSPY_INSERT_BYTE(QS_ESC)                  \
+        QSPY_INSERT_BYTE((uint8_t)((b_) ^ QS_ESC_XOR)) \
     }
 
 /*..........................................................................*/
@@ -89,8 +89,6 @@ size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
                    uint8_t const *srcBuf, size_t srcBytes)
 {
     uint8_t chksum = 0U;
-    uint8_t b;
-
     uint8_t *dst = &dstBuf[0];
     uint8_t const *src = &srcBuf[1]; /* skip the sequence from the source */
 
@@ -98,18 +96,18 @@ size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
 
     /* supply the sequence number */
     ++l_txTargetSeq;
-    b = l_txTargetSeq;
-    QS_INSERT_ESC_BYTE(b); /* insert esceped sequence into destination */
+    uint8_t b = l_txTargetSeq;
+    QSPY_INSERT_ESC_BYTE(b); /* insert esceped sequence */
 
-    for (; srcBytes > 0; ++src, --srcBytes) {
+    for (; srcBytes > 0U; ++src, --srcBytes) {
         b = *src;
-        QS_INSERT_ESC_BYTE(b) /* insert all escaped bytes into destination */
+        QSPY_INSERT_ESC_BYTE(b) /* insert all escaped bytes */
     }
 
     b = chksum;
-    b ^= 0xFFU;               /* invert the bits of the checksum */
-    QS_INSERT_ESC_BYTE(b)     /* insert the escaped checksum */
-    QS_INSERT_BYTE(QS_FRAME)  /* insert un-escaped frame */
+    b ^= 0xFFU;                /* invert the bits of the checksum */
+    QSPY_INSERT_ESC_BYTE(b)    /* insert the escaped checksum */
+    QSPY_INSERT_BYTE(QS_FRAME) /* insert un-escaped frame */
 
     return dst - &dstBuf[0];  /* number of bytes in the destination */
 }
@@ -158,7 +156,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
             size_t nBytes;
             uint8_t *evtPkt = (uint8_t *)&qrec->start[0]; /*cast const away*/
 
-            evtPkt[0] = (uint8_t)0;
+            evtPkt[0] = 0U;
             evtPkt[1] = (uint8_t)QS_RX_EVENT;
 
             /* insert the found Signal 'sig' into the binary record */
@@ -204,7 +202,7 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
         size_t nBytes;
         uint8_t *objPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
-        objPkt[0] = (uint8_t)0;
+        objPkt[0] = 0U;
         if (qrec->rec == QSPY_SEND_LOC_FILTER) {
             objPkt[1] = (uint8_t)QS_RX_LOC_FILTER;
         }
@@ -276,7 +274,7 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
         size_t nBytes;
         uint8_t *cmdPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
-        cmdPkt[0] = (uint8_t)0;
+        cmdPkt[0] = 0U;
         cmdPkt[1] = (uint8_t)QS_RX_COMMAND;
         cmdPkt[2] = (uint8_t)key;
 
@@ -308,7 +306,7 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
         size_t nBytes;
         uint8_t *tpPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
-        tpPkt[0] = (uint8_t)0;
+        tpPkt[0] = 0U;
         tpPkt[1] = (uint8_t)QS_RX_TEST_PROBE;
 
         if (funPtrSize >= 2) {
@@ -339,6 +337,6 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
 }
 /*..........................................................................*/
 void QSPY_txReset(void) {
-    l_txTargetSeq = (uint8_t)0;
+    l_txTargetSeq = 0U;
     l_currSM = (ObjType)(~0U); /* invalidate */
 }

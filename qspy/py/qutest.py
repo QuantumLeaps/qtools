@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.7.0
-# Last updated on  2020-01-09
+# Last updated for version 6.8.0
+# Last updated on  2020-01-20
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -57,7 +57,7 @@ else:
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 670
+    _VERSION = 680
 
     # class variables
     _host_exe = ''
@@ -81,8 +81,21 @@ class qutest:
     # timeout value [seconds]
     _TOUT = 1.000
 
-    # test command options
+    # options for implemented commands
     _OPT_NORESET = 0x01
+
+    # output strings with decorations (colors/backgrounds)
+    _STR_TEST_PASS  = 'PASS' # no decorations
+    _STR_TEST_FAIL  = '\033[31mFAIL\033[0m' # RED
+    _STR_ERR1       = '\033[41m\033[37m' # WHITE on RED
+    _STR_ERR2       = '\033[0m'    # expectation end DEFAULT
+    _STR_EXP1       = '\033[44m\033[37m' # WHITE on BLUE
+    _STR_EXP2       = '\033[0m'    # expectation end DEFAULT
+    _STR_EXC1       = '\033[31m' # exception text begin RED
+    _STR_EXC2       = '\033[0m'    # exception text end   DEFAULT
+    _STR_FINAL_OK   = '\033[42m    \033[30m OK     \033[0m'
+    _STR_FINAL_FAIL = '\033[41m   \033[1;37m FAIL    \033[0m'
+    _STR_QSPY_FAIL  = '\033[1;91mFAIL\033[0m'
 
     def __init__(self):
         qutest._have_target = False
@@ -198,11 +211,11 @@ class qutest:
         elif self._state == qutest._TEST:
 
             if not qspy._receive(): # timeout?
-                self._fail('expected: "%s"' %match,
-                           'received: "" (timeout)')
+                self._fail('got: "" (timeout)',
+                           'exp: "%s"' %match)
                 return False
 
-            if match.startswith('@timestamp') or match.startswith('%timestamp'):
+            if match.startswith('@timestamp'):
                 self._timestamp += 1
                 expected = '%010d' %self._timestamp + match[10:]
             elif match[0:9].isdigit():
@@ -216,8 +229,8 @@ class qutest:
             if fnmatchcase(received, expected):
                 return True
             else:
-                self._fail('expected: "%s"' %expected,
-                           'received: "%s"' %received)
+                self._fail('got: "%s"' %received,
+                           'exp: "%s"' %expected)
                 return False
         elif self._state == qutest._FAIL or self._state == qutest._SKIP:
             pass # ignore
@@ -603,7 +616,7 @@ class qutest:
                     RuntimeError,
                     OSError) as e:
                 qutest_inst._fail()
-                print(repr(e))
+                print(qutest._STR_EXC1 + repr(e) + qutest._STR_EXC2)
                 err = -2
             except: # most likely an error in a test script
                 #exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -631,20 +644,21 @@ class qutest:
 
         qspy._sendTo(struct.pack('<B', qspy._TRGT_TEST_TEARDOWN))
         if not qspy._receive(): # timeout?
-            self._fail('expected: end-of-test',
-                       'received: "" (timeout)')
+            self._fail('got: "" (timeout)',
+                       'exp: end-of-test')
             return
 
         expected = '           Trg-Ack  QS_RX_TEST_TEARDOWN'
         received = qutest._last_record[3:].decode('utf-8')
         if received == expected:
             self._DSL_dict['on_teardown']()
-            print('PASS (%.3fs)'
-                  %(qutest._time() - self._startTime))
+            print('%s (%.3fs)' %(
+                qutest._STR_TEST_PASS,
+                qutest._time() - self._startTime))
             return
         else:
-            self._fail('expected: end-of-test',
-                       'received: "%s"' %received)
+            self._fail('got: "%s"' %received,
+                       'exp: end-of-test')
             # ignore all input until timeout
             while qspy._receive():
                 pass
@@ -699,14 +713,15 @@ class qutest:
         msg = '"' + command + '" before any test'
         raise SyntaxError(msg)
 
-    def _fail(self, msg1 = '', msg2 = ''):
-        print('FAIL @line:%d (%.3fs):' %(
+    def _fail(self, err = '', exp = ''):
+        print('%s @line:%d (%.3fs):'
+            %(qutest._STR_TEST_FAIL,
             getframeinfo(stack()[-4][0]).lineno,
             qutest._time() - self._startTime))
-        if msg1 != '':
-            print(' ', msg1)
-        if msg2 != '':
-            print(' ', msg2)
+        if exp != '':
+            print(qutest._STR_EXP1 + exp + qutest._STR_EXP2)
+        if err != '':
+            print(qutest._STR_ERR1 + err + qutest._STR_ERR2)
         qutest._num_failed += 1
         qutest._need_reset = True
         self._tran(qutest._FAIL)
@@ -837,7 +852,7 @@ class qspy:
             print('OK')
             return True
         else:
-            print('FAIL!')
+            print(qutest._STR_QSPY_FAIL)
             return False
 
     @staticmethod
@@ -988,7 +1003,7 @@ def _main(argv):
         %(qutest._VERSION//100,
             (qutest._VERSION//10) % 10,
             qutest._VERSION % 10, python_version()))
-    print('Copyright (c) 2005-2019 Quantum Leaps, www.state-machine.com')
+    print('Copyright (c) 2005-2020 Quantum Leaps, www.state-machine.com')
 
     # list of scripts to exectute...
     scripts = []
@@ -1054,10 +1069,10 @@ def _main(argv):
 
     if qutest._num_failed == 0:
         # print 'OK' in GREEN
-        status = '\033[92mOK\033[0m'
+        status = qutest._STR_FINAL_OK
     else:
         # print 'FAIL!' in RED
-        status = '\033[91mFAIL!\033[0m'
+        status = qutest._STR_FINAL_FAIL
 
     if qutest._have_info:
         print('============= Target:',

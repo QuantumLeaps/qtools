@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.8.0
+* Last updated on  2020-01-20
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -46,9 +46,8 @@ extern "C" {
 
 QSpyStatus PAL_openBE(int portNum); /* open Back-End socket */
 void PAL_closeBE(void);             /* close Back-End socket */
-void PAL_send2FE(unsigned char const *buf, size_t nBytes); /* to Front-End*/
+void PAL_send2FE(unsigned char const *buf, size_t nBytes); /* to Front-End */
 void PAL_detachFE(void);            /* detach Front-End */
-
 void PAL_clearScreen(void);
 
 QSpyStatus PAL_openTargetSer(char const *comName, int baudRate);
@@ -65,10 +64,11 @@ typedef enum {
     QSPY_ERROR_EVT
 } QSPYEvtType;
 
-#define QS_FRAME            ((uint8_t)0x7E)
-#define QS_ESC              ((uint8_t)0x7D)
-#define QS_GOOD_CHKSUM      ((uint8_t)0xFF)
-#define QS_ESC_XOR          ((uint8_t)0x20)
+/* QP/Spy protocol constants */
+#define QS_FRAME            0x7EU
+#define QS_ESC              0x7DU
+#define QS_ESC_XOR          0x20U
+#define QS_GOOD_CHKSUM      0xFFU
 
 /* The PAL "virtual table" contains operations that are dependent
 * on the choice of target connection. This connection is chosen
@@ -85,12 +85,12 @@ extern PAL_VtblType PAL_vtbl;
 
 /* QSPY assertions... */
 #ifdef Q_NASSERT /* Q_NASSERT defined--assertion checking disabled */
-    #define Q_ASSERT(test_)             ((void)0)
+    #define Q_ASSERT(test_)  ((void)0)
 #else  /* assertion checking enabled */
     #define Q_ASSERT(test_) ((test_) \
         ? (void)0 : Q_onAssert(__FILE__, __LINE__))
 
-    void Q_onAssert(char const * const file, int line);
+    void Q_onAssert(char const * const module, int location);
 #endif
 
 #ifdef __cplusplus

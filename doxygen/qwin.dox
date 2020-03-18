@@ -4,10 +4,10 @@
 <img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/logo_qwin.jpg" title="QWin">
 @endhtmlonly
 
-<p>When developing embedded code for devices with non-trivial user interfaces, it often pays off to build a prototype (virtual prototype) of the embedded system of a PC. The strategy is called "dual targeting", because you develop software on one machine (e.g., Windows PC) and run it on a deeply embedded target, as well as on the PC. Dual targeting is the main strategy for avoiding the "target system bottleneck" in the agile embedded software development.
+<p>When developing embedded code for devices with non-trivial user interfaces, it often pays off to build a prototype (virtual prototype) of the embedded system on a PC. The strategy is called "dual targeting", because you develop software on one machine (e.g., Windows PC) and run it on a deeply embedded target, as well as on the PC. Dual targeting is the main strategy for avoiding the "target system bottleneck" in the agile embedded software development.
 
 @note
-Please note that dual targeting does not mean that the embedded device has anything to do with the PC. Neither it means that the simulation must be cycle-exact with the embedded target CPU. Instead, dual targeting simply means that from day one, your embedded code (typically in C or C++) is designed to run on at least two platforms: the final target hardware and your PC. All you really need for this is two C/C++ compilers: one for the PC and another for the embedded device.
+Please note that dual targeting does not mean that the embedded device has anything to do with the PC or Windows. Neither it means that the simulation must be cycle-exact with the embedded target CPU. Instead, dual targeting simply means that from day one, your embedded code (typically in C or C++) is designed to run on at least two platforms: the final target hardware and your PC. All you really need for this is two C/C++ compilers: one for the PC and another for the embedded device.
 
 
 ------------------------------------------------------------------------------

@@ -9,14 +9,14 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- QSPY interface package
-# Last updated for version 6.3.6
-# Last updated on  2018-10-03
+# Last updated for version 6.8.0
+# Last updated on  2020-03-17
 #
-#                    Q u a n t u m     L e a P s
-#                    ---------------------------
-#                    innovating embedded systems
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -34,15 +34,15 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# https://www.state-machine.com
-# mailto:info@state-machine.com
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
 #-----------------------------------------------------------------------------
 # @endcond
 
-package provide qspy 6.3
+package provide qspy 6.8
 
 package require Tcl  8.4   ;# need at least Tcl 8.4
 package require udp        ;# need the UDP sockets for Tcl

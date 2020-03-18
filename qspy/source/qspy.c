@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2019-01-08
+* Last updated for version 6.8.0
+* Last updated on  2020-01-20
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -58,7 +58,7 @@ typedef void     QEvt;
 #ifndef Q_SPY
 #define Q_SPY 1
 #endif
-#include "qs_copy.h" /* copy of the target-resident QS interface */
+#include "qs_copy.h"     /* copy of the target-resident QS interface */
 
 /* global objects ..........................................................*/
 QSPY_LastOutput QSPY_output;
@@ -466,16 +466,16 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
 }
 /*..........................................................................*/
 uint32_t QSpyRecord_getUint32(QSpyRecord * const me, uint8_t size) {
-    uint32_t ret = (uint32_t)0;
+    uint32_t ret = 0U;
 
     if (me->len >= size) {
-        if (size == (uint8_t)1) {
+        if (size == 1U) {
             ret = (uint32_t)me->pos[0];
         }
-        else if (size == (uint8_t)2) {
+        else if (size == 2U) {
             ret = (((uint32_t)me->pos[1] << 8) | (uint32_t)me->pos[0]);
         }
-        else if (size == (uint8_t)4) {
+        else if (size == 4U) {
             ret = ((((((uint32_t)me->pos[3] << 8)
                         | (uint32_t)me->pos[2]) << 8)
                           | (uint32_t)me->pos[1]) << 8)
@@ -500,18 +500,18 @@ int32_t QSpyRecord_getInt32(QSpyRecord * const me, uint8_t size) {
     int32_t ret = (int32_t)0;
 
     if (me->len >= size) {
-        if (size == (uint8_t)1) {
+        if (size == 1U) {
             ret = (uint32_t)me->pos[0];
             ret <<= 24;
             ret >>= 24; /* sign-extend */
         }
-        else if (size == (uint8_t)2) {
+        else if (size == 2U) {
             ret = ((uint32_t)me->pos[1] << 8)
                         | (uint32_t)me->pos[0];
             ret <<= 16;
             ret >>= 16; /* sign-extend */
         }
-        else if (size == (uint8_t)4) {
+        else if (size == 4U) {
             ret = ((((((int32_t)me->pos[3] << 8)
                         | (uint32_t)me->pos[2]) << 8)
                           | (uint32_t)me->pos[1]) << 8)
@@ -533,23 +533,23 @@ int32_t QSpyRecord_getInt32(QSpyRecord * const me, uint8_t size) {
 }
 /*..........................................................................*/
 uint64_t QSpyRecord_getUint64(QSpyRecord * const me, uint8_t size) {
-    uint64_t ret = (uint64_t)0;
+    uint64_t ret = 0U;
 
     if (me->len >= size) {
-        if (size == (uint8_t)1) {
+        if (size == 1U) {
             ret = (uint64_t)me->pos[0];
         }
-        else if (size == (uint8_t)2) {
+        else if (size == 2U) {
             ret = (((uint64_t)me->pos[1] << 8)
                        | (uint32_t)me->pos[0]);
         }
-        else if (size == (uint8_t)4) {
+        else if (size == 4U) {
             ret = ((((((uint64_t)me->pos[3] << 8)
                         | (uint64_t)me->pos[2]) << 8)
                           | (uint64_t)me->pos[1]) << 8)
                             | (uint64_t)me->pos[0];
         }
-        else if (size == (uint8_t)8) {
+        else if (size == 8U) {
             ret = ((((((((((((((uint64_t)me->pos[7] << 8)
                         | (uint64_t)me->pos[6]) << 8)
                           | (uint64_t)me->pos[5]) << 8)
@@ -578,18 +578,18 @@ int64_t QSpyRecord_getInt64(QSpyRecord * const me, uint8_t size) {
     int64_t ret = (int64_t)0;
 
     if (me->len >= size) {
-        if (size == (uint8_t)1) {
+        if (size == 1U) {
             ret = (uint64_t)me->pos[0];
             ret <<= 56;
             ret >>= 56; /* sign-extend */
         }
-        else if (size == (uint8_t)2) {
+        else if (size == 2U) {
             ret = (((uint64_t)me->pos[1] << 8)
                        | (uint32_t)me->pos[0]);
             ret <<= 48;
             ret >>= 48; /* sign-extend */
         }
-        else if (size == (uint8_t)4) {
+        else if (size == 4U) {
             ret = ((((((uint64_t)me->pos[3] << 8)
                         | (uint64_t)me->pos[2]) << 8)
                           | (uint64_t)me->pos[1]) << 8)
@@ -597,7 +597,7 @@ int64_t QSpyRecord_getInt64(QSpyRecord * const me, uint8_t size) {
             ret <<= 32;
             ret >>= 32; /* sign-extend */
         }
-        else if (size == (uint8_t)8) {
+        else if (size == 8U) {
             ret = ((((((((((((((uint64_t)me->pos[7] << 8)
                         | (uint64_t)me->pos[6]) << 8)
                           | (uint64_t)me->pos[5]) << 8)
@@ -635,7 +635,7 @@ char const *QSpyRecord_getStr(QSpyRecord * const me) {
     *(e.g., with the Tcl "string match" command or regular explerssions).
     */
     for (l = me->len, p = me->pos; l > 0; --l, ++p) {
-        if (*p == (uint8_t)0) { /* zero-terminated end of the string? */
+        if (*p == 0U) { /* zero-terminated end of the string? */
             char const *s = (char const *)me->pos;
             if (*s == '&') {
                 ++s;  /* skip the leading '&' */
@@ -688,7 +688,7 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
     SNPRINTF_LINE("   <COMMS> ERROR    %d more bytes needed for memory-dump",
                  (int)me->len);
     me->len = -1;
-    *pNum = (uint32_t)0;
+    *pNum = 0U;
     QSPY_onPrintLn();
 
     return (uint8_t *)0;
@@ -826,7 +826,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             }
             case QS_MEM_T: {
                 uint8_t const *mem = QSpyRecord_getMem(me, 1, &u32);
-                for (; u32 > (uint32_t)0; --u32, ++mem) {
+                for (; u32 > 0U; --u32, ++mem) {
                     SNPRINTF_APPEND(" %02X", (unsigned int)*mem);
                     FPRINF_MATFILE(" %03d", (unsigned int)*mem);
                 }
@@ -835,7 +835,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             case QS_SIG_T: {
                 u32 = QSpyRecord_getUint32(me, l_config.sigSize);
                 u64 = QSpyRecord_getUint64(me, l_config.objPtrSize);
-                if (u64 != (uint64_t)0) {
+                if (u64 != 0U) {
                     SNPRINTF_APPEND("%s,Obj=%s",
                         SigDictionary_get(&l_sigDict, u32, u64, (char *)0),
                         Dictionary_get(&l_objDict, u64, (char *)0));
@@ -1181,7 +1181,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 q = QSpyRecord_getUint64(me, l_config.objPtrSize);
             }
             else {
-                q = (uint64_t)0;
+                q = 0U;
             }
             a = QSpyRecord_getUint32(me, l_config.sigSize);
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
@@ -1448,7 +1448,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 c = QSpyRecord_getUint32(me, 1);
             }
             else {
-                p = (uint64_t)0;
+                p = 0U;
                 a = QSpyRecord_getUint32(me, l_config.sigSize);
                 b = QSpyRecord_getUint32(me, 1);
                 c = b & 0x3F;
@@ -2160,7 +2160,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u Trg-Peek Offs=%d,Size=%d,Num=%d,Data=<",
                               t, a, b, c);
-                for (; c > (uint32_t)1; --c, w += b) {
+                for (; c > 1U; --c, w += b) {
                     switch (b) {
                         case 1:
                             SNPRINTF_APPEND("%02X,", (int)(*w & 0xFFU));
@@ -2233,16 +2233,16 @@ void QSPY_printError(void) {
 /****************************************************************************/
 static uint8_t l_record[QS_MAX_RECORD_SIZE];
 static uint8_t *l_pos   = l_record; /* position within the record */
-static uint8_t l_chksum = (uint8_t)0;
-static uint8_t l_esc    = (uint8_t)0;
-static uint8_t l_seq    = (uint8_t)0;
+static uint8_t l_chksum = 0U;
+static uint8_t l_esc    = 0U;
+static uint8_t l_seq    = 0U;
 
 /*..........................................................................*/
 void QSPY_reset(void) {
     l_pos    = l_record; /* position within the record */
-    l_chksum = (uint8_t)0;
-    l_esc    = (uint8_t)0;
-    l_seq    = (uint8_t)0;
+    l_chksum = 0U;
+    l_esc    = 0U;
+    l_seq    = 0U;
 }
 /*..........................................................................*/
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
@@ -2252,7 +2252,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
         uint8_t b = *buf++;
 
         if (l_esc) { /* escaped byte arrived? */
-            l_esc = (uint8_t)0;
+            l_esc = 0U;
             b ^= QS_ESC_XOR;
 
             l_chksum = (uint8_t)(l_chksum + b);
@@ -2272,13 +2272,13 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                                (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
-                l_chksum = (uint8_t)0;
+                l_chksum = 0U;
                 l_pos = l_record;
-                l_esc = (uint8_t)0;
+                l_esc = 0U;
             }
         }
         else if (b == QS_ESC) {   /* transparent byte? */
-            l_esc = (uint8_t)1;
+            l_esc = 1U;
         }
         else if (b == QS_FRAME) { /* frame byte? */
             if (l_chksum != QS_GOOD_CHKSUM) { /* bad checksum? */
@@ -2372,9 +2372,9 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
             }
 
             /* get ready for the next record ... */
-            l_chksum = (uint8_t)0;
+            l_chksum = 0U;
             l_pos = l_record;
-            l_esc = (uint8_t)0;
+            l_esc = 0U;
         }
         else {  /* a regular un-escaped byte */
             l_chksum = (uint8_t)(l_chksum + b);
@@ -2393,9 +2393,9 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                                (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
-                l_chksum = (uint8_t)0;
+                l_chksum = 0U;
                 l_pos = l_record;
-                l_esc = (uint8_t)0;
+                l_esc = 0U;
             }
         }
     }
