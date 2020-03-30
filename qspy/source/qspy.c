@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.8.0
-* Last updated on  2020-01-20
+* Last updated on  2020-03-30
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -627,12 +627,22 @@ char const *QSpyRecord_getStr(QSpyRecord * const me) {
     int32_t l;
     bool esc = false;
 
+    /* is the string empty? */
+    if (*me->pos == 0U) {
+        /* adjust the stream for the next token */
+        --me->len;
+        ++me->pos;
+
+        /* explicit empty string as two single-quotes '' */
+        return "''";
+    }
+
     /* the following loop finds the beginning of the string and removes
     * or replaces special characters on-the-fly. Specifically a leading '&'
     * at the beginning of a string is removed and all un-escaped special
     * characters, such as brackets '[]' are replaced with '<>'. This is
     * to avoid any potential conflicts in QUTEST with matching strings
-    *(e.g., with the Tcl "string match" command or regular explerssions).
+    *(e.g., with the Python "fnmatchcase" command or regular explerssions).
     */
     for (l = me->len, p = me->pos; l > 0; --l, ++p) {
         if (*p == 0U) { /* zero-terminated end of the string? */

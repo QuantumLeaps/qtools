@@ -13,7 +13,7 @@
 # `python qutest.py [test-scripts] [host_exe] [host[:udp_port]] [tcp_port]`
 
 ## @brief current version of the Python QUTest interface
-VERSION = 637
+VERSION = 680
 
 ## @brief start a new test
 # @description
@@ -400,12 +400,13 @@ def peek(offset, size, num):
 # address of the @ref current_obj() "current AP object" inside the Target.
 #
 # @param[in] offset offset [in bytes] from the start of the current_obj()
-# @param[in] data   binary data to send
 # @param[in] size   size of the data items (1, 2, or 4)
+# @param[in] data   binary data to send
 #
 # @usage
 # `poke(4,4,pack('<II',0xB4C4D4E4,0xB5C5D5E5))`@n
-# `poke(0, 1, bytearray("dec=%d\0", "ascii"))`
+# `poke(0, 1, bytearray("dec=%d\0", "ascii"))`@n
+# `poke(0, 1, bytes("Hello World!\0",'ascii'))`
 #
 def poke(offset, size, data):
 
