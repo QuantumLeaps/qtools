@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.8.1
+* Last updated on  2020-03-31
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -46,6 +46,9 @@
 /* portable "safe" facilities from <stdio.h> and <string.h> ................*/
 #ifdef _WIN32 /* Windows OS? */
 
+#define MEMMOVE_S(dest_, num_, src_, count_) \
+    memmove_s(dest_, num_, src_, count_)
+
 #define STRCPY_S(dest_, destsiz_, src_) \
     strcpy_s(dest_, destsiz_, src_)
 
@@ -78,6 +81,9 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
     localtime_s(tm_, time_)
 
 #else /* other OS (Linux, MacOS, etc.) .....................................*/
+
+#define MEMMOVE_S(dest_, num_, src_, count_) \
+    memmove(dest_, src_, count_)
 
 #define STRCPY_S(dest_, destsiz_, src_) \
     strcpy(dest_, src_)

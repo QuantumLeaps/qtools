@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (compatible with Python 2.7+ and 3.3+)
-# Last updated for version 6.8.0
-# Last updated on  2020-01-20
+# Last updated for version 6.8.1
+# Last updated on  2020-04-02
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -57,7 +57,7 @@ else:
 #=============================================================================
 # QUTest test runner and state machine
 class qutest:
-    _VERSION = 680
+    _VERSION = 681
 
     # class variables
     _host_exe = ''

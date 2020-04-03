@@ -1,7 +1,16 @@
 /**
 @page history Revision History
 
-@section qtools_6_8_0 Version 6.8.0, 2020-03-31
+@section qtools_6_8_1 Version 6.8.1, 2020-04-04
+
+Fixed the following bugs:
+- [bug#263 QSPY handles incorrectly empty strings ](https://sourceforge.net/p/qpc/bugs/263/)
+
+Also, improved some comments in QUTest scripting documentation (qutest.py).
+
+
+------------------------------------------------------
+@section qtools_6_8_0 Version 6.8.0, 2020-03-21
 - Adapted QSPY host application to the changes in QP/C/C++ 6.8.0
 - Added color to the qutest.py Python script console output. Specifically, the failed test scripts are shown in RED while passing test scripts are shown in GREEN.
 

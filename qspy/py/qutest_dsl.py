@@ -13,7 +13,7 @@
 # `python qutest.py [test-scripts] [host_exe] [host[:udp_port]] [tcp_port]`
 
 ## @brief current version of the Python QUTest interface
-VERSION = 680
+VERSION = 681
 
 ## @brief start a new test
 # @description
