@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QFSGEN console, POSIX (Linux/Mac-OS), GNU compiler
-# Last updated for version 6.7.0
-# Last updated on  2019-12-31
+# Last updated for version 6.8.2
+# Last updated on  2020-06-23
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -113,7 +113,9 @@ CPPFLAGS = -c -ffunction-sections -fdata-sections \
 
 endif  # .....................................................................
 
-#LINKFLAGS := -no-pie
+ifndef GCC_OLD
+	LINKFLAGS := -no-pie
+endif
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))

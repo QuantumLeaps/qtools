@@ -275,7 +275,7 @@ proc ::qspy::rec12 {} { ;# QS_QF_ACTIVE_SUBSCRIBE
 }
 proc ::qspy::rec13 {} { ;# QS_QF_ACTIVE_UNSUBSCRIBE
 }
-proc ::qspy::rec14 {} { ;# QS_QF_ACTIVE_POST_FIFO
+proc ::qspy::rec14 {} { ;# QS_QF_ACTIVE_POST
 }
 proc ::qspy::rec15 {} { ;# QS_QF_ACTIVE_POST_LIFO
 }
@@ -285,7 +285,7 @@ proc ::qspy::rec17 {} { ;# QS_QF_ACTIVE_GET_LAST
 }
 proc ::qspy::rec18 {} { ;# QS_QF_EQUEUE_INIT
 }
-proc ::qspy::rec19 {} { ;# QS_QF_EQUEUE_POST_FIFO
+proc ::qspy::rec19 {} { ;# QS_QF_EQUEUE_POST
 }
 proc ::qspy::rec20 {} { ;# QS_QF_EQUEUE_POST_LIFO
 }

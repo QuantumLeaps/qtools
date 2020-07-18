@@ -20,7 +20,7 @@
 The problems caused by whitespace in the source code are particularly insidious, because you **don't see** the culprit. By using an **automated** whitespace cleanup utility you can save yourself hours of frustration and significantly improve your code quality.
 
 
-------------------------------------------------------------------------------
+
 <h1>QClean Source Code Cleanup Utility</h1>
 <strong>QClean</strong> is a simple and blazingly fast command-line utility to **automatically clean whitespace** in your source code. QClean is deployed as natively compiled executable and is located in the sub-directory <span class="img folder">qtools/bin/</span>. QClean is available in portable source code and can be compiled on all desktop platforms (Windows and POSIX -- Linux, macOS...).
 
@@ -28,7 +28,7 @@ The problems caused by whitespace in the source code are particularly insidious,
 QClean is very simple to use (no parameters are needed in most cases) and is blazingly fast (it can easily cleanup hundreds of files per second). All this is designed so that you can use QClean frequently. In fact, the use of QClean after editing your code should become part of your **basic hygiene**--like washing hands after going to the bathroom.
 
 
-------------------------------------------------------------------------------
+
 @section qclean_usage QClean Usage
 Typically, you invoke QClean from a command-line prompt without any parameters. In that case, QClean will cleanup white space in the current directory and **recursively** in all its sub-directories.
 
@@ -41,7 +41,7 @@ If you have added the <span class="img folder">qtools/bin/</span> directory to y
 As you can see in the screen shot above, QClean processes the files and prints out the names of the cleaned up files. Also, you get information as to what has been cleaned, for example, "Trail-WS" means that trailing whitespace has been cleaned up. Other possibilities are: "CR" (cleaned up DOS/Windows (CR) end-of-lines), "LF" (cleaned up Unix (LF) end-of-lines), and "Tabs" (replaced Tabs with spaces).
 
 
-<div class="separate"></div>
+
 @subsection qclean_command QClean Command-Line Parameters
 QClean takes the following command-line parameters:
 
@@ -56,7 +56,7 @@ OPTIONS        | &nbsp;   | &nbsp;
 `-l[limit]`    | 80       | line length limit (not checked when -l absent)
 </center>
 
-------------------------------------------------------------------------------
+
 @section qclean_features QClean Features
 QClean fixes the following whitespace problems:
 
@@ -69,7 +69,7 @@ QClean fixes the following whitespace problems:
 QClean can optionally check the code for **long lines of code** that exceed a specified limit (80 characters by default) to reduce the need to either wrap the long lines (which destroys indentation), or the need to scroll the text horizontally. (All GUI usability guidelines universally agree that horizontal scrolling of text is always a bad idea.) In practice, the source code is very often copied-and-pasted and then modified, rather than created from scratch. For this style of editing, it’s very advantageous to see simultaneously and side-by-side both the original and the modified copy. Also, differencing the code is a routinely performed action of any VCS (Version Control System) whenever you check-in or merge the code. Limiting the line length allows to use the horizontal screen real estate much more efficiently for side-by-side-oriented text windows instead of much less convenient and error-prone top-to-bottom differencing.
 
 
-<div class="separate"></div>
+
 @subsection qclean_files QClean File Types
 
 QClean applies the following rules for cleaning the whitespace depending on the file types:

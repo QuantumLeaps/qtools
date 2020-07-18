@@ -11,7 +11,7 @@ QFSGen is deployed as natively compiled executable and is located in the sub-dir
 The main motivation for the QFSGen utility is to generate ROM-based file systems for embedded HTTP servers. However, the utility can be used for any ROM-based file systems.
 
 
-------------------------------------------------------------------------------
+
 @section qfsgen_usage QFSGen Usage
 You use the QFSGen utility from command-prompt. First, change current directory to the directory, where you wish to generate the C header file (named `fsdata.h` by default) and type:
 
@@ -24,7 +24,7 @@ where `website` is a directory, which contains the files and sub-directories you
 @image html qfsgen_run.png "Example run of the QFSGen utility"
 
 
-<div class="separate"></div>
+
 @subsection qfsgen_command QFSGen Command-Line Parameters
 QFSGen takes the following command-line parameters:
 
@@ -38,7 +38,7 @@ OPTIONS        | &nbsp;   | &nbsp;
 </center>
 
 
-------------------------------------------------------------------------------
+
 @section qfsgen_works How QFSGen Works
 QFSGen recursively scans the provided directory and **recursively** encodes any file and sub-directory into an array in the generated header file. For example, here is the content of the `website` directory:
 

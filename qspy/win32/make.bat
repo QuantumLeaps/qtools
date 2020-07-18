@@ -1,0 +1,1 @@
+call msbuild qspy Release

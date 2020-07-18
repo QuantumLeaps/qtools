@@ -1,0 +1,1 @@
+call msbuild qfsgen Release

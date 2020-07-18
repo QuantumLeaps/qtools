@@ -14,7 +14,7 @@ It is also highly recommended that you keep checking the <a class="extern" targe
 Alternatively, you can download QTools&trade; separately as described below.
 
 
-------------------------------------------------------------------------------
+
 @section install_win32 Installing QTools&trade; on Windows
 On Windows, you simply unzip the `qtools-windows_<x.y.z>.zip` archive to the installation folder of your choice (`C:\qp\qtools` is the recommended default). After the installation, you still need to:
 
@@ -33,7 +33,7 @@ set QTOOLS=C:\qp\qtools
 Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
 
 
-------------------------------------------------------------------------------
+
 @section install_posix Installing QTools&trade; on POSIX (Linux/MacOS)
 On POSIX (Linux/MacOS), you simply unzip the `qtools-posix_<x.y.z>.zip` archive to the installation folder of your choice (`~/qp/qtools` is the recommended default). After the installation, you still need to:
 
@@ -52,7 +52,7 @@ export QTOOLS=~/qp/qtools
 Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
 
 
-------------------------------------------------------------------------------
+
 @section files Directories and Files
 The following annotated directory tree in the standard <strong>QTools&trade;</strong> distribution lists the top-level directories and files:
 

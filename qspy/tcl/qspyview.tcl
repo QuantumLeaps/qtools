@@ -14,8 +14,8 @@
 ## @cond
 #-----------------------------------------------------------------------------
 # Product: QSPY -- GUI front-end to the QSPY host utility
-# Last updated for version 6.8.0
-# Last updated on  2020-03-17
+# Last updated for version 6.8.2
+# Last updated on  2020-07-17
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -48,7 +48,7 @@
 # @endcond
 
 # this version of qspyview
-set VERSION 6.6.0
+set VERSION 6.8.2
 
 package provide qspyview 6.6
 
@@ -295,9 +295,9 @@ proc onGlbFilters {} {
         DISPATCH               UNHANDLED         \
         ACTIVE_DEFER           ACTIVE_RECALL     \
         ACTIVE_SUBSCRIBE       ACTIVE_UNSUBSCR   \
-        ACTIVE_POST_FIFO       ACTIVE_POST_LIFO  \
+        ACTIVE_POST            ACTIVE_POST_LIFO  \
         ACTIVE_GET             ACTIVE_GET_LAST   \
-        ACTIVE_RECALL_ATMPT    EQUEUE_POST_FIFO  \
+        ACTIVE_RECALL_ATMPT    EQUEUE_POST       \
         EQUEUE_POST_LIFO       EQUEUE_GET        \
         EQUEUE_GET_LAST        RESERVED2         \
         MPOOL_GET              MPOOL_PUT         \

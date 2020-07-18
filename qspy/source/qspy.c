@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.0
-* Last updated on  2020-03-30
+* Last updated for version 6.8.2
+* Last updated on  2020-07-17
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -173,12 +173,12 @@ static char const *  l_qs_rec[] = {
     "QS_QF_ACTIVE_RECALL",
     "QS_QF_ACTIVE_SUBSCRIBE",
     "QS_QF_ACTIVE_UNSUBSCRIBE",
-    "QS_QF_ACTIVE_POST_FIFO",
+    "QS_QF_ACTIVE_POST",
     "QS_QF_ACTIVE_POST_LIFO",
     "QS_QF_ACTIVE_GET",
     "QS_QF_ACTIVE_GET_LAST",
     "QS_QF_ACTIVE_RECALL_ATTEMPT",
-    "QS_QF_EQUEUE_POST_FIFO",
+    "QS_QF_EQUEUE_POST",
     "QS_QF_EQUEUE_POST_LIFO",
     "QS_QF_EQUEUE_GET",
     "QS_QF_EQUEUE_GET_LAST",
@@ -1181,7 +1181,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QF_ACTIVE_POST_FIFO:
+        case QS_QF_ACTIVE_POST:
             s = "Post ";
             /* fall through */
         case QS_QF_ACTIVE_POST_ATTEMPT: {
@@ -1216,7 +1216,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        Dictionary_get(&l_objDict, p, buf),
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        b, c, d,
-                       (me->rec == QS_QF_ACTIVE_POST_FIFO ? "Min" : "Mar"),
+                       (me->rec == QS_QF_ACTIVE_POST ? "Min" : "Mar"),
                        e);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %"PRId64" %u %"PRId64" %u %u %u %u\n",
@@ -1344,7 +1344,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        case QS_QF_EQUEUE_POST_FIFO:
+        case QS_QF_EQUEUE_POST:
             s = "Post ";
             w = "Min";
             /* fall through */

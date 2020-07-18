@@ -439,7 +439,8 @@ def fill(offset, size, num, item = 0):
 # to pack the binary event parameters or binary data for poke() and fill().
 #
 # @param[in] format string
-# @param[in] v1,v2... one or more data elements requried by format
+# @param[in] v1 one or more data elements requried by format
+# @param[in] v2 one or more data elements requried by format
 #
 # @usage
 # @n

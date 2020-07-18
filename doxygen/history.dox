@@ -1,6 +1,14 @@
 /**
 @page history Revision History
 
+@section qtools_6_8_2 Version 6.8.2, 2020-07-17
+
+- Changed the QS trace record name QS_QF_ACTIVE_POST_FIFO to ::QS_QF_ACTIVE_POST and QS_QF_EQUEUE_POST_FIFO to ::QS_QF_EQUEUE_POST. This refactoring now better matches the QP/C/C++ API QACTIVE_POST() and QEQueue_post().
+- Fixed errors in the Doxygen documentation, such as: missing documentation for parameters, wrong parameter names, unresolved references, etc.
+- Applied new, clearer styling to the Doxygen documentation.
+
+
+
 @section qtools_6_8_1 Version 6.8.1, 2020-04-04
 
 Fixed the following bugs:
@@ -9,13 +17,13 @@ Fixed the following bugs:
 Also, improved some comments in QUTest scripting documentation (qutest.py).
 
 
-------------------------------------------------------
+
 @section qtools_6_8_0 Version 6.8.0, 2020-03-21
 - Adapted QSPY host application to the changes in QP/C/C++ 6.8.0
 - Added color to the qutest.py Python script console output. Specifically, the failed test scripts are shown in RED while passing test scripts are shown in GREEN.
 
 
-------------------------------------------------------
+
 @section qtools_6_7_0 Version 6.7.0, 2019-12-30
 This QTools release changes the build process for the QSPY, QCLEAN, and QFSGEN utilities on Windows. Specifically, these programs are now built using Visual Studio 2019 instead of the MinGW compiler for Windows. Also, the source code of all Quantum Leaps utilities has been reviewed and all "unsafe" calls to standard C library have been replaced with their "safe" counterparts (e.g., strcpy()->strcpy_s(), strcat()->strcat_s(),fprintf()->fprintf_s(), etc.) All these changes were made to avoid the malware warnings that were issued by some anti-virus software against executables built with MinGW.
 
@@ -24,7 +32,7 @@ This release also replaces the MinGW toolchain (8.2.0) with the latest mingw32 (
 Finally, this release updates the QWIN Prototyping Toolkit (`qtools\qwin` directory) to work with the latest Visual Studio 2019 and specifically with the Resource Editor now available in VS 2019. The qwin-demo project has been updated to build with the Visual Studio 2019.
 
 
-------------------------------------------------------
+
 @section qtools_6_6_0 Version 6.6.0, 2019-08-30
 The main purpose of this release is the change in distribution of the QTools collection, which is now bundled together with the QP frameworks (QP/C, QP/C++ and QP-nano) as well as QM into "QP-bundle". This "QP-bundle" provides a single, streamlined and simplified download and installation of all QP frameworks and all the accompanying tools.
 
@@ -42,19 +50,19 @@ Also, this release makes the following changes to the @ref qspy "QSPY host appli
 - The QSPY host application now supports a new QP-compatibility version 6.6.0, in which the @ref qs_app "Application-Specific QS Trace Records" start at offset 100 instead of 70. This is only activated with the `-v 660` @ref qspy_command "command-line" option, but is in preparation for the future changes in QP/C and QP/C++ frameworks (the upcoming QP/C/C++ 6.6.0).
 
 
-------------------------------------------------------
+
 @section qtools_6_5_1 Version 6.5.1, 2019-06-08
 This release adds the **debug mode** to the @ref qutest_script "QUTest scripting" (in Python). Specifically, you can now provide a special value `DEBUG` to the `qutest.py` Python script launcher, in which case `qutest.py` will start in the **debug mode**, in which it will **not** launch the host executable and will **not** reset the Target. Instead, `qutest.py` will wait for the Target reset and other responses from the Target.
 
 Additionally, this release improves the @ref install_win32 "QTools installation on Windows". Specifically the Windows installer now installs Python and has been re-designed to automatically setup the `QTOOLS` environment variable and to add `%QTOOLS%\bin;%QTOOLS%\python` to the PATH. The uninstaller reverses these changes.
 
 
-------------------------------------------------------
+
 @section qtools_6_4_0 Version 6.4.0, 2019-02-10
 This release speeds up the QSPY host application by tweaking the timing constants in the TCP and UDP communication interfaces. The resulting QSPY 6.4.0 runs QUTest tests significantly faster (at least twice as fast) as before.
 
 
-------------------------------------------------------
+
 @section qtools_6_3_8 Version 6.3.8, 2018-12-31
 The main purpose of this release is the update of the GNU-ARM toolchain (included in QTools for Windows) to the latest GCC 8. Specifically, this QTools release switches to the official [GNU-ARM Embedded Toolchain for Arm Cortex-M and Cortex-R processors maintained by ARM Ltd.](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm).
 
@@ -65,7 +73,7 @@ For consistency with the [GNU-ARM Embedded Toolchain](https://developer.arm.com/
 Additionally, this release makes further improvements to the "qutest.py" Python interface. Specifically, the skip() command can now be used anywhere in the test scripts to skip the commands. (Previously, the skip() command could only be legitimately used right before the test() command).
 
 
-------------------------------------------------------
+
 @section qtools_6_3_7 Version 6.3.7, 2018-11-19
 This release brings a completely re-designed and simplified Python interface for @ref qutest "QUTest unit testing harness". Specifically, this release adds a new scripting engine called simply @ref qutest_script "qutest.py", which replaces the previous "qspypy".
 
@@ -84,7 +92,7 @@ Additionally, this release fixes the problem in the @ref "QSPY host utility" to 
 Finally, the QTools release for Windows updates the provided MinGW GNU-C/C++ compiler to version 6.3.0.
 
 
-------------------------------------------------------
+
 @section qtools_6_3_6 Version 6.3.6, 2018-10-03
 The main purpose of this release is to improve the @ref qutest "QUTest" support. Specifically, this release adds a feature of querying and reporting the status of the @ref current_obj() "current objects", such as the current State-Machine (SM), Active-Object (AO), current Memory-Pool(MP), current Event-Queue (EQ), and current Time-Event (TE). The feature impacts the following facilities:
 
@@ -114,13 +122,13 @@ If you already have the previous version of @ref qtools_qspypy "qspypy", you nee
 Finally, this release of QTools collection contains the [Unity unit testing harness (framework)](https://github.com/ThrowTheSwitch/Unity).
 
 
-------------------------------------------------------
+
 @section qtools_6_3_4 Version 6.3.4, 2018-08-16
 This release adds the official support for writing QUTest test scripts in Python.
 Also, this release fixes some minor typos in error messages generated by QSpy.
 
 
-------------------------------------------------------
+
 @section qtools_6_3_1 Version 6.3.1, 2018-05-24
 This minor release corrects the QSPY utility. Specifically, the @ref qs_app "application-specific output" from the macros QS_FUN(), QS_OBJ() and QS_SIG() contained extra space (' ') before the function/object/signal name. This extra space has been now removed.
 
@@ -131,7 +139,7 @@ The change might impact existing QUTest test scripts, which parse the QS_FUN(), 
 The corrected QS_FUN(), QS_OBJ() and QS_SIG() output (without the extra space) is assumed in the QUTest examples that ship in QP/C/C++ 6.3.1.
 
 
-------------------------------------------------------
+
 @section qtools_6_3_0 Version 6.3.0, 2018-05-10
 This release simplifies the usage of the QUTest (qutest.tcl) and QSpyView (qspyview.tcl) utilities by reducing the number of parameters required by these scripts. Specifically, the "local_port" parameter might be now omitted and still every instance of qutest.tcl / qspyview.tcl will be given a unique local UDP port. Additionally, the "port" parameter has been combined with the "host" parameter in the form host[:port].
 
@@ -163,7 +171,7 @@ Also, this release adds the LMFlash utility to QTools for Windows for flash prog
 The changes should be transparent for most existing QSpyView and QUTest projects (this include all examples shipped in QP/C and QP/C++). However, projects that run QSPY at non-default UDP ports might need to be adjusted.
 
 
-------------------------------------------------------
+
 @section qtools_6_2_0 Version 6.2.0, 2018-03-13
 This release updates QSPY host utility as well as the `qutest.tcl` and `qspyview.tcl` scripts for the following new QS records introduced in QP/C/C++ 6.2.0:
 
@@ -180,7 +188,7 @@ The global filter settings in the `qutest.tcl` and `qspyview.tcl` scripts have b
 Additionally, new commands post() and publish() have been added to the QUTest "testing DSL" (`qutest.tcl` script). Examples of use of these new commands are provided in QP/C/C++ directory `<qpc|qpcpp>\examples\qutest\defer\`.
 
 
-------------------------------------------------------
+
 @section qtools_6_1_1 Version 6.1.1, 2018-02-06
 This release fixes the following bug in QSPY:
 
@@ -193,7 +201,7 @@ Additionally, the QSPY for POSIX (Linux, MacOS, etc.) corrects the problem with 
 Finally, this release increases the QCLEAN maximum size limit to 10MB per file.
 
 
-------------------------------------------------------
+
 @section qtools_6_1_0 Version 6.1.0, 2018-01-20
 This release improves the @ref qspy_command "QSPY command-line" option processing by allowing option parameters to be separated by spaces from the option letter (including the optional parameters). For example, the following command-line would not work in the previous version, but will work now:
 
@@ -206,7 +214,7 @@ qspy -t6602
 This release also improves the handling of external dictionary files in @ref qspy "QSPY host application". Specifically, the `-d` @ref qspy_command "command-line option" has been extended to allow no parameter, in which case external dictionary file is opened automatically as soon as QSPY receives the target reset or target information. When `-d <file>` option is used, the provided dictionary file is used right away, but the dictioray information might get discarded when the target information does not match the configuration and time-stamp obtained from the dictionary file.
 
 
-------------------------------------------------------
+
 @section qtools_6_0_3 Version 6.0.3, 2017-12-12
 Fixed compilation and linkage on MacOS for qspy, qclean, qfsgen
 
@@ -219,7 +227,7 @@ In QTools for Windows, updated the GNU-ARM toolchain to the latest available GCC
 http://gnutoolchains.com/arm-eabi/
 
 
-------------------------------------------------------
+
 @section qtools_5_9_3 Version 5.9.3, 2017-07-04
 Fixed bug#175 "QS_QF_ACTIVE_GET & QS_QF_EQUEUE_GET Record Mislabeled in
 QSPY Output" (https://sourceforge.net/p/qpc/bugs/175/ )
@@ -227,7 +235,7 @@ QSPY Output" (https://sourceforge.net/p/qpc/bugs/175/ )
 Added bin/qcalc.tcl to the GIT repository (so that it shows up on GitHub).
 
 
-------------------------------------------------------
+
 @section qtools_5_9_1 Version 5.9.1, 2017-05-19
 Added the GNU-ARM (EABI) toolset to the QTools Collection for Windows in the
 directory `qtools/gnu_arm-eabi`. The addition of the GNU-ARM toolset matches the
@@ -237,7 +245,7 @@ To reduce the size of the QTools for Windows download, the self-extracting
 archive `qtools_win32_<ver>.exe` has been prepared with the 7-Zip utility.
 
 
-------------------------------------------------------
+
 @section qtools_5_9_0 Version 5.9.0, 2017-05-19
 This release adds the @ref qutest "QUTest" (pronounced 'cutest') Unit Testing support to QP/Spy software tracing. Specifically, this release adds a new head-less (console-based) QSPY front-end that, which runs unit tests.
 
@@ -252,19 +260,19 @@ Finally, all utilities in the QTools collection have been documented in the new 
 https://www.state-machine.com/qtools
 
 
-------------------------------------------------------
+
 @section qtools_5_7_0 Version 5.7.0, 2016-09-08
 Corrected QSPY software tracing host application to properly display floating point numbers in user-defined trace records (QS_F32() and QS_F64() macros). The problem was with incompatibility between Microsoft VC++ and GCC floating-point format specifications. In the GCC software build (which produces the QSPY executable in the qtools/bin directory), the MS-VC++ floating point format resulted in all zeros (e.g., 0.0000e+000).
 
 
-------------------------------------------------------
+
 @section qtools_5_6_4 Version 5.6.4, 2016-05-04
 Added <a target="_blank" class="extern" href="https://www.state-machine.com/products/#QWIN">QWIN GUI</a> to the collection (sub-directory qwin_gui).
 
 Updated the QSPY software tracing host application for the QS trace record name changes introduced in QP 5.6.2.
 
 
-------------------------------------------------------
+
 @section qtools_5_5_0 Version 5.5.0, 2015-08-21
 Extended the QSPY software tracing host application for **bi-directional**
 communication with embedded targets (output and *input* into the
@@ -278,17 +286,17 @@ build both GUI-based and "headless" scripts for their specific
 applications (see https://www.state-machine.com/qpc/arm-cm_dpp_ek-tm4c123gxl.html)
 
 
-------------------------------------------------------
+
 @section qtools_5_3_1 Version 5.3.1, 2014-04-21
 Corrected the version representation from hex to decimal, to match the change in the QP framework. The version representation missmatch caused problems in parsing newly modified trace records, when the qspy.c implementation was inserted directly into the projects.
 
 
-------------------------------------------------------
+
 @section qtools_5_3_0 Version 5.3.0, 2014-03-31
 Added new trace records to QSPY host application: QS_QEP_TRAN_HIST, QS_QEP_TRAN_EP, and QS_QEP_TRAN_XP. Changed labels for standard records from Q_ENTRY, Q_EXIT, Q_INIT to ENTRY, EXIT, INIT.
 
 
-------------------------------------------------------
+
 @section qtools_5_1_1 Version 5.1.1, 2013-10-15
 Fixed the bug in the QSPY host application, which didn't handle
 correctly object/functions/signal names longer than 32 characters. The
@@ -297,7 +305,7 @@ correctly truncates the names at the limit without printing any garbage
 characters.
 
 
-------------------------------------------------------
+
 @section qtools_5_1_0a Version 5.1.0a, 2013-09-18
 Modified QSPY utility to support changes in QP 5.1.x:
 
@@ -311,7 +319,7 @@ Modified QSPY utility to support changes in QP 5.1.x:
  object/function/signal, for which a dictionary record was received.
 
 
-------------------------------------------------------
+
 @section qtools_5_0_0a Version 5.0.0a, 2013-09-08
 Modified QSPY utility to support changes in QP 5.0.x:
 
@@ -326,7 +334,7 @@ Modified QSPY utility to support changes in QP 5.0.x:
 -added Find And Replace Text (FART) utility for Windows
 
 
-------------------------------------------------------
+
 @section qtools_4_5_02 Version 4.5.02, 2012-07-21
 Re-designed the QSPY interface to support more flexible parsing
 of the trace records in desktop-based simulations (such as Windows
@@ -336,14 +344,14 @@ dictionaries (and other cleanup in the future) when the target
 resets.
 
 
-------------------------------------------------------
+
 @section qtools_4_5_01 Version 4.5.01, 2012-06-25
 Added the QS_USR_DICTIONARY() entry for storing dictionaries of
 the user trace records. Replaced all remaining sprintf() calls
 with snprintf().
 
 
-------------------------------------------------------
+
 @section qtools_4_5_00 Version 4.5.00, 2012-05-26
 Re-designed the implementation of the QSPY host application, so
 that it can be convenienty included as part of the QP library.
@@ -352,7 +360,7 @@ running on the desktop. The QSPY application has been converted from
 C++ to plain C for easier integration with QP/C.
 
 
-------------------------------------------------------
+
 @section qtools_4_3_00 Version 4.3.00, 2011-11-03
 This QSPY version mataches the changes to the critical section
 macros made in QP 4.3.00. The QS record names QS_QF_INT_LOCK and
@@ -360,7 +368,7 @@ QS_QF_INT_UNLOCK have been replaced with QS_QF_CRIT_ENTRY and
 QS_QF_CRIT_EXIT, respectively.
 
 
-------------------------------------------------------
+
 @section qtools_4_2_04 Version 4.2.04, 2011-09-27
 This QSPY version fixes the bug of incorrect reporting function
 or object pointers for which the dictionary records are not
@@ -375,7 +383,7 @@ Queue(nFree=  5, nMin=  5)
 The Sndr= and Obj= are reported to be the same, but they were not.
 
 
-------------------------------------------------------
+
 @section qtools_4_2_01 Version 4.2.01, 2011-08-01
 This QSPY version adds generation of sequence diagrams as
 files to be processed by MscGen (www.mcternan.me.uk/mscgen/).
@@ -386,7 +394,7 @@ Also, this version of QSPY for Windows allows COM ports
 larger than COM9.
 
 
-------------------------------------------------------
+
 @section qtools_4_2_00 Version 4.2.00, 2011-07-13
 This QSPY version matches the changes made to QS target code in
 QP/C/C++ 4.2.xx. These changes include sending the additinal byte
@@ -437,7 +445,7 @@ switch QSPY into the backwards-compatibility mode with the
 earlier versions of QP.
 
 
-------------------------------------------------------
+
 @section qtools_4_1_06 Version 4.1.06, 2011-02-09
 This is the intial standalone release of the QSPY host application.
 QSPY is still available in the QP/C and QP/C++ distributions, but

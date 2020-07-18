@@ -6,11 +6,12 @@
 To check what's new in QTools, please see @ref history "QTools Revision History".
 
 
-------------------------------------------------------------------------------
+
 @section qtools_about What is it?
 QTools&trade; is a collection of open source tools for embedded software development on desktop platforms, such as Windows, Linux and macOS. The QTools collection contains the following tools developed by <a href="https://www.state-machine.com/">Quantum Leaps</a>:
 
 - @ref qpspy "QP/Spy software tracing and testing for embedded systems", which includes:
+  + @ref qs       "QS&trade; Target-Resident Component"
   + @ref qspy     "QSPY&trade; Host Application"
   + @ref qutest   "QUTest&trade; Unit Testing Harness"
   + @ref qspyview "QSpyView&trade; Visualization &amp; Monitoring"
@@ -20,32 +21,26 @@ QTools&trade; is a collection of open source tools for embedded software develop
 - @ref qcalc  "QCalc C programmer's calculator"
 
 
-------------------------------------------------------------------------------
 @section qtools_win QTools&trade; on Windows
 The QTools Collection for Windows contains additionally the following open-source, third-party tools:
 
-- GNU-make for Windows (version 3.82)
-- GNU C/C++ toolchain for Windows (MinGW version 6.3.0)
+- GNU-make for Windows (version 4.2.1)
+- GNU C/C++ toolchain for Windows (MinGW version 9.2.0)
 - GNU C/C++ toolchain for ARM Cortex-M and Cortex-R ([GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/))
-- TCL/TK for Windows (version 8.4) with **UDP sockets extension**
-- ResEdit utility (version 1.6.6-x64)
-- AVRDUDE for Windows (version 6.1)
-
-Additionally, QTools&trade; for Windows contains the following PC-Lint option files various compilers (in sub-directory `lint`):
-
-- `co-gnu-arm.*` (PC-Lint option files for GNU-ARM)
-- `co-iar-arm.*` (PC-Lint option files for IAR-ARM)
+- Python for Windows (version 3.8 embeddable)
+- Tcl/Tk for Windows (version 8.6) with **UDP sockets extension**
 
 
-------------------------------------------------------------------------------
+
 @section qtools_licensing Licensing QTools&trade;
 Most tools included in the QTools&trade; collection are distributed under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version. The text of GPL version 2 is included in the
 file GPLv2.txt in the root directory of the QTools distribution.
 
-The TCL/TK 8.4 package is distributed under the terms of the TCL LICENSE AGREEMENT, included in the file TCL_LICENSE.txt in the root directory of the QTools distribution.
+The Python package is distributed under the terms of the PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2, included in the file LICENSE.txt in the Python38 sub-directory of the QTools distribution.
+
+The Tcl/Tk package is distributed under the terms of the TCL LICENSE AGREEMENT, included in the file LICENSE.txt in the tcl_8.6 sub-directory of the QTools distribution.
 
 
-------------------------------------------------------------------------------
 @section qtools_source Source Code
 In compliance with GPL, this distribution contains the source code for
 the utilities contributed by Quantum Leaps in the `<qtools>/source/`
@@ -54,7 +49,7 @@ subdirectory, except for the QSPY source code, which is provided in the
 have been developed and are copyrighted by Quantum Leaps.
 
 
-<div class="separate"></div>
+
 @subsection qtools_mingw The MinGW C and C++ compilers for Windows
 Have been taken from the MinGW project at:
 
@@ -64,7 +59,7 @@ The installer `mingw-get-setup.exe` has been used and after the
 installation, the files have been pruned to reduce the size of the
 distribution. Please refer to the MinGW project for the source code.
 
-<div class="separate"></div>
+
 @subsection qtools_gnu-arm The GNU-ARM (NONE-EABI) compilers for Windows
 Have been taken from:
 
@@ -73,7 +68,7 @@ https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 The source code is available from the download page under "Source Invariant".
 
 
-<div class="separate"></div>
+
 @subsection qtools_make The GNU make executable for Windows
 Has been taken from the MinGW project at:
 
@@ -85,7 +80,7 @@ project at:
 http://www.gnu.org/software/make
 
 
-<div class="separate"></div>
+
 @subsection qtools_util The file and diff utilities
 Have been taken from the UnixUtils project at SourceForge.net:
 
@@ -98,18 +93,15 @@ been taken from:
 https://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
 
 
-------------------------------------------------------------------------------
+
 @section qtools_help How to get help?
 
 Please post any **technical questions** to the <a class="extern" target="_blank" href="http://sourceforge.net/p/qpc/discussion/668726"><strong>Free Support Forum</strong></a> hosted on SourceForge.net. Posts to this forum benefit the whole community and are typically answered the same day.
 
-Direct **Commercial Support** is available to the commercial licensees. Every commercial license includes one year of Technical Support for the licensed software. The support term can be extended annually.
+Direct [commercial support](https://www.state-machine.com/licensing/#Support) is available to the commercial licensees. Every commercial license includes one year of Technical Support for the licensed software. The support term can be extended annually.
 
-Training and consulting services are also available from Quantum Leaps. Please refer to the <a class="extern" target="_blank" href="https://www.state-machine.com/support/">Support web-page</a> for more information.
+[Training and consulting](https://www.state-machine.com/support/training) services are also available from Quantum Leaps.
 
-@image html logo_ql_TM.jpg
 
-Copyright &copy; 2005-2019 Quantum Leaps, LLC. All Rights Reserved.@n
-
-@next{start}
+@next{gs}
 */
