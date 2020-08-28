@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.2
-* Last updated on  2020-07-17
+* Last updated for version 6.9.0
+* Last updated on  2020-08-22
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -58,6 +58,9 @@ typedef void     QEvt;
 #ifndef Q_SPY
 #define Q_SPY 1
 #endif
+#define QS_OBJ_PTR_SIZE 4
+#define QS_FUN_PTR_SIZE 4
+#define Q_SIGNAL_SIZE   2
 #include "qs_copy.h"     /* copy of the target-resident QS interface */
 
 /* global objects ..........................................................*/
@@ -66,15 +69,14 @@ QSPY_LastOutput QSPY_output;
 /****************************************************************************/
 
 enum {
-    DNAME_SIZE = 64,  /* dictionary name length (longer names truncated) */
-    FNAME_SIZE = 256, /* file name length (longer names truncated) */
-    OLD_QS_USER = 70  /* old QS_USER used in before QS 6.6.0 */
+    OLD_QS_USER    = 70,   /* old QS_USER used in before QS 6.6.0 */
+    SEQ_ITEMS_MAX  = 10,  /* max number of items in the Sequence list */
 };
 
 /*..........................................................................*/
 typedef struct {
     KeyType key;
-    char    name[DNAME_SIZE];
+    char    name[QS_DNAME_LEN_MAX];
 } DictEntry;
 
 typedef struct {
@@ -106,7 +108,7 @@ static void resetAllDictionaries(void);
 typedef struct SigDictEntryTag {
     SigType sig;
     ObjType obj;
-    char    name[DNAME_SIZE];
+    char    name[QS_DNAME_LEN_MAX];
 } SigDictEntry;
 
 typedef struct SigDictionaryTag {
@@ -135,23 +137,40 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream);
 /*..........................................................................*/
 static DictEntry     l_funSto[512];
 static DictEntry     l_objSto[256];
-static DictEntry     l_mscSto[64];
+static DictEntry     l_seqSto[SEQ_ITEMS_MAX];
 static DictEntry     l_usrSto[128 + 1 - OLD_QS_USER];
 static SigDictEntry  l_sigSto[512];
 static Dictionary    l_funDict;
 static Dictionary    l_objDict;
-static Dictionary    l_mscDict;
+static Dictionary    l_seqDict;
 static Dictionary    l_usrDict;
 static SigDictionary l_sigDict;
-static char          l_dictFileName[FNAME_SIZE]; /* dictionary file name */
+static char          l_dictFileName[QS_FNAME_LEN_MAX]; /* dictionary file name */
 
 /*..........................................................................*/
 static QSpyConfig    l_config;
 static FILE         *l_matFile;
-static FILE         *l_mscFile;
 static uint32_t      l_userRec;
 static QSPY_CustParseFun l_custParseFun;
 static QSPY_resetFun     l_txResetFun;
+
+
+static FILE         *l_seqFile;
+static char          l_seqList[QS_SEQ_LIST_LEN_MAX];
+static char          l_seqNames[SEQ_ITEMS_MAX][QS_DNAME_LEN_MAX];
+static int           l_seqNum;
+static int           l_seqLines;
+static int           l_seqSystem;
+static void seqUpdateDictionary(char const *name, KeyType key);
+static int  seqFind(KeyType key);
+static void seqGenHeader(void);
+static void seqGenPost(uint32_t tstamp, int src, int dst, char const* sig,
+                       bool isAttempt);
+static void seqGenPostLIFO(uint32_t tstamp, int src, char const* sig);
+static void seqGenTran(uint32_t tstamp, int obj, char const* state);
+static void seqGenPublish(uint32_t tstamp, int obj, char const* sig);
+static void seqGenAnnotation(uint32_t tstamp, int obj, char const* ann);
+static void seqGenTick(uint32_t rate, uint32_t nTick);
 
 /* QS record names... NOTE: keep in synch with qs_copy.h */
 static char const *  l_qs_rec[] = {
@@ -178,25 +197,37 @@ static char const *  l_qs_rec[] = {
     "QS_QF_ACTIVE_GET",
     "QS_QF_ACTIVE_GET_LAST",
     "QS_QF_ACTIVE_RECALL_ATTEMPT",
+
+    /* [19] Event Queue (EQ) records */
     "QS_QF_EQUEUE_POST",
     "QS_QF_EQUEUE_POST_LIFO",
     "QS_QF_EQUEUE_GET",
     "QS_QF_EQUEUE_GET_LAST",
-    "QS_QF_RESERVED2",
+
+    /* [23] Reserved QS records */
+    "QS_RESERVED_23",
+
+    /* [24] Memory Pool (MP) records */
     "QS_QF_MPOOL_GET",
     "QS_QF_MPOOL_PUT",
+
+    /* [26] Additional (QF) records */
     "QS_QF_PUBLISH",
     "QS_QF_NEW_REF",
     "QS_QF_NEW",
     "QS_QF_GC_ATTEMPT",
     "QS_QF_GC",
     "QS_QF_TICK",
+
+    /* [32] Time Event (TE) records */
     "QS_QF_TIMEEVT_ARM",
     "QS_QF_TIMEEVT_AUTO_DISARM",
     "QS_QF_TIMEEVT_DISARM_ATTEMPT",
     "QS_QF_TIMEEVT_DISARM",
     "QS_QF_TIMEEVT_REARM",
     "QS_QF_TIMEEVT_POST",
+
+    /* [38] Additional (QF) records */
     "QS_QF_DELETE_REF",
     "QS_QF_CRIT_ENTRY",
     "QS_QF_CRIT_EXIT",
@@ -204,13 +235,19 @@ static char const *  l_qs_rec[] = {
     "QS_QF_ISR_EXIT",
     "QS_QF_INT_DISABLE",
     "QS_QF_INT_ENABLE",
+
+    /* [45] Additional Active Object (AO) records */
     "QS_QF_ACTIVE_POST_ATTEMPT",
+
+    /* [46] Additional Event Queue (EQ) records */
     "QS_QF_EQUEUE_POST_ATTEMPT",
+
+    /* [47] Additional Memory Pool (MP) records */
     "QS_QF_MPOOL_GET_ATTEMPT",
+
+    /* [48] Scheduler (SC) records */
     "QS_MUTEX_LOCK",
     "QS_MUTEX_UNLOCK",
-
-    /* [50] built-in scheduler records */
     "QS_SCHED_LOCK",
     "QS_SCHED_UNLOCK",
     "QS_SCHED_NEXT",
@@ -235,9 +272,9 @@ static char const *  l_qs_rec[] = {
     "QS_QUERY_DATA",
     "QS_PEEK_DATA",
     "QS_ASSERT_FAIL"
+    "QS_QF_RUN"
 
-    /* [70] Reserved QS records */
-    "QS_RESERVED_70",
+    /* [71] Reserved QS records */
     "QS_RESERVED_71",
     "QS_RESERVED_72",
     "QS_RESERVED_73",
@@ -315,80 +352,115 @@ static char const *  l_qs_rx_rec[] = {
     } else (void)0
 
 /*..........................................................................*/
-void QSPY_config(uint16_t version,
-                 uint8_t objPtrSize,
-                 uint8_t funPtrSize,
-                 uint8_t tstampSize,
-                 uint8_t sigSize,
-                 uint8_t evtSize,
-                 uint8_t queueCtrSize,
-                 uint8_t poolCtrSize,
-                 uint8_t poolBlkSize,
-                 uint8_t tevtCtrSize,
+static char const *my_strtok(char *str, char delim) {
+    static char *next;
+    char const *token;
+    if (str != (char*)0) {
+        next = str;
+    }
+    token = next;
+    if (token != (char *)0) {
+        char *s = next;
+        for (;;) {
+            if (*s == delim) {
+                *s = '\0';
+                next = s + 1;
+                break;
+            }
+            else if (*s == '\0') {
+                next = (char *)0;
+                break;
+            }
+            else {
+                ++s;
+            }
+        }
+    }
+    return token;
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+void QSPY_config(QSpyConfig const *config,
                  void   *matFile,
-                 void   *mscFile,
+                 void   *seqFile, const char *seqList,
                  QSPY_CustParseFun custParseFun)
 {
-    l_config.version      = version;
-    l_config.objPtrSize   = objPtrSize;
-    l_config.funPtrSize   = funPtrSize;
-    l_config.tstampSize   = tstampSize;
-    l_config.sigSize      = sigSize;
-    l_config.evtSize      = evtSize;
-    l_config.queueCtrSize = queueCtrSize;
-    l_config.poolCtrSize  = poolCtrSize;
-    l_config.poolBlkSize  = poolBlkSize;
-    l_config.tevtCtrSize  = tevtCtrSize;
+    MEMMOVE_S(&l_config, sizeof(l_config), config, sizeof(*config));
     l_matFile      = (FILE *)matFile;
-    l_mscFile      = (FILE *)mscFile;
+    l_seqFile      = (FILE *)seqFile;
     l_custParseFun = custParseFun;
-
-    if (l_mscFile != (FILE *)0) {
-        /* reserve space at the beginning of the MscGen file for the header,
-        * which is known only at the end of the run in qsStop().
-        */
-        FPRINTF_S(l_mscFile,
-            "                                        \n"
-            "                                        \n"
-            "                                        \n"
-            "                                        \n"
-            "                                        \n"
-            "                                        \n"
-            "                                        \n"
-            "                                        \n");
-    }
 
     Dictionary_ctor(&l_funDict, l_funSto,
                     sizeof(l_funSto)/sizeof(l_funSto[0]));
     Dictionary_ctor(&l_objDict, l_objSto,
                     sizeof(l_objSto)/sizeof(l_objSto[0]));
-    Dictionary_ctor(&l_mscDict, l_mscSto,
-                    sizeof(l_mscSto)/sizeof(l_mscSto[0]));
+    Dictionary_ctor(&l_seqDict, l_seqSto,
+                    sizeof(l_seqSto)/sizeof(l_seqSto[0]));
     Dictionary_ctor(&l_usrDict, l_usrSto,
                     sizeof(l_usrSto)/sizeof(l_usrSto[0]));
     SigDictionary_ctor(&l_sigDict, l_sigSto,
                        sizeof(l_sigSto)/sizeof(l_sigSto[0]));
     Dictionary_config(&l_funDict, l_config.funPtrSize);
     Dictionary_config(&l_objDict, l_config.objPtrSize);
+    Dictionary_config(&l_seqDict, l_config.objPtrSize);
     Dictionary_config(&l_usrDict, 1);
     SigDictionary_config(&l_sigDict, l_config.objPtrSize);
 
     l_config.tstamp[5] = 0U;   /* invalidate the year-part of the timestamp */
     l_dictFileName[0]  = '\0'; /* assume no external dictionary management */
-
-    SNPRINTF_LINE("-v %d", (unsigned)version);       QSPY_onPrintLn();
-    SNPRINTF_LINE("-T %d", (unsigned)tstampSize);    QSPY_onPrintLn();
-    SNPRINTF_LINE("-O %d", (unsigned)objPtrSize);    QSPY_onPrintLn();
-    SNPRINTF_LINE("-F %d", (unsigned)l_config.funPtrSize); QSPY_onPrintLn();
-    SNPRINTF_LINE("-S %d", (unsigned)sigSize);       QSPY_onPrintLn();
-    SNPRINTF_LINE("-E %d", (unsigned)evtSize);       QSPY_onPrintLn();
-    SNPRINTF_LINE("-Q %d", (unsigned)queueCtrSize);  QSPY_onPrintLn();
-    SNPRINTF_LINE("-P %d", (unsigned)poolCtrSize);   QSPY_onPrintLn();
-    SNPRINTF_LINE("-B %d", (unsigned)poolBlkSize);   QSPY_onPrintLn();
-    SNPRINTF_LINE("-C %d", (unsigned)tevtCtrSize);   QSPY_onPrintLn();
-    QSPY_line[0] = '\0'; QSPY_onPrintLn();
-
     l_userRec = ((l_config.version < 660U) ? OLD_QS_USER : QS_USER);
+
+    /* split the comma-separated 'seqList' into string array l_seqNames[] */
+    l_seqNum    = 0;
+    l_seqSystem = -1;
+    if ((seqList != (void*)0) && (*seqList != '\0')) {
+        STRNCPY_S(l_seqList, sizeof(l_seqList), seqList);
+
+        char seqTokens[QS_SEQ_LIST_LEN_MAX]; /* local mutable copy */
+        STRNCPY_S(seqTokens, sizeof(seqTokens), l_seqList);
+        char const *token;
+        for (token = my_strtok(seqTokens, ',');
+             (token != (char*)0) && (l_seqNum < SEQ_ITEMS_MAX);
+             token = my_strtok((char *)0, ','), ++l_seqNum)
+        {
+            if (strncmp(token, "?", 2) == 0) { /* system border? */
+                l_seqSystem = l_seqNum;
+            }
+            STRNCPY_S(l_seqNames[l_seqNum], sizeof(l_seqNames[l_seqNum]),
+                     token);
+        }
+        if (token != (char*)0) {
+            SNPRINTF_LINE("   <QSPY-> Too many names in the Sequence list\n"
+                          "   %s\n", l_seqList);
+            QSPY_printInfo();
+        }
+        else {
+            l_seqLines = 0;
+            seqGenHeader();
+        }
+    }
+
+    /* echo all the options to the screen... */
+    SNPRINTF_LINE("-v %d", (unsigned)l_config.version);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-T %d", (unsigned)l_config.tstampSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-O %d", (unsigned)l_config.objPtrSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-F %d", (unsigned)l_config.funPtrSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-S %d", (unsigned)l_config.sigSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-E %d", (unsigned)l_config.evtSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-Q %d", (unsigned)l_config.queueCtrSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-P %d", (unsigned)l_config.poolCtrSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-B %d", (unsigned)l_config.poolBlkSize);
+    QSPY_onPrintLn();
+    SNPRINTF_LINE("-C %d", (unsigned)l_config.tevtCtrSize);
+    QSPY_onPrintLn();
+    QSPY_line[0] = '\0'; QSPY_onPrintLn();
 }
 /*..........................................................................*/
 void QSPY_configTxReset(QSPY_resetFun txResetFun) {
@@ -402,30 +474,13 @@ void QSPY_configMatFile(void *matFile) {
     l_matFile = (FILE *)matFile;
 }
 /*..........................................................................*/
-void QSPY_configMscFile(void *mscFile) {
-    if (l_mscFile != (FILE *)0) {
-        int i;
-        FPRINTF_S(l_mscFile, "}\n");
-        rewind(l_mscFile);
-        FPRINTF_S(l_mscFile, "msc {\n");
-        for (i = 0; ; ++i) {
-            char const *entry = Dictionary_at(&l_mscDict, i);
-            if (entry[0] != '\0') {
-                if (i == 0) {
-                    FPRINTF_S(l_mscFile, "\"%s\"", entry);
-                }
-                else {
-                    FPRINTF_S(l_mscFile, ",\"%s\"", entry);
-                }
-            }
-            else {
-                break;
-            }
-        }
-        FPRINTF_S(l_mscFile, ";\n");
-        fclose(l_mscFile);
+void QSPY_configSeqFile(void *seqFile) {
+    if (l_seqFile != (FILE *)0) {
+        fclose(l_seqFile);
     }
-    l_mscFile = (FILE *)mscFile;
+    l_seqFile = (FILE *)seqFile;
+    l_seqLines = 0;
+    seqGenHeader();
 }
 /*..........................................................................*/
 QSpyConfig const *QSPY_getConfig(void) {
@@ -440,6 +495,9 @@ void QSpyRecord_init(QSpyRecord * const me,
     me->len     = (uint32_t)(tot_len - 3U);
     me->pos     = start + 2;
     me->rec     = start[1];
+
+    /* set the current QS record-ID for any subsequent output */
+    QSPY_output.rec  = me->rec;
 }
 /*..........................................................................*/
 QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
@@ -625,7 +683,6 @@ int64_t QSpyRecord_getInt64(QSpyRecord * const me, uint8_t size) {
 char const *QSpyRecord_getStr(QSpyRecord * const me) {
     uint8_t const *p;
     int32_t l;
-    bool esc = false;
 
     /* is the string empty? */
     if (*me->pos == 0U) {
@@ -633,43 +690,18 @@ char const *QSpyRecord_getStr(QSpyRecord * const me) {
         --me->len;
         ++me->pos;
 
-        /* explicit empty string as two single-quotes '' */
+        /* return explicit empty string as two single-quotes '' */
         return "''";
     }
 
-    /* the following loop finds the beginning of the string and removes
-    * or replaces special characters on-the-fly. Specifically a leading '&'
-    * at the beginning of a string is removed and all un-escaped special
-    * characters, such as brackets '[]' are replaced with '<>'. This is
-    * to avoid any potential conflicts in QUTEST with matching strings
-    *(e.g., with the Python "fnmatchcase" command or regular explerssions).
-    */
     for (l = me->len, p = me->pos; l > 0; --l, ++p) {
         if (*p == 0U) { /* zero-terminated end of the string? */
             char const *s = (char const *)me->pos;
-            if (*s == '&') {
-                ++s;  /* skip the leading '&' */
-            }
 
             /* adjust the stream for the next token */
             me->len = l - 1;
             me->pos = p + 1;
             return s; /* normal return */
-        }
-        else if (*p == '\033') { /* escape character? */
-            esc = true;
-        }
-        else if (!esc) { /* non-escape character while not escaping? */
-            /* handle any un-escaped special characters... */
-            if (*p == '[') { /* replace '[' with '<' */
-                *((uint8_t *)p) = '<'; /* cast 'const' away */
-            }
-            else if (*p == ']') { /* replace ']' with '>' */
-                *((uint8_t *)p) = '>'; /* cast 'const' away */
-            }
-        }
-        else { /* non-escape character while escaping */
-           esc = false;
         }
     }
 
@@ -897,13 +929,9 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 static void QSpyRecord_process(QSpyRecord * const me) {
     uint32_t t, a, b, c, d, e;
     uint64_t p, q, r;
-    char buf[FNAME_SIZE];
+    char buf[QS_FNAME_LEN_MAX];
     char const *s = 0;
     char const *w = 0;
-
-    /* set the current QS record-ID for any output in this function */
-    QSPY_output.rec  = me->rec;
-    QSPY_output.type = REG_OUT;
 
     switch (me->rec) {
         /* Session start ...................................................*/
@@ -1008,23 +1036,21 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             q = QSpyRecord_getUint64(me, l_config.funPtrSize);
             r = QSpyRecord_getUint64(me, l_config.funPtrSize);
             if (QSpyRecord_OK(me)) {
+                w = Dictionary_get(&l_funDict, r, buf);
                 SNPRINTF_LINE("%010u ===>Tran "
                        "Obj=%s,Sig=%s,State=%s->%s",
                        t,
                        Dictionary_get(&l_objDict, p, (char *)0),
                        SigDictionary_get(&l_sigDict, a, p, (char *)0),
                        Dictionary_get(&l_funDict, q, (char *)0),
-                       Dictionary_get(&l_funDict, r, buf));
+                       w);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %u %"PRId64" %"PRId64" %"PRId64"\n",
                                (int)me->rec, t, a, p, q, r);
-                if (l_mscFile != (FILE *)0) {
-                    if (Dictionary_find(&l_mscDict, p) >= 0) { /* found? */
-                        FPRINTF_S(l_mscFile,
-                                "\"%s\" rbox \"%s\" [label=\"%s\"];\n",
-                                Dictionary_get(&l_mscDict, p, (char *)0),
-                                Dictionary_get(&l_mscDict, p, buf),
-                                Dictionary_get(&l_funDict, r, (char *)0));
+                if (l_seqFile != (FILE*)0) {
+                    int obj = seqFind(p);
+                    if (obj >= 0) {
+                        seqGenTran(t, obj, w);
                     }
                 }
             }
@@ -1110,6 +1136,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     QSPY_onPrintLn();
                     FPRINF_MATFILE("%d %u %"PRId64" %"PRId64" %u %u %u\n",
                                    (int)me->rec, t, p, q, a, b, c);
+                    if (l_seqFile != (FILE*)0) {
+                        int obj = seqFind(p);
+                        if (obj >= 0) {
+                            seqGenAnnotation(t, obj, s);
+                        }
+                    }
                 }
             }
             else if (me->rec == QS_QF_ACTIVE_RECALL) { /* former... */
@@ -1144,6 +1176,12 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     QSPY_onPrintLn();
                     FPRINF_MATFILE("%d %u %"PRId64" %"PRId64"\n",
                                    (int)me->rec, t, p, q);
+                    if (l_seqFile != (FILE*)0) {
+                        int obj = seqFind(p);
+                        if (obj >= 0) {
+                            seqGenAnnotation(t, obj, "RcallA");
+                        }
+                    }
                 }
             }
             else { /* former QS_QF_EQUEUE_INIT */
@@ -1207,6 +1245,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             e = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             if (QSpyRecord_OK(me)) {
+                w = SigDictionary_get(&l_sigDict, a, p, (char *)0);
                 SNPRINTF_LINE("%010u AO-%s Sdr=%s,Obj=%s,"
                        "Evt<Sig=%s,Pool=%u,Ref=%u>,"
                        "Que<Free=%u,%s=%u>",
@@ -1214,28 +1253,18 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                        s,
                        Dictionary_get(&l_objDict, q, (char *)0),
                        Dictionary_get(&l_objDict, p, buf),
-                       SigDictionary_get(&l_sigDict, a, p, (char *)0),
+                       w,
                        b, c, d,
                        (me->rec == QS_QF_ACTIVE_POST ? "Min" : "Mar"),
                        e);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %"PRId64" %u %"PRId64" %u %u %u %u\n",
                                (int)me->rec, t, q, a, p, b, c, d, e);
-                if (l_mscFile != (FILE *)0) {
-                    if (Dictionary_find(&l_mscDict, q) < 0) { /* not found? */
-                        Dictionary_put(&l_mscDict, q,
-                            Dictionary_get(&l_objDict, q, (char *)0));
-                    }
-                    if (Dictionary_find(&l_mscDict, p) < 0) { /* not found? */
-                        Dictionary_put(&l_mscDict, p,
-                            Dictionary_get(&l_objDict, p, (char *)0));
-                    }
-                    FPRINTF_S(l_mscFile,
-                            "\"%s\"->\"%s\" [label=\"%u:%s\"];\n",
-                            Dictionary_get(&l_mscDict, q, (char *)0),
-                            Dictionary_get(&l_mscDict, p, buf),
-                            t,
-                            SigDictionary_get(&l_sigDict, a, p, (char *)0));
+                if (l_seqFile != (FILE *)0) {
+                    int src = seqFind(q);
+                    int dst = seqFind(p);
+                    seqGenPost(t, src, dst, w,
+                               (me->rec == QS_QF_ACTIVE_POST_ATTEMPT));
                 }
             }
             break;
@@ -1256,27 +1285,22 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             d = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             e = QSpyRecord_getUint32(me, l_config.queueCtrSize);
             if (QSpyRecord_OK(me)) {
+                w = SigDictionary_get(&l_sigDict, a, p, (char *)0);
                 SNPRINTF_LINE("%010u AO-LIFO  Obj=%s,"
                        "Evt<Sig=%s,Pool=%u,Ref=%u>,"
                        "Que<Free=%u,Min=%u>",
                        t,
                        Dictionary_get(&l_objDict, p, (char *)0),
-                       SigDictionary_get(&l_sigDict, a, p, (char *)0),
+                       w,
                        b, c, d, e);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %u %"PRId64" %u %u %u %u\n",
                                (int)me->rec, t, a, p, b, c, d, e);
-                if (l_mscFile != (FILE *)0) {
-                    if (Dictionary_find(&l_mscDict, p) < 0) { /* not found? */
-                        Dictionary_put(&l_mscDict, p,
-                            Dictionary_get(&l_objDict, p, (char *)0));
+                if (l_seqFile != (FILE*)0) {
+                    int src = seqFind(p);
+                    if (src >= 0) {
+                        seqGenPostLIFO(t, src, w);
                     }
-                    FPRINTF_S(l_mscFile,
-                            "\"%s\"->\"%s\" [label=\"%u:%s-LIFO\"];\n",
-                            Dictionary_get(&l_mscDict, p, (char *)0),
-                            Dictionary_get(&l_mscDict, p, buf),
-                            t,
-                            SigDictionary_get(&l_sigDict, a, p, (char *)0));
                 }
             }
             break;
@@ -1387,7 +1411,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_QF_RESERVED2: {
+        case QS_RESERVED_23: {
             if (l_config.version >= 620U) {
                 SNPRINTF_LINE("           Unknown Rec=%d,Len=%d",
                        (int)me->rec, (int)me->len);
@@ -1465,27 +1489,19 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 b >>= 6;
             }
             if (QSpyRecord_OK(me)) {
+                w = SigDictionary_get(&l_sigDict, a, 0, buf);
                 SNPRINTF_LINE("%010u QF-Pub   Sdr=%s,"
                        "Evt<Sig=%s,Pool=%u,Ref=%u>",
                        t,
                        Dictionary_get(&l_objDict, p, (char *)0),
-                       SigDictionary_get(&l_sigDict, a, 0, (char *)0),
+                       w,
                        b, c);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
                                (int)me->rec, t, p, a, b);
-                if (l_mscFile != (FILE *)0) {
-                    if (Dictionary_find(&l_mscDict, p) < 0) { /* not found? */
-                        Dictionary_put(&l_mscDict, p,
-                            Dictionary_get(&l_objDict, p, (char *)0));
-                    }
-                    FPRINTF_S(l_mscFile,
-                            "\"%s\"->* [label=\"%u:%s\""
-                            ",textcolour=\"#0000ff\""
-                            ",linecolour=\"#0000ff\"];\n",
-                            Dictionary_get(&l_mscDict, p, (char *)0),
-                            t,
-                            SigDictionary_get(&l_sigDict, a, p, (char *)0));
+                if (l_seqFile != (FILE *)0) {
+                    int obj = seqFind(p);
+                    seqGenPublish(t, obj, w);
                 }
             }
             break;
@@ -1610,12 +1626,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         a);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u\n", (int)me->rec, a);
-                if (l_mscFile != (FILE *)0) {
-                    FPRINTF_S(l_mscFile,
-                            "--- [label=\"tick %u\""
-                            ",textcolour=\"#ff0000\""
-                            ",linecolour=\"#ff0000\"];\n",
-                            a);
+                if (l_seqFile != (FILE*)0) {
+                    seqGenTick(b, a);
                 }
             }
             break;
@@ -1906,6 +1918,19 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_OBJ_DICT: {
             p = QSpyRecord_getUint64(me, l_config.objPtrSize);
             s = QSpyRecord_getStr(me);
+
+            /* for backward compatibilty replace the '['/']' with '<'/'>' */
+            if (l_config.version < 690U) {
+                char *ps;
+                for (ps = (char *)s; *ps != '\0'; ++ps) {
+                    if (*ps == '[') {
+                        *ps = '<';
+                    }
+                    else if (*ps == ']') {
+                        *ps = '>';
+                    }
+                }
+            }
             if (QSpyRecord_OK(me)) {
                 Dictionary_put(&l_objDict, p, s);
                 if (l_config.objPtrSize <= 4) {
@@ -1919,6 +1944,9 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %s=%"PRId64";\n",
                                (int)me->rec, getMatDict(s), p);
+
+                /* if needed, update the object in the Sequence dictionary */
+                seqUpdateDictionary(s, p);
             }
             break;
         }
@@ -1976,7 +2004,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 * find differences from the current config and store in 'd'
                 */
                 d = 0U; /* assume no difference in the target info */
-                CONFIG_UPDATE(version ,    (uint16_t)(b & 0xFFFFU), d);
+                CONFIG_UPDATE(version ,    (uint16_t)(b & 0x7FFFU), d);
+                CONFIG_UPDATE(endianness,  (uint8_t)((b >> 15) & 0x01U), d);
                 CONFIG_UPDATE(objPtrSize,  (uint8_t)(buf[3] & 0xFU), d);
                 CONFIG_UPDATE(funPtrSize,  (uint8_t)((buf[3] >> 4) & 0xFU),d);
                 CONFIG_UPDATE(tstampSize,  (uint8_t)(buf[4] & 0xFU), d);
@@ -2025,7 +2054,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     if (l_txResetFun != (QSPY_resetFun)0) {
                         (*l_txResetFun)();
                     }
-                    /*TBD: close and re-open MATLAB file, MSC file, etc. */
+                    /*TBD: close and re-open MATLAB, Sequence file, etc. */
                 }
 
                 /* should external dictionaries be used (-d option)? */
@@ -2098,10 +2127,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 case SM_OBJ:
                     q = QSpyRecord_getUint64(me, l_config.funPtrSize);
                     break;
-                case AO_OBJ:
-                    b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
-                    c = QSpyRecord_getUint32(me, l_config.queueCtrSize);
-                    break;
                 case MP_OBJ:
                     b = QSpyRecord_getUint32(me, l_config.poolCtrSize);
                     c = QSpyRecord_getUint32(me, l_config.poolCtrSize);
@@ -2122,6 +2147,21 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 default:
                     break;
             }
+            if (l_config.version < 690U) {
+                switch (a) {
+                    case AO_OBJ:
+                        b = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                        c = QSpyRecord_getUint32(me, l_config.queueCtrSize);
+                        break;
+                }
+            }
+            else {
+                switch (a) {
+                    case AO_OBJ:
+                        q = QSpyRecord_getUint64(me, l_config.funPtrSize);
+                        break;
+                }
+            }
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u Query-%s Obj=%s",
                        t,
@@ -2131,10 +2171,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     case SM_OBJ:
                         SNPRINTF_APPEND(",State=%s",
                             Dictionary_get(&l_funDict, q, (char *)0));
-                        break;
-                    case AO_OBJ:
-                        SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
-                            b, c);
                         break;
                     case MP_OBJ:
                         SNPRINTF_APPEND(",Free=%u,Min=%u",
@@ -2156,6 +2192,22 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         break;
                     default:
                         break;
+                }
+                if (l_config.version < 690U) {
+                    switch (a) {
+                        case AO_OBJ:
+                            SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
+                                b, c);
+                            break;
+                    }
+                }
+                else {
+                    switch (a) {
+                        case AO_OBJ:
+                            SNPRINTF_APPEND(",State=%s",
+                                Dictionary_get(&l_funDict, q, (char *)0));
+                            break;
+                    }
                 }
                 QSPY_onPrintLn();
             }
@@ -2215,16 +2267,25 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        /* User records ....................................................*/
-        default: {
-            if (me->rec >= l_userRec) {
-                QSpyRecord_processUser(me);
-            }
-            else {
-                SNPRINTF_LINE("           Unknown Rec=%d,Len=%d",
-                       (int)me->rec, (int)me->len);
+        case QS_QF_RUN: {
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("           QF_RUN");
                 QSPY_onPrintLn();
+                if (l_dictFileName[0] != '\0') {
+                    QSPY_writeDict();
+                }
             }
+            break;
+        }
+
+        /* Unknown records .................................................*/
+        /* NOTE: the Application-Specific records have been already
+         * sifted out in QSPY_parse()
+         */
+        default: {
+            SNPRINTF_LINE("           Unknown Rec=%d,Len=%d",
+                   (int)me->rec, (int)me->len);
+            QSPY_onPrintLn();
             break;
         }
     }
@@ -2232,16 +2293,34 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 /*..........................................................................*/
 void QSPY_stop(void) {
     QSPY_configMatFile((void *)0);
-    QSPY_configMscFile((void *)0);
+    QSPY_configSeqFile((void *)0);
 }
 /*..........................................................................*/
 void QSPY_printError(void) {
     QSPY_output.type = ERR_OUT; /* this is an error message */
     QSPY_onPrintLn();
 }
+/*..........................................................................*/
+char const* QSPY_tstampStr(void) {
+    time_t rawtime = time(NULL);
+    struct tm tstamp;
+    static char tstampStr[16];
+
+    LOCALTIME_S(&tstamp, &rawtime);
+
+    SNPRINTF_S(tstampStr, sizeof(tstampStr), "%02d%02d%02d_%02d%02d%02d",
+        (tstamp.tm_year + 1900) % 100,
+        (tstamp.tm_mon + 1),
+        tstamp.tm_mday,
+        tstamp.tm_hour,
+        tstamp.tm_min,
+        tstamp.tm_sec);
+
+    return &tstampStr[0];
+}
 
 /****************************************************************************/
-static uint8_t l_record[QS_MAX_RECORD_SIZE];
+static uint8_t l_record[QS_RECORD_SIZE_MAX];
 static uint8_t *l_pos   = l_record; /* position within the record */
 static uint8_t l_chksum = 0U;
 static uint8_t l_esc    = 0U;
@@ -2304,14 +2383,6 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                     }
                     SNPRINTF_APPEND("Seq=%u", (unsigned)l_seq);
                     QSPY_printError();
-
-                    if (l_mscFile != (FILE *)0) {
-                        FPRINTF_S(l_mscFile, "...;\n"
-                            "--- [label=\"Bad checksum at Seq=%u,Id=%u(?)\""
-                            ",textbgcolour=\"#ffff00\""
-                            ",linecolour=\"#ff0000\"];\n",
-                            (unsigned)l_seq, (unsigned)l_record[1]);
-                    }
                 }
             }
             else if (l_pos < &l_record[3]) { /* record too short? */
@@ -2326,13 +2397,6 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                                (unsigned)(l_record[1] - l_userRec));
                 }
                 QSPY_printError();
-                if (l_mscFile != (FILE *)0) {
-                    FPRINTF_S(l_mscFile, "...;\n"
-                        "--- [label=\"Record too short at Seq=%u,Id=%u(?)\""
-                        ",textbgcolour=\"#ffff00\""
-                        ",linecolour=\"#ff0000\"];\n",
-                    (unsigned)l_seq, (unsigned)l_record[1]);
-                }
             }
             else { /* a healty record received */
                 QSpyRecord qrec;
@@ -2350,15 +2414,6 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                             "Seq=%u->%u",
                             (unsigned)(l_seq - 1), (unsigned)l_record[0]);
                         QSPY_printError();
-                        if (l_mscFile != (FILE *)0) {
-                            FPRINTF_S(l_mscFile,
-                                "--- [label=\""
-                                "Data discontinuity Seq=%u->%u\""
-                                ",textbgcolour=\"#ffff00\""
-                                ",linecolour=\"#ff0000\"];\n"
-                                "...;\n",
-                               (unsigned)(l_seq - 1), (unsigned)l_record[0]);
-                        }
                     }
                 }
                 else {
@@ -2377,7 +2432,12 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                     }
                 }
                 if (parse) {
-                    QSpyRecord_process(&qrec);
+                    if (qrec.rec < l_userRec) {
+                        QSpyRecord_process(&qrec);
+                    }
+                    else {
+                        QSpyRecord_processUser(&qrec);
+                    }
                 }
             }
 
@@ -2418,7 +2478,7 @@ void QSPY_setExternDict(char const *dictName) {
 /*..........................................................................*/
 QSpyStatus QSPY_writeDict(void) {
     FILE *dictFile = (FILE *)0;
-    char buf[FNAME_SIZE];
+    char buf[QS_FNAME_LEN_MAX];
 
     /* no external dictionaries configured? */
     if (l_dictFileName[0] == '\0') {
@@ -2483,9 +2543,6 @@ QSpyStatus QSPY_writeDict(void) {
     FPRINTF_S(dictFile, "Sig-Dic:\n");
     SigDictionary_write(&l_sigDict, dictFile);
 
-    FPRINTF_S(dictFile, "Msc-Dic:\n");
-    Dictionary_write(&l_mscDict, dictFile);
-
     fclose(dictFile);
 
     SNPRINTF_LINE("   <QSPY-> Dictionaries saved to File=%s",
@@ -2497,7 +2554,7 @@ QSpyStatus QSPY_writeDict(void) {
 /*..........................................................................*/
 QSpyStatus QSPY_readDict(void) {
     FILE *dictFile;
-    char name[FNAME_SIZE];
+    char name[QS_FNAME_LEN_MAX];
     char buf[256];
     uint32_t c = l_config.tstamp[5]; /* save the year-part of the tstamp */
     uint32_t d = 0U; /* assume no difference in the configuration */
@@ -2582,7 +2639,7 @@ QSpyStatus QSPY_readDict(void) {
                         CONFIG_UPDATE(poolCtrSize, (buf[2] - '0'), d);
                         break;
                     case 'B':
-                        CONFIG_UPDATE(poolBlkSize,  (buf[2] - '0'), d);
+                        CONFIG_UPDATE(poolBlkSize, (buf[2] - '0'), d);
                         break;
                     case 'C':
                         CONFIG_UPDATE(tevtCtrSize, (buf[2] - '0'), d);
@@ -2609,7 +2666,7 @@ QSpyStatus QSPY_readDict(void) {
                         goto error;
                 }
                 break;
-            case 'O':
+            case 'O': /* object dictionary */
                 if (!Dictionary_read(&l_objDict, (FILE *)dictFile)) {
                     SNPRINTF_LINE("   <QSPY-> Parsing OBJ dictionaries failed"
                                   " File=%s", name);
@@ -2617,8 +2674,14 @@ QSpyStatus QSPY_readDict(void) {
                     stat = QSPY_ERROR;
                     goto error;
                 }
+                Dictionary_reset(&l_seqDict);
+                int i;
+                for (i = 0; i < l_objDict.entries; ++i) {
+                    seqUpdateDictionary(l_objDict.sto[i].name,
+                                        l_objDict.sto[i].key);
+                }
                 break;
-            case 'F':
+            case 'F': /* function dictionary */
                 if (!Dictionary_read(&l_funDict, (FILE *)dictFile)) {
                     SNPRINTF_LINE("   <QSPY-> Parsing FUN dictionaries failed"
                                   " File=%s", name);
@@ -2627,7 +2690,7 @@ QSpyStatus QSPY_readDict(void) {
                     goto error;
                 }
                 break;
-            case 'U':
+            case 'U': /* user dictionary */
                 if (!Dictionary_read(&l_usrDict, (FILE *)dictFile)) {
                     SNPRINTF_LINE("   <QSPY-> Parsing USR dictionaries failed"
                                   " File=%s", name);
@@ -2636,7 +2699,7 @@ QSpyStatus QSPY_readDict(void) {
                     goto error;
                 }
                 break;
-            case 'S':
+            case 'S': /* signal dictionary */
                 if (!SigDictionary_read(&l_sigDict, (FILE *)dictFile)) {
                     SNPRINTF_LINE("   <QSPY-> Parsing SIG dictionaries failed"
                                   " File=%s", name);
@@ -2645,18 +2708,10 @@ QSpyStatus QSPY_readDict(void) {
                     goto error;
                 }
                 break;
-            case 'M':
-                if (!Dictionary_read(&l_mscDict, (FILE *)dictFile)) {
-                    SNPRINTF_LINE("   <QSPY-> Parsing MSC dictionaries failed"
-                                  " File=%s", name);
-                    QSPY_printError();
-                    stat = QSPY_ERROR;
-                    goto error;
-                }
-                break;
+            /* don't read the sequence dictionary */
             default:
                 SNPRINTF_LINE("   <QSPY-> Unexpected line in "
-                          "Dictionary File=%s,Char=%c", name, buf[0]);
+                              "Dictionary File=%s,Char=%c", name, buf[0]);
                 QSPY_printError();
                 stat = QSPY_ERROR;
                 goto error;
@@ -2682,12 +2737,15 @@ error:
 static void resetAllDictionaries(void) {
     Dictionary_reset(&l_funDict);
     Dictionary_reset(&l_objDict);
-    Dictionary_reset(&l_mscDict);
     Dictionary_reset(&l_usrDict);
+    Dictionary_reset(&l_seqDict);
     SigDictionary_reset(&l_sigDict);
 
-    /* pre-fill known entries */
+    /* pre-fill known user entries */
     Dictionary_put(&l_usrDict, 124, "QUTEST_ON_POST");
+
+    /* find out if NULL needs to be added to the Sequence dictionary... */
+    seqUpdateDictionary("NULL", 0);
 }
 /*..........................................................................*/
 SigType QSPY_findSig(char const *name, ObjType obj) {
@@ -2772,13 +2830,13 @@ static void Dictionary_put(Dictionary * const me,
     if (idx >= 0) { /* the key found? */
         Q_ASSERT((idx <= n) || (n == 0));
         dst = me->sto[idx].name;
-        STRCPY_S(dst, sizeof(me->sto[idx].name), name);
+        STRNCPY_S(dst, sizeof(me->sto[idx].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
     }
     else if (n < me->capacity - 1) {
         me->sto[n].key = key;
         dst = me->sto[n].name;
-        STRCPY_S(dst, sizeof(me->sto[n].name), name);
+        STRNCPY_S(dst, sizeof(me->sto[n].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
         ++me->entries;
         /* keep the entries sorted by the key */
@@ -2804,10 +2862,10 @@ static char const *Dictionary_get(Dictionary * const me,
         }
         /* otherwise use the provided buffer... */
         if (me->keySize <= 4) {
-            SNPRINTF_S(buf, DNAME_SIZE, "0x%08X", (unsigned)key);
+            SNPRINTF_S(buf, QS_DNAME_LEN_MAX, "0x%08X", (unsigned)key);
         }
         else {
-            SNPRINTF_S(buf, DNAME_SIZE, "0x%016"PRIX64"", key);
+            SNPRINTF_S(buf, QS_DNAME_LEN_MAX, "0x%016"PRIX64"", key);
         }
         //Dictionary_put(me, key, buf); /* put into the dictionary */
         return buf;
@@ -2819,19 +2877,20 @@ static int Dictionary_find(Dictionary * const me, KeyType key) {
     int mid;
     int first = 0;
     int last = me->entries;
-    while (first <= last) {
-        mid = (first + last) / 2;
-        if (me->sto[mid].key == key) {
-            return mid;
-        }
-        if (me->sto[mid].key > key) {
-            last = mid - 1;
-        }
-        else {
-            first = mid + 1;
+    if (last > 0) { /* not empty? */
+        while (first <= last) {
+            mid = (first + last) / 2;
+            if (me->sto[mid].key == key) {
+                return mid;
+            }
+            if (me->sto[mid].key > key) {
+                last = mid - 1;
+            }
+            else {
+                first = mid + 1;
+            }
         }
     }
-
     return -1; /* entry not found */
 }
 /*..........................................................................*/
@@ -2955,14 +3014,14 @@ static void SigDictionary_put(SigDictionary * const me,
         Q_ASSERT((idx <= n) || (n == 0));
         me->sto[idx].obj = obj;
         dst = me->sto[idx].name;
-        STRCPY_S(dst, sizeof(me->sto[idx].name), name);
+        STRNCPY_S(dst, sizeof(me->sto[idx].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
     }
     else if (n < me->capacity - 1) {
         me->sto[n].sig = sig;
         me->sto[n].obj = obj;
         dst = me->sto[n].name;
-        STRCPY_S(dst, sizeof(me->sto[n].name), name);
+        STRNCPY_S(dst, sizeof(me->sto[n].name), name);
         dst[sizeof(me->sto[idx].name) - 1] = '\0'; /* zero-terminate */
         ++me->entries;
         /* keep the entries sorted by the sig */
@@ -2988,11 +3047,11 @@ static char const *SigDictionary_get(SigDictionary * const me,
         }
         /* otherwise use the provided buffer... */
         if (me->ptrSize <= 4) {
-            SNPRINTF_S(buf, DNAME_SIZE, "%08d,Obj=0x%08X",
+            SNPRINTF_S(buf, QS_DNAME_LEN_MAX, "%08d,Obj=0x%08X",
                       (int)sig, (int)obj);
         }
         else {
-            SNPRINTF_S(buf, DNAME_SIZE, "%08d,Obj=0x%016"PRIX64"",
+            SNPRINTF_S(buf, QS_DNAME_LEN_MAX, "%08d,Obj=0x%016"PRIX64"",
                        (int)sig, obj);
         }
         //SigDictionary_put(me, sig, obj, buf); /* put into the dictionary */
@@ -3143,4 +3202,458 @@ static bool SigDictionary_read(SigDictionary * const me, FILE *stream) {
 error:
     SigDictionary_reset(me);
     return false;
+}
+
+/* Sequence diagram facilities =============================================*/
+enum {
+    SEQ_LANE_WIDTH   = 20,
+    SEQ_LEFT_OFFSET  = 19,  /* offset to the middle of the first lane */
+    SEQ_BOX_WIDTH    = SEQ_LANE_WIDTH - 3,
+    SEQ_LABEL_MAX    = SEQ_LANE_WIDTH - 5,
+    SEQ_HEADER_EVERY = 100, /* # lines between repeated headers */
+};
+
+/*..........................................................................*/
+static void seqUpdateDictionary(char const* name, KeyType key) {
+    int n;
+    for (n = 0; n < l_seqNum; ++n) { /* brute-force search */
+        if (strncmp(l_seqNames[n], name, QS_DNAME_LEN_MAX) == 0) {
+            char str[2];
+            str[0] = (char)n;
+            str[1] = '\0';
+            Dictionary_put(&l_seqDict, key, str);
+            break;
+        }
+    }
+}
+/*..........................................................................*/
+static int seqFind(KeyType key) {
+    int idx = Dictionary_find(&l_seqDict, key);
+    if (idx >= 0) {
+        char const *str = Dictionary_at(&l_seqDict, idx);
+        return (int)str[0];
+    }
+    return -1;
+}
+/*..........................................................................*/
+static void seqGenHeader(void) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    static char seq_header[(SEQ_LEFT_OFFSET
+                            + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX + 4) * 3];
+    static size_t seq_header_len = 0;
+    if (seq_header_len == 0) { /* not initialized yet? */
+        int n;
+        int i = 0;
+        int left_box_edge;
+        char *seq_line = &seq_header[0];
+
+        /* clear the whole header */
+        for (i = 0; (unsigned)i < sizeof(seq_header); ++i) {
+            seq_header[i] = ' ';
+        }
+
+        /* top box edges... */
+        left_box_edge = SEQ_LEFT_OFFSET - SEQ_BOX_WIDTH/2;
+        for (n = 0; n < l_seqNum; ++n, left_box_edge += SEQ_LANE_WIDTH) {
+            i = left_box_edge;
+            seq_line[i] = '+';
+            for (i += 1; i < left_box_edge - 1 + SEQ_BOX_WIDTH; ++i) {
+                seq_line[i] = '-';
+            }
+            seq_line[i - SEQ_BOX_WIDTH / 2] = '+';
+            seq_line[i] = '+'; i += 1;
+        }
+        seq_line[i] = '\n';
+        seq_line = &seq_line[i + 1];
+
+        /* box content... */
+        left_box_edge = SEQ_LEFT_OFFSET - SEQ_BOX_WIDTH/2;
+        for (n = 0; n < l_seqNum; ++n, left_box_edge += SEQ_LANE_WIDTH) {
+            seq_line[left_box_edge] = '|';
+
+            /* write the name */
+            char const *name = l_seqNames[n];
+            int len = strlen(name);
+            i = left_box_edge + 1;
+            if (len < SEQ_BOX_WIDTH - 2) {
+                i += (SEQ_BOX_WIDTH - 2 - len)/2; /* center the name */
+            }
+            for (; (*name != '\0')
+                    && (i < left_box_edge + SEQ_BOX_WIDTH - 1);
+                    ++name, ++i)
+            {
+                seq_line[i] = *name;
+            }
+
+            i = left_box_edge - 1 + SEQ_BOX_WIDTH;
+            seq_line[i] = '|'; i += 1;
+        }
+        seq_line[i] = '\n';
+        seq_line = &seq_line[i + 1];
+
+        /* bottom box edges... */
+        left_box_edge = SEQ_LEFT_OFFSET - SEQ_BOX_WIDTH/2;
+        for (n = 0; n < l_seqNum; ++n, left_box_edge += SEQ_LANE_WIDTH) {
+            i = left_box_edge;
+            seq_line[i] = '+';
+            for (i += 1; i < left_box_edge - 1 + SEQ_BOX_WIDTH; ++i) {
+                seq_line[i] = '-';
+            }
+            seq_line[i - SEQ_BOX_WIDTH/2] = '+';
+            seq_line[i] = '+'; i += 1;
+        }
+        seq_line[i] = '\n';
+        seq_header_len = &seq_line[i + 1] - &seq_header[0];
+    }
+    if (l_seqLines == 0) {
+        FPRINTF_S(l_seqFile, "-g %s\n\n", l_seqList);
+    }
+    fwrite(seq_header, 1, seq_header_len, l_seqFile);
+    l_seqLines += 3;
+}
+/*..........................................................................*/
+static void seqGenPost(uint32_t tstamp, int src, int dst, char const* sig,
+                       bool isAttempt)
+{
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if (src < 0) {
+        src = l_seqSystem;
+    }
+    if (dst < 0) {
+        dst = l_seqSystem;
+    }
+    if ((src < 0) || (dst < 0)) {
+        return;
+    }
+    if ((src == l_seqSystem) && (dst == l_seqSystem)) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET+ SEQ_LABEL_MAX
+                    + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+    int j;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    i += 10;
+    for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET)%SEQ_LANE_WIDTH) == 0
+                        ? '|'
+                        : ' ';
+    }
+    seq_line[i] = '|'; i += 1;
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+    char dash = isAttempt ? '~' : '-';
+    if (src < dst) {
+        for (i = SEQ_LEFT_OFFSET + src*SEQ_LANE_WIDTH;
+                i < SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH; ++i)
+        {
+            seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
+                            ? '+'
+                            : dash;
+        }
+        seq_line[i - 1] = '>';
+        /* write the signal */
+        for (i = SEQ_LEFT_OFFSET + 3 + src*SEQ_LANE_WIDTH;
+                ((*sig != '\0')
+                    && (i < SEQ_LEFT_OFFSET + SEQ_LABEL_MAX + 3
+                            + src*SEQ_LANE_WIDTH));
+                ++i, ++sig)
+        {
+                seq_line[i] = *sig;
+        }
+    }
+    else if (src > dst) {
+        i = SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH;
+        for (i = SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH;
+                i < SEQ_LEFT_OFFSET + src* SEQ_LANE_WIDTH; ++i)
+        {
+            seq_line[i] = ((i - SEQ_LEFT_OFFSET)% SEQ_LANE_WIDTH) == 0
+                            ? '+'
+                            : dash;
+        }
+        seq_line[SEQ_LEFT_OFFSET + 1 + dst*SEQ_LANE_WIDTH] = '<';
+        seq_line[SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH] = '|';
+
+        /* write the signal */
+        int len = strlen(sig);
+        if (len > SEQ_LABEL_MAX) {
+            len = SEQ_LABEL_MAX;
+        }
+        i = SEQ_LEFT_OFFSET - 2 + src*SEQ_LANE_WIDTH - len;
+        j = i + SEQ_LABEL_MAX;
+        for (; (*sig != '\0') && (i < j); ++i, ++sig) {
+            seq_line[i] = *sig;
+        }
+    }
+    else { /* self-posting */
+        /* write the signal */
+        i = SEQ_LEFT_OFFSET + 3 + src*SEQ_LANE_WIDTH;
+        j = i + SEQ_LABEL_MAX;
+        for (; (*sig != '\0') && (i < j); ++i, ++sig) {
+            seq_line[i] = *sig;
+        }
+        seq_line[i] = ']'; i += 1;
+        if (seq_line_len <= (size_t)i) {
+            seq_line[i] = '\n';
+            seq_line_len = i + 1;
+        }
+        i = SEQ_LEFT_OFFSET + src*SEQ_LANE_WIDTH;
+        seq_line[i + 1] = '<';
+        seq_line[i + 2] = '-';
+    }
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    seq_line[SEQ_LEFT_OFFSET + src*SEQ_LANE_WIDTH] = isAttempt ? 'A' : '*';
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
+}
+/*..........................................................................*/
+static void seqGenPostLIFO(uint32_t tstamp, int src, char const* sig) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET + SEQ_LABEL_MAX
+                  + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+    int j;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    i += 10;
+    for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
+            ? '|'
+            : ' ';
+    }
+    seq_line[i] = '|'; i += 1;
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+
+    /* write the signal */
+    i = SEQ_LEFT_OFFSET + 3 + src * SEQ_LANE_WIDTH;
+    j = i + SEQ_LABEL_MAX;
+    for (; (*sig != '\0') && (i <= j); ++i, ++sig) {
+        seq_line[i] = *sig;
+    }
+    seq_line[i] = ']'; i += 1;
+    if (seq_line_len <= (size_t)i) {
+        seq_line[i] = '\n';
+        seq_line_len = i + 1;
+    }
+    i = SEQ_LEFT_OFFSET + src * SEQ_LANE_WIDTH;
+    seq_line[i + 1] = '<';
+    seq_line[i + 2] = '=';
+
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    seq_line[SEQ_LEFT_OFFSET + src * SEQ_LANE_WIDTH] = '*';
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
+}
+/*..........................................................................*/
+static void seqGenPublish(uint32_t tstamp, int obj, char const* sig) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if (obj < 0) {
+        obj = l_seqSystem;
+    }
+    if (obj < 0) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET + SEQ_LABEL_MAX
+        + SEQ_LANE_WIDTH * SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+    int j;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    i += 10;
+    for (;
+         i < SEQ_LEFT_OFFSET - SEQ_LANE_WIDTH + SEQ_BOX_WIDTH/2
+             + l_seqNum*SEQ_LANE_WIDTH; ++i)
+    {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET)%SEQ_LANE_WIDTH) == 0
+                       ? '|'
+                       : ((i % 2) ? '.' : ' ');
+    }
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+    i = SEQ_LEFT_OFFSET + obj * SEQ_LANE_WIDTH;
+
+    /* write the signal */
+    int len = strlen(sig);
+    if (len > SEQ_LABEL_MAX) {
+        len = SEQ_LABEL_MAX;
+    }
+    if (obj < l_seqNum - 1) { /* signal to the right of '*' */
+        i = SEQ_LEFT_OFFSET + 3 + obj*SEQ_LANE_WIDTH;
+        j = i + SEQ_LABEL_MAX;
+        for (; (*sig != '\0') && (i <= j); ++i, ++sig) {
+            seq_line[i] = *sig;
+        }
+    }
+    else { /* signal to the left of '*' */
+        i = SEQ_LEFT_OFFSET - 2 + obj*SEQ_LANE_WIDTH - len;
+        j = i + SEQ_LABEL_MAX;
+        for (; (*sig != '\0') && (i <= j); ++i, ++sig) {
+            seq_line[i] = *sig;
+        }
+    }
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    seq_line[SEQ_LEFT_OFFSET + obj * SEQ_LANE_WIDTH] = '*';
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
+}
+/*..........................................................................*/
+static void seqGenTran(uint32_t tstamp, int obj, char const* state) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET + SEQ_LABEL_MAX
+                  + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+    int j;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    i += 10;
+    for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET)% SEQ_LANE_WIDTH) == 0
+                      ? '|'
+                      : ' ';
+    }
+    seq_line[i] = '|'; i += 1;
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+    i = SEQ_LEFT_OFFSET + obj* SEQ_LANE_WIDTH;
+    /* write the state */
+    int len = strlen(state);
+    if (len > SEQ_LABEL_MAX) {
+        len = SEQ_LABEL_MAX;
+    }
+    i = SEQ_LEFT_OFFSET + obj* SEQ_LANE_WIDTH - (len + 1)/2;
+    j = i + SEQ_LABEL_MAX;
+    seq_line[i] = '<'; i += 1;
+    for (; (*state != '\0') && (i <= j); ++i, ++state) {
+        seq_line[i] = *state;
+    }
+    seq_line[i] = '>'; i += 1;
+    if (seq_line_len <= (size_t)i) {
+        seq_line[i] = '\n';
+        seq_line_len = i + 1;
+    }
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
+}
+/*..........................................................................*/
+static void seqGenAnnotation(uint32_t tstamp, int obj, char const* ann) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET + SEQ_LABEL_MAX
+        + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+    int j;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    i += 10;
+    for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET)%SEQ_LANE_WIDTH) == 0
+            ? '|'
+            : ' ';
+    }
+    seq_line[i] = '|'; i += 1;
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+    i = SEQ_LEFT_OFFSET + obj*SEQ_LANE_WIDTH;
+    /* write the annotation */
+    int len = strlen(ann);
+    if (len > SEQ_LABEL_MAX) {
+        len = SEQ_LABEL_MAX;
+    }
+    i = SEQ_LEFT_OFFSET + obj*SEQ_LANE_WIDTH - (len + 1) / 2;
+    j = i + SEQ_LABEL_MAX;
+    seq_line[i] = '('; i += 1;
+    for (; (*ann != '\0') && (i <= j); ++i, ++ann) {
+        seq_line[i] = *ann;
+    }
+    seq_line[i] = ')'; i += 1;
+    if (seq_line_len <= (size_t)i) {
+        seq_line[i] = '\n';
+        seq_line_len = i + 1;
+    }
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
+}
+/*..........................................................................*/
+static void seqGenTick(uint32_t rate, uint32_t nTick) {
+    if ((l_seqNum == 0) || (l_seqFile == (FILE*)0)) {
+        return;
+    }
+    if ((l_seqLines % SEQ_HEADER_EVERY) == 0) {
+        seqGenHeader();
+    }
+    char seq_line[SEQ_LEFT_OFFSET + SEQ_LABEL_MAX
+                  + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX];
+    size_t seq_line_len;
+    int i = 0;
+
+    SNPRINTF_S(&seq_line[i], sizeof(seq_line),
+               "##########  Tick<%1u> Ctr=%010u",
+               (unsigned)rate, (unsigned)nTick);
+    i += 34;
+    for (;
+        i < SEQ_LEFT_OFFSET - SEQ_LANE_WIDTH + SEQ_BOX_WIDTH/2
+            + l_seqNum*SEQ_LANE_WIDTH; ++i)
+    {
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
+            ? '|'
+            : ((i % 2) ? ' ' : '\'');
+    }
+    if (l_seqSystem >= 0) {
+        seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
+    }
+    seq_line[i] = '\n';
+    seq_line_len = i + 1;
+    Q_ASSERT(seq_line_len <= sizeof(seq_line));
+    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    l_seqLines += 1;
 }

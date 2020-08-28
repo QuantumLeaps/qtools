@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-02-06
+* Last updated for version 6.9.0
+* Last updated on  2020-08-21
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -41,7 +41,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <conio.h>
+
+#pragma warning(push)
+#pragma warning(disable: 4255)
 #include <ws2tcpip.h> /* for Windows socket facilities */
+#pragma warning(pop)
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
@@ -68,22 +72,29 @@ static void file_cleanup(void);
 static QSPYEvtType be_receive (unsigned char *buf, size_t *pBytes);
 static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes);
 
-
 /*..........................................................................*/
-static HANDLE l_serHNDL;
+enum PAL_Constants { /* local constants... */
+    FE_DETACHED = 0,   /* Front-End detached */
+    PAL_TOUT_MS = 10,  /* determines how long to wait for an event [ms] */
+};
+
+/* fron-end address */
+typedef union {
+    uint64_t data[2];
+    struct sockaddr addr;
+} fe_addr;
+
+static HANDLE       l_serHNDL;
 static COMMTIMEOUTS l_timeouts;
 
-static SOCKET l_beSock = INVALID_SOCKET;
-static struct sockaddr l_beReturnAddr;
-static int    l_beReturnAddrSize;
+static SOCKET  l_beSock = INVALID_SOCKET;
+static fe_addr l_feAddr;
+static int     l_feAddrSize = FE_DETACHED;
 
 static SOCKET l_serverSock = INVALID_SOCKET;
 static SOCKET l_clientSock = INVALID_SOCKET;
 
 static FILE *l_file = (FILE *)0;
-
-/* PAL timeout determines how long to wait for an event [ms] */
-#define PAL_TOUT_MS 10
 
 /*==========================================================================*/
 /* Win32 serial communication with the Target */
@@ -597,7 +608,7 @@ QSpyStatus PAL_openBE(int portNum) {
 /*..........................................................................*/
 void PAL_closeBE(void) {
     if (l_beSock != INVALID_SOCKET) {
-        if (l_beReturnAddrSize > 0) { /* front-end attached? */
+        if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
             fd_set writeSet;
             struct timeval delay;
 
@@ -625,9 +636,9 @@ void PAL_closeBE(void) {
 }
 /*..........................................................................*/
 void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
-    if (l_beReturnAddrSize > 0) { /* front-end attached? */
+    if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
         if (sendto(l_beSock, (char *)buf, (int)nBytes, 0,
-                   &l_beReturnAddr, l_beReturnAddrSize) == SOCKET_ERROR)
+                   &l_feAddr.addr, l_feAddrSize) == SOCKET_ERROR)
         {
             PAL_detachFE(); /* detach the Front-End */
 
@@ -639,7 +650,7 @@ void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
 }
 /*..........................................................................*/
 void PAL_detachFE(void) {
-    l_beReturnAddrSize = 0;
+    l_feAddrSize = FE_DETACHED;
 }
 
 /*..........................................................................*/
@@ -649,23 +660,20 @@ void PAL_clearScreen(void) {
 
 /*--------------------------------------------------------------------------*/
 static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
-    int beReturnAddrSize;
+    fe_addr feAddr;
+    int feAddrSize;
     int status;
 
     if (l_beSock == INVALID_SOCKET) { /* Back-End socket not initialized? */
         return QSPY_NO_EVT;
     }
 
-    /* attempt to receive packet from the Back-End socket (non-blocking) */
-    beReturnAddrSize = sizeof(l_beReturnAddr);
+    /* receive a packet from the Back-End socket */
+    feAddrSize = sizeof(feAddr);
     status = recvfrom(l_beSock, (char *)buf, (int)*pBytes, 0,
-                      &l_beReturnAddr, &beReturnAddrSize);
-    if (status != SOCKET_ERROR) {  /* reception succeeded? */
-        l_beReturnAddrSize = beReturnAddrSize; /* attach connection */
-        *pBytes = (size_t)status;
-        return QSPY_FE_INPUT_EVT;
-    }
-    else { /* socket error -- most likely would block */
+                      &feAddr.addr, &feAddrSize);
+
+    if (status == SOCKET_ERROR) { /* socket error - most likely would block */
         status = WSAGetLastError();
         if (status != WSAEWOULDBLOCK) {
             PAL_detachFE(); /* detach from the Front-End */
@@ -674,6 +682,27 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
                           status);
             QSPY_printError();
             return QSPY_ERROR_EVT;
+        }
+    }
+    else if (l_feAddrSize == 0) { /* not attached yet? */
+        memcpy(&l_feAddr, &feAddr, feAddrSize);
+        l_feAddrSize = feAddrSize; /* attach connection */
+        *pBytes = (size_t)status;
+        return QSPY_FE_INPUT_EVT;
+    }
+    else { /* already attached */
+        /* is this from the attached front-end address? */
+        if ((feAddrSize == l_feAddrSize)
+            && (feAddr.data[1] == l_feAddr.data[1])
+            && (feAddr.data[0] == l_feAddr.data[0]))
+        {
+            *pBytes = (size_t)status;
+            return QSPY_FE_INPUT_EVT;
+        }
+        else {
+            SNPRINTF_LINE("   <F-END> WARN     UDP socket in use");
+            QSPY_printError();
+            /* this packet is from a DIFFERENT front-end -- ignore it */
         }
     }
     return QSPY_NO_EVT;

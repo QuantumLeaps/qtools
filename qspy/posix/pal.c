@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-02-06
+* Last updated for version 6.9.0
+* Last updated on  2020-08-24
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -85,26 +85,32 @@ static QSPYEvtType kbd_receive(fd_set const *pReadSet,
 static void updateReadySet(int targetConn);
 
 /*..........................................................................*/
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR   -1
+enum PAL_Constants { /* local constants... */
+    INVALID_SOCKET = -1,
+    SOCKET_ERROR   = -1,
+    FE_DETACHED    = 0,   /* Front-End detached */
+    PAL_TOUT_MS    = 10,  /* determines how long to wait for an event [ms] */
+};
+
+/* fron-end address */
+typedef union {
+    uint64_t data[2];
+    struct sockaddr addr;
+} fe_addr;
 
 static int l_serFD      = 0;  /* Serial port file descriptor */
 static int l_serverSock = INVALID_SOCKET;
 static int l_clientSock = INVALID_SOCKET;
 static int l_beSock     = INVALID_SOCKET;
 
+static fe_addr   l_feAddr;
+static socklen_t l_feAddrSize = FE_DETACHED;
+
+static FILE *l_file = (FILE *)0;
 
 static struct termios l_termios_saved; /* saved terminal attributes */
 static fd_set l_readSet; /* descriptor set for reading all input sources */
 static int l_maxFd;      /* maximum file descriptor for select() */
-
-static struct sockaddr l_beReturnAddr;
-static socklen_t       l_beReturnAddrSize;
-
-static FILE *l_file = (FILE *)0;
-
-/* PAL timeout determines how long to wait for an event [ms] */
-#define PAL_TOUT_MS 10
 
 /*==========================================================================*/
 /* POSIX serial communication with the Target */
@@ -624,7 +630,7 @@ QSpyStatus PAL_openBE(int portNum) {
 /*..........................................................................*/
 void PAL_closeBE(void) {
     if (l_beSock != INVALID_SOCKET) {
-        if (l_beReturnAddrSize > 0) { /* front-end attached? */
+        if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
             fd_set writeSet;
             struct timeval delay;
 
@@ -652,9 +658,9 @@ void PAL_closeBE(void) {
 }
 /*..........................................................................*/
 void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
-    if (l_beReturnAddrSize > 0) { /* front-end attached? */
+    if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
         if (sendto(l_beSock, (char *)buf, (int)nBytes, 0,
-                   &l_beReturnAddr, l_beReturnAddrSize) == SOCKET_ERROR)
+                   &l_feAddr.addr, l_feAddrSize) == SOCKET_ERROR)
         {
             PAL_detachFE(); /* detach the Front-End */
 
@@ -666,7 +672,7 @@ void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
 }
 /*..........................................................................*/
 void PAL_detachFE(void) {
-    l_beReturnAddrSize = 0;
+    l_feAddrSize = FE_DETACHED;
 }
 
 /*..........................................................................*/
@@ -682,28 +688,47 @@ void PAL_clearScreen(void) {
 static QSPYEvtType be_receive(fd_set const *pReadSet,
                               unsigned char *buf, size_t *pBytes)
 {
-    if (l_beSock == INVALID_SOCKET) { /* Back-End socket not initialized? */
+    fe_addr feAddr;
+    socklen_t feAddrSize;
+    ssize_t nBytes;
+
+    if ((l_beSock == INVALID_SOCKET) /* Back-End socket not initialized? */
+        || !FD_ISSET(l_beSock, pReadSet)) /* Front-End socket has no data? */
+    {
         return QSPY_NO_EVT;
     }
 
-    /* attempt to receive packet from the Back-End socket */
-    if (FD_ISSET(l_beSock, pReadSet)) {
-        socklen_t beReturnAddrSize = sizeof(l_beReturnAddr);
-        ssize_t nBytes = recvfrom(l_beSock, buf, *pBytes, 0,
-                              &l_beReturnAddr, &beReturnAddrSize);
-        if (nBytes > 0) {  /* reception succeeded? */
-        l_beReturnAddrSize = beReturnAddrSize; /* attach connection */
-            *pBytes = (size_t)nBytes;
+    /* receive a packet from the Back-End socket */
+    feAddrSize = sizeof(feAddr);
+    nBytes = recvfrom(l_beSock, buf, *pBytes, 0,
+                      &feAddr.addr, &feAddrSize);
+
+    if (nBytes == 0)  { /* socket error */
+        PAL_detachFE(); /* detach from the Front-End */
+        SNPRINTF_LINE("   <F-END> ERROR    "
+            "UDP socket recvfrom() errno=%d", errno);
+        QSPY_printError();
+        return QSPY_ERROR_EVT;
+    }
+    else if (l_feAddrSize == 0) { /* not attached yet? */
+        memcpy(&l_feAddr, &feAddr, feAddrSize);
+        l_feAddrSize = feAddrSize; /* attach connection */
+        *pBytes = nBytes;
+        return QSPY_FE_INPUT_EVT;
+    }
+    else { /* already attached */
+        /* is this from the attached front-end address? */
+        if ((feAddrSize == l_feAddrSize)
+            && (feAddr.data[1] == l_feAddr.data[1])
+            && (feAddr.data[0] == l_feAddr.data[0]))
+        {
+            *pBytes = nBytes;
             return QSPY_FE_INPUT_EVT;
         }
         else {
-            if (nBytes < 0) {
-                PAL_detachFE(); /* detach from the Front-End */
-                SNPRINTF_LINE("   <F-END> ERROR    UDP socket recv() errno=%d",
-                              errno);
-                QSPY_printError();
-                return QSPY_ERROR_EVT;
-            }
+            SNPRINTF_LINE("   <F-END> WARN     UDP socket in use");
+            QSPY_printError();
+            /* this packet is from a DIFFERENT front-end -- ignore it */
         }
     }
     return QSPY_NO_EVT;
@@ -763,4 +788,26 @@ static void updateReadySet(int targetConn) {
             l_maxFd = l_beSock + 1;
         }
     }
+}
+
+/*..........................................................................*/
+/* simplified strncpy_s() implementation "good enough" for the intended use */
+int strncpy_s(char* strDest, size_t numberOfElements,
+    const char* strSource, size_t count)
+{
+    size_t n;
+    for (n = (numberOfElements < count) ? numberOfElements : count;
+         n > 0;
+         --n, ++strSource, ++strDest)
+    {
+        if (*strSource != '\0') {
+            *strDest = *strSource;
+        }
+        else {
+            *strDest = '\0';
+            return 0; /* destination fits the source */
+        }
+    }
+    strDest[numberOfElements - 1] = '\0';
+    return -1; /* destination holds truncated source */
 }

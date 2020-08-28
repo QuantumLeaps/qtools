@@ -13,12 +13,11 @@ QTools&trade; is a collection of open source tools for embedded software develop
 - @ref qpspy "QP/Spy software tracing and testing for embedded systems", which includes:
   + @ref qs       "QS&trade; Target-Resident Component"
   + @ref qspy     "QSPY&trade; Host Application"
-  + @ref qutest   "QUTest&trade; Unit Testing Harness"
-  + @ref qspyview "QSpyView&trade; Visualization &amp; Monitoring"
++ @ref qutest "QUTest&trade; Unit Testing Harness"
++ @ref qview  "QView&trade; Visualization &amp; Monitoring"
 - @ref qwin   "QWin GUI toolkit for prototyping embedded systems on Windows in C or C++"
 - @ref qclean "QClean utility for cleaning the white space in the source code"
 - @ref qfsgen "QFSGen utility for building ROM-based file systems"
-- @ref qcalc  "QCalc C programmer's calculator"
 
 
 @section qtools_win QTools&trade; on Windows
@@ -27,9 +26,7 @@ The QTools Collection for Windows contains additionally the following open-sourc
 - GNU-make for Windows (version 4.2.1)
 - GNU C/C++ toolchain for Windows (MinGW version 9.2.0)
 - GNU C/C++ toolchain for ARM Cortex-M and Cortex-R ([GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/))
-- Python for Windows (version 3.8 embeddable)
-- Tcl/Tk for Windows (version 8.6) with **UDP sockets extension**
-
+- Python for Windows (version 3.8 with tkinter)
 
 
 @section qtools_licensing Licensing QTools&trade;
@@ -38,8 +35,6 @@ file GPLv2.txt in the root directory of the QTools distribution.
 
 The Python package is distributed under the terms of the PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2, included in the file LICENSE.txt in the Python38 sub-directory of the QTools distribution.
 
-The Tcl/Tk package is distributed under the terms of the TCL LICENSE AGREEMENT, included in the file LICENSE.txt in the tcl_8.6 sub-directory of the QTools distribution.
-
 
 @section qtools_source Source Code
 In compliance with GPL, this distribution contains the source code for
@@ -47,7 +42,6 @@ the utilities contributed by Quantum Leaps in the `<qtools>/source/`
 subdirectory, except for the QSPY source code, which is provided in the
 `<qtools>/qspy/source/` directory. All tools with names starting with 'q'
 have been developed and are copyrighted by Quantum Leaps.
-
 
 
 @subsection qtools_mingw The MinGW C and C++ compilers for Windows
@@ -68,7 +62,6 @@ https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 The source code is available from the download page under "Source Invariant".
 
 
-
 @subsection qtools_make The GNU make executable for Windows
 Has been taken from the MinGW project at:
 
@@ -78,7 +71,6 @@ The "GNU Make" manual (make.pdf) has been copied from the GNU make
 project at:
 
 http://www.gnu.org/software/make
-
 
 
 @subsection qtools_util The file and diff utilities
@@ -91,7 +83,6 @@ The file and diff utilities source (source/fileutils-3.16-src.zip) has
 been taken from:
 
 https://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
-
 
 
 @section qtools_help How to get help?

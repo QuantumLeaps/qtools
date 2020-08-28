@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2019-01-05
+* Last updated for version 6.9.0
+* Last updated on  2020-08-20
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -50,9 +50,6 @@
 #include "getopt.h"   /* command-line option processor */
 
 /*..........................................................................*/
-enum { FNAME_SIZE = 256 };
-
-/*..........................................................................*/
 typedef enum {
     NO_LINK,
     FILE_LINK,
@@ -66,26 +63,26 @@ static int   l_quiet_ctr = 0;
 static FILE *l_outFile = (FILE *)0;
 static FILE *l_savFile = (FILE *)0;
 static FILE *l_matFile = (FILE *)0;
-static FILE *l_mscFile = (FILE *)0;
+static FILE *l_seqFile = (FILE *)0;
 
-static char  l_comPort    [FNAME_SIZE];
-static char  l_inpFileName[FNAME_SIZE];
-static char  l_outFileName[FNAME_SIZE];
-static char  l_savFileName[FNAME_SIZE];
-static char  l_matFileName[FNAME_SIZE];
-static char  l_mscFileName[FNAME_SIZE];
-static char  l_dicFileName[FNAME_SIZE];
+static char  l_comPort    [QS_FNAME_LEN_MAX];
+static char  l_inpFileName[QS_FNAME_LEN_MAX];
+static char  l_outFileName[QS_FNAME_LEN_MAX];
+static char  l_savFileName[QS_FNAME_LEN_MAX];
+static char  l_matFileName[QS_FNAME_LEN_MAX];
+static char  l_seqFileName[QS_FNAME_LEN_MAX];
+static char  l_dicFileName[QS_FNAME_LEN_MAX];
 
 static char  l_tstampStr  [16];
+static char  l_seqList[QS_SEQ_LIST_LEN_MAX];
 
 static int   l_bePort   = 7701;   /* default UDP port  */
 static int   l_tcpPort  = 6601;   /* default TCP port */
 static int   l_baudRate = 115200; /* default serial baudrate */
 
-static char const l_introStr[] =
-    "QSPY %s Copyright (c) 2005-2020 Quantum Leaps\n"
-    "Documentation: https://www.state-machine.com/qtools/qspy.html\n"
-    "Current timestamp: %s\n";
+#define INTRO_STR  "QSPY %s Copyright (c) 2005-2020 Quantum Leaps\n" \
+    "Documentation: https://www.state-machine.com/qtools/qspy.html\n" \
+    "Current timestamp: %s\n"
 
 static char const l_helpStr[] =
     "Usage: qspy [options]     <arg> = required, [arg] = optional\n"
@@ -100,7 +97,7 @@ static char const l_helpStr[] =
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
-    "-g                        produce MscGen output to a file\n"
+    "-g <obj_list>             produce Sequence diagram to a file\n"
     "-t [TCP_port]     6601    TCP/IP input with optional port\n"
 #ifdef _WIN32
     "-c <COM_port>     COM1    com port input (default)\n"
@@ -136,12 +133,11 @@ static char const l_kbdHelpStr[] =
     "  o               toggle screen file output (close/re-open)\n"
     "  s/b             toggle binary file output (close/re-open)\n"
     "  m               toggle Matlab file output (close/re-open)\n"
-    "  g               toggle MscGen file output (close/re-open)\n";
+    "  g               toggle Message sequence output (close/re-open)\n";
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]);
 static void cleanup(void);
-static char const *tstampStr(void);
 static uint8_t l_buf[8*1024]; /* process input in 8K chunks */
 
 /*..........................................................................*/
@@ -276,36 +272,40 @@ void QSPY_printInfo(void) {
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hq::u::v:osmgc:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:osmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
-    uint16_t version     = 620U;
-    uint8_t tstampSize   = 4U;
-    uint8_t objPtrSize   = 4U;
-    uint8_t funPtrSize   = 4U;
-    uint8_t sigSize      = 2U;
-    uint8_t evtSize      = 2U;
-    uint8_t queueCtrSize = 1U;
-    uint8_t poolCtrSize  = 2U;
-    uint8_t poolBlkSize  = 2U;
-    uint8_t tevtCtrSize  = 2U;
-    int     optChar;
+    QSpyConfig config = {
+        .version      = 620U,
+        .endianness   = 0U,
+        .tstampSize   = 4U,
+        .objPtrSize   = 4U,
+        .funPtrSize   = 4U,
+        .sigSize      = 2U,
+        .evtSize      = 2U,
+        .queueCtrSize = 1U,
+        .poolCtrSize  = 2U,
+        .poolBlkSize  = 2U,
+        .tevtCtrSize  = 2U,
+    };
+    int  optChar;
 
-    STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
-    STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
-    STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
-    STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
-    STRCPY_S(l_dicFileName, sizeof(l_dicFileName), "OFF");
+    STRNCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
+    STRNCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
+    STRNCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
+    STRNCPY_S(l_seqFileName, sizeof(l_seqFileName), "OFF");
+    STRNCPY_S(l_dicFileName, sizeof(l_dicFileName), "OFF");
 
-    (void)tstampStr();
-    PRINTF_S(l_introStr, QSPY_VER, l_tstampStr);
+    STRNCPY_S(l_tstampStr, sizeof(l_tstampStr), QSPY_tstampStr());
+    PRINTF_S(INTRO_STR, QSPY_VER, l_tstampStr);
 
-    STRCPY_S(l_inpFileName, sizeof(l_inpFileName), "qs.bin");
+    STRNCPY_S(l_inpFileName, sizeof(l_inpFileName), "qs.bin");
 #ifdef _WIN32
-    STRCPY_S(l_comPort, sizeof(l_comPort), "COM1");
+    STRNCPY_S(l_comPort, sizeof(l_comPort), "COM1");
 #elif (defined __linux) || (defined __linux__) || (defined __posix)
-    STRCPY_S(l_comPort, sizeof(l_comPort), "/dev/ttyS0");
+    STRNCPY_S(l_comPort, sizeof(l_comPort), "/dev/ttyS0");
 #endif
+    l_seqList[0] = '\0';
 
     /* parse the command-line parameters ...................................*/
     while ((optChar = getopt(argc, argv, getoptStr)) != -1) {
@@ -333,8 +333,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     && (optarg[1] == '.')
                     && ('0' <= optarg[2] && optarg[2] <= '9'))
                 {
-                    version = (((optarg[0] - '0') * 10)
-                              + (optarg[2] - '0')) * 10;
+                    config.version = (((optarg[0] - '0') * 10)
+                                     + (optarg[2] - '0')) * 10;
                     PRINTF_S("-v %c.%c\n", optarg[0], optarg[2]);
                 }
                 else {
@@ -361,10 +361,18 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 PRINTF_S("-m (%s)\n", l_matFileName);
                 break;
             }
-            case 'g': { /* MscGen file output */
-                SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName) - 1U,
-                           "qspy%s.msc", l_tstampStr);
-                PRINTF_S("-g (%s)\n", l_mscFileName);
+            case 'g': { /* Sequence file output */
+                if (optarg != NULL) { /* is optional argument provided? */
+                    STRNCPY_S(l_seqList, sizeof(l_seqList), optarg);
+                }
+                else {
+                    FPRINTF_S(stderr,
+                         "empty object-list for sequence diagram");
+                    return QSPY_ERROR;
+                }
+                SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName) - 1U,
+                           "qspy%s.seq", l_tstampStr);
+                PRINTF_S("-g %s (%s)\n", l_seqList, l_seqFileName);
                 break;
             }
             case 'c': { /* COM port */
@@ -373,7 +381,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                             "The -c option is incompatible with -t/-f\n");
                     return QSPY_ERROR;
                 }
-                STRCPY_S(l_comPort, sizeof(l_comPort), optarg);
+                STRNCPY_S(l_comPort, sizeof(l_comPort), optarg);
                 PRINTF_S("-c %s\n", l_comPort);
                 l_link = SERIAL_LINK;
                 break;
@@ -399,14 +407,14 @@ static QSpyStatus configure(int argc, char *argv[]) {
                             "The -f option is incompatible with -c/-b/-t\n");
                     return QSPY_ERROR;
                 }
-                STRCPY_S(l_inpFileName, sizeof(l_inpFileName), optarg);
+                STRNCPY_S(l_inpFileName, sizeof(l_inpFileName), optarg);
                 PRINTF_S("-f %s\n", l_inpFileName);
                 l_link = FILE_LINK;
                 break;
             }
             case 'd': { /* Dictionary file */
                 if (optarg != NULL) { /* is optional argument provided? */
-                    STRCPY_S(l_dicFileName, sizeof(l_dicFileName), optarg);
+                    STRNCPY_S(l_dicFileName, sizeof(l_dicFileName), optarg);
                     PRINTF_S("-d %s\n", l_dicFileName);
                 }
                 else { /* apply the default */
@@ -436,49 +444,53 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 break;
             }
             case 'T': { /* timestamp size */
-                tstampSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.tstampSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'F': { /* function pointer size */
-                funPtrSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.funPtrSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'O': { /* object pointer size */
-                objPtrSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.objPtrSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'S': { /* signal size */
-                sigSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.sigSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
                 }
             case 'E': { /* event size */
-                evtSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.evtSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'Q': { /* Queue counter size */
-                queueCtrSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.queueCtrSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'P': { /* Memory-pool counter size */
-                poolCtrSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.poolCtrSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'B': { /* Memory-pool blocksize size */
-                poolBlkSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.poolBlkSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'C': { /* Time event counter size */
-                tevtCtrSize = (uint8_t)strtoul(optarg, 0, 10);
+                config.tevtCtrSize = (uint8_t)strtoul(optarg, 0, 10);
                 break;
             }
             case 'h': { /* help */
                 PRINTF_S("\n%s\n%s", l_helpStr, l_kbdHelpStr);
                 return QSPY_ERROR;
             }
-            default: { /* unknown option */
-                FPRINTF_S(stderr, "Unknown option -%c\n", (char)optChar);
+            case '?': /* intentionally fall through */
+            case '!': /* intentionally fall through */
+            case '$': {
                 PRINTF_S("\n%s\n%s", l_helpStr, l_kbdHelpStr);
                 return QSPY_ERROR;
+            }
+            default: {
+                Q_ASSERT(0);
             }
         }
     }
@@ -527,7 +539,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     if (l_outFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_outFile, l_outFileName, "w");
         if (l_outFile != (FILE *)0) {
-            FPRINTF_S(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
+            FPRINTF_S(l_outFile, INTRO_STR, QSPY_VER, l_tstampStr);
         }
         else {
             PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_outFileName);
@@ -548,25 +560,17 @@ static QSpyStatus configure(int argc, char *argv[]) {
             return QSPY_ERROR;
         }
     }
-    if (l_mscFileName[0] != 'O') { /* "OFF" ? */
-        FOPEN_S(l_mscFile, l_mscFileName, "w");
-        if (l_mscFile == (FILE *)0) {
-            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_mscFileName);
+    if (l_seqFileName[0] != 'O') { /* "OFF" ? */
+        FOPEN_S(l_seqFile, l_seqFileName, "w");
+        if (l_seqFile == (FILE *)0) {
+            PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_seqFileName);
             return QSPY_ERROR;
         }
     }
-    QSPY_config(version,
-                objPtrSize,
-                funPtrSize,
-                tstampSize,
-                sigSize,
-                evtSize,
-                queueCtrSize,
-                poolCtrSize,
-                poolBlkSize,
-                tevtCtrSize,
+    QSPY_config(&config,
                 l_matFile,
-                l_mscFile,
+                l_seqFile,
+                l_seqList,
                 (l_bePort != 0)
                     ? &BE_parseRecFromTarget
                     : (QSPY_CustParseFun)0);
@@ -600,10 +604,10 @@ bool QSPY_command(uint8_t cmdId) {
             else {
                 PRINTF_S("Quiet Mode    [q]: %d\n", l_quiet);
             }
-            PRINTF_S("Screen Output [o]: %s\n", l_outFileName);
-            PRINTF_S("Binary Output [s]: %s\n", l_savFileName);
-            PRINTF_S("Matlab Output [m]: %s\n", l_matFileName);
-            PRINTF_S("MscGen Output [g]: %s\n", l_mscFileName);
+            PRINTF_S("Screen   Output [o]: %s\n", l_outFileName);
+            PRINTF_S("Binary   Output [s]: %s\n", l_savFileName);
+            PRINTF_S("Matlab   Output [m]: %s\n", l_matFileName);
+            PRINTF_S("Sequence Output [g]: %s\n", l_seqFileName);
             break;
 
         case 'r':  /* send RESET command to the Target */
@@ -658,20 +662,21 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_outFile != (FILE *)0) {
                 fclose(l_outFile);
                 l_outFile = (FILE *)0;
-                STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
+                STRNCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
             }
             else {
+                STRNCPY_S(l_tstampStr, sizeof(l_tstampStr), QSPY_tstampStr());
                 SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
-                           "qspy%s.txt", tstampStr());
+                           "qspy%s.txt", l_tstampStr);
                 FOPEN_S(l_outFile, l_outFileName, "w");
                 if (l_outFile != (FILE *)0) {
-                    FPRINTF_S(l_outFile, l_introStr, QSPY_VER,
-                            l_tstampStr);
+                    FPRINTF_S(l_outFile, INTRO_STR, QSPY_VER,
+                              l_tstampStr);
                 }
                 else {
                     PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
-                           l_outFileName);
-                    STRCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
+                             l_outFileName);
+                    STRNCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
                 }
             }
             PRINTF_S("   <USER-> Screen Output [o] File=%s\n", l_outFileName);
@@ -682,16 +687,16 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_savFile != (FILE *)0) {
                 fclose(l_savFile);
                 l_savFile = (FILE *)0;
-                STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
+                STRNCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_savFileName, sizeof(l_savFileName),
-                           "qspy%s.bin", tstampStr());
+                           "qspy%s.bin", QSPY_tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
                 if (l_savFile == (FILE *)0) {
                     PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
-                           l_savFileName);
-                    STRCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
+                             l_savFileName);
+                    STRNCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
                 }
             }
             PRINTF_S("   <USER-> Binary Output [s] File=%s\n",
@@ -702,46 +707,51 @@ bool QSPY_command(uint8_t cmdId) {
             if (l_matFile != (FILE *)0) {
                 QSPY_configMatFile((void *)0); /* close the Matlab file */
                 l_matFile = (FILE *)0;
-                STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
+                STRNCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
             }
             else {
                 SNPRINTF_S(l_matFileName, sizeof(l_matFileName),
-                           "qspy%s.mat", tstampStr());
+                           "qspy%s.mat", QSPY_tstampStr());
                 FOPEN_S(l_matFile, l_matFileName, "w");
                 if (l_matFile != (FILE *)0) {
                     QSPY_configMatFile(l_matFile);
                 }
                 else {
                     PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
-                           l_matFileName);
-                    STRCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
+                             l_matFileName);
+                    STRNCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
                 }
             }
             PRINTF_S("   <USER-> Matlab Output [m] File=%s\n",
                    l_matFileName);
             break;
 
-        case 'g':  /* save MscGen file open/close toggle*/
-            if (l_mscFile != (FILE *)0) {
-                QSPY_configMscFile((void *)0); /* close the MscGen file */
-                l_mscFile = (FILE *)0;
-                STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
+        case 'g':  /* save Sequence file open/close toggle */
+            if (l_seqList[0] == '\0') {
+                SNPRINTF_LINE("   <QSPY-> Sequence list NOT provided "
+                              "(no -g option)");
+                QSPY_printError();
+            }
+            else if (l_seqFile != (FILE *)0) {
+                QSPY_configSeqFile((void *)0); /* close the Sequence file */
+                l_seqFile = (FILE *)0;
+                STRNCPY_S(l_seqFileName, sizeof(l_seqFileName), "OFF");
             }
             else {
-                SNPRINTF_S(l_mscFileName, sizeof(l_mscFileName),
-                           "qspy%s.msc", tstampStr());
-                FOPEN_S(l_mscFile, l_mscFileName, "w");
-                if (l_mscFile != (FILE *)0) {
-                    QSPY_configMscFile(l_mscFile);
+                SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName),
+                           "qspy%s.seq", QSPY_tstampStr());
+                FOPEN_S(l_seqFile, l_seqFileName, "w");
+                if (l_seqFile != (FILE *)0) {
+                    QSPY_configSeqFile(l_seqFile);
                 }
                 else {
                     PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
-                           l_mscFileName);
-                    STRCPY_S(l_mscFileName, sizeof(l_mscFileName), "OFF");
+                             l_seqFileName);
+                    STRNCPY_S(l_seqFileName, sizeof(l_seqFileName), "OFF");
                 }
             }
-            PRINTF_S("   <USER-> MscGen Output [g] File=%s\n",
-                   l_mscFileName);
+            PRINTF_S("   <USER-> Sequence Output [g] File=%s\n",
+                   l_seqFileName);
             break;
 
         case 'x':
@@ -752,21 +762,4 @@ bool QSPY_command(uint8_t cmdId) {
     }
 
     return isRunning;
-}
-/*..........................................................................*/
-static char const *tstampStr(void) {
-    time_t rawtime = time(NULL);
-    struct tm tstamp;
-
-    LOCALTIME_S(&tstamp, &rawtime);
-
-    SNPRINTF_S(l_tstampStr, sizeof(l_tstampStr), "%02d%02d%02d_%02d%02d%02d",
-               (tstamp.tm_year + 1900)%100,
-               (tstamp.tm_mon + 1),
-               tstamp.tm_mday,
-               tstamp.tm_hour,
-               tstamp.tm_min,
-               tstamp.tm_sec);
-
-    return &l_tstampStr[0];
 }

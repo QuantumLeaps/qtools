@@ -1,6 +1,12 @@
 /*! @page qutest QUTest&trade; Unit Testing Harness
 
-![](qutest_banner.jpg)
+@image html qutest_banner.jpg
+
+@subpage qutest_tut "&nbsp;"
+@subpage qutest_rtc "&nbsp;"
+@subpage qutest_fixture "&nbsp;"
+@subpage qutest_script "&nbsp;"
+
 
 @section qutest_about About QUTest&trade;
 <p><strong>QUTest&trade;</strong> (pronounced "cutest") is a **unit testing harness** (a.k.a. *unit testing framework*), which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://www.state-machine.com/products/#QP" target="_blank" class="extern">QP/C/C++ applications</a>, which is a highly recommended best-practice.
@@ -26,19 +32,19 @@ The process of testing embedded code with QUTest&trade; involves the following c
 
 
 @n
-![Communication between Target, QSPY, and QUTest](qutest_targ.gif)
+@image html qutest_targ.gif "Communication between Target, QSPY, and QUTest"
 
 
 @remark
-The separation between CUT execution and checking the test results has many benefits. One of the most important ones is that CUT execution (*test fixture*) and checking the results (*test script*) can be done in *different programming languages*. To this end QUTest&trade; provides support for writing the @ref qutest_script "test scripts in Python" (2.7+ and 3+).
+The separation between CUT execution and checking the test results has many benefits. One of the most important ones is that CUT execution (*test fixture*) and checking the results (*test script*) can be done in *different programming languages*. To this end QUTest&trade; provides support for writing the @ref qutest_script "test scripts in Python".
 @n
-![](logo_python27-python3.gif)
+@image html img/logo_python3.gif
 
 
 The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the QSPY host application via a TCP/IP socket (QSPY started with the `-t` @ref qspy_command "command-line option"). In this case all QUTest&trade; components execute on the host computer.
 
 
-![QUTest with Host Executable](qutest_host.gif)
+@image html qutest_host.gif "QUTest with Host Executable"
 
 
 @remark
@@ -55,7 +61,7 @@ Unlike other existing unit testing harnesses for embedded systems (e.g., <a href
 
 - QUTest&trade; is a unique test harness on the embedded market that supports **scripting**. QUTest @ref qutest_script "test scripts" run on the Host, which skips compilation and uploading the code to the Target and thus shortens the TDD micro-cycle.
 
-> **NOTE:** QUTest&trade; supports *test scripts* written either in [Python](https://www.python.org) (2.7 or 3.x).
+> **NOTE:** QUTest&trade; supports *test scripts* written in [Python](https://www.python.org) (3.3+).
 
 
 - QUTest&trade; supports **resetting the Target** for each individual test, if needed. This goes far beyond providing test `setup()` and `teardown()` functions that other test fixtures offer (and of course QUTest supports as well). Clean reset of the Target avoids erroneous tests that implicitly rely on side effects from previously executed code. This is particularly important for embedded systems and for state machines, so that each test can start from a known reset condition.
@@ -73,17 +79,114 @@ Even though QUTest&trade; is particularly suitable for running tests on deeply e
 
 
 
-@subsection qutest_inst Downloading and Installing QUTest&trade;
-QUTest&trade; is automatically installed as part of the @ref gs_obtain "QTools&trade; Collection".
+@section qutest_use Installation &amp; Use
+The <span class="img file_py">qutest.py</span> script can be used standalone, without any installation in your Python system (see  @ref qutest_run below).
 
 @note
-To run <span class="img file_py">Python</span> @ref qutest_script "test scripts" you need to install Python on your machine and you need to add `python` to your `PATH`.
+The <span class="img file_py">qutest.py</span> script is included in the @ref qtools_about "QTools&trade; collection". Also, the @ref qtools_win "QTools&trade; collection for Windows" already includes Python (3.8), so you don't need to install anything extra.
 
 
-@subpage qutest_tut "&nbsp;"
-@subpage qutest_rtc "&nbsp;"
-@subpage qutest_fixture "&nbsp;"
-@subpage qutest_script "&nbsp;"
+Alternatively, you can use *your own Python** installation, into which you can install the latest QUTest&trade; with `pip` from the [<b>PyPi index</b>](https://pypi.org/project/qutest/) by executing the following command:
+
+@verbatim
+pip install qutest
+@endverbatim
+
+
+@subsection qutest_run Running QUTest&trade;
+If you are using QUTest&trade; as a standalone Python script, you invoke it as follows:
+
+@verbatim
+python3 <path-to-qutest-script>/qutest.py [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
+@endverbatim
+
+Alternatively, if you've installed QView&trade; with `pip`, you invoke it as follows:
+
+@verbatim
+qutest [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
+@endverbatim
+
+
+
+@subsection qutest_command Command-line Options
+
+- `-x` - optional flag that causes qutest to exit on first test failure.
+
+- `test_scripts` - optional specification of the Python test scripts to run. If not specified, qutest will try to run all *.py files in the current directory as test scripts
+
+- `host_exe | DEBUG` - optional specification of the test-fixture compiled for the host (host executable) for testing on the host computer. The special value DEBUG means that qutest will run in the "debug mode", in which it will NOT launch the host executables and it will wait for the Target reset and other responses from the Target. If host_exe is not specified, an embedded target is assumed (which is loaded with the test fixture already).
+
+- `qspy_host[:udp_port]` - optional host-name/IP-address:port for the host running the QSPY host utility. If not specified, the default is 'localhost:7701'.
+
+- `tcp_port`- optional the QSpy TCP port number for connecting host executables. If not specified, the default is `6601`.
+
+
+@subsection qutest_exa Examples
+
+<span class="logo logo_win">Windows Hosts</span>
+
+@verbatim
+python3 %QTOOLS%\qutest\qutest.py
+@endverbatim
+
+runs all the test scripts (`*.py`) in the current directory.
+
+@verbatim
+python3 %QTOOLS%\qutest\qutest.py *.py
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory.
+
+@verbatim
+python3 %QTOOLS%\qutest\qutest.py *.py build\dpp.exe
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory and uses the host executable: `build\dpp.exe`
+
+@verbatim
+qutest *.py build\dpp.exe 192.168.1.100:7705
+@endverbatim
+
+runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable: `build\dpp.exe`, and connects to QSPY at `192.168.1.100:7705`
+
+@verbatim
+qutest *.py build\dpp.exe localhost:7701 6605
+@endverbatim
+
+runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable: `build\dpp.exe`, and connects to QSPY at `localhost:7701`, using the local UDP port `6605`
+
+
+<span class="logo logo_linux"></span><span class="logo logo_macos">Linux/MacOS Hosts</span>
+
+@verbatim
+python3 $(QTOOLS)/qutest/qutest.py
+@endverbatim
+
+runs all the test scripts (`*.py`) in the current directory.
+
+@verbatim
+python3 $(QTOOLS)/qutest/utest.py *.py
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory.
+
+@verbatim
+python3 $(QTOOLS)/qutest/qutest.py *.py build/dpp
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory and uses the host executable: `build/dpp`
+
+@verbatim
+qutest *.py build/dpp 192.168.1.100:7705
+@endverbatim
+
+runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable: `build/dpp`, and connects to QSPY at `192.168.1.100:7705`
+
+@verbatim
+qutest *.py build/dpp localhost:7701 6605
+@endverbatim
+
+runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable: `build/dpp`, and connects to QSPY at `localhost:7701`, using the local UDP port `6605`
 
 
 @next{qutest_tut}
@@ -116,44 +219,44 @@ Most individual tests in a *test script*, start with a clean **target reset**. T
 ![Target reset](qutest_reset.gif)
 
 <dl class="tag">
-  <dt>[0]</dt><dd> A *test script* executes the test() command.
+  <dt>0</dt><dd> A *test script* executes the test() command.
   </dd>
-  <dt>[1]</dt><dd> By default, each test starts with calling an internal function reset() to reset the Target. This reset() function sends the `QS_RX_RESET` request to the *test fixture*. After this, the *test script* enters a wait state in which it waits for `QS_TARGET_INFO` reply from the Target.
+  <dt>1</dt><dd> By default, each test starts with calling an internal function reset() to reset the Target. This reset() function sends the `QS_RX_RESET` request to the *test fixture*. After this, the *test script* enters a wait state in which it waits for `QS_TARGET_INFO` reply from the Target.
   </dd>
 > **NOTE:** The Target reset can be suppressed by the `NORESET` option given in the test() command, which is illustrated in the @ref qutest_noreset "NORESET Tests" sequence diagram. Please note, however, that the first test in a *test script* (test group) and any test immediately following an "assertion-test" **must** cleanly reset the Target (so it cannot use the `NORESET` option).
-  <dt>[2]</dt><dd> The *test fixture* processes the #QS_RX_RESET request immediately by calling the QS_onReset() callback inside the Target.
+  <dt>2</dt><dd> The *test fixture* processes the #QS_RX_RESET request immediately by calling the QS_onReset() callback inside the Target.
   </dd>
 > **NOTE:** Embedded Targets reboot automatically after resetting. In case of a **host executable**, however, QUTest&trade; (qutest.py) launches it again.@n
-  <dt>[3]</dt><dd> The Target starts executing the *test fixture* code from the beginning. After QS gets initialized (QS_INIT()), the *test fixture* sends the `QS_TARGET_INFO` reply to the *test script*.
+  <dt>3</dt><dd> The Target starts executing the *test fixture* code from the beginning. After QS gets initialized (QS_INIT()), the *test fixture* sends the `QS_TARGET_INFO` reply to the *test script*.
   </dd>
-  <dt>[4]</dt><dd> Upon reception of the awaited `QS_TARGET_INFO` reply, the *test script* attempts to execute the `on_reset()` procedure. If `on_reset()` is defined in the script, it runs at this time. (This scenario assumes that `on_reset()` is defined and runs until step [8]).
+  <dt>4</dt><dd> Upon reception of the awaited `QS_TARGET_INFO` reply, the *test script* attempts to execute the `on_reset()` procedure. If `on_reset()` is defined in the script, it runs at this time. (This scenario assumes that `on_reset()` is defined and runs until step [8]).
   </dd>
-  <dt>[5]</dt><dd> A *test fixture* continues the initialization RTC step and typically produces some @ref qs_dict "QS dictionaries".
+  <dt>5</dt><dd> A *test fixture* continues the initialization RTC step and typically produces some @ref qs_dict "QS dictionaries".
   </dd>
 > **NOTE:** The @ref qs_dict "QS dictionaries" are consumed by QSPY and are **not** forwarded to the *test script*.
-  <dt>[6]</dt><dd> The *test fixture* might also produce some output that **is** forwarded to the *test script*.
+  <dt>6</dt><dd> The *test fixture* might also produce some output that **is** forwarded to the *test script*.
   </dd>
-  <dt>[7]</dt><dd> Any such output needs to be explicitly expected by the *test script*. The `on_reset()` procedure is the ideal place to handle such output.
+  <dt>7</dt><dd> Any such output needs to be explicitly expected by the *test script*. The `on_reset()` procedure is the ideal place to handle such output.
   </dd>
 > **NOTE:** The main purpose of the `on_reset()` procedure is to consume any output generated during the reset RTC step as well as to perform any setup that should follow the Target reset. In principle, instead of coding `on_reset()`, you could place all this code directly at every test, but this would be repetitious and defining `on_reset()` allows you to avoid such repetitions.
-  <dt>[8]</dt><dd> The `on_reset()` procedure ends and the *test script* sends `QS_RX_TEST_SETUP` to the Target.
+  <dt>8</dt><dd> The `on_reset()` procedure ends and the *test script* sends `QS_RX_TEST_SETUP` to the Target.
   </dd>
-  <dt>[9]</dt><dd> `QS_RX_TEST_SETUP` typically arrives while the *test fixture* still runs the initialization RTC. Therefore, `QS_RX_TEST_SETUP` is **not** processed immediately and its processing is delayed until the end of the current RTC step.
+  <dt>9</dt><dd> `QS_RX_TEST_SETUP` typically arrives while the *test fixture* still runs the initialization RTC. Therefore, `QS_RX_TEST_SETUP` is **not** processed immediately and its processing is delayed until the end of the current RTC step.
   </dd>
-  <dt>[10]</dt><dd> A *test fixture* continues the initialization RTC step and might still produce some @ref qs_dict "QS dictionaries".
+  <dt>10</dt><dd> A *test fixture* continues the initialization RTC step and might still produce some @ref qs_dict "QS dictionaries".
   </dd>
-  <dt>[11]</dt><dd> Finally, the *test fixture* completes the initialization RTC by calling `QF_run()`. `QF_run()` runs an event loop, in which it processes commands that have accumulated from the *test script*.
+  <dt>11</dt><dd> Finally, the *test fixture* completes the initialization RTC by calling `QF_run()`. `QF_run()` runs an event loop, in which it processes commands that have accumulated from the *test script*.
   </dd>
-  <dt>[12]</dt><dd> The first such command is `QS_RX_TEST_SETUP`, which has been waiting in the input buffer.
+  <dt>12</dt><dd> The first such command is `QS_RX_TEST_SETUP`, which has been waiting in the input buffer.
   </dd>
-  <dt>[13]</dt><dd> The acknowledgement for the `QS_RX_TEST_SETUP` is sent back to the *test script*
+  <dt>13</dt><dd> The acknowledgement for the `QS_RX_TEST_SETUP` is sent back to the *test script*
   </dd>
-  <dt>[14]</dt><dd> Upon reception of `Trg-Ack QS_RX_TEST_SETUP`, the *test script* attempts to execute the `on_setup()` procedure. If `on_setup()` is defined in the script, it runs at this time.
+  <dt>14</dt><dd> Upon reception of `Trg-Ack QS_RX_TEST_SETUP`, the *test script* attempts to execute the `on_setup()` procedure. If `on_setup()` is defined in the script, it runs at this time.
   </dd>
 > **NOTE:** The main purpose of the `on_setup()` procedure is to consume any output generated from the `QS_onTestSetup()` callback in the *test fixture* invoked in the next step [15]. Note also the `QS_onTestSetup()` runs in all tests, including @ref qutest_noreset "NORESET tests".
-  <dt>[15]</dt><dd> The *test fixture* calls the `QS_onTestSetup()` callback function in the Target.
+  <dt>15</dt><dd> The *test fixture* calls the `QS_onTestSetup()` callback function in the Target.
   </dd>
-  <dt>[16]</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
+  <dt>16</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -212,9 +315,9 @@ The following *test fixture* code illustrates the use of the QS_TEST_PAUSE() mac
 @endcode
 
 <dl class="tag">
-  <dt>[1]</dt><dd> The QS_TEST_PAUSE() macro pauses the initialization RTC after producing QS dictionaries, but before starting active objects.
+  <dt>1</dt><dd> The QS_TEST_PAUSE() macro pauses the initialization RTC after producing QS dictionaries, but before starting active objects.
   </dd>
-  <dt>[2]</dt><dd> The QF_run() function completes the initialization RTC.
+  <dt>2</dt><dd> The QF_run() function completes the initialization RTC.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -224,22 +327,22 @@ The following sequence diagram shows the details of pausing a test. The explanat
 ![Pausing a test](qutest_pause.gif)
 
 <dl class="tag">
-  <dt>[1]</dt><dd> The target reset proceeds as before and produces the QS_TARGET_INFO trace record.
+  <dt>1</dt><dd> The target reset proceeds as before and produces the QS_TARGET_INFO trace record.
   </dd>
-  <dt>[2]</dt><dd> At some point, however, the *test fixture* executes <b>QS_TEST_PAUSE()</b>, which sends QS_TEST_PAUSED record to the *test script*. At this point, the *test fixture* enters the event loop, so the initialization RTC finishes and the *test fixture* is now responsive to commands.
+  <dt>2</dt><dd> At some point, however, the *test fixture* executes <b>QS_TEST_PAUSE()</b>, which sends QS_TEST_PAUSED record to the *test script*. At this point, the *test fixture* enters the event loop, so the initialization RTC finishes and the *test fixture* is now responsive to commands.
   </dd>
-  <dt>[3]</dt><dd> At this point, the *test script* must be explicitily expecting QS_TEST_PAUSE by means of the expect_pause() command.
+  <dt>3</dt><dd> At this point, the *test script* must be explicitily expecting QS_TEST_PAUSE by means of the expect_pause() command.
   </dd>
 > **NOTE:** The best place to put expect_pause() is the on_reset() callback function, which should be defined in *test scripts* corresponding to *test fixtures* that call QS_TEST_PAUSE().
-  <dt>[4]</dt><dd> The on_reset() callack can now execute commands that are processed **immediately** in the *test fixture*.
+  <dt>4</dt><dd> The on_reset() callack can now execute commands that are processed **immediately** in the *test fixture*.
   </dd>
-  <dt>[5]</dt><dd> Eventually the on_reset() callback releases the *test fixture* from the pause by executing the continue_test() command. This command sends QS_RX_TEST_CONTINUE to the *test fixture*.
+  <dt>5</dt><dd> Eventually the on_reset() callback releases the *test fixture* from the pause by executing the continue_test() command. This command sends QS_RX_TEST_CONTINUE to the *test fixture*.
   </dd>
-  <dt>[6]</dt><dd> Upon reception of QS_RX_TEST_CONTINUE, the *test fixture* continues the initialization in another RTC step.
+  <dt>6</dt><dd> Upon reception of QS_RX_TEST_CONTINUE, the *test fixture* continues the initialization in another RTC step.
   </dd>
-  <dt>[7]</dt><dd> The on_reset() callback ends and the test script sends QS_RX_TEST_SETUP to the Target.
+  <dt>7</dt><dd> The on_reset() callback ends and the test script sends QS_RX_TEST_SETUP to the Target.
   </dd>
-  <dt>[8]</dt><dd> The test proceeds as before.
+  <dt>8</dt><dd> The test proceeds as before.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -276,22 +379,22 @@ The following sequence diagram shows the details of this process. The explanatio
 ![NORESET Test](qutest_noreset.gif)
 
 <dl class="tag">
-  <dt>[0]</dt><dd> The *test fixture* is done processing commands from any previous test(s) and is running an event loop.
+  <dt>0</dt><dd> The *test fixture* is done processing commands from any previous test(s) and is running an event loop.
   </dd>
-  <dt>[1]</dt><dd> The *test script* executes the @ref test() "test(..., NORESET)" command.
+  <dt>1</dt><dd> The *test script* executes the @ref test() "test(..., NORESET)" command.
   </dd>
-  <dt>[2]</dt><dd> The @ref test() "test(..., NORESET)" command sends QS_RX_TEST_SETUP command to the *test fixture*.
+  <dt>2</dt><dd> The @ref test() "test(..., NORESET)" command sends QS_RX_TEST_SETUP command to the *test fixture*.
   </dd>
-  <dt>[3]</dt><dd> The *test fixture* processes QS_RX_TEST_SETUP immediately, because it is running event loop.
+  <dt>3</dt><dd> The *test fixture* processes QS_RX_TEST_SETUP immediately, because it is running event loop.
   </dd>
-  <dt>[4]</dt><dd> The *test fixture* responds with Trg-Ack QS_RX_TEST_SETUP.
+  <dt>4</dt><dd> The *test fixture* responds with Trg-Ack QS_RX_TEST_SETUP.
   </dd>
-  <dt>[5]</dt><dd> Upon reception of Trg-Ack QS_RX_TEST_SETUP, the *test script* attempts to execute the on_setup() callback. If on_setup() is defined in the script, it runs at this time.
+  <dt>5</dt><dd> Upon reception of Trg-Ack QS_RX_TEST_SETUP, the *test script* attempts to execute the on_setup() callback. If on_setup() is defined in the script, it runs at this time.
 > **NOTE**: The main purpose of the on_setup() callback is to consume any output generated from the QS_onTestSetup() callback in the test fixture invoked in the next step [6].
   </dd>
-  <dt>[6]</dt><dd> The *test fixture* calls the QS_onTestSetup() callback function in the Target.
+  <dt>6</dt><dd> The *test fixture* calls the QS_onTestSetup() callback function in the Target.
   </dd>
-  <dt>[7]</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
+  <dt>7</dt><dd> The *test script* proceeds with commands defined after the test() command. Processing of these commands is explained in sections @ref qutest_simple and @ref qutest_complex.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -334,17 +437,16 @@ Simple *test script* commands do not produce any output from the Target, except 
 ![Simple command processing](qutest_simple.gif)
 
 <dl class="tag">
-  <dt>[1]</dt><dd> A *test script* sends a `<SIMPLE-COMMAND>` to the *test fixture*.
+  <dt>1</dt><dd> A *test script* sends a `<SIMPLE-COMMAND>` to the *test fixture*.
   </dd>
-  <dt>[2]</dt><dd> The *test fixture* receives the command and immediately starts processing it.
+  <dt>2</dt><dd> The *test fixture* receives the command and immediately starts processing it.
   </dd>
-  <dt>[3]</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <SIMPLE-COMMAND>" (acknowledgement of the specific `<SIMPLE-COMMAND>`).
+  <dt>3</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <SIMPLE-COMMAND>" (acknowledgement of the specific `<SIMPLE-COMMAND>`).
   </dd>
-  <dt>[4]</dt><dd> Immediately after sending the `<SIMPLE-COMMAND>`, the *test script* enters an implicit expect state, in which it waits for the "Trg-Ack <SIMPLE-COMMAND>" output from the Target. The processing of the `<SIMPLE-COMMAND>` ends when the next output received from the Target matches exactly the expected output.
+  <dt>4</dt><dd> Immediately after sending the `<SIMPLE-COMMAND>`, the *test script* enters an implicit expect state, in which it waits for the "Trg-Ack <SIMPLE-COMMAND>" output from the Target. The processing of the `<SIMPLE-COMMAND>` ends when the next output received from the Target matches exactly the expected output.
   </dd>
 </dl>
 <div style="clear:both;"></div>
-
 
 
 @section qutest_complex Complex Commands
@@ -353,21 +455,21 @@ Complex *test script* commands might produce some output from the Target, not ju
 ![Complex command processing](qutest_complex.gif)
 
 <dl class="tag">
-  <dt>[1]</dt><dd> A *test script* sends a `<COMPLEX-COMMAND>` to the *test fixture*.
+  <dt>1</dt><dd> A *test script* sends a `<COMPLEX-COMMAND>` to the *test fixture*.
   </dd>
-  <dt>[2]</dt><dd> The *test fixture* receives the command and immediately starts processing it.
+  <dt>2</dt><dd> The *test fixture* receives the command and immediately starts processing it.
   </dd>
-  <dt>[3]</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <COMPLEX-COMMAND>" (acknowledgement of the specific `<COMPLEX-COMMAND>`).
+  <dt>3</dt><dd> Processing of a command triggers an RTC step and produces only the "Trg-Ack  <COMPLEX-COMMAND>" (acknowledgement of the specific `<COMPLEX-COMMAND>`).
   </dd>
-  <dt>[4]</dt><dd> The `<COMPLEX-COMMAND>` must be followed in the *test script* by the explicit expect() commands that concume any ouptu produced by the command.
+  <dt>4</dt><dd> The `<COMPLEX-COMMAND>` must be followed in the *test script* by the explicit expect() commands that concume any ouptu produced by the command.
   </dd>
-  <dt>[5-6]</dt><dd> The *test fixture* produces some output.
+  <dt>5-6</dt><dd> The *test fixture* produces some output.
   </dd>
-  <dt>[7]</dt><dd> Each such ouput is consumed by the matching expect() command.
+  <dt>7</dt><dd> Each such ouput is consumed by the matching expect() command.
   </dd>
-  <dt>[8]</dt><dd> The *test fixture* sends additional QS record "Trg-Done <COMPLEX-COMMAND>", which explicitly delimits the output from this parricualr command.
+  <dt>8</dt><dd> The *test fixture* sends additional QS record "Trg-Done <COMPLEX-COMMAND>", which explicitly delimits the output from this parricualr command.
   </dd>
-  <dt>[8]</dt><dd> The *test script* must consume the "Trg-Done <COMPLEX-COMMAND>" record by an explicit expect() command.
+  <dt>8</dt><dd> The *test script* must consume the "Trg-Done <COMPLEX-COMMAND>" record by an explicit expect() command.
   </dd>
 </dl>
 <div style="clear:both;"></div>

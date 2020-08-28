@@ -30,7 +30,7 @@ set QTOOLS=C:\qp\qtools
 @endverbatim
 
 @note
-Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qview "QView Visualization and Monitoring" utilities.
 
 
 
@@ -49,7 +49,7 @@ export QTOOLS=~/qp/qtools
 @endverbatim
 
 @note
-Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qspyview "QSpyView Visualization and Monitoring" utilities.
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qview "QView Visualization and Monitoring" utilities.
 
 
 
@@ -64,13 +64,10 @@ The following annotated directory tree in the standard <strong>QTools&trade;</st
       <li><span class="img file">`qspy.exe`</span> &mdash; @ref qspy "QSPY executable"</li>
       <li><span class="img file">`qclean.exe`</span> &mdash; @ref qclean</li>
       <li><span class="img file">`qfsgen.exe`</span> &mdash; @ref qfsgen</li>
-      <li><span class="img file_tcl">`qcalc.tcl`</span> &mdash; @ref qcalc</li>
       <li>~ ~ ~</li>
       <li><span class="img file">`make.exe`</span> &mdash; make utility</li>
       <li><span class="img file">`rm.exe`</span> &mdash; rm (remove) utility</li>
       <li><span class="img file_py">`python.bat`</span> &mdash; Batch file to call Python</li>
-      <li><span class="img file_tcl">`tclsh.bat`</span> &mdash; Batch file to call Tcl interpreter</li>
-      <li><span class="img file_wish">`wish.bat`</span> &mdash; Batch file to call Tk interpreter</li>
     </ul>
     <li><span class="img folder">qspy</span> &mdash; @ref qspy "QSPY tool" for software tracing and testing</li>
     <ul class="tag">
@@ -79,16 +76,13 @@ The following annotated directory tree in the standard <strong>QTools&trade;</st
       <li><span class="img folder">posix</span> &mdash; QSPY port to POSIX (Linux, macOS)</li>
       <li><span class="img folder">py</span> &mdash; Python support (@ref qutest "QUTest")</li>
       <li><span class="img folder">win32</span> &mdash; QSPY port to Windows</li>
-      <li><span class="img folder">tcl</span> &mdash; Tcl/Tk scripts (@ref qspyview "QSpyView")</li>
-      <li><span class="img folder">matlab</span> &mdash; @ref qspy_matlab "QSPY MATLAB Support"</li>
     </ul>
     <li>&nbsp;</li>
-    <li>*** The following directories are present in QTools for Windows only ***</li>
+    <li><b>The following directories are present in QTools for Windows only</b></li>
     <li><span class="img folder">qwin</span> &mdash; @ref qwin</li>
     <li><span class="img folder">MinGW</span> &mdash; GNU C/C++ toolset for Windows (32-bit)</li>
     <li><span class="img folder">gnu_arm-none-eabi</span> &mdash; GNU ARM-EABI toolset for Windows</li>
     <li><span class="img folder">Python38</span> &mdash; Python 3.8 for Windows</li>
-    <li><span class="img folder">tcl_8.6</span> &mdash; Tcl/Tk 8.6 for Windows</li>
   </ul>
 </ul>
 

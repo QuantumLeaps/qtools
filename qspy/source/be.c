@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.9.0
+* Last updated on  2020-08-21
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -56,11 +56,12 @@ typedef void     QEvt;
 #ifndef Q_SPY
 #define Q_SPY 1
 #endif
+#define QS_OBJ_PTR_SIZE 4
+#define QS_FUN_PTR_SIZE 4
+#define Q_SIGNAL_SIZE   2
 #include "qs_copy.h" /* copy of the target-resident QS interface */
 
 /*..........................................................................*/
-static uint8_t  l_buf[8*1024]; /* the output buffer [bytes] */
-static uint8_t *l_pos;         /* current position in the output buffer */
 static uint8_t  l_rxBeSeq;     /* receive  Back-End  sequence number */
 static uint8_t  l_txBeSeq;     /* transmit Back-End sequence number */
 static uint8_t  l_channels;    /* channels of the output (bitmask) */
@@ -69,6 +70,9 @@ enum Channels {
     BINARY_CH = (1 << 0),
     TEXT_CH   = (1 << 1)
 };
+
+/* send a packet to Front-End */
+static void BE_sendShortPkt(int pktId);
 
 #define BIN_FORMAT "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BIN(byte_)  \
@@ -87,7 +91,6 @@ static FILE *l_testFile;
 #endif
 
 void BE_onStartup(void) {
-    l_pos      = &l_buf[0];
     l_rxBeSeq  = 0U;
     l_txBeSeq  = 0U;
     l_channels = 0U;
@@ -98,7 +101,7 @@ void BE_onStartup(void) {
 }
 /*..........................................................................*/
 void BE_onCleanup(void) {
-    BE_sendPkt(QSPY_DETACH);
+    BE_sendShortPkt(QSPY_DETACH);
 #ifndef NDEBUG
     fclose(l_testFile);
 #endif
@@ -129,7 +132,7 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
 
     /* check if this is a packet to be forwarded directly to the Target */
     if (buf[1] < 128) {
-        static uint8_t qbuf[QS_MAX_RECORD_SIZE]; /* encoded QS record */
+        static uint8_t qbuf[QS_RECORD_SIZE_MAX]; /* encoded QS record */
 
         /* encode the packet according to the QS/QSPY protocol */
         size_t len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
@@ -179,7 +182,7 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             l_txBeSeq  = 0U;             /* re-start the transmit sequence */
 
             /* send the attach confirmation packet back to the Front-End */
-            BE_sendPkt(QSPY_ATTACH);
+            BE_sendShortPkt(QSPY_ATTACH);
 
             break;
         }
@@ -207,7 +210,7 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             QSPY_command('m');
             break;
         }
-        case QSPY_MSCGEN_OUT: {
+        case QSPY_SEQUENCE_OUT: {
             QSPY_command('g');
             break;
         }
@@ -256,32 +259,38 @@ int BE_parseRecFromTarget(QSpyRecord * const qrec) {
 }
 
 /*--------------------------------------------------------------------------*/
-void BE_sendPkt(int pktId) {
-    if ((pktId >= 128) || ((l_channels & 1U) != 0)) {
-        l_pos = &l_buf[0];
+void BE_sendShortPkt(int pktId) {
+    if ((pktId >= 128) || ((l_channels & BINARY_CH) != 0)) {
+        uint8_t buf[4];
+        uint8_t *pos = &buf[0];
         ++l_txBeSeq;
-        *l_pos++ = l_txBeSeq;
-        *l_pos++ = (uint8_t)pktId;
-        PAL_send2FE(l_buf, (l_pos - &l_buf[0]));
+        *pos++ = l_txBeSeq;
+        *pos++ = (uint8_t)pktId;
+        PAL_send2FE(buf, (pos - &buf[0]));
     }
 }
 /*..........................................................................*/
 void BE_sendLine(void) {
-    /* global filter for permanently enabled QS records
-    * minus the records that generate time stamps
-    */
-    static uint8_t const glbFilter[32] = {
-        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0,
-        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
-
-    if ((l_channels & 2U) != 0) {
+    if ((l_channels & TEXT_CH) != 0) {
+        /* filter for permanently enabled QS records
+         * that should NOT be forwarded to BE:
+         * QS_EMPTY,
+         * QS_SIG_DICT,
+         * QS_OBJ_DICT,
+         * QS_FUN_DICT,
+         * QS_USR_DICT,
+         * QS_TARGET_INFO
+         */
+        static uint8_t const dont_forward[32] = {
+            0x01U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0xF0U,
+            0x01U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
+            0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
+            0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U
+        };
         uint8_t rec = (uint8_t)QSPY_output.rec;
 
-        /* is this QS record not permanently blocked? */
-        if ((glbFilter[rec >> 3] & (1U << (rec & 7U))) == 0U) {
+        /* should this QS record be forwarded? */
+        if ((dont_forward[rec >> 3] & (1U << (rec & 7U))) == 0U) {
             ++l_txBeSeq;
 
             /* prepend the BE UDP packet header in front of the string */
@@ -292,36 +301,5 @@ void BE_sendLine(void) {
             PAL_send2FE((uint8_t const *)&QSPY_output.buf[QS_LINE_OFFSET - 3],
                         QSPY_output.len + 3);
         }
-    }
-}
-
-/*--------------------------------------------------------------------------*/
-void BE_putU8(uint8_t d) {
-    *l_pos++ = d;
-}
-/*..........................................................................*/
-void BE_putU16(uint16_t d) {
-    *l_pos++ = (uint8_t)d; d >>= 8;
-    *l_pos++ = (uint8_t)d;
-}
-/*..........................................................................*/
-void BE_putU32(uint32_t d) {
-    *l_pos++ = (uint8_t)d;  d >>= 8;
-    *l_pos++ = (uint8_t)d;  d >>= 8;
-    *l_pos++ = (uint8_t)d;  d >>= 8;
-    *l_pos++ = (uint8_t)d;
-}
-/*..........................................................................*/
-void BE_putStr(char const *str) {
-    while (*str != '\0') {
-        *l_pos++ = (uint8_t)*str++;
-    }
-}
-/*..........................................................................*/
-void BE_putMem(uint8_t const *mem, uint8_t size) {
-    *l_pos++ = size;
-    while (size > 0) {
-        *l_pos++ = (uint8_t)*mem++;
-        --size;
     }
 }

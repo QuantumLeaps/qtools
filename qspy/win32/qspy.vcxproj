@@ -314,7 +314,7 @@
       <HeaderFileName />
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/wd4127 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4820 /wd4710 /wd4774 /wd5045 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -325,10 +325,12 @@
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <WarningVersion>
+      </WarningVersion>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -357,7 +359,7 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <AdditionalOptions>/wd4127 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4820 /wd4710 /wd4774 /wd5045 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -369,10 +371,12 @@
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <WarningVersion>
+      </WarningVersion>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

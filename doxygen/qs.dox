@@ -175,7 +175,7 @@ QS_END()
 Obviously, QS cannot eliminate completely the overhead of software tracing. But with the fine-granularity <strong>filters</strong> available in QS, you can make this impact as small as necessary. For greatest flexibility, QS uses two complementary levels of filters: **Global Filters** and **Local Filters** described below. Combination of such two complementary filtering criteria results in very selective tracing capabilities.
 
 @note
-The Global and Local filters are initialized in the Target. Subsequently, if the QS receive channel is enabled (@ref qs_rx "QS-RX"), the filters can be changed from the @ref qutest "QUTest" or @ref qspyview "QSpyView" front-ends at **runtime**.
+The Global and Local filters are initialized in the Target. Subsequently, if the QS receive channel is enabled (@ref qs_rx "QS-RX"), the filters can be changed from the @ref qutest "QUTest" or @ref qview "QView" front-ends at **runtime**.
 
 
 
@@ -201,12 +201,12 @@ Memory@n Pool   | QS_FILTER_ON(QS_MP_RECORDS);@n QS_FILTER_OFF(QS_MP_RECORDS); |
 Time@n Event    | QS_FILTER_ON(QS_TE_RECORDS);@n QS_FILTER_OFF(QS_TE_RECORDS); | #QS_QF_TICK,@n #QS_QF_TIMEEVT_ARM,@n #QS_QF_TIMEEVT_AUTO_DISARM,@n #QS_QF_TIMEEVT_DISARM_ATTEMPT,@n #QS_QF_TIMEEVT_DISARM,@n #QS_QF_TIMEEVT_REARM,@n #QS_QF_TIMEEVT_POST
 Event Management (QF) | QS_FILTER_ON(QS_QF_RECORDS);@n QS_FILTER_OFF(QS_QF_RECORDS); | #QS_QF_NEW,@n #QS_QF_GC_ATTEMPT,@n #QS_QF_GC,@n #QS_QF_TIMEEVT_DISARM_ATTEMPT,@n #QS_QF_TICK,@n
 Scheduler       | QS_FILTER_ON(QS_SC_RECORDS);@n QS_FILTER_OFF(QS_SC_RECORDS); | #QS_SCHED_LOCK,@n #QS_SCHED_UNLOCK,@n #QS_SCHED_NEXT,@n #QS_SCHED_IDLE,@n #QS_SCHED_RESUME,@n #QS_QF_TIMEEVT_DISARM_ATTEMPT,@n #QS_QF_TICK,@n
-User Group-0    | QS_FILTER_ON(QS_U0_RECORDS);@n QS_FILTER_OFF(QS_U0_RECORDS); | #QS_USER + 0  .. #QS_USER + 9
-User Group-1    | QS_FILTER_ON(QS_U1_RECORDS);@n QS_FILTER_OFF(QS_U1_RECORDS); | #QS_USER + 10 .. #QS_USER + 19
-User Group-2    | QS_FILTER_ON(QS_U2_RECORDS);@n QS_FILTER_OFF(QS_U2_RECORDS); | #QS_USER + 20 .. #QS_USER + 29
-User Group-3    | QS_FILTER_ON(QS_U3_RECORDS);@n QS_FILTER_OFF(QS_U3_RECORDS); | #QS_USER + 30 .. #QS_USER + 39
-User Group-4    | QS_FILTER_ON(QS_U4_RECORDS);@n QS_FILTER_OFF(QS_U4_RECORDS); | #QS_USER + 40 .. #QS_USER + 54
-User-All        | QS_FILTER_ON(QS_UA_RECORDS);@n QS_FILTER_OFF(QS_UA_RECORDS); | #QS_USER + 0  .. #QS_USER + 54
+User Group-0    | QS_FILTER_ON(QS_U0_RECORDS);@n QS_FILTER_OFF(QS_U0_RECORDS); | #QS_USER + 0  .. #QS_USER + 4
+User Group-1    | QS_FILTER_ON(QS_U1_RECORDS);@n QS_FILTER_OFF(QS_U1_RECORDS); | #QS_USER + 5  .. #QS_USER + 9
+User Group-2    | QS_FILTER_ON(QS_U2_RECORDS);@n QS_FILTER_OFF(QS_U2_RECORDS); | #QS_USER + 10 .. #QS_USER + 14
+User Group-3    | QS_FILTER_ON(QS_U3_RECORDS);@n QS_FILTER_OFF(QS_U3_RECORDS); | #QS_USER + 15 .. #QS_USER + 19
+User Group-4    | QS_FILTER_ON(QS_U4_RECORDS);@n QS_FILTER_OFF(QS_U4_RECORDS); | #QS_USER + 20 .. #QS_USER + 24
+User-All        | QS_FILTER_ON(QS_UA_RECORDS);@n QS_FILTER_OFF(QS_UA_RECORDS); | #QS_USER + 0  .. #QS_USER + 24
 </center>
 @n
 
@@ -257,7 +257,7 @@ The QS Target-resident component provides special **dictionary trace records** d
 
 The dictionary trace records are typically generated during the system initialization and this is the only time when they are sent to the @ref qspy "QSPY" host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
 
-@code
+@code{c}
 void main(void) {
     ~ ~ ~
     /* global filter */
@@ -296,7 +296,7 @@ The QS target component contains the receive-channel (QS-RX), which can receive 
 - Store a @ref qutest_fixture-probe "Test Probe" supplied from @ref qspy "QSPY" inside the Target
 
 @note
-The QS-RX channel is the backbone for interacting with the target system and implemeting such features as @ref qutest "Unit Testing" and @ref qspyview "Visualization/Monitoring" of the target system.
+The QS-RX channel is the backbone for interacting with the target system and implemeting such features as @ref qutest "Unit Testing" and @ref qview "Visualization/Monitoring" of the target system.
 
 @next{qspy}
 */

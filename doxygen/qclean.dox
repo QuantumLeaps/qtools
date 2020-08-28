@@ -88,8 +88,9 @@ FILE TYPE      | END-OF-LINE | TRAILING WS | TABS    | LONG-LINES
 `.md`          | DOS (CR,LF) | remove  | remove  | don't check
 `.bat`         | DOS (CR,LF) | remove  | remove  | don't check
 `.ld`          | Unix (LF)   | remove  | remove  | check
-`.tcl`         | Unix (LF)   | remove  | remove  | check
 `.py`          | Unix (LF)   | remove  | remove  | check
+`.pyw`         | Unix (LF)   | remove  | remove  | check
+`.tcl`         | Unix (LF)   | remove  | remove  | check
 `.java`        | Unix (LF)   | remove  | remove  | check
 `Makefile`     | Unix (LF)   | remove  | leave   | check
 `.mak`         | Unix (LF)   | remove  | leave   | check
@@ -109,5 +110,5 @@ The cleanup rules specified in the table above can be easily customized by editi
 @attention
 For best code portability, QClean enforces the consistent use of the specified End-Of-Line convention (typically Unix (LF)), **regardless of the native EOL of the platform**. The DOS/Windows EOL convention (CR,LF) is typically not applied because it causes compilation problems on Unix-like systems (Specifically, the C preprocessor doesn't correctly parse the multi-line macros.) On the other hand, most DOS/Windows compilers seem to tolerate the Unix EOL convention without problems.
 
-@next{qcalc}
+@next{qfsgen}
 */

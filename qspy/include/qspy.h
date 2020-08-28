@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.2
-* Last updated on  2020-06-23
+* Last updated for version 6.9.0
+* Last updated on  2020-08-21
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -40,7 +40,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.8.2"
+#define QSPY_VER "6.9.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,7 +60,7 @@ typedef enum {
     QSPY_SCREEN_OUT,      /*!< toggle screen output to a file in QSPY */
     QSPY_BIN_OUT,         /*!< toggle binary output to a file in QSPY */
     QSPY_MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
-    QSPY_MSCGEN_OUT,      /*!< toggle MscGen output to a file in QSPY */
+    QSPY_SEQUENCE_OUT,    /*!< toggle Sequence output to a file in QSPY */
     QSPY_SEND_EVENT,      /*!< send event (QSPY supplying signal) */
     QSPY_SEND_LOC_FILTER, /*!< send Local Filter (QSPY supplying addr) */
     QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
@@ -81,6 +81,7 @@ typedef struct {
 /*! QSPY configuration parameters. @sa QSPY_config() */
 typedef struct {
     uint16_t version;
+    uint8_t endianness;
     uint8_t objPtrSize;
     uint8_t funPtrSize;
     uint8_t tstampSize;
@@ -97,11 +98,14 @@ typedef uint64_t KeyType;
 typedef uint32_t SigType;
 typedef uint64_t ObjType;
 
-/* the largest valid QS record size [bytes] */
-#define QS_MAX_RECORD_SIZE  512
-
-/* the maximum length of a single QSPY line [chars] */
-#define QS_MAX_LINE_LENGTH  1000
+/* limits */
+enum {
+    QS_RECORD_SIZE_MAX  = 512,  /* max QS record size [bytes] */
+    QS_LINE_LEN_MAX     = 1000, /* max length of a QSPY line [chars] */
+    QS_FNAME_LEN_MAX    = 256,  /* max length of filenames [chars] */
+    QS_SEQ_LIST_LEN_MAX = 300,  /* max length of the Seq list [chars] */
+    QS_DNAME_LEN_MAX    = 32,   /* max dictionary name length [chars] */
+};
 
 /* pointer to the callback function for customized QS record parsing  */
 typedef int (*QSPY_CustParseFun)(QSpyRecord * const me);
@@ -120,25 +124,15 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
                                  uint32_t *pNum);
 
 /* QSPY configuration and high-level interface .............................*/
-void QSPY_config(
-    uint16_t version,
-    uint8_t objPtrSize,
-    uint8_t funPtrSize,
-    uint8_t tstampSize,
-    uint8_t sigSize,
-    uint8_t evtSize,
-    uint8_t queueCtrSize,
-    uint8_t poolCtrSize,
-    uint8_t poolBlkSize,
-    uint8_t tevtCtrSize,
+void QSPY_config(QSpyConfig const *config,
     void   *matFile,
-    void   *mscFile,
+    void   *seqFile, char const *seqList,
     QSPY_CustParseFun custParseFun);
 QSpyConfig const *QSPY_getConfig(void);
 void QSPY_configTxReset(QSPY_resetFun txResetFun);
 
 void QSPY_configMatFile(void *matFile);
-void QSPY_configMscFile(void *mscFile);
+void QSPY_configSeqFile(void *seqFile);
 
 void QSPY_reset(void);
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
@@ -166,12 +160,13 @@ KeyType QSPY_findFun(char const *name);
 KeyType QSPY_findUsr(char const *name);
 
 void QSPY_stop(void); /* orderly close all used files */
+char const* QSPY_tstampStr(void);
 
 /* last human-readable line of output from QSPY */
 #define QS_LINE_OFFSET  8
 enum QSPY_LastOutputType { REG_OUT, INF_OUT, ERR_OUT };
 typedef struct {
-    char buf[QS_LINE_OFFSET + QS_MAX_LINE_LENGTH];
+    char buf[QS_LINE_OFFSET + QS_LINE_LEN_MAX];
     int  len;  /* the length of the composed string */
     int  rec;  /* the corresponding QS record ID */
     int  type; /* the type of the output */
@@ -183,26 +178,26 @@ void QSPY_onPrintLn(void); /* callback to print the last line of output */
 
 #define SNPRINTF_LINE(format_, ...) do {                         \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],        \
-                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET),           \
+                (QS_LINE_LEN_MAX - QS_LINE_OFFSET),           \
                 format_,  ##__VA_ARGS__);                        \
-    if ((0 < n_) && (n_ < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET)) {\
+    if ((0 < n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) {\
         QSPY_output.len = n_;                                    \
     }                                                            \
     else {                                                       \
-        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;   \
+        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;   \
     }                                                            \
 } while (0)
 
 #define SNPRINTF_APPEND(format_, ...) do {                                 \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
-                (QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len),   \
+                (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len),   \
                 format_, ##__VA_ARGS__);                                   \
     if ((0 < n_)                                                           \
-        && (n_ < QS_MAX_LINE_LENGTH - QS_LINE_OFFSET - QSPY_output.len)) { \
+        && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len)) { \
         QSPY_output.len += n_;                                             \
     }                                                                      \
     else {                                                                 \
-        QSPY_output.len = QS_MAX_LINE_LENGTH - QS_LINE_OFFSET;             \
+        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;             \
     }                                                                      \
 } while (0)
 

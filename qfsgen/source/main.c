@@ -4,8 +4,8 @@
 * @ingroup qfsgen
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.9.0
+* Last updated on  2020-08-25
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -57,26 +57,26 @@ static void dumpStrHex(char const *s) {
         if (i == 0) { /* new line? */
             ++i;
             if (len == 0) { /* beginning of the file? */
-                FPRINTF_S(l_file, "    ");
+                FPRINTF_S(l_file, "%s", "    ");
             }
             else {
-                FPRINTF_S(l_file, ",\x0A    ");
+                FPRINTF_S(l_file, "%s", ",\x0A    ");
             }
         }
         else if (i < 9) { /* inside the line? */
             ++i;
-            FPRINTF_S(l_file, ", ");
+            FPRINTF_S(l_file, "%s", ", ");
         }
         else { /* end of line */
             i = 0;
-            FPRINTF_S(l_file, ", ");
+            FPRINTF_S(l_file, "%s", ", ");
         }
         FPRINTF_S(l_file, "0x%02X", ((unsigned)*s & 0xFF));
         ++s;
         ++len;
     }
     if (i == 0) {
-        FPRINTF_S(l_file, "    ");
+        FPRINTF_S(l_file, "%s", "    ");
     }
 }
 /*..........................................................................*/
@@ -155,19 +155,19 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     *d = '\0';
 
     FPRINTF_S(l_file, "static unsigned char const data_%s[] = {\x0A", fvar);
-    FPRINTF_S(l_file, "    /* name: */\x0A");
+    FPRINTF_S(l_file, "%s", "    /* name: */\x0A");
     dumpStrHex(buf); /* dump the file name */
-    FPRINTF_S(l_file, ", 0x00,\x0A"); /* zero-terminate */
+    FPRINTF_S(l_file, "%s", ", 0x00,\x0A"); /* zero-terminate */
 
     if (l_genHttpHeaders) { /* encode HTTP header, if option -h provided */
         if (strstr(fname, "404") != 0) {
-            STRCPY_S(buf, sizeof(buf), "HTTP/1.0 404 File not found\r\x0A");
+            STRNCPY_S(buf, sizeof(buf), "HTTP/1.0 404 File not found\r\x0A");
         }
         else {
-            STRCPY_S(buf, sizeof(buf), "HTTP/1.0 200 OK\r\x0A");
+            STRNCPY_S(buf, sizeof(buf), "HTTP/1.0 200 OK\r\x0A");
         }
         STRCAT_S(buf, sizeof(buf),
-                  "Server: QL (https://state-machine.com)\r\x0A");
+                 "Server: QL (https://state-machine.com)\r\x0A");
 
         /* analyze the file type... */
         s = strrchr(fname, '.');
@@ -215,12 +215,12 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
         }
         STRCAT_S(buf, sizeof(buf), "\r\x0A");
 
-        FPRINTF_S(l_file, "    /* HTTP header: */\x0A");
+        FPRINTF_S(l_file, "%s", "    /* HTTP header: */\x0A");
         dumpStrHex(buf);
-        FPRINTF_S(l_file, ",\x0A");
+        FPRINTF_S(l_file, "%s", ",\x0A");
     }
 
-    FPRINTF_S(l_file, "    /* data: */\x0A");
+    FPRINTF_S(l_file, "%s", "    /* data: */\x0A");
     len = 0;
     i = 0;
     while ((nBytes = fread(buf, 1, sizeof(buf), fin)) != 0) {
@@ -230,45 +230,46 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
             if (i == 0) { /* new line? */
                 ++i;
                 if (len == 0) { /* beginning of the file? */
-                    FPRINTF_S(l_file, "    ");
+                    FPRINTF_S(l_file, "%s", "    ");
                 }
                 else {
-                    FPRINTF_S(l_file, ",\x0A    ");
+                    FPRINTF_S(l_file, "%s", ",\x0A    ");
                 }
             }
             else if (i < 9) { /* inside the line? */
                 ++i;
-                FPRINTF_S(l_file, ", ");
+                FPRINTF_S(l_file, "%s", ", ");
             }
             else { /* end of line */
                 i = 0;
-                FPRINTF_S(l_file, ", ");
+                FPRINTF_S(l_file, "%s", ", ");
             }
             FPRINTF_S(l_file, "0x%02X", ((unsigned)*pc & 0xFF));
             ++pc;
             len += nBytes;
         }
     }
-    FPRINTF_S(l_file, "\x0A};\x0A\x0A");
+    FPRINTF_S(l_file, "%s", "\x0A};\x0A\x0A");
     fclose(fin);
 
     FPRINTF_S(l_file, "struct fsdata_file const file_%s[] = {\x0A    {\x0A",
-                    fvar);
+              fvar);
     FPRINTF_S(l_file, "        %s,\x0A",      l_prevFile);
     FPRINTF_S(l_file, "        data_%s,\x0A", fvar);
     FPRINTF_S(l_file, "        data_%s + %d,\x0A",
                     fvar, (int)(strlen(fvar) + 2));
     FPRINTF_S(l_file, "        sizeof(data_%s) - %d\x0A",
                     fvar, (int)(strlen(fvar) + 2));
-    FPRINTF_S(l_file, "    }\x0A};\x0A\x0A");
+    FPRINTF_S(l_file, "%s", "    }\x0A};\x0A\x0A");
     SNPRINTF_S(l_prevFile, sizeof(l_prevFile) - 1U, "file_%s", fvar);
 }
 /*..........................................................................*/
 int main(int argc, char *argv[]) {
     char const *fileName = "fsdata.h";
 
-    PRINTF_S("QFSGen " VERSION " Copyright (c) 2005-2020 Quantum Leaps\n"
-             "Documentation: https://state-machine.com/qtools/qfsgen.html\n");
+    PRINTF_S("QFSGen %s Copyright (c) 2005-2020 Quantum Leaps\n"
+             "Documentation: https://state-machine.com/qtools/qfsgen.html\n",
+             VERSION);
     PRINTF_S("Usage: qfsgen fs-dir [output-file] [-h]\n"
              "       fs-dir      file-system directory (must be provided)\n"
              "       output-file optional (default is %s)\n"
@@ -277,7 +278,7 @@ int main(int argc, char *argv[]) {
 
     /* parse the command line... */
     if (argc < 2) {
-        PRINTF_S("the fs-dir argument must be provided\n");
+        PRINTF_S("%s", "the fs-dir argument must be provided\n");
         return -1;
     }
     else {
@@ -308,10 +309,10 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    FPRINTF_S(l_file, "/* This file has been generated "
+    FPRINTF_S(l_file, "%s", "/* This file has been generated "
                     "with the qfsgen utility. */\x0A\x0A");
     l_nFiles = 0;
-    STRCPY_S(l_prevFile, sizeof(l_prevFile), "(struct fsdata_file *)0");
+    STRNCPY_S(l_prevFile, sizeof(l_prevFile), "(struct fsdata_file *)0");
     filesearch(l_fsDir); /* search through the file-system directory tree */
     FPRINTF_S(l_file, "#define FS_ROOT %s\x0A\x0A", l_prevFile);
     FPRINTF_S(l_file, "#define FS_NUMFILES %d\x0A", l_nFiles);

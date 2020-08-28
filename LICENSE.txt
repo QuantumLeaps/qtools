@@ -14,10 +14,6 @@ The Python package is distributed under the terms of the PYTHON
 LICENSE AGREEMENT, included in the file PYTHON_LICENSE.txt in the
 qtools/open-source subdirectory.
 
-The TCL/TK package is distributed under the terms of the TCL
-LICENSE AGREEMENT, included in the file TCL_LICENSE.txt in the
-qtools/open-source subdirectory.
-
 The LMFlash utility for Windows is is distributed under the terms
 of the LMFlash license, included in the file LMFlash_LICENSE.rtf
 in the qtools/open-source subdirectory. Specifically, the LMFlash

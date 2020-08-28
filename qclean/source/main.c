@@ -4,8 +4,8 @@
 * @ingroup qclean
 * @cond
 ******************************************************************************
-* Last updated for version 6.7.0
-* Last updated on  2020-01-05
+* Last updated for version 6.9.0
+* Last updated on  2020-08-06
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -95,6 +95,7 @@ static FileType l_fileTypes[] = {
     { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU ld */
     { ".tcl",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".java",    5, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { "Makefile", 8, CR_FLG           | LONG_LINE_FLG },
     { ".mak",     4, CR_FLG           | LONG_LINE_FLG },

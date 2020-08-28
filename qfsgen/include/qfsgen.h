@@ -4,8 +4,8 @@
 * @ingroup qfsgen
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.2
-* Last updated on  2020-07-17
+* Last updated for version 6.9.0
+* Last updated on  2020-08-22
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -41,7 +41,7 @@
 #ifndef qfsgen_h
 #define qfsgen_h
 
-#define VERSION "6.8.2"
+#define VERSION "6.9.0"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);

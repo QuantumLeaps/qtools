@@ -1,10 +1,15 @@
 /*****************************************************************************
 * getopt.c - competent and free getopt library.
 *
+* getopt() return values:
+* -1  end of processing
+* '?' unknown option
+* '!' unexpected option argument
+* '$' option argument required
+*
 * Copyright (c) 2002-2003, Mark K. Kim
 * Copyright (c) 2012-2017, Kim Grasman <kim.grasman@gmail.com>
 * Copyright (c) 2018-2020, Quantum Leaps 2018 <https://www.state-machine.com>
-*
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -46,7 +51,10 @@ static int opt_offset   = 0;     /* Index into compounded "-option" */
 static int dashdash     = 0;     /* True if "--" option reached */
 static int nonopt       = 0;     /* How many nonopts we've found */
 
-static void increment_index() {
+static void increment_index(void);   /* prototype */
+static int permute_argv_once(void);  /* prototype */
+
+static void increment_index(void) {
     /* Move onto the next option */
     if (argv_index < argv_index2) {
         while (prev_argv[++argv_index]
@@ -64,7 +72,7 @@ static void increment_index() {
 * Permutes argv[] so that the argument currently being processed is moved
 * to the end.
 */
-static int permute_argv_once() {
+static int permute_argv_once(void) {
     /* Movability check */
     if (argv_index + nonopt >= prev_argc) {
         return 1;
@@ -163,10 +171,11 @@ int getopt(int argc, char *argv[], char const *optstr) {
         /* Invalid argument */
         if (!opt_ptr) {
             if (opterr) {
-                FPRINTF_S(stderr, "%s: invalid option: -%c\n", argv[0], c);
+                FPRINTF_S(stderr, "\nERROR: -%c command-line option "
+                   "takes no arguments\n", optopt);
             }
             optopt = c;
-            c = '?';
+            c = '!';  /* notify the caller about invalid argument */
 
             /* Move onto the next option */
             increment_index();
@@ -216,11 +225,11 @@ int getopt(int argc, char *argv[], char const *optstr) {
             /* If we got no argument for an option with required argument */
             if (optarg == NULL && opt_ptr[2] != ':') {
                 optopt = c;
-                c = '?';
+                c = '$';  /* notify the caller about required argument(s) */
 
                 if (opterr) {
-                    FPRINTF_S(stderr,"%s: option requires an argument: -%c\n",
-                            argv[0], optopt);
+                    FPRINTF_S(stderr, "\nERROR: -%c command-line option "
+                       "requires argument(s)\n", optopt);
                 }
             }
         }

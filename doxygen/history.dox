@@ -1,6 +1,53 @@
 /**
 @page history Revision History
 
+@section qtools_6_9_0 Version 6.9.0, 2020-08-21
+
+This release represents a major overhaul of QTools. Specifically, this release brings the new @ref qview component, which replaces QSpyView written originally in Tcl/Tk. The new @ref qview "QView" is written in **Python** (3.3.+) and brings much commonality with the @ref qutest, which has also been re-structured and improved.
+
+@note
+Starting with this version, both @ref qview and @ref qutest require **Python3** (3.3+) and are **no longer compatible** with Python2. The support for Tcl/Tk has been dropped entirely in QTools.
+
+
+__Changes in Directory Structure__
+
+The new new @ref qview "QView" and the updated @ref qutest "QUTest" components are now located directly under the `qtools` folder and are no longer in the `qtools\qspy` folder. Here is the new `qtools` directory structure:
+
+@code{py}
+qtools/
++---bin/
++---gnu_arm-none-eabi/
++---matlab/
++---mingw32/
++---Python38/
++---qclean/
++---qspy/
++---qutest/   # <== new qutest location
++---qview/    # <== new qview location
++---qwin/
++---Unity/
+@endcode 
+
+@note
+The changes in the QTools directory structure have impact on the QUTest testing, because the Makefiles (or any other build tools you might be using) need to be adjusted to the new location of the `qutest.py` script.
+
+
+__Changes in QSPY:__
+
+- The @ref qspy "QSPY host utility" has been extended with @ref qspy_seq "Sequence Diagram Output".
+This new feature replaces the previous support for MscGen and is no longer reliant on any such external tools.
+
+- QSPY now recognizes the new QS trace record #QS_QF_RUN
+
+@note
+The #QS_QF_RUN record is now generated in @ref qutest "QUTest", which requires adjustments in the existing @ref qutest_script "test scripts". Specifically, the test scripts that provide their own on_reset() callback must now also call expect_run().
+
+
+__Bug Fixes:__
+
+- [bug#153 QSPY Creating corrupt MscGen files](https://sourceforge.net/p/qpc/bugs/153/)
+
+
 @section qtools_6_8_2 Version 6.8.2, 2020-07-17
 
 - Changed the QS trace record name QS_QF_ACTIVE_POST_FIFO to ::QS_QF_ACTIVE_POST and QS_QF_EQUEUE_POST_FIFO to ::QS_QF_EQUEUE_POST. This refactoring now better matches the QP/C/C++ API QACTIVE_POST() and QEQueue_post().
@@ -8,10 +55,9 @@
 - Applied new, clearer styling to the Doxygen documentation.
 
 
-
 @section qtools_6_8_1 Version 6.8.1, 2020-04-04
 
-Fixed the following bugs:
+__Bug Fixes:__
 - [bug#263 QSPY handles incorrectly empty strings ](https://sourceforge.net/p/qpc/bugs/263/)
 
 Also, improved some comments in QUTest scripting documentation (qutest.py).

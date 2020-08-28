@@ -22,7 +22,7 @@ Software tracing is particularly effective and powerful in combination with the 
 @image html qpspy0.gif "Software tracing data records flowing from Target to the Host"
 
 @remarks
-QP/Spy can also (optionally) send commands and data **to the embedded target** (see @ref qpspy_rx "Bi-Directional QP/Spy"), which serves as the basis for @ref qutest "Unit Testing" and for @ref qspyview "Visualization" subsystems of the QP/Spy system.
+QP/Spy can also (optionally) send commands and data **to the embedded target** (see @ref qpspy_rx "Bi-Directional QP/Spy"), which serves as the basis for @ref qutest "Unit Testing" and for @ref qview "Visualization and Monitoring" subsystems of the QP/Spy system.
 
 
 
@@ -71,13 +71,13 @@ Finally, the tracing facility must allow consolidating data from all parts of th
 
 
 @subsection qpspy_rx Bi-Directional Connection to the Target
-While traditional software tracing systems support only uni-directional output of trace data from the embedded Target to a Host computer, QP/Spy supports bi-directional communication to the target as well. This capability allows users to send commands and data to the Target and form the basis for @ref qutest "Unit Testing" and @ref qspyview "Visualization and Monitoring" of embedded Targets.
+While traditional software tracing systems support only uni-directional output of trace data from the embedded Target to a Host computer, QP/Spy supports bi-directional communication to the target as well. This capability allows users to send commands and data to the Target and form the basis for @ref qutest "Unit Testing" and @ref qview "Visualization and Monitoring" of embedded Targets.
 
 @image html qpspy1.gif "Bi-directional data exchange between the Target and the Host"
 
 
 @subsection qpspy_udp UDP Socket Extension
-The QP/Spy system provides a  @ref qspy_udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). Currently, the UDP connection point is used by the  @ref qutest "QUTest" headless (console-based) front-end and GUI-based @ref qspyview "QSpyView" front-end.
+The QP/Spy system provides a  @ref qspy_udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). Currently, the UDP connection point is used by the  @ref qutest "QUTest" headless (console-based) front-end and GUI-based @ref qview "QView" front-end.
 
 
 

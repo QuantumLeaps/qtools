@@ -58,6 +58,9 @@ typedef void     QEvt;
 #ifndef Q_SPY
 #define Q_SPY 1
 #endif
+#define QS_OBJ_PTR_SIZE 4
+#define QS_FUN_PTR_SIZE 4
+#define Q_SIGNAL_SIZE   2
 #include "qs_copy.h"     /* copy of the target-resident QS interface */
 
 /*..........................................................................*/

@@ -19,7 +19,7 @@ at: https://www.state-machine.com/qtools/
 # About QTools
 QTools is a collection of various open source tools for working with the
 [QP Real-Time Embedded Frameworks (RTEFs)][QP] on desktop platforms, such
-as Windows, Linux, and Mac OS X.
+as Windows, Linux, and macOS.
 
 The following open-source tools are currently provided (NOTE: tools
 starting with 'q' are contributed by Quantum Leaps)
@@ -28,15 +28,15 @@ starting with 'q' are contributed by Quantum Leaps)
               real-time data from embedded targets running the QS
               software tracing.
 
-2. qutest   - Tcl extension of the QSPY host application for **uint testing**
+2. qutest   - Python extension of the QSPY host application for **uint testing**
               specifically designed for embedded systems, but also supports
               unit testing of embedded code on host computers
               ("dual targeting").
 
-3. qspyview - Tcl/Tk extension of the QSPY host application for
+3. qview    - Python extension of the QSPY host application for
               visualization and monitoring of the QS real-time tracing
-              data from embedded targets at real-time. QSpyView enables
-              developers to rapidly build both GUI-based and "headless"
+              data from embedded targets at real-time. QView enables
+              developers to quickly build both GUI-based and "headless"
               scripts for their specific applications.
 
 4. qwin     - QWIN GUI toolkit for prototyping embedded systems on
@@ -50,9 +50,7 @@ starting with 'q' are contributed by Quantum Leaps)
 6. qfsgen   - for generating ROM-based file systems to be used
               in embedded web pages served by the HTTP server
 
-7. qcalc    - programmer's calculator with C-syntax expressions
-
-8. Unity    - traditional unit testing harness (framework) for embedded C
+7. Unity    - traditional unit testing harness (framework) for embedded C
               (version 2.4.3)
 
 Additionally, QTools for Windows contains the following open-source,
@@ -64,13 +62,9 @@ Additionally, QTools for Windows contains the following open-source,
 
 12. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
 
-13. Python for Windows (32-bit version 3.8.0 for x86)
+13. Python for Windows (version 3.8.5 32-bit)
 
-14. Tcl/Tk for Windows (32-bit version 8.6) with UDP sockets extension
-
-15. ResEdit utility (32-bit version 1.6.6-x64)
-
-16. LMFlash for Windows (32-bit build 1613)
+14. LMFlash for Windows (32-bit build 1613)
 
 
 ---------------------------------------------------------------------------
@@ -108,7 +102,7 @@ installation directory of QTools.
 
 
 --------------------
-## QTools on Linux/MacOS
+## QTools on Linux/macOS
 On Linux/MacOS, installation of QTools consists of unzipping the
 `qtools-posix_<ver>.zip` archive into a directory of your choice,
 although the recommended default is `~/qp`.
@@ -143,43 +137,10 @@ The Python package is distributed under the terms of the PYTHON LICENSE
 AGREEMENT, included in the file PYTHON_LICENSE.txt in the licenses/
 subdirectory of the QTools distribution.
 
-The TCL/TK package is distributed under the terms of the TCL LICENSE
-AGREEMENT, included in the file TCL_LICENSE.txt in the licenses/
-subdirectory of the QTools distribution.
-
 The LMFlash utility for Windows is is distributed under the terms of the
 LMFlash license, included in the file LMFlash_LICENSE.rtf in the licenses/
 subdirectory of the QTools distribution. Specifically, the LMFlash utility
 is distributed according to Section 2a "Demonstration License".
-
-
----------------------------------------------------------------------------
-# Documentation
-The links to the documentation of the tools are provided in the
-`<qtools>\doc\` directory.
-
-### QUTest Python Scripting Support
-The QUTest Python scripting support for the QSPY utility are located in the
-`<qtools>\qspy\py\` directory.
-
-### QUTest Tcl Scripting Support
-The QUTest Tcl scripting support for the QSPY utility are located in the
-`<qtools>\qspy\tcl\` directory.
-
-A web-link to the TCL/TK documentation is provided in the shortcut
-[tcl_tk_8.6](https://www.tcl.tk/man/tcl8.6/).
-
-### QSPYView Tcl/Tk Scripts
-The QSpyView Tcl/Tk scripts for the QSPY utility are located in the
-`<qtools>\qspy\tcl\` directory.
-
-### QSPY Matlab Scripts
-The Matlab/GNU Octave scripts for the QSPY utility are located in the
-`<qtools>\qspy\matlab\` directory.
-
-### Unity Unit Testing Framework
-The documentation of the Unity Testing Framework for Embedded C is
-located in the `<qtools>\unity\doc\` directory.
 
 
 ---------------------------------------------------------------------------
