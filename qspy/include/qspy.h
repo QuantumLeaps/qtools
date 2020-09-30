@@ -4,7 +4,7 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
+* Last updated for version 6.9.0a
 * Last updated on  2020-08-21
 *
 *                    Q u a n t u m  L e a P s
@@ -40,7 +40,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.9.0"
+#define QSPY_VER "6.9.0a"
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,7 +104,7 @@ enum {
     QS_LINE_LEN_MAX     = 1000, /* max length of a QSPY line [chars] */
     QS_FNAME_LEN_MAX    = 256,  /* max length of filenames [chars] */
     QS_SEQ_LIST_LEN_MAX = 300,  /* max length of the Seq list [chars] */
-    QS_DNAME_LEN_MAX    = 32,   /* max dictionary name length [chars] */
+    QS_DNAME_LEN_MAX    = 64,   /* max dictionary name length [chars] */
 };
 
 /* pointer to the callback function for customized QS record parsing  */
