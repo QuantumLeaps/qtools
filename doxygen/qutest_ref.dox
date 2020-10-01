@@ -171,6 +171,7 @@ The commands that you can place in the tests (as well as inside the callback fun
 - expect()
 - glb_filter()
 - loc_filter()
+- ao_filter()
 - current_obj()
 - query_curr()
 - tick()

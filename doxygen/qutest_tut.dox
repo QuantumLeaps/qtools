@@ -308,25 +308,25 @@ The following test script performs the same tests as the Unity test fixture <spa
 
 [14] test("FunctionWhichReturnsLocalVariable() Should Return The Current Counter Value")
 [15] command(1)
-     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariab 0x5A5A")
+     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x5A5A")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
      # This should be true because we can still change our answer
 [16] poke(0, 4, pack("<L", 0x1234))
      command(1)
-     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariab 0x1234")
+     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x1234")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
 
 [17] test("FunctionWhichReturnsLocalVariable() Should Return The Current Counter Value Again", NORESET)
      # This should be true again because setup was rerun before this test (and after we changed it to 0x1234)
      command(1)
-     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariab 0x5A5A")
+     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x5A5A")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
 
      test("FunctionWhichReturnsLocalVariable() Should Return Current Counter, But Fails Because This Test Is Actually Flawed", NORESET)
      # Sometimes you get the test wrong.  When that happens, you get a failure too... and a quick look should tell
      # you what actually happened...which in this case was a failure to setup the initial condition.
      command(1)
-     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariab 0x1234")
+     expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x1234")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
 @endcode
 
@@ -395,7 +395,7 @@ The following test script performs the same tests as the Unity test fixture <spa
 <div style="clear:both;"></div>
 
 @attention
-The unusually long function name `FunctionWhichReturnsLocalVariable` has been **truncated** in the test expectations to `FunctionWhichReturnsLocalVariab`. This is because the QSPY host application limits the @ref qs_dict "QS dictionaries" to the **first 31 characters** only. Please keep this limit in mind when choosing various names in your application.  
+The  QSPY host application limits the @ref qs_dict "QS dictionaries" to the **first 63 characters**. This means that longer names of functions or objects will be **truncated** to this limit. Please keep this limit in mind when choosing various names in your application.
 
 
 <strong>Test: "FunctionWhichReturnsLocalVariable() Should Return The Current Counter..."</strong> checks whether `FunctionWhichReturnsLocalVariable()` CUT returns the value poked into the `Counter` variable:

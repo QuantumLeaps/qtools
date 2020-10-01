@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
-* Last updated on  2020-08-20
+* Last updated for version 6.9.1
+* Last updated on  2020-09-15
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -93,7 +93,7 @@ static char const l_helpStr[] =
     "-h                        help (show this message)\n"
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
     "-u [UDP_port|0]   7701    UDP socket with optional port, 0-no UDP\n"
-    "-v <QS_version>   6.2     compatibility with QS version\n"
+    "-v <QS_version>   6.6     compatibility with QS version\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
@@ -276,7 +276,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
 
     /* default configuration options... */
     QSpyConfig config = {
-        .version      = 620U,
+        .version      = 660U,
         .endianness   = 0U,
         .tstampSize   = 4U,
         .objPtrSize   = 4U,

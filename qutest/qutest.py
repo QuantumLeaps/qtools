@@ -1,7 +1,9 @@
+##
+# @file
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.0
-# Last updated on  2020-08-17
+# Last updated for version 6.9.1
+# Last updated on  2020-09-12
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -54,7 +56,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 690
+    VERSION = 691
 
     # class variables
     _host_exe = ""
@@ -114,6 +116,7 @@ class QUTest:
             "expect": self.expect,
             "glb_filter": self.glb_filter,
             "loc_filter": self.loc_filter,
+            "ao_filter": self.ao_filter,
             "current_obj": self.current_obj,
             "query_curr": self.query_curr,
             "tick": self.tick,
@@ -142,8 +145,7 @@ class QUTest:
             "OBJ_TE": QSpy._OBJ_TE,
             "OBJ_AP": QSpy._OBJ_AP,
             "OBJ_SM_AO": QSpy._OBJ_SM_AO,
-            "GRP_OFF": 0,
-            "GRP_ON": QSpy._GRP_ON,
+            "GRP_ALL": QSpy._GRP_ALL,
             "GRP_SM": QSpy._GRP_SM,
             "GRP_AO": QSpy._GRP_AO,
             "GRP_EQ": QSpy._GRP_EQ,
@@ -156,7 +158,15 @@ class QUTest:
             "GRP_U2": QSpy._GRP_U2,
             "GRP_U3": QSpy._GRP_U3,
             "GRP_U4": QSpy._GRP_U4,
-            "GRP_UA": QSpy._GRP_UA
+            "GRP_UA": QSpy._GRP_UA,
+            "GRP_OFF": -QSpy._GRP_ALL,
+            "GRP_ON": QSpy._GRP_ALL,
+            "QS_USER": QSpy._QS_USER,
+            "IDS_ALL": QSpy._IDS_ALL,
+            "IDS_AO": QSpy._IDS_AO,
+            "IDS_EP": QSpy._IDS_EP,
+            "IDS_EQ": QSpy._IDS_EQ,
+            "IDS_AP": QSpy._IDS_AP
         }
 
     def __del__(self):
@@ -248,7 +258,6 @@ class QUTest:
 
     # glb_filter DSL command .................................................
     def glb_filter(self, *args):
-
         # internal helper function
         def _apply(filter, mask, is_neg):
             if is_neg:
@@ -264,7 +273,7 @@ class QUTest:
             filter = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
-                # negative filter argument meand 'remove' (disallow)
+                # negative filter argument means 'remove' (disallow)
                 is_neg = False
                 if isinstance(arg, str):
                     is_neg = (arg[0] == '-') # is  request?
@@ -281,34 +290,34 @@ class QUTest:
 
                 if arg < 0x7F:
                     filter = _apply(filter, 1 << arg, is_neg)
-                elif arg == QSpy._GRP_ON:
-                    filter = _apply(filter, QSpy._FILTER_MASK_ON, is_neg)
+                elif arg == QSpy._GRP_ALL:
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_ALL, is_neg)
                 elif arg == QSpy._GRP_SM:
-                    filter = _apply(filter, QSpy._FILTER_MASK_SM, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_SM, is_neg)
                 elif arg == QSpy._GRP_AO:
-                    filter = _apply(filter, QSpy._FILTER_MASK_AO, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_AO, is_neg)
                 elif arg == QSpy._GRP_QF:
-                    filter = _apply(filter, QSpy._FILTER_MASK_QF, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_QF, is_neg)
                 elif arg == QSpy._GRP_TE:
-                    filter = _apply(filter, QSpy._FILTER_MASK_TE, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_TE, is_neg)
                 elif arg == QSpy._GRP_EQ:
-                    filter = _apply(filter, QSpy._FILTER_MASK_EQ, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_EQ, is_neg)
                 elif arg == QSpy._GRP_MP:
-                    filter = _apply(filter, QSpy._FILTER_MASK_MP, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_MP, is_neg)
                 elif arg == QSpy._GRP_SC:
-                    filter = _apply(filter, QSpy._FILTER_MASK_SC, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_SC, is_neg)
                 elif arg == QSpy._GRP_U0:
-                    filter = _apply(filter, QSpy._FILTER_MASK_U0, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_U0, is_neg)
                 elif arg == QSpy._GRP_U1:
-                    filter = _apply(filter, QSpy._FILTER_MASK_U1, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_U1, is_neg)
                 elif arg == QSpy._GRP_U2:
-                    filter = _apply(filter, QSpy._FILTER_MASK_U2, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_U2, is_neg)
                 elif arg == QSpy._GRP_U3:
-                    filter = _apply(filter, QSpy._FILTER_MASK_U3, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_U3, is_neg)
                 elif arg == QSpy._GRP_U4:
-                    filter = _apply(filter, QSpy._FILTER_MASK_U4, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_U4, is_neg)
                 elif arg == QSpy._GRP_UA:
-                    filter = _apply(filter, QSpy._FILTER_MASK_UA, is_neg)
+                    filter = _apply(filter, QSpy._GLB_FLT_MASK_UA, is_neg)
                 else:
                     assert 0, "invalid global filter arg=0x%X"%(arg)
 
@@ -324,28 +333,84 @@ class QUTest:
             assert 0, "invalid state in glb_filter"
 
     # loc_filter DSL command .................................................
-    def loc_filter(self, obj_kind, obj_id):
+    def loc_filter(self, *args):
+        # internal helper function
+        def _apply(filter, mask, is_neg):
+            if is_neg:
+                return filter & ~mask
+            else:
+                return filter | mask
+
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("loc_filter")
         elif self._state == QUTest._TEST:
-            fmt = "<BB" + QSpy.fmt_objPtr
-            if isinstance(obj_id, int):
-                # Send directly to Target
-                QSpy._sendTo(struct.pack(
-                    fmt, QSpy._TRGT_LOC_FILTER, obj_kind, obj_id))
-            else:
-                # Have QSpy interpret obj_id string and send filter
-                QSpy._sendTo(struct.pack(
-                    fmt, QSpy._QSPY_SEND_LOC_FILTER, obj_kind, 0),
-                    obj_id)
+            filter = 0 # 128-bit integer bitmask
+            for arg in args:
+                # NOTE: positive filter argument means 'add' (allow),
+                # negative filter argument means 'remove' (disallow)
+                is_neg = (arg < 0)
+                if is_neg:
+                    arg = -arg
+
+                if arg < 0x7F:
+                    filter = _apply(filter, 1 << arg, is_neg)
+                elif arg == QSpy._IDS_ALL:
+                    filter = _apply(filter, QSpy._LOC_FLT_MASK_ALL, is_neg)
+                elif arg == QSpy._IDS_AO:
+                    filter = _apply(filter, QSpy._LOC_FLT_MASK_AO, is_neg)
+                elif arg == QSpy._IDS_EP:
+                    filter = _apply(filter, QSpy._LOC_FLT_MASK_EP, is_neg)
+                elif arg == QSpy._IDS_EQ:
+                    filter = _apply(filter, QSpy._LOC_FLT_MASK_EQ, is_neg)
+                elif arg == QSpy._IDS_AP:
+                    filter = _apply(filter, QSpy._LOC_FLT_MASK_AP, is_neg)
+                else:
+                    assert 0, "invalid local filter arg=0x%X"%(arg)
+
+            QSpy._sendTo(struct.pack("<BBQQ", QSpy._TRGT_LOC_FILTER, 16,
+                                     filter & 0xFFFFFFFFFFFFFFFF,
+                                     filter >> 64))
+
             self.expect("           Trg-Ack  QS_RX_LOC_FILTER")
 
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
             assert 0, "invalid state in loc_filter"
+
+    # ao_filter DSL command ................................................
+    def ao_filter(self, obj_id):
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == QUTest._INIT:
+            self._before_test("ao_filter")
+        elif self._state == QUTest._TEST:
+            # NOTE: positive obj_id argument means 'add' (allow),
+            # negative obj_id argument means 'remove' (disallow)
+            remove = 0
+            fmt = "<BB" + QSpy.fmt_objPtr
+            if isinstance(obj_id, str):
+                if obj_id == '-': # is it remvoe request?
+                    obj_id = obj_id[1:]
+                    remove = 1
+                QSpy._sendTo(struct.pack(
+                    fmt, QSpy._QSPY_SEND_AO_FILTER, remove, 0),
+                    obj_id) # add string object-ID to end
+            else:
+                if obj_id < 0:
+                    obj_id = -obj_id
+                    remove = 1
+                QSpy._sendTo(struct.pack(
+                    fmt, QSpy._TRGT_AO_FILTER, remove, obj_id))
+
+            self.expect("           Trg-Ack  QS_RX_AO_FILTER")
+
+        elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
+            pass # ignore
+        else:
+            assert 0, "invalid state in ao_filter"
 
     # current_obj DSL command ................................................
     def current_obj(self, obj_kind, obj_id):
@@ -820,13 +885,13 @@ class QSpy:
     _QSPY_MATLAB_OUT = 133
     _QSPY_MSCGEN_OUT = 134
     _QSPY_SEND_EVENT = 135
-    _QSPY_SEND_LOC_FILTER = 136
+    _QSPY_SEND_AO_FILTER  = 136
     _QSPY_SEND_CURR_OBJ   = 137
     _QSPY_SEND_COMMAND    = 138
     _QSPY_SEND_TEST_PROBE = 139
 
     # gloal filter groups...
-    _GRP_ON = 0xF0
+    _GRP_ALL= 0xF0
     _GRP_SM = 0xF1
     _GRP_AO = 0xF2
     _GRP_MP = 0xF3
@@ -840,6 +905,14 @@ class QSpy:
     _GRP_U3 = 0xFB
     _GRP_U4 = 0xFC
     _GRP_UA = 0xFD
+    _QS_USER = 100
+
+    # local filter groups...
+    _IDS_ALL= 0xF0
+    _IDS_AO = (0x80 + 0)
+    _IDS_EP = (0x80 + 64)
+    _IDS_EQ = (0x80 + 80)
+    _IDS_AP = (0x80 + 96)
 
     # kinds of objects (local-filter and curr-obj)...
     _OBJ_SM = 0
@@ -880,13 +953,13 @@ class QSpy:
         "QS_QF_EQUEUE_POST",      "QS_QF_EQUEUE_POST_LIFO",
         "QS_QF_EQUEUE_GET",       "QS_QF_EQUEUE_GET_LAST",
 
-        # [23] Reserved QS records
-        "QS_RESERVED_23",
+        # [23] Framework (QF) records
+        "QS_QF_NEW_ATTEMPT",
 
         # [24] Memory Pool (MP) records
         "QS_QF_MPOOL_GET",        "QS_QF_MPOOL_PUT",
 
-        # [26] Framework (QF) records
+        # [26] Additional Framework (QF) records
         "QS_QF_PUBLISH",          "QS_QF_NEW_REF",
         "QS_QF_NEW",              "QS_QF_GC_ATTEMPT",
         "QS_QF_GC",               "QS_QF_TICK",
@@ -963,27 +1036,35 @@ class QSpy:
         "QS_USER_24")
 
     # global filter masks
-    _FILTERS_RANGE  = 125
-    _FILTER_MASK_SM = 0x000000000000000003800000000003FE
-    _FILTER_MASK_AO = 0x0000000000000000000020000007FC00
-    _FILTER_MASK_QF = 0x000000000000000000001FC0FC000000
-    _FILTER_MASK_TE = 0x00000000000000000000003F00000000
-    _FILTER_MASK_EQ = 0x00000000000000000000400000780000
-    _FILTER_MASK_MP = 0x00000000000000000000800003000000
-    _FILTER_MASK_SC = 0x0000000000000000007F000000000000
-    _FILTER_MASK_U0 = 0x000001F0000000000000000000000000
-    _FILTER_MASK_U1 = 0x00003E00000000000000000000000000
-    _FILTER_MASK_U2 = 0x0007C000000000000000000000000000
-    _FILTER_MASK_U3 = 0x00F80000000000000000000000000000
-    _FILTER_MASK_U4 = 0x1F000000000000000000000000000000
-    _FILTER_MASK_ON = 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    _FILTER_MASK_UA = 0x1FFFFFF0000000000000000000000000
+    _GLB_FLT_MASK_ALL= 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    _GLB_FLT_MASK_SM = 0x000000000000000003800000000003FE
+    _GLB_FLT_MASK_AO = 0x0000000000000000000020000007FC00
+    _GLB_FLT_MASK_QF = 0x000000000000000000001FC0FC800000
+    _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
+    _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
+    _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
+    _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000
+    _GLB_FLT_MASK_U1 = 0x00003E00000000000000000000000000
+    _GLB_FLT_MASK_U2 = 0x0007C000000000000000000000000000
+    _GLB_FLT_MASK_U3 = 0x00F80000000000000000000000000000
+    _GLB_FLT_MASK_U4 = 0x1F000000000000000000000000000000
+    _GLB_FLT_MASK_UA = 0x1FFFFFF0000000000000000000000000
+
+    # local filter masks
+    _LOC_FLT_MASK_ALL= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    _LOC_FLT_MASK_AO = 0x0000000000000001FFFFFFFFFFFFFFFE
+    _LOC_FLT_MASK_EP = 0x000000000000FFFE0000000000000000
+    _LOC_FLT_MASK_EQ = 0x00000000FFFF00000000000000000000
+    _LOC_FLT_MASK_AP = 0xFFFFFFFF000000000000000000000000
 
     @staticmethod
     def _init():
         # Create socket
         QSpy._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        QSpy._sock.settimeout(QUTest._TOUT) # timeout for the socket
+        QSpy._sock.settimeout(QUTest._TOUT) # timeout for blocking socket
+        #bufsize = QSpy._sock.getsockopt(socket.SOL_UDP, socket.SO_RCVBUF)
+        #print("SO_RCVBUF ", bufsize)
         try:
             QSpy._sock.bind(("localhost", QSpy._local_port))
             #print("bind: ", ("localhost", QSpy._local_port))

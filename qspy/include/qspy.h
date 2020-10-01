@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0a
-* Last updated on  2020-08-21
+* Last updated for version 6.9.1
+* Last updated on  2020-09-10
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -40,7 +40,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.9.0a"
+#define QSPY_VER "6.9.1"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,7 +62,7 @@ typedef enum {
     QSPY_MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
     QSPY_SEQUENCE_OUT,    /*!< toggle Sequence output to a file in QSPY */
     QSPY_SEND_EVENT,      /*!< send event (QSPY supplying signal) */
-    QSPY_SEND_LOC_FILTER, /*!< send Local Filter (QSPY supplying addr) */
+    QSPY_SEND_AO_FILTER,  /*!< send Local Filter (QSPY supplying addr) */
     QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
     QSPY_SEND_COMMAND,    /*!< send command (QSPY supplying cmdId) */
     QSPY_SEND_TEST_PROBE  /*!< send Test-Probe (QSPY supplying apiId) */

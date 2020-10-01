@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.0
-* Last updated on  2020-01-20
+* Last updated for version 6.9.1
+* Last updated on  2020-09-10
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -206,13 +206,13 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
         uint8_t *objPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         objPkt[0] = 0U;
-        if (qrec->rec == QSPY_SEND_LOC_FILTER) {
-            objPkt[1] = (uint8_t)QS_RX_LOC_FILTER;
+        if (qrec->rec == QSPY_SEND_AO_FILTER) {
+            objPkt[1] = (uint8_t)QS_RX_AO_FILTER;
         }
         else if (qrec->rec == QSPY_SEND_CURR_OBJ) {
             objPkt[1] = (uint8_t)QS_RX_CURR_OBJ;
 
-            /* see enum QSpyObjKind in qs_copy.c */
+            /* see enum QSpyObjKind in qs_copy.h */
             switch (qrec->start[2]) { /* object-kind */
                 case SM_OBJ:
                 case AO_OBJ:
@@ -252,7 +252,7 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
 
         nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), objPkt, n);
         if (nBytes == 0) {
-            SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_LOC_FILTER");
+            SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_CURR_OBJ");
             QSPY_onPrintLn();
         }
         else {

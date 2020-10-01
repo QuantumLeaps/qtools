@@ -1,9 +1,13 @@
-loc_filter(OBJ_SM, "my_state_machine") # sets SM-local-filter to "my_state_machine"
+loc_filter(IDS_ALL) # enables all QS-IDs
 
-loc_filter(OBJ_MP, "EvtPool1")         # sets the MP-local-filter to "EvtPool1"
+loc_filter(-IDS_ALL) # disables all QS-IDs
 
-loc_filter(OBJ_AP, "my_object")        # sets the AP-local-filter to "my_object"
+loc_filter(IDS_AO)   # enables all active objcts
 
-loc_filter(OBJ_SM, "Philo[2]")         # sets the SM-local-filter to "Philo[2]"
+loc_filter(IDS_AO, -6)   # enables all active objcts,
+                         # but disables AO with priority 6
 
-loc_filter(OBJ_AP, 0x20001234)         # sets the AP-local-filter to the given address
+
+loc_filter(IDS_AO, IDS_EP)   # enables all active objects and event pools
+
+loc_filter(IDS_AP)       # enables all app-specific QS_IDs

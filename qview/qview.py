@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QView in Python (requires Python 3.3+)
-# Last updated for version 6.9.0
-# Last updated on  2020-08-26
+# Last updated for version 6.9.1
+# Last updated on  2020-09-26
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -51,7 +51,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 690
+    VERSION = 691
 
     # public static variables...
     ## menu to be customized
@@ -68,7 +68,9 @@ class QView:
     _gui  = None
     _cust = None
     _err  = 0
-    _glb_filter = 0      # 128-bit integer bitmask
+    _glb_filter = 0x00000000000000000000000000000000
+    _loc_filter = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
     _dtypes = ("8-bit", "16-bit", "32-bit")
     _dsizes = (1, 2, 4)
 
@@ -135,12 +137,16 @@ class QView:
 
         # Local-Filters menu...
         m = Menu(main_menu, tearoff=0)
-        m.add_command(label="SM_OBJ", command=QView._onLocFilter_SM)
-        m.add_command(label="AO_OBJ", command=QView._onLocFilter_AO)
-        m.add_command(label="MP_OBJ", command=QView._onLocFilter_MP)
-        m.add_command(label="EQ_OBJ", command=QView._onLocFilter_EQ)
-        m.add_command(label="TE_OBJ", command=QView._onLocFilter_TE)
-        m.add_command(label="AP_OBJ", command=QView._onLocFilter_AP)
+        m.add_command(label="AO IDs...", accelerator="[NONE]",
+            command=QView._onLocFilter_AO)
+        m.add_command(label="EP IDs...", accelerator="[NONE]",
+            command=QView._onLocFilter_EP)
+        m.add_command(label="EQ IDs...", accelerator="[NONE]",
+            command=QView._onLocFilter_EQ)
+        m.add_command(label="AP IDs...", accelerator="[NONE]",
+            command=QView._onLocFilter_AP)
+        m.add_separator()
+        m.add_command(label="AO-OBJ...", command=QView._onLocFilter_AO_OBJ)
         main_menu.add_cascade(label="Local-Filters", menu=m)
         QView._menu_loc_filter = m
 
@@ -244,8 +250,7 @@ class QView:
         QView.canvas.pack()
 
         # tkinter variables for dialog boxes .................................
-        QView._locFilter = (StringVar(), StringVar(), StringVar(),
-                            StringVar(), StringVar(), StringVar())
+        QView._locAO_OBJ = StringVar()
         QView._currObj   = (StringVar(), StringVar(), StringVar(),
                             StringVar(), StringVar(), StringVar())
         QView._command    = StringVar()
@@ -308,8 +313,8 @@ class QView:
     @staticmethod
     def _onReset():
         QView._glb_filter = 0
-        for i in range(len(QView._locFilter)):
-            QView._locFilter[i].set("")
+        QView._loc_filter = QSpy._LOC_FLT_MASK_ALL
+        QView._locAO_OBJ.set("")
         for i in range(len(QView._currObj)):
             QView._currObj[i].set("")
         QView._updateMenus()
@@ -329,9 +334,18 @@ class QView:
             QView._menu_glb_filter.entryconfig(label,
                     accelerator=status)
 
-        for i in range(len(QView._locFilter)):
-            QView._menu_loc_filter.entryconfig(i,
-                accelerator=QView._locFilter[i].get())
+        # internal helper function
+        def _update_loc_filter_menu(label, mask):
+            x = (QView._loc_filter & mask)
+            if x == 0:
+                status = "[ - ]"
+            elif x == mask:
+                status = "[ + ]"
+            else:
+                status = "[+-]"
+            QView._menu_loc_filter.entryconfig(label,
+                    accelerator=status)
+
         for i in range(len(QView._currObj)):
             QView._menu_curr_obj.entryconfig(i,
                 accelerator=QView._currObj[i].get())
@@ -363,18 +377,25 @@ class QView:
         QView._menu_commands.entryconfig(6, state=state_AP)
         QView._menu_commands.entryconfig(7, state=state_AP)
 
-        _update_glb_filter_menu("SM Group...", QSpy._FILTER_MASK_SM)
-        _update_glb_filter_menu("AO Group...", QSpy._FILTER_MASK_AO)
-        _update_glb_filter_menu("QF Group...", QSpy._FILTER_MASK_QF)
-        _update_glb_filter_menu("TE Group...", QSpy._FILTER_MASK_TE)
-        _update_glb_filter_menu("MP Group...", QSpy._FILTER_MASK_MP)
-        _update_glb_filter_menu("EQ Group...", QSpy._FILTER_MASK_EQ)
-        _update_glb_filter_menu("SC Group...", QSpy._FILTER_MASK_SC)
-        _update_glb_filter_menu("U0 Group...", QSpy._FILTER_MASK_U0)
-        _update_glb_filter_menu("U1 Group...", QSpy._FILTER_MASK_U1)
-        _update_glb_filter_menu("U2 Group...", QSpy._FILTER_MASK_U2)
-        _update_glb_filter_menu("U3 Group...", QSpy._FILTER_MASK_U3)
-        _update_glb_filter_menu("U4 Group...", QSpy._FILTER_MASK_U4)
+        _update_glb_filter_menu("SM Group...", QSpy._GLB_FLT_MASK_SM)
+        _update_glb_filter_menu("AO Group...", QSpy._GLB_FLT_MASK_AO)
+        _update_glb_filter_menu("QF Group...", QSpy._GLB_FLT_MASK_QF)
+        _update_glb_filter_menu("TE Group...", QSpy._GLB_FLT_MASK_TE)
+        _update_glb_filter_menu("MP Group...", QSpy._GLB_FLT_MASK_MP)
+        _update_glb_filter_menu("EQ Group...", QSpy._GLB_FLT_MASK_EQ)
+        _update_glb_filter_menu("SC Group...", QSpy._GLB_FLT_MASK_SC)
+        _update_glb_filter_menu("U0 Group...", QSpy._GLB_FLT_MASK_U0)
+        _update_glb_filter_menu("U1 Group...", QSpy._GLB_FLT_MASK_U1)
+        _update_glb_filter_menu("U2 Group...", QSpy._GLB_FLT_MASK_U2)
+        _update_glb_filter_menu("U3 Group...", QSpy._GLB_FLT_MASK_U3)
+        _update_glb_filter_menu("U4 Group...", QSpy._GLB_FLT_MASK_U4)
+
+        _update_loc_filter_menu("AO IDs...", QSpy._LOC_FLT_MASK_AO)
+        _update_loc_filter_menu("EP IDs...", QSpy._LOC_FLT_MASK_EP)
+        _update_loc_filter_menu("EQ IDs...", QSpy._LOC_FLT_MASK_EQ)
+        _update_loc_filter_menu("AP IDs...", QSpy._LOC_FLT_MASK_AP)
+        QView._menu_loc_filter.entryconfig("AO-OBJ...",
+                accelerator=QView._locAO_OBJ.get())
 
 
     @staticmethod
@@ -427,75 +448,71 @@ class QView:
 
     @staticmethod
     def _onGlbFilter_SM(*args):
-        QView._GlbFilterDialog("SM Group", QSpy._FILTER_MASK_SM)
+        QView._GlbFilterDialog("SM Group", QSpy._GLB_FLT_MASK_SM)
 
     @staticmethod
     def _onGlbFilter_AO(*args):
-        QView._GlbFilterDialog("AO Group", QSpy._FILTER_MASK_AO)
+        QView._GlbFilterDialog("AO Group", QSpy._GLB_FLT_MASK_AO)
 
     @staticmethod
     def _onGlbFilter_QF(*args):
-        QView._GlbFilterDialog("QF Group", QSpy._FILTER_MASK_QF)
+        QView._GlbFilterDialog("QF Group", QSpy._GLB_FLT_MASK_QF)
 
     @staticmethod
     def _onGlbFilter_TE(*args):
-        QView._GlbFilterDialog("TE Group", QSpy._FILTER_MASK_TE)
+        QView._GlbFilterDialog("TE Group", QSpy._GLB_FLT_MASK_TE)
 
     @staticmethod
     def _onGlbFilter_EQ(*args):
-        QView._GlbFilterDialog("EQ Group", QSpy._FILTER_MASK_EQ)
+        QView._GlbFilterDialog("EQ Group", QSpy._GLB_FLT_MASK_EQ)
 
     @staticmethod
     def _onGlbFilter_MP(*args):
-        QView._GlbFilterDialog("MP Group", QSpy._FILTER_MASK_MP)
+        QView._GlbFilterDialog("MP Group", QSpy._GLB_FLT_MASK_MP)
 
     @staticmethod
     def _onGlbFilter_SC(*args):
-        QView._GlbFilterDialog("SC Group", QSpy._FILTER_MASK_SC)
+        QView._GlbFilterDialog("SC Group", QSpy._GLB_FLT_MASK_SC)
 
     @staticmethod
     def _onGlbFilter_U0(*args):
-        QView._GlbFilterDialog("U0 Group", QSpy._FILTER_MASK_U0)
+        QView._GlbFilterDialog("U0 Group", QSpy._GLB_FLT_MASK_U0)
 
     @staticmethod
     def _onGlbFilter_U1(*args):
-        QView._GlbFilterDialog("U1 Group", QSpy._FILTER_MASK_U1)
+        QView._GlbFilterDialog("U1 Group", QSpy._GLB_FLT_MASK_U1)
 
     @staticmethod
     def _onGlbFilter_U2(*args):
-        QView._GlbFilterDialog("U2 Group", QSpy._FILTER_MASK_U2)
+        QView._GlbFilterDialog("U2 Group", QSpy._GLB_FLT_MASK_U2)
 
     @staticmethod
     def _onGlbFilter_U3(*args):
-        QView._GlbFilterDialog("U3 Group", QSpy._FILTER_MASK_U3)
+        QView._GlbFilterDialog("U3 Group", QSpy._GLB_FLT_MASK_U3)
 
     @staticmethod
     def _onGlbFilter_U4(*args):
-        QView._GlbFilterDialog("U4 Group", QSpy._FILTER_MASK_U4)
-
-    @staticmethod
-    def _onLocFilter_SM(*args):
-        QView._LocFilterDialog(OBJ_SM, "SM_OBJ")
+        QView._GlbFilterDialog("U4 Group", QSpy._GLB_FLT_MASK_U4)
 
     @staticmethod
     def _onLocFilter_AO(*args):
-        QView._LocFilterDialog(OBJ_AO, "AO_OBJ")
+        QView._LocFilterDialog("AO IDs", QSpy._LOC_FLT_MASK_AO)
 
     @staticmethod
-    def _onLocFilter_MP(*args):
-        QView._LocFilterDialog(OBJ_MP, "MP_OBJ")
+    def _onLocFilter_EP(*args):
+        QView._LocFilterDialog("EP IDs", QSpy._LOC_FLT_MASK_EP)
 
     @staticmethod
     def _onLocFilter_EQ(*args):
-        QView._LocFilterDialog(OBJ_EQ, "EQ_OBJ")
-
-    @staticmethod
-    def _onLocFilter_TE(*args):
-        QView._LocFilterDialog(OBJ_TE, "TE_OBJ")
+        QView._LocFilterDialog("EQ IDs", QSpy._LOC_FLT_MASK_EQ)
 
     @staticmethod
     def _onLocFilter_AP(*args):
-        QView._LocFilterDialog(OBJ_AP, "AP_OBJ")
+        QView._LocFilterDialog("AP IDs", QSpy._LOC_FLT_MASK_AP)
+
+    @staticmethod
+    def _onLocFilter_AO_OBJ(*args):
+        QView._LocFilterDialog_AO_OBJ()
 
     @staticmethod
     def _onCurrObj_SM(*args):
@@ -683,7 +700,7 @@ class QView:
                 .grid(row=0,column=N_ROW-1, padx=2, pady=2, sticky=W+E)
             n = 0
             self._filter_var = []
-            for i in range(QSpy._FILTERS_RANGE):
+            for i in range(QSpy._GLB_FLT_RANGE):
                 if self._mask & (1 << i) != 0:
                     self._filter_var.append(IntVar())
                     if QView._glb_filter & (1 << i):
@@ -696,21 +713,21 @@ class QView:
 
         def _sel_all(self):
             n = 0
-            for i in range(QSpy._FILTERS_RANGE):
+            for i in range(QSpy._GLB_FLT_RANGE):
                 if self._mask & (1 << i) != 0:
                     self._filter_var[n].set(1)
                     n += 1
 
         def _clr_all(self):
             n = 0
-            for i in range(QSpy._FILTERS_RANGE):
+            for i in range(QSpy._GLB_FLT_RANGE):
                 if self._mask & (1 << i) != 0:
                     self._filter_var[n].set(0)
                     n += 1
 
         def apply(self):
             n = 0
-            for i in range(QSpy._FILTERS_RANGE):
+            for i in range(QSpy._GLB_FLT_RANGE):
                 if self._mask & (1 << i) != 0:
                     if self._filter_var[n].get():
                         QView._glb_filter |= (1 << i)
@@ -724,26 +741,75 @@ class QView:
 
     #.........................................................................
     class _LocFilterDialog(Dialog):
-        def __init__(self, obj_kind, label):
-            self._obj_kind = obj_kind
-            self._label = label
-            super().__init__(QView._gui, "Local Filter")
+        def __init__(self, title, mask):
+            self._title = title
+            self._mask = mask
+            super().__init__(QView._gui, title)
 
         def body(self, master):
-            Label(master, text=self._label).grid(row=0,column=0,
+            N_ROW = 8
+            Button(master, text="Select ALL", command=self._sel_all)\
+                .grid(row=0,column=0, padx=2, pady=2, sticky=W+E)
+            Button(master, text="Clear ALL", command=self._clr_all)\
+                .grid(row=0,column=N_ROW-1, padx=2, pady=2, sticky=W+E)
+            n = 0
+            self._filter_var = []
+            for i in range(QSpy._LOC_FLT_RANGE):
+                if self._mask & (1 << i) != 0:
+                    self._filter_var.append(IntVar())
+                    if QView._loc_filter & (1 << i):
+                        self._filter_var[n].set(1)
+                    Checkbutton(master, text="AO-prio=%d"%(i), anchor=W,
+                                variable=self._filter_var[n])\
+                        .grid(row=(n + N_ROW)//N_ROW,column=(n+N_ROW)%N_ROW,
+                              padx=2,pady=2,sticky=W)
+                    n += 1
+
+        def _sel_all(self):
+            n = 0
+            for i in range(QSpy._LOC_FLT_RANGE):
+                if self._mask & (1 << i) != 0:
+                    self._filter_var[n].set(1)
+                    n += 1
+
+        def _clr_all(self):
+            n = 0
+            for i in range(QSpy._LOC_FLT_RANGE):
+                if self._mask & (1 << i) != 0:
+                    self._filter_var[n].set(0)
+                    n += 1
+
+        def apply(self):
+            n = 0
+            for i in range(QSpy._LOC_FLT_RANGE):
+                if self._mask & (1 << i) != 0:
+                    if self._filter_var[n].get():
+                        QView._loc_filter |= (1 << i)
+                    else:
+                        QView._loc_filter &= ~(1 << i)
+                    n += 1
+            QSpy._sendTo(pack("<BBQQ", QSpy._TRGT_LOC_FILTER, 16,
+                        QView._loc_filter & 0xFFFFFFFFFFFFFFFF,
+                        QView._loc_filter >> 64))
+            QView._updateMenus()
+
+    #.........................................................................
+    class _LocFilterDialog_AO_OBJ(Dialog):
+        def __init__(self):
+            super().__init__(QView._gui, "Local AO-OBJ Filter")
+
+        def body(self, master):
+            Label(master, text="AO-OBJ").grid(row=0,column=0,
                 sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=25,
-                  textvariable=QView._locFilter[self._obj_kind])\
-                     .grid(row=0,column=1)
+                  textvariable=QView._locAO_OBJ).grid(row=0,column=1)
 
         def validate(self):
-            self._obj = QView._strVar_value(QView._locFilter[self._obj_kind])
-            if self._obj == "":
-                self._obj = 0
+            self._obj = QView._strVar_value(QView._locAO_OBJ)
             return 1
 
         def apply(self):
-            loc_filter(self._obj_kind, self._obj)
+            ao_filter(self._obj)
 
     #.........................................................................
     class _CurrObjDialog(Dialog):
@@ -1021,13 +1087,13 @@ class QSpy:
         "QS_QF_EQUEUE_POST",      "QS_QF_EQUEUE_POST_LIFO",
         "QS_QF_EQUEUE_GET",       "QS_QF_EQUEUE_GET_LAST",
 
-        # [23] Reserved QS records
-        "QS_RESERVED_23",
+        # [23] Framework (QF) records
+        "QS_QF_NEW_ATTEMPT",
 
         # [24] Memory Pool (MP) records
         "QS_QF_MPOOL_GET",        "QS_QF_MPOOL_PUT",
 
-        # [26] Framework (QF) records
+        # [26] Additional Framework (QF) records
         "QS_QF_PUBLISH",          "QS_QF_NEW_REF",
         "QS_QF_NEW",              "QS_QF_GC_ATTEMPT",
         "QS_QF_GC",               "QS_QF_TICK",
@@ -1103,6 +1169,31 @@ class QSpy:
         "QS_USER_22",             "QS_USER_23",
         "QS_USER_24")
 
+    # global filter masks
+    _GLB_FLT_MASK_ALL= 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    _GLB_FLT_MASK_SM = 0x000000000000000003800000000003FE
+    _GLB_FLT_MASK_AO = 0x0000000000000000000020000007FC00
+    _GLB_FLT_MASK_QF = 0x000000000000000000001FC0FC800000
+    _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
+    _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
+    _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
+    _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000
+    _GLB_FLT_MASK_U1 = 0x00003E00000000000000000000000000
+    _GLB_FLT_MASK_U2 = 0x0007C000000000000000000000000000
+    _GLB_FLT_MASK_U3 = 0x00F80000000000000000000000000000
+    _GLB_FLT_MASK_U4 = 0x1F000000000000000000000000000000
+    _GLB_FLT_MASK_UA = 0x1FFFFFF0000000000000000000000000
+    _GLB_FLT_RANGE  = 125
+
+    # local filter masks
+    _LOC_FLT_MASK_ALL= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    _LOC_FLT_MASK_AO = 0x0000000000000001FFFFFFFFFFFFFFFE
+    _LOC_FLT_MASK_EP = 0x000000000000FFFE0000000000000000
+    _LOC_FLT_MASK_EQ = 0x00000000FFFF00000000000000000000
+    _LOC_FLT_MASK_AP = 0xFFFFFFFF000000000000000000000000
+    _LOC_FLT_RANGE  = 125
+
     # interesting packets from QSPY/Target...
     _PKT_TEXT_ECHO   = 0
     _PKT_TARGET_INFO = 64
@@ -1141,27 +1232,10 @@ class QSpy:
 
     # packets to QSpy to be "massaged" and forwarded to the Target...
     _QSPY_SEND_EVENT      = 135
-    _QSPY_SEND_LOC_FILTER = 136
+    _QSPY_SEND_AO_FILTER  = 136
     _QSPY_SEND_CURR_OBJ   = 137
     _QSPY_SEND_COMMAND    = 138
     _QSPY_SEND_TEST_PROBE = 139
-
-    # global filter masks
-    _FILTERS_RANGE  = 125
-    _FILTER_MASK_SM = 0x000000000000000003800000000003FE
-    _FILTER_MASK_AO = 0x0000000000000000000020000007FC00
-    _FILTER_MASK_QF = 0x000000000000000000001FC0FC000000
-    _FILTER_MASK_TE = 0x00000000000000000000003F00000000
-    _FILTER_MASK_EQ = 0x00000000000000000000400000780000
-    _FILTER_MASK_MP = 0x00000000000000000000800003000000
-    _FILTER_MASK_SC = 0x0000000000000000007F000000000000
-    _FILTER_MASK_U0 = 0x000001F0000000000000000000000000
-    _FILTER_MASK_U1 = 0x00003E00000000000000000000000000
-    _FILTER_MASK_U2 = 0x0007C000000000000000000000000000
-    _FILTER_MASK_U3 = 0x00F80000000000000000000000000000
-    _FILTER_MASK_U4 = 0x1F000000000000000000000000000000
-    _FILTER_MASK_ON = 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    _FILTER_MASK_UA = 0x1FFFFFF0000000000000000000000000
 
     # special event sub-commands for QSPY_SEND_EVENT
     _EVT_PUBLISH   = 0
@@ -1427,7 +1501,7 @@ class QSpy:
 #=============================================================================
 # DSL for QView customizations
 
-# kinds of objects for loc_filter() and current_obj()...
+# kinds of objects for current_obj()...
 OBJ_SM = 0
 OBJ_AO = 1
 OBJ_MP = 2
@@ -1436,7 +1510,7 @@ OBJ_TE = 4
 OBJ_AP = 5
 
 # global filter groups...
-GRP_ON = 0xF0
+GRP_ALL= 0xF0
 GRP_SM = 0xF1
 GRP_AO = 0xF2
 GRP_MP = 0xF3
@@ -1450,6 +1524,15 @@ GRP_U2 = 0xFA
 GRP_U3 = 0xFB
 GRP_U4 = 0xFC
 GRP_UA = 0xFD
+GRP_ON = GRP_ALL
+GRP_OFF= -GRP_ALL
+
+# local filter groups...
+IDS_ALL= 0xF0
+IDS_AO = (0x80 + 0)
+IDS_EP = (0x80 + 64)
+IDS_EQ = (0x80 + 80)
+IDS_AP = (0x80 + 96)
 
 HOME_DIR = None   ##< home directory of the customization script
 
@@ -1490,7 +1573,6 @@ def poke(offset, size, data):
 ## @brief Set/clear the Global-Filter in the Target.
 # @sa qutest_dsl.glb_filter()
 def glb_filter(*args):
-
     # internal helper function
     def _apply(mask, is_neg):
         if is_neg:
@@ -1522,53 +1604,97 @@ def glb_filter(*args):
         if arg < 0x7F:
             _apply(1 << arg, is_neg)
         elif arg == GRP_ON:
-            _apply(QSpy._FILTER_MASK_ON, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_ALL, is_neg)
         elif arg == GRP_SM:
-            _apply(QSpy._FILTER_MASK_SM, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_SM, is_neg)
         elif arg == GRP_AO:
-            _apply(QSpy._FILTER_MASK_AO, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_AO, is_neg)
         elif arg == GRP_QF:
-            _apply(QSpy._FILTER_MASK_QF, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_QF, is_neg)
         elif arg == GRP_TE:
-            _apply(QSpy._FILTER_MASK_TE, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_TE, is_neg)
         elif arg == GRP_EQ:
-            _apply(QSpy._FILTER_MASK_EQ, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_EQ, is_neg)
         elif arg == GRP_MP:
-            _apply(QSpy._FILTER_MASK_MP, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_MP, is_neg)
         elif arg == GRP_U0:
-            _apply(QSpy._FILTER_MASK_U0, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_U0, is_neg)
         elif arg == GRP_U1:
-            _apply(QSpy._FILTER_MASK_U1, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_U1, is_neg)
         elif arg == GRP_U2:
-            _apply(QSpy._FILTER_MASK_U2, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_U2, is_neg)
         elif arg == GRP_U3:
-            _apply(QSpy._FILTER_MASK_U3, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_U3, is_neg)
         elif arg == GRP_U4:
-            _apply(QSpy._FILTER_MASK_U4, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_U4, is_neg)
         elif arg == GRP_UA:
-            _apply(QSpy._FILTER_MASK_UA, is_neg)
+            _apply(QSpy._GLB_FLT_MASK_UA, is_neg)
+        else:
+            assert 0, "invalid global filter arg=0x%X"%(arg)
 
     QSpy._sendTo(pack("<BBQQ", QSpy._TRGT_GLB_FILTER, 16,
-                QView._glb_filter & 0xFFFFFFFFFFFFFFFF,
-                QView._glb_filter >> 64))
+                      QView._glb_filter & 0xFFFFFFFFFFFFFFFF,
+                      QView._glb_filter >> 64))
     QView._updateMenus()
 
-## @brief Set the Local Filter in the Target
+## @brief Set/clear the Local-Filter in the Target.
 # @sa qutest_dsl.loc_filter()
-def loc_filter(obj_kind, obj_id):
-    if obj_id == "":
-        return
-    if isinstance(obj_id, int):
-        QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
-            QSpy._TRGT_LOC_FILTER, obj_kind, obj_id))
-        obj_id = "0x%08X"%(obj_id)
-    else:
-        QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
-            QSpy._QSPY_SEND_LOC_FILTER, obj_kind, 0), obj_id)
+def loc_filter(*args):
+    # internal helper function
+    def _apply(mask, is_neg):
+        if is_neg:
+            QView._loc_filter &= ~mask
+        else:
+            QView._loc_filter |= mask
 
-    QView._locFilter[obj_kind].set(obj_id)
-    QView._menu_loc_filter.entryconfig(obj_kind, accelerator=obj_id)
-    QView._updateMenus()
+    for arg in args:
+        # NOTE: positive filter argument means 'add' (allow),
+        # negative filter argument means 'remove' (disallow)
+        is_neg = (arg < 0)
+        if is_neg:
+            arg = -arg
+
+        if arg < 0x7F:
+            _apply(1 << arg, is_neg)
+        elif arg == IDS_ALL:
+            _apply(QSpy._LOC_FLT_MASK_ALL, is_neg)
+        elif arg == IDS_AO:
+            _apply(QSpy._LOC_FLT_MASK_AO, is_neg)
+        elif arg == IDS_EP:
+            _apply(QSpy._LOC_FLT_MASK_EP, is_neg)
+        elif arg == IDS_EQ:
+            _apply(QSpy._LOC_FLT_MASK_EQ, is_neg)
+        elif arg == IDS_AP:
+            _apply(QSpy._LOC_FLT_MASK_AP, is_neg)
+        else:
+            assert 0, "invalid local filter arg=0x%X"%(arg)
+
+    QSpy._sendTo(pack("<BBQQ", QSpy._TRGT_LOC_FILTER, 16,
+                      QView._loc_filter & 0xFFFFFFFFFFFFFFFF,
+                      QView._loc_filter >> 64))
+
+## @brief Set/clear the Active-Object Local-Filter in the Target.
+# @sa qutest_dsl.ao_filter()
+def ao_filter(obj_id):
+    # NOTE: positive obj_id argument means 'add' (allow),
+    # negative obj_id argument means 'remove' (disallow)
+    remove = 0
+    QView._locAO_OBJ.set(obj_id)
+    QView._menu_loc_filter.entryconfig("AO-OBJ...",
+            accelerator=QView._locAO_OBJ.get())
+    if isinstance(obj_id, str):
+        if obj_id[0:1] == '-': # is it remvoe request?
+            obj_id = obj_id[1:]
+            remove = 1
+        QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
+            QSpy._QSPY_SEND_AO_FILTER, remove, 0),
+            obj_id) # add string object-ID to end
+    else:
+        if obj_id < 0:
+            obj_id = -obj_id
+            remove = 1
+        QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
+            QSpy._TRGT_AO_FILTER, remove, obj_id))
 
 ## @brief Set the Current-Object in the Target.
 # @sa qutest_dsl.current_obj()
@@ -1741,15 +1867,14 @@ def _main():
     # extend the QView with a custom sript
     if script != "":
         try:
-            f = open(script)
-
             # set the (global) home directory of the custom script
             global HOME_DIR
             HOME_DIR = os.path.dirname(os.path.realpath(script))
 
-            code = compile(f.read(), script, "exec")
+            with open(script) as f:
+                code = compile(f.read(), script, "exec")
+
             exec(code) # execute the script
-            f.close()
         except: # error opening the file or error in the script
             # NOTE: don't use QView._showError() because the
             # polling loop is not running yet.

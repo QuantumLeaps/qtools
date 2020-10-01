@@ -66,8 +66,8 @@ ALIGN="center" VALIGN="middle">
 
   <TR bgColor="#c0c0c0">
     <TD>-v &lt;QS_version&gt;</TD>
-    <TD>-v 5.0</TD>
-    <TD>6.2</TD>
+    <TD>-v 6.2</TD>
+    <TD>6.6</TD>
     <TD></TD>
     <TD>Enforce backwards-compatibility with the specific QS version</TD>
   </TR>
@@ -102,7 +102,7 @@ ALIGN="center" VALIGN="middle">
     <TD>-g Table::inst,Philo::inst[0],Philo::inst[1]</TD>
     <TD>(key-g)</TD>
     <TD></TD>
-    <TD>Produce @ref qspy_seq "Sequence output" to a file</TD>
+    <TD>Produce @ref qspy_seq "Sequence diagram output" to a file</TD>
   </TR>
 
   <TR bgColor="#f0f0f0">
@@ -260,7 +260,7 @@ Documentation: https://www.state-machine.com/qtools/qspy.html
 Current timestamp: 190811_124028
 -u 7701
 -t 6601
--v 620
+-v 660
 -T 4
 -O 4
 -F 4
@@ -335,7 +335,7 @@ Command-Line@n Option | Keyboard@n Option| File@n Extension |  Example |  Commen
 `-s`                | `s`            | `.qs`     | `qspy150914_132234.qs`  | @ref qpspy_proto "raw binary output"
 `-d`                | `d`            | `.dic`    | `qspy150901_101203.dic` | @ref qspy_dict "dictionary output"
 `-m`                | `m`            | `.mat`    | `qspy150914_132234.mat` | @ref qspy_matlab "MATLAB output"
-`-g`                | `g`            | `.seq`    | `qspy150914_132234.seq` | @ref qspy_seq "Sequence output"
+`-g`                | `g`            | `.seq`    | `qspy150914_132234.seq` | @ref qspy_seq "Sequence diagram output"
 
 @note
 All files except the dictionary output are time-stamped with the <strong>local</strong> time of the Host. The **dictionary** output is time-stamped with the build-time of the Target image.
@@ -347,7 +347,7 @@ The following sub-sections explain the following QSPY features:
 - @subpage qspy_text "text (screen) output"
 - @subpage qspy_dict "dictionary output"
 - @subpage qspy_udp  "UDP socket interface"
-- @subpage qspy_seq  "Sequence output"
+- @subpage qspy_seq  "Sequence diagram output"
 - @subpage qspy_matlab "MATLAB output"
 
 @next{qspy_text}
@@ -375,7 +375,7 @@ Documentation: https://www.state-machine.com/qtools/qspy.html
 Current timestamp: 200827_093625
 -c COM7
 -u 7701
--v 620
+-v 660
 -T 4
 -O 4
 -F 4

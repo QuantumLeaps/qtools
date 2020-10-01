@@ -15,9 +15,43 @@
 # or
 #
 # `qutest [-x] [test-scripts] [host_exe] [host[:udp_port]] [tcp_port]`
+#
+#-----------------------------------------------------------------------------
+# Product: QUTest Python scripting (requires Python 3.3+)
+# Last updated for version 6.9.1
+# Last updated on  2020-09-12
+#
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
+#
+# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+#
+# This program is open source software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Alternatively, this program may be distributed and modified under the
+# terms of Quantum Leaps commercial licenses, which expressly supersede
+# the GNU General Public License and are specifically designed for
+# licensees interested in retaining the proprietary status of their code.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <www.gnu.org/licenses/>.
+#
+# Contact information:
+# <www.state-machine.com/licensing>
+# <info@state-machine.com>
+#-----------------------------------------------------------------------------
 
 ## @brief current version of the Python QUTest interface
-VERSION = 690
+VERSION = 691
 
 ## @brief start a new test
 # @description
@@ -89,31 +123,33 @@ def skip(nTests = 9999):
 #
 def expect(match):
 
-## @brief Set/clear the Global-Filter in the Target
+## @brief Send the QS Global Filter to the Target
 #
 # @description
-# This command sets or clears the @ref qs_global "QS globar filters" in the Target.
-# A given filter-group or an individual filter is set when it is positive, and
-# cleared with it is preceded with the minus (`-`) sign. See also examples below.
+# This command sends the complete @ref qs_global "QS Global Filter" to the Target.
+# Any existing Global Filter setting inside the Target will be overwritten.
 #
-# @param[in] args  list of global filter groups to set in the Target
+# @param[in] args  list of Record-Type groups or individual Record-Types to set or clear.
+# A given filter-group or an individual filter is set when it is positive, and
+# cleared with it is preceded with the minus (`-`) sign.
+#
 # @n
-# The filter list can contain the following filters:@n
-# `GRP_ON` -- all filters on@n
-# `GRP_SM` -- State Machine filters@n
-# `GRP_AO` -- Active Object filters@n
-# `GRP_MP` -- Memory Pool filters@n
-# `GRP_EQ` -- Event Queue filters@n
-# `GRP_TE` -- Time Events filters@n
-# `GRP_QF` -- Framework filters (e.g., post/publish/..)@n
-# `GRP_SC` -- Scheduler filters (e.g., scheduler lock/unlock)@n
-# `GRP_U0` -- User group 0 (70-79)@n
-# `GRP_U1` -- User group 1 (80-89)@n
-# `GRP_U2` -- User group 2 (90-99)@n
-# `GRP_U3` -- User group 3 (100-109)@n
-# `GRP_U4` -- User group 0 (110-124)@n
-# `GRP_UA` -- All user records (70-124)@n
-# `<num>` -- Specific QS trace record number in the range 0..127
+# The filter list can contain the following:@n
+# `GRP_ALL` -- all Record-Types@n
+# `GRP_SM` -- State Machine Record-Types@n
+# `GRP_AO` -- Active Object Record-Types@n
+# `GRP_MP` -- Memory Pool Record-Types@n
+# `GRP_EQ` -- Event Queue Record-Types@n
+# `GRP_TE` -- Time Events Record-Types@n
+# `GRP_QF` -- Framework Record-Types (e.g., post/publish/..)@n
+# `GRP_SC` -- Scheduler Record-Types (e.g., scheduler lock/unlock)@n
+# `GRP_U0` -- User group 0 (Record-Types 100-104)@n
+# `GRP_U1` -- User group 1 (Record-Types 105-109)@n
+# `GRP_U2` -- User group 2 (Record-Types 110-114)@n
+# `GRP_U3` -- User group 3 (Record-Types 115-119)@n
+# `GRP_U4` -- User group 0 (Record-Types 120-124)@n
+# `GRP_UA` -- All user records (Record-Types 100-124)@n
+# `<num>` -- Specific QS trace Record-Type in the range 0..127
 #
 # @usage
 # @include glb_filter.py
@@ -123,23 +159,22 @@ def expect(match):
 #
 def glb_filter(*args):
 
-## @brief Set the Local Filter in the Target
+## @brief Send the Local Filter to the Target
 #
 # @description
-# This command sets the @ref qs_local "QS local filters" in the Target.
+# This command sends the complete @ref qs_local "QS Local Filter" to the Target.
+# Any existing Local Filter setting inside the Target will be overwritten.
 #
-# @param[in] obj_kind  Kind of object to filter
+# @param[in] args  list of QS-ID groups or individual QS-IDs to set or clear.
+# A given filter-group or an individual filter is set when it is positive, and
+# cleared with it is preceded with the minus (`-`) sign.
 # @n
 # This parameter can take one of the following values:@n
-# `OBJ_SM` -- State Machine object@n
-# `OBJ_AO` -- Active Object object@n
-# `OBJ_MP` -- Memory Pool object@n
-# `OBJ_EQ` -- Event Queue object@n
-# `OBJ_TE` -- Time Event object@n
-# `OBJ_AP` -- Application-Specific object@n
-# `OBJ_SM_AO` -- Both, State Machine and Active Object
-#
-# @param[in] obj_id  Name or addres of the object
+# `IDS_ALL` -- all QS-IDs@n
+# `IDS_AO` -- Active Object QS-IDs (1..64)@n
+# `IDS_EP` -- Event Pool QS-IDs (65-80)@n
+# `IDS_EQ` -- Event Queue QS-IDs (81-96)@n
+# `IDS_AP` -- Application-Specific QS-IDs (97-127)@n
 #
 # @usage
 # @include loc_filter.py
@@ -147,7 +182,27 @@ def glb_filter(*args):
 # @sa
 # glb_filter()
 #
-def loc_filter(obj_kind, obj_id):
+def loc_filter(*args):
+
+## @brief Updates the Local Filter for a given AO in the Target
+#
+# @description
+# This command sets or clears the @ref qs_local "QS Local Filter" corresponding to the given AO in the Target.
+# Unlike loc_filter(), this facility changes **only** the QS-ID (AO's priority) of the given AO in the Target.
+# All other Local Filters will be left unchanged. 
+#
+# @param[in] obj_id  active object to set/clear the local filter for in the Target
+# @n
+# This parameter can be either a string (name of the AO) or the AO's priority.
+# Also, it can be either positive (to set) or negative (to clear) the QS local filter.
+#
+# @usage
+# @include ao_filter.py
+#
+# @sa
+# loc_filter()
+#
+def ao_filter(obj_id):
 
 ## @brief Set the Current-Object in the Target
 #

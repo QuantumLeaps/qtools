@@ -12,7 +12,7 @@
 <img style="float:right; margin:10px 8px 8px 15px; clear:right;" src="img/logo_python3.gif" title="Python3">
 @endhtmlonly
 
-<p>QView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create **remote graphical user-interfaces** to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QView&trade; can visualize the tracing data produced by QP/Spy&trade; and can also **interact with the target** by sending commands and injecting events to the embedded target.
+<p>QView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create **remote graphical user-interfaces** to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QView&trade; can visualize the tracing data produced by @ref qpspy "QP/Spy" and can also **interact with the target** by sending commands and injecting events to the embedded target.
 </p>
 
 As you can see in the screen shots below, a QView&trade; user interface consists of the text box with extensible menus plus a **customizable canvas** that can serve as a remote graphical user-interface to your embedded device. The canvas can contain various "widgets", such as buttons, sliders, guages, graphs, animations etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QView&trade; provides only a skeleton, which is then @ref qview_cust "customized" by user-supplied scripts written in <a href="hhttps://www.python.org" class="extern"><b>Python</b></a> (version 3).
@@ -235,7 +235,7 @@ The provided screen shot of the Canvas-view is specific to the DPP example appli
 
 
 @section qview_glob Global Filters Menu
-The Filters menu opens dialog boxes through which you can set the @ref qspy_filters "QSPY global filters" for QS record types.
+The Filters menu opens dialog boxes through which you can set the @ref qs_global "QS Global Filter" for QS Record-Types.
 
 The Global Filter menu opens dialog boxes for each *group* of global filters. For example, the screen shot below shows the "SM Group" (State Machine Group). In this "SM Group" dialog box you can check/uncheck the individual filters, or you can "Select ALL" or "Clear ALL" filters in the group.
 
@@ -251,14 +251,17 @@ The Global-Filters menu reflects the status of the whole group by the following 
 
 
 @section qview_loc Local Filters Menu
-The Filters menu opens dialog boxes through which you can set the @ref qspy_filters "QSPY filters".
+The Filters menu opens dialog boxes through which you can set the  @ref qs_local "QS Local Filter" for QS QS-IDs.
 
-The Local Filter menu opens dialog boxes for each local filter object. For example, the screen shot below shows the "AO_OBJ" (Active Object filter). In this "Local Filter" dialog box you can specify the object either by its name (must match the QS dictionary), or as addresses of the objects in decimal and in hexadecimal (with the `0x` prefix).
+The Local Filter menu opens dialog boxes for each *group* of local filters. For example, the screen shot below shows the "AO-IDs" (Active Object Group). In this "AO-IDs" dialog box you can check/uncheck the individual QS-IDs (which are AO priorities in this case), or you can "Select ALL" or "Clear ALL" filters in the group.
 
 @image html qview_loc_dlg.gif "Local Filter AO_OBJ Dialog Box"
 
 @note
-The Local-Filters menu reflects the selected local filters, which are listed to the right of the filter (e.g. `Philo_inst[0].timeEvt`).
+The Local-Filters menu reflects the status of the whole group by the following status-indicators:
+- `[-]`- no filters in the group selected
+- `[+-]` - some filters in the group selected
+- `[+]` - all filters in the group selected
 
 
 
@@ -450,7 +453,7 @@ The easiest way to customize QView is to copy the provided example script (<span
              # NOTE: the names of objects for loc_filter() and current_obj()
              # must match the QS Object Dictionaries produced by the application.
 [22]         current_obj(OBJ_AO, "Table_inst")
-[23]         loc_filter(OBJ_TE, "l_philo[0].timeEvt")
+[23]         loc_filter(IDS_AO)
 
              # turn lists into tuples for better performance
 [24]         self._philo_obj = tuple(self._philo_obj)
@@ -621,7 +624,7 @@ The qunpack() facility "understands" all formats supported by the Python `struct
 <div style="clear:both;"></div>
 
 
-@section qview_pre App-Specific Vs. Predefined Trace Records
+@subsection qview_pre App-Specific Vs. Predefined Trace Records
 The customization script discussed in the previous section was based on the @ref qs_app "application-specific trace record" (`QS_USER_00`), which was specifically produced by the DPP application. This trace record delivered the information abou the changing status of the Dining Philosophers, which allowed the customization script to animate the Philosopher images on the custom canvas.
 
 However, it is also possible to use a different strategy based on the @ref qs_pre "predefined QS trace records". The advantage is that **no additional instrumentation** is needed in the application, because the information is already produced by the framework. All you need to do is to enable (in the global filter) the appropriate QS trace record.
@@ -688,7 +691,27 @@ class DPP:
 
 @n
 @note
-The presented strategy of intercepting the @ref qs_dict "QS dictionary" records #QS_OBJ_DICT and #QS_FUN_DICT is quite generic and can be easily adapted in your own customization scripts.  
+The presented strategy of intercepting the @ref qs_dict "QS dictionary" records #QS_OBJ_DICT and #QS_FUN_DICT is quite generic and can be easily adapted in your own customization scripts.
+
+
+@subsection qview_dsl-commands QView Script Commands
+Here is the summary of commands that you can use in the QView scripts:
+
+- reset_target()
+- command()
+- peek()
+- poke()
+- tick()
+- glb_filter()
+- loc_filter()
+- ao_filter()
+- current_obj()
+- query_curr()
+- post()
+- publish()
+- init()
+- dispatch()
+- qunpack()
 
 @next{qwin}
 */

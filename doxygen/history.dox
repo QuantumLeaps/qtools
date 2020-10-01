@@ -1,9 +1,38 @@
 /**
 @page history Revision History
 
+
+@section qtools_6_9_1 Version 6.9.1, 2020-09-28
+
+The main purpose of this release is to adjust @ref qutest and @ref qview to the new @ref qs_local "QS Local Filter" design implemented in [QP/C](https://www.state-machine.com/qpc) and [QP/C++](https://www.state-machine.com/qpcpp) 6.9.1. Specifically, the loc_filter() and ao_filter() functions in @ref qutest_script "QUTest scripts" and in @ref qview_script "QView scripts" have been re-designed. Additionally, the @ref qview_loc "QView Local Filter menu" have been adjusted accordingly.
+
+@note
+The change in the loc_filter() command has implications for the existing @ref qutest_script "QUTest scripts". Specifically, the parameters of loc_filter() are no longer object names but rather "QS-IDs" (see the documentation to loc_filter()).
+
+__Changes in QSPY__
+
+The @ref qspy "QSPY host application" has been updated to handle the redesigned local-filters and the new predefined #QS_QF_NEW_ATTEMPT trace record. Also the default version compatibility with the @ref qs "QS target-resident component" (the `-v` @ref qspy_command "command-line option") has been increased from 6.2 to 6.6.
+
+Additionally, the QS_U64() and QS_I64() data elements have been made available for all types of CPUs, whereas previously they were available only on 64-bit CPUs (see also [feature#181](https://sourceforge.net/p/qpc/feature-requests/181)).
+
+Additionally, QSPY now can format @ref qs_app "application-specific data elements" in hexadecimal. Here are a few examples of QS trace records in the Target and the generated QSPY output:
+
+@code{c}
+QS_U8(QS_HEX_FMT,  0xABU);  // --> 0xAB
+QS_U16(QS_HEX_FMT, 0xDEADU);  // --> 0xDEAD
+QS_U32(QS_HEX_FMT, 0xDEADBEEFU); // --> 0xDEADBEEF
+QS_U64(QS_HEX_FMT, 0xDEADBEEF12345678LL); // --> 0xDEADBEEF12345678
+@endcode
+
+
+__Implemented Feature Requests__
+
+- [feature#181 "use of QS_U64() on 32 bit machine"](https://sourceforge.net/p/qpc/feature-requests/181)
+
+
 @section qtools_6_9_0 Version 6.9.0, 2020-08-21
 
-This release represents a major overhaul of QTools. Specifically, this release brings the new @ref qview component, which replaces QSpyView written originally in Tcl/Tk. The new @ref qview "QView" is written in **Python** (3.3.+) and brings much commonality with the @ref qutest, which has also been re-structured and improved.
+This release brings the new @ref qview component, which replaces QSpyView written originally in Tcl/Tk. The new @ref qview "QView" is written in **Python** (3.3.+) and brings much commonality with the @ref qutest, which has also been re-structured and improved.
 
 @note
 Starting with this version, both @ref qview and @ref qutest require **Python3** (3.3+) and are **no longer compatible** with Python2. The support for Tcl/Tk has been dropped entirely in QTools.
@@ -26,7 +55,7 @@ qtools/
 +---qview/    # <== new qview location
 +---qwin/
 +---Unity/
-@endcode 
+@endcode
 
 @note
 The changes in the QTools directory structure have impact on the QUTest testing, because the Makefiles (or any other build tools you might be using) need to be adjusted to the new location of the `qutest.py` script.
@@ -39,7 +68,7 @@ This new feature replaces the previous support for MscGen and is no longer relia
 
 - QSPY now recognizes the new QS trace record #QS_QF_RUN
 
-@note
+@note 
 The #QS_QF_RUN record is now generated in @ref qutest "QUTest", which requires adjustments in the existing @ref qutest_script "test scripts". Specifically, the test scripts that provide their own on_reset() callback must now also call expect_run().
 
 

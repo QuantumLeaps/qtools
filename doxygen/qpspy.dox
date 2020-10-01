@@ -110,9 +110,9 @@ The QS protocol transmits each trace record in an HDLC-like frame. The upper par
 
 1. Each frame starts with the Frame **Sequence-No** byte. The target QS component increments the Frame Sequence Number for every frame inserted into the circular buffer. The Sequence Number naturally rolls-over from 255 to 0. The Frame Sequence Number allows the QSPY host component to detect any data discontinuities.
 
-2. Following the Fame Sequence Number is the **Record-ID** byte, which is one of the predefined QS records, or an application-specific record.
+2. Following the Fame Sequence Number is the **Record-Type** byte, which is one of the predefined QS records, or an application-specific record.
 
-3. Following the Record-ID is zero or more **Data** bytes.
+3. Following the Record-Type is zero or more **Data** bytes.
 
 4. Following the data is the **Checksum**. The Checksum is computed over the Fame Sequence Number, the Record ID, and all the Data bytes. The next section gives the detailed Checksum computation formula.
 
@@ -127,11 +127,11 @@ One of the most important characteristics of HDLC-type protocols is establishing
 
 Of course, now the Escape byte itself must also be transparent to avoid interpreting an unintentional Escape byte as the two-byte escape sequence. The procedure of escaping the Escape byte is identical to that of escaping the Flag byte.
 
-The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Fame Sequence Number, the Record-ID, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
+The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Fame Sequence Number, the Record-Type, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
 
 An example may make this clearer. Suppose that the following trace record needs to be inserted to the trace buffer (the transparent bytes are shown in bold):
 
-     Record-ID = 0x7D, Record Data = 0x7D 0x08 0x01
+     Record-Type = 0x7D, Record Data = 0x7D 0x08 0x01
 
 Assuming that the current Fame Sequence Number is, say `0x7E`, the Checksum will be computed over the following bytes:
 
@@ -141,7 +141,7 @@ and the actual frame inserted into the QS trace buffer will be as follows:
 
      0x7D 0x5E 0x7D 0x5D 0x7D 0x5D 0x08 0x01 0x7D 0x5E 0x7E
 
-Obviously, this is a degenerated example, where the Frame Sequence Number, the Record-ID, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
+Obviously, this is a degenerated example, where the Frame Sequence Number, the Record-Type, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
 
 
 

@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
-* Last updated on  2020-08-22
+* Last updated for version 6.9.1
+* Last updated on  2020-09-10
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -69,7 +69,7 @@ QSPY_LastOutput QSPY_output;
 /****************************************************************************/
 
 enum {
-    OLD_QS_USER    = 70,   /* old QS_USER used in before QS 6.6.0 */
+    OLD_QS_USER    = 70,  /* old QS_USER used in before QS 6.6.0 */
     SEQ_ITEMS_MAX  = 10,  /* max number of items in the Sequence list */
 };
 
@@ -204,14 +204,14 @@ static char const *  l_qs_rec[] = {
     "QS_QF_EQUEUE_GET",
     "QS_QF_EQUEUE_GET_LAST",
 
-    /* [23] Reserved QS records */
-    "QS_RESERVED_23",
+    /* [23] Framework (QF) records */
+    "QS_QF_NEW_ATTEMPT",
 
     /* [24] Memory Pool (MP) records */
     "QS_QF_MPOOL_GET",
     "QS_QF_MPOOL_PUT",
 
-    /* [26] Additional (QF) records */
+    /* [26] Additional Framework (QF) records */
     "QS_QF_PUBLISH",
     "QS_QF_NEW_REF",
     "QS_QF_NEW",
@@ -227,7 +227,7 @@ static char const *  l_qs_rec[] = {
     "QS_QF_TIMEEVT_REARM",
     "QS_QF_TIMEEVT_POST",
 
-    /* [38] Additional (QF) records */
+    /* [38] Additional Framework (QF) records */
     "QS_QF_DELETE_REF",
     "QS_QF_CRIT_ENTRY",
     "QS_QF_CRIT_EXIT",
@@ -737,7 +737,6 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
 }
 /*..........................................................................*/
 static void QSpyRecord_processUser(QSpyRecord * const me) {
-    uint8_t  fmt;
     int64_t  i64;
     uint64_t u64;
     int32_t  i32;
@@ -769,7 +768,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
     static char const *ulfmt[] = {
         "%2"PRIu64,  "%4"PRIu64,  "%6"PRIu64,  "%8"PRIu64,
         "%10"PRIu64, "%12"PRIu64, "%14"PRIu64, "%16"PRIu64,
-        "%18"PRIu64, "%"PRIu64, "%22"PRIu64, "%24"PRIu64,
+        "%18"PRIu64, "%20"PRIu64, "%22"PRIu64, "%24"PRIu64,
         "%26"PRIu64, "%28"PRIu64, "%30"PRIu64, "%32"PRIu64
     };
     static char const *efmt[] = {
@@ -792,52 +791,53 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 
     while (me->len > 0) {
         char const *s;
-        fmt = (uint8_t)QSpyRecord_getUint32(me, 1);  /* get the format byte */
+         /* get the format byte */
+        uint32_t fmt = QSpyRecord_getUint32(me, 1);
+        uint32_t len = (fmt >> 4U) & 0x0FU;
+        bool is_hex = (len == (uint32_t)QS_HEX_FMT);
+        fmt &= 0x0FU;
 
         SNPRINTF_APPEND(" ");
         FPRINF_MATFILE(" ");
 
-        switch (fmt & 0x0F) {
+        switch (fmt) {
             case QS_I8_T: {
                 i32 = QSpyRecord_getInt32(me, 1);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
+                SNPRINTF_APPEND(ifmt[len], (long)i32);
+                FPRINF_MATFILE(ifmt[len], (long)i32);
                 break;
             }
             case QS_U8_T: {
                 u32 = QSpyRecord_getUint32(me, 1);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
+                SNPRINTF_APPEND(is_hex ? uhfmt[2] : ufmt[len],
+                                (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[len], (unsigned long)u32);
                 break;
             }
             case QS_I16_T: {
                 i32 = QSpyRecord_getInt32(me, 2);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
+                SNPRINTF_APPEND(ifmt[len], (long)i32);
+                FPRINF_MATFILE(ifmt[len], (long)i32);
                 break;
             }
             case QS_U16_T: {
                 u32 = QSpyRecord_getUint32(me, 2);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
+                SNPRINTF_APPEND(is_hex ? uhfmt[4] : ufmt[len],
+                                (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[len], (unsigned long)u32);
                 break;
             }
             case QS_I32_T: {
                 i32 = QSpyRecord_getInt32(me, 4);
-                SNPRINTF_APPEND(ifmt[fmt >> 4], (long)i32);
-                FPRINF_MATFILE(ifmt[fmt >> 4], (long)i32);
+                SNPRINTF_APPEND(ifmt[len], (long)i32);
+                FPRINF_MATFILE(ifmt[len], (long)i32);
                 break;
             }
             case QS_U32_T: {
                 u32 = QSpyRecord_getUint32(me, 4);
-                SNPRINTF_APPEND(ufmt[fmt >> 4], (unsigned long)u32);
-                FPRINF_MATFILE(ufmt[fmt >> 4], (unsigned long)u32);
-                break;
-            }
-            case QS_U32_HEX_T: {
-                u32 = QSpyRecord_getUint32(me, 4);
-                SNPRINTF_APPEND(uhfmt[fmt >> 4], (unsigned long)u32);
-                FPRINF_MATFILE(uhfmt[fmt >> 4], (unsigned long)u32);
+                SNPRINTF_APPEND(is_hex ? uhfmt[8] : ufmt[len],
+                                (unsigned long)u32);
+                FPRINF_MATFILE(ufmt[len], (unsigned long)u32);
                 break;
             }
             case QS_F32_T: {
@@ -846,8 +846,8 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                    float    f;
                 } x;
                 x.u = QSpyRecord_getUint32(me, 4);
-                SNPRINTF_APPEND(efmt[fmt >> 4], (double)x.f);
-                FPRINF_MATFILE(efmt[fmt >> 4], (double)x.f);
+                SNPRINTF_APPEND(efmt[len], (double)x.f);
+                FPRINF_MATFILE(efmt[len], (double)x.f);
                 break;
             }
             case QS_F64_T: {
@@ -856,8 +856,8 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                     double   d;
                 } data;
                 data.u = QSpyRecord_getUint64(me, 8);
-                SNPRINTF_APPEND(efmt[fmt >> 4], data.d);
-                FPRINF_MATFILE(efmt[fmt >> 4], data.d);
+                SNPRINTF_APPEND(efmt[len], data.d);
+                FPRINF_MATFILE(efmt[len], data.d);
                 break;
             }
             case QS_STR_T: {
@@ -905,14 +905,20 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             }
             case QS_I64_T: {
                 i64 = QSpyRecord_getInt64(me, 8);
-                SNPRINTF_APPEND(ilfmt[fmt >> 4], i64);
-                FPRINF_MATFILE(ilfmt[fmt >> 4], i64);
+                SNPRINTF_APPEND(ilfmt[len], i64);
+                FPRINF_MATFILE(ilfmt[len], i64);
                 break;
             }
             case QS_U64_T: {
                 u64 = QSpyRecord_getUint64(me, 8);
-                SNPRINTF_APPEND(ulfmt[fmt >> 4], u64);
-                FPRINF_MATFILE(ulfmt[fmt >> 4], u64);
+                SNPRINTF_APPEND(is_hex ? "0x%16"PRIX64 : ulfmt[len], u64);
+                FPRINF_MATFILE(ulfmt[len], u64);
+                break;
+            }
+            case 0x0FU: { /* former QS_U32_HEX_T */
+                u32 = QSpyRecord_getUint32(me, 4);
+                SNPRINTF_APPEND(uhfmt[len], (unsigned long)u32);
+                FPRINF_MATFILE(uhfmt[len], (unsigned long)u32);
                 break;
             }
             default: {
@@ -1411,26 +1417,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
-        case QS_RESERVED_23: {
-            if (l_config.version >= 620U) {
-                SNPRINTF_LINE("           Unknown Rec=%d,Len=%d",
-                       (int)me->rec, (int)me->len);
-                QSPY_onPrintLn();
-            }
-            else { /* former QS_QF_MPOOL_INIT */
-                p = QSpyRecord_getUint64(me, l_config.objPtrSize);
-                b = QSpyRecord_getUint32(me, l_config.poolCtrSize);
-                if (QSpyRecord_OK(me)) {
-                    SNPRINTF_LINE("           MP-Init  Obj=%s,Blcks=%u",
-                           Dictionary_get(&l_objDict, p, (char *)0),
-                           b);
-                    QSPY_onPrintLn();
-                    FPRINF_MATFILE("%d %"PRId64" %u\n",
-                                   (int)me->rec, p, b);
-                }
-            }
-            break;
-        }
+
         case QS_QF_MPOOL_GET:
             s = "Get  ";
             w = "Min";
@@ -1473,6 +1460,26 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
 
         /* QF */
+        case QS_QF_NEW_ATTEMPT:
+            s = "QF-NewA ";
+            /* fall through */
+        case QS_QF_NEW: {
+            if (s == 0) s = "QF-New  ";
+            t = QSpyRecord_getUint32(me, l_config.tstampSize);
+            a = QSpyRecord_getUint32(me, l_config.evtSize);
+            c = QSpyRecord_getUint32(me, l_config.sigSize);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u %s Sig=%s,Size=%u",
+                       t, s,
+                       SigDictionary_get(&l_sigDict, c, 0, (char *)0),
+                       a);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %u %u\n",
+                               (int)me->rec, t, a, c);
+            }
+            break;
+        }
+
         case QS_QF_PUBLISH: {
             t = QSpyRecord_getUint32(me, l_config.tstampSize);
             if (l_config.version >= 420U) {
@@ -1520,22 +1527,6 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %u %u %u\n",
                                (int)me->rec, t, a, b, c);
-            }
-            break;
-        }
-
-        case QS_QF_NEW: {
-            t = QSpyRecord_getUint32(me, l_config.tstampSize);
-            a = QSpyRecord_getUint32(me, l_config.evtSize);
-            c = QSpyRecord_getUint32(me, l_config.sigSize);
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u QF-New   Sig=%s,Size=%u",
-                       t,
-                       SigDictionary_get(&l_sigDict, c, 0, (char *)0),
-                       a);
-                QSPY_onPrintLn();
-                FPRINF_MATFILE("%d %u %u %u\n",
-                               (int)me->rec, t, a, c);
             }
             break;
         }

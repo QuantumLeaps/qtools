@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
-* Last updated on  2020-08-21
+* Last updated for version 6.9.1
+* Last updated on  2020-09-10
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -219,7 +219,7 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             QSPY_sendEvt(qrec);
             break;
         }
-        case QSPY_SEND_LOC_FILTER:
+        case QSPY_SEND_AO_FILTER:
         case QSPY_SEND_CURR_OBJ: {
             QSPY_sendObj(qrec);
             break;
