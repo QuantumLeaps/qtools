@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QView in Python (requires Python 3.3+)
-# Last updated for version 6.9.1
-# Last updated on  2020-09-26
+# Last updated for version 6.9.2
+# Last updated on  2020-10-20
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -51,7 +51,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 691
+    VERSION = 692
 
     # public static variables...
     ## menu to be customized
@@ -1249,7 +1249,8 @@ class QSpy:
         QSpy._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         QSpy._sock.setblocking(0) # NON-BLOCKING socket
         try:
-            QSpy._sock.bind(("localhost", QSpy._local_port))
+            QSpy._sock.bind(("0.0.0.0", QSpy._local_port))
+            #print("bind: ", ("0.0.0.0", QSpy._local_port))
         except:
             QView._showerror("UDP Socket Error",
                "Can't bind the UDP socket\n"

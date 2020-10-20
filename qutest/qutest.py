@@ -2,8 +2,8 @@
 # @file
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.1
-# Last updated on  2020-09-12
+# Last updated for version 6.9.2
+# Last updated on  2020-10-20
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -56,7 +56,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 691
+    VERSION = 692
 
     # class variables
     _host_exe = ""
@@ -1066,8 +1066,8 @@ class QSpy:
         #bufsize = QSpy._sock.getsockopt(socket.SOL_UDP, socket.SO_RCVBUF)
         #print("SO_RCVBUF ", bufsize)
         try:
-            QSpy._sock.bind(("localhost", QSpy._local_port))
-            #print("bind: ", ("localhost", QSpy._local_port))
+            QSpy._sock.bind(("0.0.0.0", QSpy._local_port))
+            #print("bind: ", ("0.0.0.0", QSpy._local_port))
         except:
             messagebox.showerror("UDP Socket Error",
                "Can't bind the UDP socket\nto the specified local_host")
@@ -1274,14 +1274,14 @@ def main(*args):
             QUTest._host_exe = ""
             QUTest._is_debug = True
     if arg < argc:
-        host_port = new_argv[arg].split(":")
+        host_port = argv[arg].split(":")
         arg += 1
         if len(host_port) > 0:
             QSpy._host_addr[0] = host_port[0]
         if len(host_port) > 1:
             QSpy._host_addr[1] = int(host_port[1])
     if arg < argc:
-        QSpy._tcp_port = new_argv[arg]
+        QSpy._tcp_port = argv[arg]
 
     QSpy._host_addr = tuple(QSpy._host_addr) # convert to immutable tuple
 

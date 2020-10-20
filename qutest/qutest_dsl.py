@@ -189,7 +189,7 @@ def loc_filter(*args):
 # @description
 # This command sets or clears the @ref qs_local "QS Local Filter" corresponding to the given AO in the Target.
 # Unlike loc_filter(), this facility changes **only** the QS-ID (AO's priority) of the given AO in the Target.
-# All other Local Filters will be left unchanged. 
+# All other Local Filters will be left unchanged.
 #
 # @param[in] obj_id  active object to set/clear the local filter for in the Target
 # @n
