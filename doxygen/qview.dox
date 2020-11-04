@@ -15,7 +15,7 @@
 <p>QView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create **remote graphical user-interfaces** to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QView&trade; can visualize the tracing data produced by @ref qpspy "QP/Spy" and can also **interact with the target** by sending commands and injecting events to the embedded target.
 </p>
 
-As you can see in the screen shots below, a QView&trade; user interface consists of the text box with extensible menus plus a **customizable canvas** that can serve as a remote graphical user-interface to your embedded device. The canvas can contain various "widgets", such as buttons, sliders, guages, graphs, animations etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QView&trade; provides only a skeleton, which is then @ref qview_cust "customized" by user-supplied scripts written in <a href="hhttps://www.python.org" class="extern"><b>Python</b></a> (version 3).
+As you can see in the screen shots below, a QView&trade; user interface consists of the text box with extensible menus plus a **customizable canvas** that can serve as a remote graphical user-interface to your embedded device. The canvas can contain various "widgets", such as buttons, sliders, guages, graphs, animations etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QView&trade; provides only a skeleton, which is then @ref qview_cust "customized" by user-supplied scripts written in <a href="https://www.python.org" class="extern"><b>Python</b></a> (version 3).
 
 <div style="clear:both;"></div>
 
@@ -27,7 +27,7 @@ As you can see in the screen shots below, a QView&trade; user interface consists
 
 @subsection qview_special What's Special About It?
 
-QView&trade; has been specifically designed for extensibility, so that you can quickly @ref qview_cust "customize its GUI and behavior" to your specific embedded project, so that you can use QView&trade; as a powerful custom Human-Machine Interface (HMI) for your projects. The cusomization is accomplished in <a href="hhttps://www.python.org" class="extern"><b>Python</b></a> (version 3), which means that it is naturally platform-neutral and runs without any changes on Windows, Linux, or macOS.
+QView&trade; has been specifically designed for extensibility, so that you can quickly @ref qview_cust "customize its GUI and behavior" to your specific embedded project, so that you can use QView&trade; as a powerful custom Human-Machine Interface (HMI) for your projects. The cusomization is accomplished in <a href="https://www.python.org" class="extern"><b>Python</b></a> (version 3), which means that it is naturally platform-neutral and runs without any changes on Windows, Linux, or macOS.
 
 Out of the box, QView&trade; supports the following @ref qview_ui "commands" (<strong>NOTE:</strong> This basic functionality can be extended in the @ref qview_cust "QView&trade; customization"):
 
