@@ -179,7 +179,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
             nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), evtPkt, n);
             if (nBytes == 0) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_EVENT");
-                QSPY_onPrintLn();
+                QSPY_printError();
             }
             else {
                  (void)(*PAL_vtbl.send2Target)(l_dstBuf, nBytes);

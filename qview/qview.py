@@ -754,12 +754,16 @@ class QView:
                 .grid(row=0,column=N_ROW-1, padx=2, pady=2, sticky=W+E)
             n = 0
             self._filter_var = []
+            if self._mask == QSpy._LOC_FLT_MASK_AO:
+                QS_id = "AO-prio=%d"
+            else:
+                QS_id = "QS-ID=%d"
             for i in range(QSpy._LOC_FLT_RANGE):
                 if self._mask & (1 << i) != 0:
                     self._filter_var.append(IntVar())
                     if QView._loc_filter & (1 << i):
                         self._filter_var[n].set(1)
-                    Checkbutton(master, text="AO-prio=%d"%(i), anchor=W,
+                    Checkbutton(master, text=QS_id%(i), anchor=W,
                                 variable=self._filter_var[n])\
                         .grid(row=(n + N_ROW)//N_ROW,column=(n+N_ROW)%N_ROW,
                               padx=2,pady=2,sticky=W)
@@ -794,6 +798,7 @@ class QView:
             QView._updateMenus()
 
     #.........................................................................
+    # deprecated
     class _LocFilterDialog_AO_OBJ(Dialog):
         def __init__(self):
             super().__init__(QView._gui, "Local AO-OBJ Filter")
@@ -1192,7 +1197,7 @@ class QSpy:
     _LOC_FLT_MASK_EP = 0x000000000000FFFE0000000000000000
     _LOC_FLT_MASK_EQ = 0x00000000FFFF00000000000000000000
     _LOC_FLT_MASK_AP = 0xFFFFFFFF000000000000000000000000
-    _LOC_FLT_RANGE  = 125
+    _LOC_FLT_RANGE  = 128
 
     # interesting packets from QSPY/Target...
     _PKT_TEXT_ECHO   = 0

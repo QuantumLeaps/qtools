@@ -10,7 +10,7 @@
 @set PROJ=qview
 
 :: adjust the Python location for your system
-@set PYTHON=C:\tools\Python38-32\python.exe
+@set PYTHON=C:\tools\Python39-32\python.exe
 
 :: cleanup any previous builds...
 @rmdir /S /Q build

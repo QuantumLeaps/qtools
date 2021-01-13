@@ -15,6 +15,7 @@ Please note that dual targeting does not mean that the embedded device has anyth
 <strong>QWin&trade;</strong> is a free GUI toolkit for prototyping embedded systems on Windows in the C or C++ programming language, including building realistic embedded front panels consisting of LCD displays (both graphic and segmented), LEDs, buttons, knobs, sliders, etc. The implementation is based on the **raw Win32 API** to provide simple <b>direct mapping to C/C++</b> for easy integration with your embedded code.
 
 @image html qwin_ani.gif "Example of a QWIN Prototype with graphic LCD, buttons, LEDs, and segmented display"
+@n
 
 @remark
 The problem of building GUI prototypes of embedded devices on the desktop is very common, yet it seems that most developers try to use C#, .NET, VisualBasic or other such environments to build prototypes of their embedded devices. The main shortcoming of all such solutions is that they don't provide direct binding to C/C++, which complicates the build process and the **debugging of the C/C++ code** on the host.
