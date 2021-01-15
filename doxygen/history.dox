@@ -2,6 +2,33 @@
 @page history Revision History
 
 
+@section qtools_6_9_2 Version 6.9.2, 2021-01-18
+
+__Changes in QUTest and QView__
+
+The UDP socket binding (for connection to QSPY host application) has been changed from "localhost" to "0.0.0.0". This is to improve access to QSPY running on remote hosts.
+
+
+__Changes in QView__
+
+Changed the "Local Filter" dialog box to show "QS_id=..." instead of "AO-prio=..." for QS-IDs above 64.
+
+
+__Added QCalc__
+ 
+A new version of the popular QCalc Programmer's Calculator has been added again. This version is based on Python (whereas the previous was based on Tcl/Tk). The new version is console based and, among other enhancements, adds support for 64-bit range.
+
+
+__Updated GNU-ARM Toolchain for Windows__
+
+The GNU-ARM toolchain in QTools for Windows has been updated to the latest Version 10-2020-q4-major released on December 11, 2020. 
+
+
+__Updated Python for Windows__
+
+The Python interpreter in QTools for Windows has been updated to Python 3.9. 
+
+
 @section qtools_6_9_1 Version 6.9.1, 2020-09-28
 
 The main purpose of this release is to adjust @ref qutest and @ref qview to the new @ref qs_local "QS Local Filter" design implemented in [QP/C](https://www.state-machine.com/qpc) and [QP/C++](https://www.state-machine.com/qpcpp) 6.9.1. Specifically, the loc_filter() and ao_filter() functions in @ref qutest_script "QUTest scripts" and in @ref qview_script "QView scripts" have been re-designed. Additionally, the @ref qview_loc "QView Local Filter menu" have been adjusted accordingly.
