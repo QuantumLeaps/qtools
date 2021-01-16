@@ -6,7 +6,9 @@
 
 __Changes in QUTest and QView__
 
-The UDP socket binding (for connection to QSPY host application) has been changed from "localhost" to "0.0.0.0". This is to improve access to QSPY running on remote hosts.
+The UDP socket binding (for connection to QSPY host application) has been changed from "localhost" to "0.0.0.0". This is to improve access to QSPY running on remote hosts. This fixes the following bug:
+
+- [bug#283  QUTest 6.9.1. broken](https://sourceforge.net/p/qpc/bugs/283/)
 
 
 __Changes in QView__

@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QView in Python (requires Python 3.3+)
-# Last updated for version 6.9.2
-# Last updated on  2020-10-20
+# Last updated for version 6.9.3
+# Last updated on  2021-01-16
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -51,7 +51,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 692
+    VERSION = 693
 
     # public static variables...
     ## menu to be customized
@@ -1829,7 +1829,7 @@ def qunpack(fmt, bstr):
 
 #=============================================================================
 # main entry point to QView
-def _main():
+def main():
     # process command-line arguments...
     argv = sys.argv
     argc = len(argv)
@@ -1901,5 +1901,5 @@ def _main():
 
 #=============================================================================
 if __name__ == "__main__":
-    _main()
+    main()
 

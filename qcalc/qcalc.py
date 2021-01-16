@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QCalc in Python (requires Python 3.3+)
-# Last updated for version 6.9.2
-# Last updated on  2021-01-10
+# Last updated for version 6.9.3
+# Last updated on  2021-01-16
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -32,32 +32,12 @@ import traceback
 from math import *
 from platform import python_version
 
+# the 'ans' global variable
+ans = 0
+
 class QCalc:
     ## current version of QCalc
-    VERSION = 692
-
-    @staticmethod
-    def _main():
-        print("QCalc Programmer's Calculator {0:d}.{1:d}.{2:d} " \
-              "running on Python {3}".format(
-                  QCalc.VERSION//100,
-                  (QCalc.VERSION//10) % 10,
-                  QCalc.VERSION % 10,
-                  python_version()))
-        print("(c) 2005-2021 Quantum Leaps, www.state-machine.com\n")
-
-        # main loop for processing user input...
-        while True:
-            expr = input('> ')
-            if expr:
-                try:
-                    result = eval(expr)
-                except:
-                    traceback.print_exc(2)
-                else:
-                    QCalc._print(result)
-            else:
-                break
+    VERSION = 693
 
     @staticmethod
     def _print(result):
@@ -109,9 +89,31 @@ class QCalc:
         else:
             print("=", ans)
 
-# the 'ans' global variable
-ans = 0
+#=============================================================================
+# main entry point to QCalc
+def main():
+    print("QCalc Programmer's Calculator {0:d}.{1:d}.{2:d} " \
+          "running on Python {3}".format(
+              QCalc.VERSION//100,
+              (QCalc.VERSION//10) % 10,
+              QCalc.VERSION % 10,
+              python_version()))
+    print("(c) 2005-2021 Quantum Leaps, www.state-machine.com\n")
+
+    # main loop for processing user input...
+    while True:
+        expr = input('> ')
+        if expr:
+            try:
+                result = eval(expr)
+            except:
+                traceback.print_exc(2)
+            else:
+                QCalc._print(result)
+        else:
+            break
+
 
 #=============================================================================
 if __name__ == "__main__":
-    QCalc._main()
+    main()
