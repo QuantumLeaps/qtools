@@ -56,15 +56,19 @@ starting with 'q' are contributed by Quantum Leaps)
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-10. GNU-make for Windows (32-bit version 4.2.1)
+8. GNU-make for Windows (32-bit version 4.2.1)
 
-11. GNU C/C++ toolset for Windows (mingw32 version 9.2.0)
+9. LMFlash for Windows (32-bit build 1613)
 
-12. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
 
-13. Python for Windows (version 3.8.5 32-bit)
+Additionally, the QTools directory in the QP-bundle contains the
+following 3rd-party tools:
 
-14. LMFlash for Windows (32-bit build 1613)
+10. GNU C/C++ toolset for Windows (mingw32 version 9.2.0)
+
+11. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
+
+12. Python for Windows (version 3.9 32-bit)
 
 
 ---------------------------------------------------------------------------
