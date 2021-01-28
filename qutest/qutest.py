@@ -2,7 +2,7 @@
 # @file
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.2
+# Last updated for version 6.9.3
 # Last updated on  2020-10-20
 #
 #                    Q u a n t u m  L e a P s
@@ -56,7 +56,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 692
+    VERSION = 693
 
     # class variables
     _host_exe = ""
@@ -1122,17 +1122,17 @@ class QSpy:
                     break
                 except socket.timeout:
                     print("\nwaiting for Target "\
-                        "(press Enter to skip this test)...", end="")
+                        "(press Enter to quit this test)...", end="")
                     if os.name == "nt":
                         if msvcrt.kbhit():
-                            if msvcrt.getch() == "\r":
-                                print()
+                            if msvcrt.getch() == b'\r':
+                                print("quit")
                                 return False; # timeout
                     else:
                         dr,dw,de = select.select([sys.stdin], [], [], 0)
                         if dr != []:
-                            sys.stdin.readline() # consue the Return key
-                            print()
+                            sys.stdin.readline() # consume the Return key
+                            print("quit")
                             return False; # timeout
                 # don"t catch OSError
 
