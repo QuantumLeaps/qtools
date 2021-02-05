@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
 # Last updated for version 6.9.3
-# Last updated on  2021-02-02
+# Last updated on  2021-02-05
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -800,10 +800,24 @@ class QUTest:
         raise SyntaxError(msg)
 
     def _fail(self, err = "", exp = ""):
-        print("%s @line:%d (%.3fs):"%(
+        print("%s (%.3fs):"%(
             QUTest._STR_TEST_FAIL,
-            getframeinfo(stack()[-4][0]).lineno,
             QUTest._time() - self._startTime))
+        stk = stack()
+        max = len(stk) - 3
+        lvl = 2
+        while lvl < max:
+            fun = getframeinfo(stk[lvl][0]).function
+            if fun == "<module>":
+                print("  @%s:%d"%(
+                      getframeinfo(stk[lvl][0]).filename,
+                      getframeinfo(stk[lvl][0]).lineno))
+            else:
+                print("  @%s/%s:%d"%(
+                      getframeinfo(stk[lvl][0]).filename,
+                      getframeinfo(stk[lvl][0]).function,
+                      getframeinfo(stk[lvl][0]).lineno))
+            lvl += 1
         if exp != "":
             print(QUTest._STR_EXP1 + exp + QUTest._STR_EXP2)
         if err != "":
