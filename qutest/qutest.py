@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
 # Last updated for version 6.9.3
-# Last updated on  2021-02-05
+# Last updated on  2021-02-08
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -108,9 +108,10 @@ class QUTest:
 
         # The following _DSL_dict dictionary defines the QUTest testing
         # DSL (Domain Specific Language), which is documented separately
-        # in the file "QUTest_dsl.py".
+        # in the file "qutest_dsl.py".
         #
         self._DSL_dict  = {
+            "include": self.include,
             "test": self.test,
             "skip": self.skip,
             "expect": self.expect,
@@ -669,6 +670,13 @@ class QUTest:
     def skip(self, nTests = 9999):
         if self._to_skip == 0: # not skipping already?
             self._to_skip = nTests
+
+    # include DSL command ....................................................
+    def include(self, fname):
+        with open(fname) as f:
+            code = compile(f.read(), fname, "exec")
+            # execute the include script code in this instance of QUTest
+            exec(code, self._DSL_dict)
 
     # dummy callbacks --------------------------------------------------------
     def _dummy_on_reset(self):
@@ -1252,7 +1260,7 @@ def main(*args):
             QUTest.VERSION//100,
             (QUTest.VERSION//10) % 10,
              QUTest.VERSION % 10, python_version()))
-    print("Copyright (c) 2005-2020 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2021 Quantum Leaps, www.state-machine.com")
 
     if "--version" in argv:
         return sys.exit(0)
