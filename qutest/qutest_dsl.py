@@ -18,14 +18,14 @@
 #
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.1
-# Last updated on  2020-09-12
+# Last updated for version 6.9.3
+# Last updated on  2021-02-08
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -51,7 +51,27 @@
 #-----------------------------------------------------------------------------
 
 ## @brief current version of the Python QUTest interface
-VERSION = 691
+VERSION = 693
+
+## @brief include python code in a test script
+# @description
+# This command includes python code in a specified file into the test script.
+# The included file can contain any code that you would put into test scripts,
+# such as 
+#
+# @param[in] fname  name of the file to include
+#
+# @usage
+# `include("test_include.pyi") # include the specified file`
+#
+# __Example__@n
+# file to be included:@n
+# @include inc_file.py
+#
+# test script calling `include()`:@n
+# @include inc_test.py
+#
+def include(fname):
 
 ## @brief start a new test
 # @description

@@ -153,6 +153,7 @@ The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defi
 @subsection qutest_dsl-preamble Preamble
 The "preamble" section of a test script file defines callback functions common to all tests in this file. It can contain the following callback functions:
 
+- include()
 - on_reset()
 - on_setup()
 - on_teardown()
