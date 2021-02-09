@@ -151,20 +151,21 @@ The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defi
 
 
 @subsection qutest_dsl-preamble Preamble
-The "preamble" section of a test script file defines callback functions common to all tests in this file. It can contain the following callback functions:
+The "preamble" section of a test script file specifies include scripts and defines callback functions common to all tests in this file. It can contain the following functions:
 
 - include()
 - on_reset()
 - on_setup()
 - on_teardown()
 
-These callback functions can call any of the @ref qutest_dsl-commands "test commands".
-
+The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "test commands".
 
 
 @subsection qutest_dsl-tests Tests
 The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
 
+- test()
+- skip()
 
 
 @subsection qutest_dsl-commands Commands
@@ -189,6 +190,8 @@ The commands that you can place in the tests (as well as inside the callback fun
 - poke()
 - fill()
 - pack()
+- test_file()
+- test_dir()
 
 
 

@@ -19,7 +19,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
 # Last updated for version 6.9.3
-# Last updated on  2021-02-08
+# Last updated on  2021-02-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -57,12 +57,14 @@ VERSION = 693
 # @description
 # This command includes python code in a specified file into the test script.
 # The included file can contain any code that you would put into test scripts,
-# such as 
+# such as
 #
-# @param[in] fname  name of the file to include
+# @param[in] fname  name of the file to include. May contain a path
+#                   **relative** to the test script.
 #
 # @usage
 # `include("test_include.pyi") # include the specified file`
+# `include("../my_include/test_include.pyi") # include the specified file`
 #
 # __Example__@n
 # file to be included:@n
@@ -72,6 +74,12 @@ VERSION = 693
 # @include inc_test.py
 #
 def include(fname):
+
+## @brief get the test file name with path
+def test_file():
+
+## @brief get the test directory (relative to the current directory)
+def test_dir():
 
 ## @brief start a new test
 # @description

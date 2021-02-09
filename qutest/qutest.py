@@ -2,8 +2,8 @@
 # @file
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.3
-# Last updated on  2021-02-08
+# Last updated for version 6.9.3a
+# Last updated on  2021-02-09
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -105,6 +105,8 @@ class QUTest:
         self._timestamp = 0
         self._startTime = 0
         self._to_skip   = 0
+        self._test_file = ""
+        self._test_dir = ""
 
         # The following _DSL_dict dictionary defines the QUTest testing
         # DSL (Domain Specific Language), which is documented separately
@@ -134,6 +136,8 @@ class QUTest:
             "poke": self.poke,
             "fill": self.fill,
             "pack": struct.pack,
+            "test_file": self.test_file,
+            "test_dir": self.test_dir,
             "on_reset": self._dummy_on_reset,
             "on_setup": self._dummy_on_setup,
             "on_teardown": self._dummy_on_teardown,
@@ -673,10 +677,20 @@ class QUTest:
 
     # include DSL command ....................................................
     def include(self, fname):
-        with open(fname) as f:
-            code = compile(f.read(), fname, "exec")
+        path = os.path.normcase(os.path.join(self._test_dir, fname))
+        if not os.path.exists(path):
+            raise FileNotFoundError(path)
+        with open(path) as f:
+            code = compile(f.read(), path, "exec")
             # execute the include script code in this instance of QUTest
             exec(code, self._DSL_dict)
+
+    # test file/dir read-only accessors ......................................
+    def test_file(self):
+        return self._test_file
+
+    def test_dir(self):
+        return self._test_dir
 
     # dummy callbacks --------------------------------------------------------
     def _dummy_on_reset(self):
@@ -702,6 +716,10 @@ class QUTest:
         err = 0 # assume no errors
         with open(fname) as f:
             QUTest_inst = QUTest()
+            QUTest_inst._test_file = fname
+            QUTest_inst._test_dir = os.path.dirname(fname)
+            if not QUTest_inst._test_dir: # empty dir?
+                QUTest_inst._test_dir = "."
             try:
                 code = compile(f.read(), fname, "exec")
                 # execute the script code in a separate instance of QUTest
@@ -710,10 +728,10 @@ class QUTest:
                     RuntimeError,
                     OSError) as e:
                 QUTest_inst._fail()
-                print(QUTest._STR_EXC1 + repr(e) + QUTest._STR_EXC2)
+                #print(QUTest._STR_EXC1 + repr(e) + QUTest._STR_EXC2)
+                traceback.print_exc()
                 err = -2
             except: # most likely an error in a test script
-                #exc_type, exc_value, exc_traceback = sys.exc_info()
                 QUTest_inst._fail()
                 QUTest._quit_host_exe()
                 traceback.print_exc()
