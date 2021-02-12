@@ -63,8 +63,11 @@ VERSION = 693
 #                   **relative** to the test script.
 #
 # @usage
-# `include("test_include.pyi") # include the specified file`
-# `include("../my_include/test_include.pyi") # include the specified file`
+# @code{py}
+# include("test_include.pyi") # file in the same directory as the script
+# ~ ~ ~
+# include("../my_include/test_include.pyi") # relative directory
+# @endcode
 #
 # __Example__@n
 # file to be included:@n
@@ -76,9 +79,25 @@ VERSION = 693
 def include(fname):
 
 ## @brief get the test file name with path
+# @description
+# This command returns a string containing the file name of the currently
+# executed test script ("test group").
+#
+# @usage
+# @code{py}
+# file_name = test_file()
+# @endcode
 def test_file():
 
 ## @brief get the test directory (relative to the current directory)
+# @description
+# This command returns a string containing the directory name of the currently
+# executed test script ("test group").
+#
+# @usage
+# @code{py}
+# dir_name = test_dir()
+# @endcode
 def test_dir():
 
 ## @brief start a new test
@@ -89,10 +108,12 @@ def test_dir():
 # @param[in] opt    options  {0=default, NORESET}
 #
 # @usage
-# `test("my first test") # test with title and with full target reset`@n
-# `~ ~ ~`@n
-# `test("my second test", NORESET) # test without target reset`@n
-# `~ ~ ~`
+# @code{py}
+# test("my first test") # test with title and with full target reset
+# ~ ~ ~
+# test("my second test", NORESET) # test without target reset
+# ~ ~ ~
+# @endcode
 #
 # @sa skip()
 #
@@ -108,15 +129,16 @@ def test(title, opt = 0):
 # errors, such as commands and parameters coded in the skipped tests.
 #
 # @usage
-# `test("my first test")`@n
-# `~ ~ ~`@n
-# `skip(1) # skip one subsequent test`@n
-# `test("my second test")`@n
-# `~ ~ ~`@n
-# `skip() # skip all subsequent tests`@n
-# `test("my second test")`@n
-# `~ ~ ~`@n
-# `~ ~ ~`
+# @code{py}
+# test("my first test")
+# ~ ~ ~
+# skip(1) # skip one subsequent test
+# test("my second test")
+# ~ ~ ~
+# skip() # skip all subsequent tests
+# test("my second test")
+# ~ ~ ~
+# @endcode
 #
 # @sa
 # test()
@@ -162,22 +184,24 @@ def expect(match):
 # cleared with it is preceded with the minus (`-`) sign.
 #
 # @n
-# The filter list can contain the following:@n
-# `GRP_ALL` -- all Record-Types@n
-# `GRP_SM` -- State Machine Record-Types@n
-# `GRP_AO` -- Active Object Record-Types@n
-# `GRP_MP` -- Memory Pool Record-Types@n
-# `GRP_EQ` -- Event Queue Record-Types@n
-# `GRP_TE` -- Time Events Record-Types@n
-# `GRP_QF` -- Framework Record-Types (e.g., post/publish/..)@n
-# `GRP_SC` -- Scheduler Record-Types (e.g., scheduler lock/unlock)@n
-# `GRP_U0` -- User group 0 (Record-Types 100-104)@n
-# `GRP_U1` -- User group 1 (Record-Types 105-109)@n
-# `GRP_U2` -- User group 2 (Record-Types 110-114)@n
-# `GRP_U3` -- User group 3 (Record-Types 115-119)@n
-# `GRP_U4` -- User group 0 (Record-Types 120-124)@n
-# `GRP_UA` -- All user records (Record-Types 100-124)@n
-# `<num>` -- Specific QS trace Record-Type in the range 0..127
+# The filter list can contain the following:
+# @code{py}
+# GRP_ALL # all Record-Types
+# GRP_SM # State Machine Record-Types
+# GRP_AO # Active Object Record-Types
+# GRP_MP # Memory Pool Record-Types
+# GRP_EQ # Event Queue Record-Types
+# GRP_TE # Time Events Record-Types
+# GRP_QF # Framework Record-Types (e.g., post/publish/..)
+# GRP_SC # Scheduler Record-Types (e.g., scheduler lock/unlock)
+# GRP_U0 # User group 0 (Record-Types 100-104)
+# GRP_U1 # User group 1 (Record-Types 105-109)
+# GRP_U2 # User group 2 (Record-Types 110-114)
+# GRP_U3 # User group 3 (Record-Types 115-119)
+# GRP_U4 # User group 0 (Record-Types 120-124)
+# GRP_UA # All user records (Record-Types 100-124)
+# <num>  # Specific QS trace Record-Type in the range 0..127
+# @endcode
 #
 # @usage
 # @include glb_filter.py
@@ -197,12 +221,14 @@ def glb_filter(*args):
 # A given filter-group or an individual filter is set when it is positive, and
 # cleared with it is preceded with the minus (`-`) sign.
 # @n
-# This parameter can take one of the following values:@n
-# `IDS_ALL` -- all QS-IDs@n
-# `IDS_AO` -- Active Object QS-IDs (1..64)@n
-# `IDS_EP` -- Event Pool QS-IDs (65-80)@n
-# `IDS_EQ` -- Event Queue QS-IDs (81-96)@n
-# `IDS_AP` -- Application-Specific QS-IDs (97-127)@n
+# This parameter can take one of the following values:
+# @code{py}
+# IDS_ALL # all QS-IDs
+# IDS_AO # Active Object QS-IDs (1..64)
+# IDS_EP # Event Pool QS-IDs (65-80)
+# IDS_EQ # Event Queue QS-IDs (81-96)
+# IDS_AP # Application-Specific QS-IDs (97-127)
+# @endcode
 #
 # @usage
 # @include loc_filter.py
@@ -239,14 +265,16 @@ def ao_filter(obj_id):
 #
 # @param[in] obj_kind  Kind of object to set
 # @n
-# This parameter can take one of the following values:@n
-# `OBJ_SM` -- State Machine object@n
-# `OBJ_AO` -- Active Object object@n
-# `OBJ_MP` -- Memory Pool object@n
-# `OBJ_EQ` -- Event Queue object@n
-# `OBJ_TE` -- Time Event object@n
-# `OBJ_AP` -- Application-Specific object@n
-# `OBJ_SM_AO` -- Both, State Machine and Active Object
+# This parameter can take one of the following values:
+# @code{py}
+# OBJ_SM # State Machine object
+# OBJ_AO # Active Object object
+# OBJ_MP # Memory Pool object
+# OBJ_EQ # Event Queue object
+# OBJ_TE # Time Event object
+# OBJ_AP # Application-Specific object
+# OBJ_SM_AO # Both, State Machine and Active Object
+# @endcode
 #
 # @param[in] obj_id  Name or addres of the object
 #
@@ -254,9 +282,9 @@ def ao_filter(obj_id):
 # @include current_obj.py
 #
 # @sa
-# query_curr()@n
-# init()@n
-# dispatch()
+# - query_curr()
+# - init()
+# - dispatch()
 #
 def current_obj(obj_kind, obj_id):
 
@@ -267,26 +295,30 @@ def current_obj(obj_kind, obj_id):
 #
 # @param[in] obj_kind  Kind of object to query
 # @n
-# This parameter can take one of the following values:@n
-# `OBJ_SM` -- State Machine object@n
-# `OBJ_AO` -- Active Object object@n
-# `OBJ_MP` -- Memory Pool object@n
-# `OBJ_EQ` -- Event Queue object@n
-# `OBJ_TE` -- Time Event object
+# This parameter can take one of the following values:
+# @code{py}
+# OBJ_SM # State Machine object@n
+# OBJ_AO # Active Object object@n
+# OBJ_MP # Memory Pool object@n
+# OBJ_EQ # Event Queue object@n
+# OBJ_TE # Time Event object
+# @endcode
 #
 # @usage
 # The queries for various objects generate the following QS trace records
-# from the Target:@n
-# `query_curr(OBJ_SM)`:@n
-# `"@timestamp Query-SM Obj=<obj-name>,State=<state-name>"`@n
-# `query_curr(OBJ_AO)`:@n
-# `"@timestamp Query-AO Obj=<obj-name>,Queue<Free=<n>,Min=<m>>"`@n
-# `query_curr(OBJ_EQ)`:@n
-# `"@timestamp Query-EQ Obj=<obj-name>,Queue<Free=<n>,Min=<m>>"`@n
-# `query_curr(OBJ_MP)`:@n
-# `"@timestamp Query-MP Obj=<obj-name>,Free=<n>,Min=<m>"`@n
-# `query_curr(OBJ_TE)`:@n
-# `"@timestamp Query-TE Obj=<obj-name>,Rate=<r>,Sig=<s>,Tim=<n>,Int=<m>,Flags=<f>"`
+# from the Target
+# @code{py}
+# query_curr(OBJ_SM)
+# "@timestamp Query-SM Obj=<obj-name>,State=<state-name>"
+# query_curr(OBJ_AO)
+# "@timestamp Query-AO Obj=<obj-name>,Queue<Free=<n>,Min=<m>>"
+# query_curr(OBJ_EQ)
+# "@timestamp Query-EQ Obj=<obj-name>,Queue<Free=<n>,Min=<m>>"
+# query_curr(OBJ_MP)
+# "@timestamp Query-MP Obj=<obj-name>,Free=<n>,Min=<m>"
+# query_curr(OBJ_TE)
+# "@timestamp Query-TE Obj=<obj-name>,Rate=<r>,Sig=<s>,Tim=<n>,Int=<m>,Flags=<f>"
+# @endcode
 #
 # @sa
 # current_obj()
@@ -389,9 +421,11 @@ def command(cmdId, param1 = 0, param2 = 0, param3 = 0):
 # @param[in] params  the parameters of the "initialization event"
 #
 # @usage
-# `init()`@n
-# `init("MY_SIG")`@n
-# `init("MY_SIG", pack("<B", 2))`
+# @code{py}
+# init()
+# init("MY_SIG")
+# init("MY_SIG", pack("<B", 2))
+# @endcode
 #
 def init(signal = 0, params = None):
 
@@ -405,8 +439,10 @@ def init(signal = 0, params = None):
 # @param[in] params  the parameters of the event to be dispatched
 #
 # @usage
-# `dispatch("MY_SIG")`@n
-# `dispatch("MY_SIG", pack("<B", 2))`
+# @code{py}
+# dispatch("MY_SIG")
+# dispatch("MY_SIG", pack("<B", 2))
+# @endcode
 #
 def dispatch(signal, params = None):
 
@@ -420,8 +456,10 @@ def dispatch(signal, params = None):
 # @param[in] params  the parameters of the event to be posted
 #
 # @usage
-# `post("MY_SIG")`@n
-# `post("MY_SIG", pack("<B", 2))`
+# @code{py}
+# `post("MY_SIG")
+# `post("MY_SIG", pack("<B", 2))
+# @endcode
 #
 def post(signal, params = None):
 
@@ -434,8 +472,10 @@ def post(signal, params = None):
 # @param[in] params  the parameters of the event to be posted
 #
 # @usage
-# `publish("MY_SIG")`@n
-# `publish("MY_SIG", pack("<B", 2))`
+# @code{py}
+# publish("MY_SIG")
+# publish("MY_SIG", pack("<B", 2))
+# @endcode
 #
 def publish(signal, params = None):
 
@@ -458,7 +498,9 @@ def publish(signal, params = None):
 # (NORESET tests).
 #
 # @usage
-# `probe("myFunction", 123)`
+# @code{py}
+# probe("myFunction", 123)
+# @endcode
 #
 def probe(func, data):
 
@@ -473,9 +515,11 @@ def probe(func, data):
 # @param[in] num    number of data items to peek
 #
 # @usage
-# `peek(0, 1, 10)`@n
-# `peek(8, 2, 4)`@n
-# `peek(4, 4, 2)`
+# @code{py}
+# peek(0, 1, 10)
+# peek(8, 2, 4)
+# peek(4, 4, 2)
+# @endcode
 #
 def peek(offset, size, num):
 
@@ -489,9 +533,11 @@ def peek(offset, size, num):
 # @param[in] data   binary data to send
 #
 # @usage
-# `poke(4,4,pack("<II",0xB4C4D4E4,0xB5C5D5E5))`@n
-# `poke(0, 1, bytearray("dec=%d\0", "ascii"))`@n
-# `poke(0, 1, bytes("Hello World!\0","ascii"))`
+# @code{py}
+# poke(4,4,pack("<II",0xB4C4D4E4,0xB5C5D5E5))
+# poke(0, 1, bytearray("dec=%d\0", "ascii"))
+# poke(0, 1, bytes("Hello World!\0","ascii"))
+# @endcode
 #
 def poke(offset, size, data):
 
@@ -506,9 +552,11 @@ def poke(offset, size, data):
 # @param[in] item   data item to fill with
 #
 # @usage
-# `fill(0, 1, 100, 0x1A)`@n
-# `fill(0, 2, 50, 0x2A2B)`@n
-# `fill(0, 4, 25, 0x4A4B4C4D)`
+# @code{py}
+# fill(0, 1, 100, 0x1A)
+# fill(0, 2, 50, 0x2A2B)
+# fill(0, 4, 25, 0x4A4B4C4D)
+# @endcode
 #
 def fill(offset, size, num, item = 0):
 
@@ -528,9 +576,10 @@ def fill(offset, size, num, item = 0):
 # @param[in] v2 one or more data elements requried by format
 #
 # @usage
-# @n
-# `dispatch("MY_SIG", pack("<B", 2))`@n
-# `poke(2, 2, pack("<HH", 0xB2C2, 0xD2E2))`
+# @code{py}
+# dispatch("MY_SIG", pack("<B", 2))
+# poke(2, 2, pack("<HH", 0xB2C2, 0xD2E2))
+# @endcode
 #
 def pack(format, v1, v2, ...):
 
