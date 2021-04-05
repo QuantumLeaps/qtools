@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-10
+* Last updated for version 6.9.3
+* Last updated on  2021-04-04
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -2285,6 +2285,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 void QSPY_stop(void) {
     QSPY_configMatFile((void *)0);
     QSPY_configSeqFile((void *)0);
+}
+/*..........................................................................*/
+void QSPY_printInfo(void) {
+    QSPY_output.type = INF_OUT; /* this is an internal info message */
+    QSPY_onPrintLn();
 }
 /*..........................................................................*/
 void QSPY_printError(void) {

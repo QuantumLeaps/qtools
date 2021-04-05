@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-15
+* Last updated for version 6.9.3
+* Last updated on  2021-04-04
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -80,9 +80,10 @@ static int   l_bePort   = 7701;   /* default UDP port  */
 static int   l_tcpPort  = 6601;   /* default TCP port */
 static int   l_baudRate = 115200; /* default serial baudrate */
 
-#define INTRO_STR  "QSPY %s Copyright (c) 2005-2020 Quantum Leaps\n" \
+static char const l_introStr[] = \
+    "QSPY %s Copyright (c) 2005-2021 Quantum Leaps\n" \
     "Documentation: https://www.state-machine.com/qtools/qspy.html\n" \
-    "Current timestamp: %s\n"
+    "Current timestamp: %s\n";
 
 static char const l_helpStr[] =
     "Usage: qspy [options]     <arg> = required, [arg] = optional\n"
@@ -263,11 +264,6 @@ void QSPY_onPrintLn(void) {
 
     QSPY_output.type = REG_OUT; /* reset for the next time */
 }
-/*..........................................................................*/
-void QSPY_printInfo(void) {
-    QSPY_output.type = INF_OUT; /* this is an internal info message */
-    QSPY_onPrintLn();
-}
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
@@ -278,9 +274,9 @@ static QSpyStatus configure(int argc, char *argv[]) {
     QSpyConfig config = {
         .version      = 660U,
         .endianness   = 0U,
-        .tstampSize   = 4U,
         .objPtrSize   = 4U,
         .funPtrSize   = 4U,
+        .tstampSize   = 4U,
         .sigSize      = 2U,
         .evtSize      = 2U,
         .queueCtrSize = 1U,
@@ -297,7 +293,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     STRNCPY_S(l_dicFileName, sizeof(l_dicFileName), "OFF");
 
     STRNCPY_S(l_tstampStr, sizeof(l_tstampStr), QSPY_tstampStr());
-    PRINTF_S(INTRO_STR, QSPY_VER, l_tstampStr);
+    PRINTF_S(l_introStr, QSPY_VER, l_tstampStr);
 
     STRNCPY_S(l_inpFileName, sizeof(l_inpFileName), "qs.bin");
 #ifdef _WIN32
@@ -539,7 +535,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     if (l_outFileName[0] != 'O') { /* "OFF" ? */
         FOPEN_S(l_outFile, l_outFileName, "w");
         if (l_outFile != (FILE *)0) {
-            FPRINTF_S(l_outFile, INTRO_STR, QSPY_VER, l_tstampStr);
+            FPRINTF_S(l_outFile, l_introStr, QSPY_VER, l_tstampStr);
         }
         else {
             PRINTF_S("   <QSPY-> Cannot open File=%s\n", l_outFileName);
@@ -670,7 +666,7 @@ bool QSPY_command(uint8_t cmdId) {
                            "qspy%s.txt", l_tstampStr);
                 FOPEN_S(l_outFile, l_outFileName, "w");
                 if (l_outFile != (FILE *)0) {
-                    FPRINTF_S(l_outFile, INTRO_STR, QSPY_VER,
+                    FPRINTF_S(l_outFile, l_introStr, QSPY_VER,
                               l_tstampStr);
                 }
                 else {

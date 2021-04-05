@@ -78,7 +78,6 @@ Unlike other existing unit testing harnesses for embedded systems (e.g., <a href
 Even though QUTest&trade; is particularly suitable for running tests on deeply embedded targets, it also fully supports running *the same* tests on your **host computer** (Windows, Linux, and MacOS are supported). In fact, running the tests as much as possible on the host and thus avoiding the target-hardware bottleneck is the highly recommended best-practice of embedded TDD. QUTest&trade; supports **fully-automated** unit testing, both on the embedded target and on the host computer.
 
 
-
 @section qutest_use Installation &amp; Use
 The <span class="img file_py">qutest.py</span> script can be used standalone, without any installation in your Python system (see  @ref qutest_run below).
 
@@ -114,11 +113,16 @@ qutest [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
 
 - `test_scripts` - optional specification of the Python test scripts to run. If not specified, qutest will try to run all *.py files in the current directory as test scripts
 
-- `host_exe | DEBUG` - optional specification of the test-fixture compiled for the host (host executable) for testing on the host computer. The special value DEBUG means that qutest will run in the "debug mode", in which it will NOT launch the host executables and it will wait for the Target reset and other responses from the Target. If host_exe is not specified, an embedded target is assumed (which is loaded with the test fixture already).
+- `host_exe | "" | DEBUG` - optional specification of the test-fixture compiled for the host (host executable) for testing on the host computer. The placeholder value `""` (empty string) can be used for running test fixtures on an embedded Target. The special value DEBUG means that qutest will run in the "debug mode", in which it will NOT launch the host executables and it will wait for the Target reset and other responses from the Target. If host_exe is not specified, an embedded target is assumed (which is loaded with the test fixture already).
 
 - `qspy_host[:udp_port]` - optional host-name/IP-address:port for the host running the QSPY host utility. If not specified, the default is 'localhost:7701'.
 
 - `tcp_port`- optional the QSpy TCP port number for connecting host executables. If not specified, the default is `6601`.
+
+
+@note
+The command-line options for `qutest.py` are **positional**, meaning that an option must be at the specific position in the command-line to be parsed correctly. For example, if you wish to run QUTest on an embedded target at the specified `[qspy_host]` host-name, you still need to provide a placeholder for the host executable `[host_exe]` ("") option, to get to the right position for the `[qspy_host]` option.
+
 
 
 @subsection qutest_exa Examples
@@ -142,6 +146,12 @@ python3 %QTOOLS%\qutest\qutest.py *.py build\dpp.exe
 @endverbatim
 
 runs the test scripts (`*.py`) in the current directory and uses the host executable: `build\dpp.exe`
+
+@verbatim
+python3 %QTOOLS%\qutest\qutest.py *.py "" 192.168.1.100:7705
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory, without a host executable: (`""`), and connects to QSPY at `192.168.1.100:7705`
 
 @verbatim
 qutest *.py build\dpp.exe 192.168.1.100:7705
@@ -175,6 +185,12 @@ python3 $(QTOOLS)/qutest/qutest.py *.py build/dpp
 @endverbatim
 
 runs the test scripts (`*.py`) in the current directory and uses the host executable: `build/dpp`
+
+@verbatim
+python3 $(QTOOLS)/qutest/utest.py *.py "" 192.168.1.100:7705
+@endverbatim
+
+runs the test scripts (`*.py`) in the current directory, without a host executable: (`""`), and connects to QSPY at `192.168.1.100:7705`
 
 @verbatim
 qutest *.py build/dpp 192.168.1.100:7705

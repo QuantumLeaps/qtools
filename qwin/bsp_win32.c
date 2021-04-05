@@ -1,14 +1,13 @@
 /*****************************************************************************
 * Product: BSP for QWIN GUI demo
-* Last updated for version 5.6.5
-* Last updated on  2016-06-04
+* Last updated for version: 6.9.3
+* Date of the Last Update:  2021-03-03
 *
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
-*
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the following MIT License (MIT).
@@ -32,8 +31,8 @@
 * DEALINGS IN THE SOFTWARE.
 *
 * Contact information:
-* https://state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com/licensing>
+* <info@state-machine.com>
 *****************************************************************************/
 #include <stdint.h>
 
@@ -172,21 +171,23 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
             return 0;
         }
 
-        /* commands from regular buttons and menus... */
+        /* commands from child controls and menus... */
         case WM_COMMAND: {
-            SetFocus(hWnd);
             switch (wParam) {
                 case IDOK:
                 case IDCANCEL: {
                     PostQuitMessage(0);
-
+                    break;
+                }
+                case IDC_USER: { /* owner-drawn button(s) */
+                    SetFocus(hWnd);
                     break;
                 }
             }
             return 0;
         }
 
-        /* owner-drawn buttons... */
+        /* drawing of owner-drawn buttons... */
         case WM_DRAWITEM: {
             LPDRAWITEMSTRUCT pdis = (LPDRAWITEMSTRUCT)lParam;
             switch (pdis->CtlID) {
