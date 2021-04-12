@@ -3,6 +3,31 @@
 
 @section qtools_6_9_3 Version 6.9.3, 2021-04-09
 
+__Changes in QSpy__
+- Moved function `QSPY_printInfo()` to `qspy.c`, to enable the direct QSPY output to the console. Please see also discussion thread [QSPY to console in win32-qv and posix-qv ports](https://sourceforge.net/p/qpc/discussion/668726/thread/92e56e9480) 
+ 
+
+__Changes in QUTest__
+- Corrected the @ref qutest_command "DEBUG mode", where the Enter key now correctly skips a test.
+- Added new command include() and provided examples of its use.
+- Improved error reporting from test scripts. Specifically, the content of the Python stack has been expanded to encompass all the relevant calls.
+
+
+__Changes in QView__
+- Modified the Python implementation to run correctly after [installing with pip](https://pypi.org/project/qview/).
+
+
+__Changes in QWin__
+- Modified the example code to correctly handle regular buttons alongside the "owner-drawn" buttons.
+
+
+__Changes in QCalc__
+- Modified the Python implementation to run correctly after [installing with pip](https://pypi.org/project/qcalc/).
+
+
+__Updated Python for Windows__
+- The Python interpreter in QTools for Windows has been updated to Python 3.9.4.
+
 
 
 @section qtools_6_9_2 Version 6.9.2, 2021-01-18
