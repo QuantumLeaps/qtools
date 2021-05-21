@@ -68,9 +68,9 @@ Additionally, the provided code shows how to handle input sources:
 ---------------------------------------------------------------------------
 # QWin™ Documentation
 QWin™ GUI Prototyping Toolkit is described in the pplication Note:
-[QWIN GUI Kit for Prototyping Embedded Systems on Windows]().
+[QWIN GUI Kit for Prototyping Embedded Systems on Windows](https://www.state-machine.com/doc/AN_QWin-GUI.pdf).
 
-![AppNote: QWIN GUI Kit for Prototyping Embedded Systems](https://www.state-machine.com/img/qwin_an.jpg)
+[![AppNote: QWIN GUI Kit for Prototyping Embedded Systems](https://www.state-machine.com/img/qwin_an.jpg)](https://www.state-machine.com/doc/AN_QWin-GUI.pdf)
 
 
 ---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ The QWin is licensed under the permissive MIT license
 
 > **NOTE**
 _Other tools in the QTools™ collection are licensed under different terms than
-the QWin™. Please check the licensing of the particular tool for licensing._
+the QWin™. Please check the licensing of the particular tool._
 
 
 ---------------------------------------------------------------------------
