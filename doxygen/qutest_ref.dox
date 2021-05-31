@@ -192,6 +192,7 @@ The commands that you can place in the tests (as well as inside the callback fun
 - pack()
 - test_file()
 - test_dir()
+- last_rec()
 
 
 

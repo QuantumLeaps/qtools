@@ -2,8 +2,8 @@
 # @file
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.3a
-# Last updated on  2021-02-09
+# Last updated for version 6.9.4
+# Last updated on  2021-05-31
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -56,7 +56,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 693
+    VERSION = 694
 
     # class variables
     _host_exe = ""
@@ -141,6 +141,7 @@ class QUTest:
             "on_reset": self._dummy_on_reset,
             "on_setup": self._dummy_on_setup,
             "on_teardown": self._dummy_on_teardown,
+            "last_rec": self.last_rec,
             "VERSION": QUTest.VERSION,
             "NORESET": QUTest._OPT_NORESET,
             "OBJ_SM": QSpy._OBJ_SM,
@@ -705,6 +706,10 @@ class QUTest:
     def _dummy_on_teardown(self):
         #print("_dummy_on_teardown")
         pass
+
+    # last_rec DSL command ...................................................
+    def last_rec(self):
+        return QUTest._last_record[3:].decode("utf-8")
 
     # helper methods ---------------------------------------------------------
     @staticmethod

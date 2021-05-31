@@ -18,8 +18,8 @@
 #
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.3
-# Last updated on  2021-02-09
+# Last updated for version 6.9.4
+# Last updated on  2021-05-31
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -51,7 +51,7 @@
 #-----------------------------------------------------------------------------
 
 ## @brief current version of the Python QUTest interface
-VERSION = 693
+VERSION = 694
 
 ## @brief include python code in a test script
 # @description
@@ -582,6 +582,23 @@ def fill(offset, size, num, item = 0):
 # @endcode
 #
 def pack(format, v1, v2, ...):
+
+## @brief returns last record received from the target as string.
+#
+# @usage
+# @code{py}
+# command("COMMAND_B", 123, 23456, 3456789) # generate record (if needed)
+# expect("@timestamp COMMAND_B *") # expect the record from the target
+# last = last_rec().split() # <-- obtain the last record and split it
+# p1 = int(last[2])         # extract the expected parameter p1 (int)
+# s1 = last[3]              # extract the expected string s1
+# p2 = int(last[4])         # extract the expected parameter p2 (int)
+# s2 = last[5]              # extract the expected string s2
+# p3 = int(last[6])         # extract the expected parameter p3 (int)
+# p4 = float(last[7])       # extract the expected parameter p4 (float)
+# @endcode
+#
+def last_rec():
 
 ## @brief
 # callback function invoked after each Target reset
