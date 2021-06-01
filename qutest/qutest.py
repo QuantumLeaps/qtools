@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
 # Last updated for version 6.9.4
-# Last updated on  2021-05-31
+# Last updated on  2021-06-01
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -247,14 +247,13 @@ class QUTest:
                 pattern = exp.replace("[", "\2")
                 pattern = pattern.replace("]", "\3")
 
-            got = QUTest._last_record[3:].decode("utf-8")
-            names = got.replace("[", "\2")
+            names = QUTest._last_record.replace("[", "\2")
             names = names.replace("]", "\3")
 
             if fnmatchcase(names, pattern):
                 return True
             else:
-                self._fail('got: "%s"'%(got),
+                self._fail('got: "%s"'%(QUTest._last_record),
                            'exp: "%s"'%(exp))
                 return False
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
@@ -709,7 +708,7 @@ class QUTest:
 
     # last_rec DSL command ...................................................
     def last_rec(self):
-        return QUTest._last_record[3:].decode("utf-8")
+        return QUTest._last_record
 
     # helper methods ---------------------------------------------------------
     @staticmethod
@@ -766,15 +765,14 @@ class QUTest:
             return
 
         exp = "           Trg-Ack  QS_RX_TEST_TEARDOWN"
-        got = QUTest._last_record[3:].decode("utf-8")
-        if got == exp:
+        if QUTest._last_record == exp:
             self._DSL_dict["on_teardown"]()
             print("%s (%.3fs)"%(
                   QUTest._STR_TEST_PASS,
                   QUTest._time() - self._startTime))
             return
         else:
-            self._fail('got: "%s"'%(got),
+            self._fail('got: "%s"'%(QUTest._last_record),
                        'exp: end-of-test')
             # ignore all input until timeout
             while QSpy._receive():
@@ -974,9 +972,6 @@ class QSpy:
     _EVT_INIT      = 254
     _EVT_DISPATCH  = 255
 
-    # special empty record
-    _EMPTY_RECORD  = "    "
-
     # tuple of QS records from the Target.
     # !!! NOTE: Must match qs_copy.h !!!
     _QS = ("QS_EMPTY",
@@ -1157,7 +1152,7 @@ class QSpy:
             try:
                 packet = QSpy._sock.recv(4096)
             except socket.timeout:
-                QUTest._last_record = QSpy._EMPTY_RECORD
+                QUTest._last_record = ""
                 return False # timeout
             # don"t catch OSError
         else:
@@ -1183,19 +1178,19 @@ class QSpy:
 
         dlen = len(packet)
         if dlen < 2:
-            QUTest._last_record = QSpy._EMPTY_RECORD
+            QUTest._last_record = ""
             raise RuntimeError("UDP packet from QSpy too short")
 
         recID = packet[1]
         if recID == QSpy._PKT_TEXT_ECHO: # text packet (most common)
-            QUTest._last_record = packet
+            QUTest._last_record = packet[3:].decode("utf-8")
             # QS_ASSERTION?
             if dlen > 3 and packet[2] == QSpy._PKT_ASSERTION:
                 QUTest._need_reset = True
 
         elif recID == QSpy._PKT_TARGET_INFO: # target info?
+            QUTest._last_record = ""
             if dlen != 18:
-                QUTest._last_record = QSpy._EMPTY_RECORD
                 raise RuntimeError("Incorrect Target info")
 
             fmt = "xBHxLxxxQ"
@@ -1213,21 +1208,20 @@ class QSpy:
                    tstamp[12], tstamp[11], tstamp[10],
                    tstamp[9], tstamp[8], tstamp[7])
             #print("Target:", QSpy.fmt_targetTstamp)
-            QUTest._last_record = packet
             QUTest._have_info = True
 
         elif recID == QSpy._PKT_ATTACH_CONF:
-            QUTest._last_record = packet
+            QUTest._last_record = ""
             QSpy._is_attached = True
 
         elif recID == QSpy._PKT_DETACH:
             QUTest._quit_host_exe()
-            QUTest._last_record = packet
+            QUTest._last_record = ""
             QSpy._detach()
             QSpy._is_attached = False
 
         else:
-            QUTest._last_record = QSpy._EMPTY_RECORD
+            QUTest._last_record = ""
             raise RuntimeError("Unrecognized UDP packet type from QSpy")
 
         return True # some input received
