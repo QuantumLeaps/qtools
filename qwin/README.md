@@ -59,7 +59,7 @@ Currently QWin™ provides the following facilities:
   custom bitmaps for the segments.
 * Owner-drawn buttons with custom “depressed” and “released” bitmaps and capable
   of generating separate events when depressed and when released.
-  
+
 Additionally, the provided code shows how to handle input sources:
 * Keyboard events
 * Mouse move events and mouse-wheel events

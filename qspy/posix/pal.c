@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
-* Last updated on  2020-08-24
+* Last updated for version 6.9.4
+* Last updated on  2021-06-17
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -52,6 +52,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <time.h>
+#include <signal.h>
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
@@ -78,8 +79,6 @@ static void file_cleanup(void);
 static QSPYEvtType be_receive (fd_set const *pReadSet,
                                unsigned char *buf, size_t *pBytes);
 
-static QSpyStatus kbd_open(void);
-static void kbd_close(void);
 static QSPYEvtType kbd_receive(fd_set const *pReadSet,
                                unsigned char *buf, size_t *pBytes);
 static void updateReadySet(int targetConn);
@@ -98,6 +97,8 @@ typedef union {
     struct sockaddr addr;
 } fe_addr;
 
+static bool l_kbd_inp = false;
+
 static int l_serFD      = 0;  /* Serial port file descriptor */
 static int l_serverSock = INVALID_SOCKET;
 static int l_clientSock = INVALID_SOCKET;
@@ -113,6 +114,59 @@ static fd_set l_readSet; /* descriptor set for reading all input sources */
 static int l_maxFd;      /* maximum file descriptor for select() */
 
 /*==========================================================================*/
+/* Keyboard input */
+static void sigExitHandler(int dummy) {
+    (void)dummy; /* unused parameter */
+    QSPY_cleanup();
+    exit(0);
+}
+
+QSpyStatus PAL_openKbd(bool kbd_inp) {
+    struct sigaction sig_act;
+    memset(&sig_act, 0, sizeof(sig_act));
+
+    /* install the SIGINT (Ctrl-C) signal handler */
+    sig_act.sa_handler = &sigExitHandler;
+    sigaction(SIGINT, &sig_act, NULL);
+
+    /* install the SIGTERM (kill) signal handler */
+    sig_act.sa_handler = &sigExitHandler;
+    sig_act.sa_flags   = SA_SIGINFO;
+    sigaction(SIGTERM, &sig_act, NULL);
+
+    if (kbd_inp) {
+        struct termios t;
+
+        /* modify the terminal attributes... */
+        /* get the original terminal settings */
+        if (tcgetattr(0, &l_termios_saved) == -1) {
+            SNPRINTF_LINE("    <CONS> ERROR    getting terminal attributes");
+            QSPY_printError();
+            return QSPY_ERROR;
+        }
+
+        t = l_termios_saved;
+        t.c_lflag &= ~(ICANON | ECHO); /* disable canonical mode and echo */
+        if (tcsetattr(0, TCSANOW, &t) == -1) {
+            SNPRINTF_LINE("    <CONS> ERROR    setting terminal attributes");
+            QSPY_printError();
+            return QSPY_ERROR;
+        }
+
+        l_kbd_inp = true;
+    }
+    return QSPY_SUCCESS;
+}
+/*..........................................................................*/
+void PAL_closeKbd(void) {
+    if (l_kbd_inp) {
+        /* restore the saved terminal settings */
+        tcsetattr(0, TCSANOW, &l_termios_saved);
+        l_kbd_inp = false;
+    }
+}
+
+/*==========================================================================*/
 /* POSIX serial communication with the Target */
 QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     struct termios t;
@@ -122,11 +176,6 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     PAL_vtbl.getEvt      = &ser_getEvt;
     PAL_vtbl.send2Target = &ser_send2Target;
     PAL_vtbl.cleanup     = &ser_cleanup;
-
-    /* start with initializing the keyboard (terminal) */
-    if (kbd_open() != QSPY_SUCCESS) {
-        return QSPY_ERROR;
-    }
 
     l_serFD = open(comName, O_RDWR | O_NOCTTY | O_NONBLOCK);/* R/W,no-block */
     if (l_serFD == -1) {
@@ -308,8 +357,6 @@ static QSpyStatus ser_send2Target(unsigned char *buf, size_t nBytes) {
 }
 /*..........................................................................*/
 static void ser_cleanup(void) {
-    kbd_close(); /* close the keyboard */
-
     if (l_serFD != 0) {
         close(l_serFD); /* close the serial port */
         l_serFD = 0;
@@ -330,11 +377,6 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
     PAL_vtbl.getEvt      = &tcp_getEvt;
     PAL_vtbl.send2Target = &tcp_send2Target;
     PAL_vtbl.cleanup     = &tcp_cleanup;
-
-    /* start with initializing the keyboard (terminal) */
-    if (kbd_open() != QSPY_SUCCESS) {
-        return QSPY_ERROR;
-    }
 
     /* create TCP socket */
     l_serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -374,8 +416,6 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
 }
 /*..........................................................................*/
 static void tcp_cleanup(void) {
-    kbd_close(); /* close the keyboard */
-
     if (l_serverSock != INVALID_SOCKET) {
         close(l_serverSock);
     }
@@ -487,11 +527,6 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
     PAL_vtbl.send2Target = &file_send2Target;
     PAL_vtbl.cleanup     = &file_cleanup;
 
-    /* start with initializing the keyboard (terminal) */
-    if (kbd_open() != QSPY_SUCCESS) {
-        return QSPY_ERROR;
-    }
-
     FOPEN_S(l_file, fName, "rb"); /* open for reading binary */
     if (l_file == (FILE *)0) {
         SNPRINTF_LINE("   <COMMS> ERROR    Cannot find File=%s", fName);
@@ -558,8 +593,6 @@ static QSpyStatus file_send2Target(unsigned char *buf, size_t nBytes) {
 }
 /*..........................................................................*/
 static void file_cleanup(void) {
-    kbd_close(); /* close the keyboard */
-
     if (l_file != (FILE *)0) {
         fclose(l_file);
         l_file = (FILE *)0;
@@ -735,37 +768,10 @@ static QSPYEvtType be_receive(fd_set const *pReadSet,
 }
 
 /*..........................................................................*/
-static QSpyStatus kbd_open(void) {
-    struct termios t;
-
-    /* modify the terminal attributes... */
-    /* get the original terminal settings */
-    if (tcgetattr(0, &l_termios_saved) == -1) {
-        SNPRINTF_LINE("    <CONS> ERROR    getting terminal attributes");
-        QSPY_printError();
-        return QSPY_ERROR;
-    }
-
-    t = l_termios_saved;
-    t.c_lflag &= ~(ICANON | ECHO); /* disable canonical mode and echo */
-    if (tcsetattr(0, TCSANOW, &t) == -1) {
-        SNPRINTF_LINE("    <CONS> ERROR    setting terminal attributes");
-        QSPY_printError();
-        return QSPY_ERROR;
-    }
-
-    return QSPY_SUCCESS;
-}
-/*..........................................................................*/
-static void kbd_close(void) {
-    /* restore the saved terminal settings */
-    tcsetattr(0, TCSANOW, &l_termios_saved);
-}
-/*..........................................................................*/
 static QSPYEvtType kbd_receive(fd_set const *pReadSet,
                                unsigned char *buf, size_t *pBytes)
 {
-    if (FD_ISSET(0, pReadSet)) {
+    if (l_kbd_inp && FD_ISSET(0, pReadSet)) {
         *pBytes = read(0, buf, 1); /* the key pressed */
         if (*pBytes > 0) {
             return QSPY_KEYBOARD_EVT;

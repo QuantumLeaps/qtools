@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.3
-* Last updated on  2021-04-04
+* Last updated for version 6.9.4
+* Last updated on  2021-06-17
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -60,6 +60,7 @@ typedef enum {
 static TargetLink l_link = NO_LINK;
 static int   l_quiet     = -1;
 static int   l_quiet_ctr = 0;
+static bool  l_kbd_inp   = true; /* keyboard input supported */
 static FILE *l_outFile = (FILE *)0;
 static FILE *l_savFile = (FILE *)0;
 static FILE *l_matFile = (FILE *)0;
@@ -95,6 +96,7 @@ static char const l_helpStr[] =
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
     "-u [UDP_port|0]   7701    UDP socket with optional port, 0-no UDP\n"
     "-v <QS_version>   6.6     compatibility with QS version\n"
+    "-k                        suppress keyboard input\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
     "-m                        produce Matlab output to a file\n"
@@ -119,7 +121,7 @@ static char const l_helpStr[] =
     "-C <counter_size> 2       QTimeEvt counter size (bytes)\n";
 
 static char const l_kbdHelpStr[] =
-    "Keyboard shortcuts:\n"
+    "Keyboard shortcuts (valid when -k option is absent):\n"
     "KEY(s)            ACTION\n"
     "-----------------------------------------------------------------\n"
     "<Esc>/x/X         Exit QSPY\n"
@@ -138,7 +140,6 @@ static char const l_kbdHelpStr[] =
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]);
-static void cleanup(void);
 static uint8_t l_buf[8*1024]; /* process input in 8K chunks */
 
 /*..........................................................................*/
@@ -195,14 +196,16 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
     /* cleanup .............................................................*/
-    cleanup();
-    PRINTF_S("\nQSPY Done\n");
+    QSPY_cleanup();
     return status;
 }
 
 /*..........................................................................*/
-static void cleanup(void) {
+void QSPY_cleanup(void) {
+    PAL_closeKbd();  /* close the keyboard input (if open) */
+
     if (l_savFile != (FILE *)0) {
         fclose(l_savFile);
     }
@@ -219,13 +222,15 @@ static void cleanup(void) {
     if (PAL_vtbl.cleanup != 0) {
         (*PAL_vtbl.cleanup)();  /* close the target connection */
     }
+
+    PRINTF_S("\nQSPY Done\n");
 }
 
 /*..........................................................................*/
 void Q_onAssert(char const * const module, int loc) {
     PRINTF_S("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
            module, loc);
-    cleanup();
+    QSPY_cleanup();
     exit(-1);
 }
 
@@ -268,7 +273,7 @@ void QSPY_onPrintLn(void) {
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hq::u::v:osmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:kosmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
     QSpyConfig config = {
@@ -337,6 +342,10 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     FPRINTF_S(stderr, "Incorrect version number: %s", optarg);
                     return QSPY_ERROR;
                 }
+                break;
+            }
+            case 'k': { /* suppress keyboard input */
+                l_kbd_inp = false;
                 break;
             }
             case 'o': { /* save screen output to a file */
@@ -576,6 +585,11 @@ static QSpyStatus configure(int argc, char *argv[]) {
     if (l_dicFileName[0] != 'O') { /* not "OFF" ? */
         QSPY_setExternDict(l_dicFileName);
         QSPY_readDict();
+    }
+
+    /* open the keyboard input... */
+    if (PAL_openKbd(l_kbd_inp)  != QSPY_SUCCESS) {
+        return QSPY_ERROR;
     }
 
     return QSPY_SUCCESS;

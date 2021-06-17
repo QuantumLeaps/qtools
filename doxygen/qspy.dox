@@ -48,7 +48,7 @@ ALIGN="center" VALIGN="middle">
     <TD>Help. Prints the summary of options</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-q [num]</TD>
     <TD>-q 99</TD>
     <TD>(key-q)</TD>
@@ -64,7 +64,7 @@ ALIGN="center" VALIGN="middle">
     <TD>UDP socket for "Front-Ends".@n`-u0` suppresses opening the UPD socket </TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-v &lt;QS_version&gt;</TD>
     <TD>-v 6.2</TD>
     <TD>6.6</TD>
@@ -73,6 +73,14 @@ ALIGN="center" VALIGN="middle">
   </TR>
 
   <TR bgColor="#f0f0f0">
+    <TD>-k</TD>
+    <TD>-k</TD>
+    <TD></TD>
+    <TD></TD>
+    <TD>suppress keyboard input</TD>
+  </TR>
+
+  <TR bgColor="#e0e0e0">
     <TD>-o</TD>
     <TD>-o</TD>
     <TD>(key-o)</TD>
@@ -80,7 +88,7 @@ ALIGN="center" VALIGN="middle">
     <TD>Produce output to the specified file</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>-s</TD>
     <TD>-s</TD>
     <TD>(key-s)</TD>
@@ -89,7 +97,7 @@ ALIGN="center" VALIGN="middle">
     </TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#e0e0e0">
     <TD>-m</TD>
     <TD>-m</TD>
     <TD>(key-m)</TD>
@@ -97,7 +105,7 @@ ALIGN="center" VALIGN="middle">
     <TD>Produce @ref qspy_matlab "MATLAB/GNU-Octave output" to a file</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>-g [object-list]</TD>
     <TD>-g Table::inst,Philo::inst[0],Philo::inst[1]</TD>
     <TD>(key-g)</TD>
@@ -105,7 +113,7 @@ ALIGN="center" VALIGN="middle">
     <TD>Produce @ref qspy_seq "Sequence diagram output" to a file</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#e0e0e0">
     <TD>-t [TCP-port]</TD>
     <TD>-t </TD>
     <TD>6601</TD>
@@ -113,7 +121,7 @@ ALIGN="center" VALIGN="middle">
     <TD>TCP/IP input selection. Not compatible with -c, -b, -f</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>-c &lt;port&gt;</TD>
     <TD>-c COM2</TD>
     <TD>COM1</TD>
@@ -121,7 +129,7 @@ ALIGN="center" VALIGN="middle">
     <TD>COM port selection. Not compatible with -t, -p, -f</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#e0e0e0">
     <TD>-b &lt;baud&gt;</TD>
     <TD>-b 38400</TD>
     <TD>115200</TD>
@@ -129,7 +137,7 @@ ALIGN="center" VALIGN="middle">
     <TD>Baud rate selection. Not compatible with -t, -p, -f</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#f0f0f0">
     <TD>-f &lt;file&gt;</TD>
     <TD>-f qs.spy</TD>
     <TD></TD>
@@ -137,7 +145,7 @@ ALIGN="center" VALIGN="middle">
     <TD>File input selection. Not compatible with -c, -b, -t, -p</TD>
   </TR>
 
-  <TR bgColor="#f0f0f0">
+  <TR bgColor="#e0e0e0">
     <TD>-d [file]</TD>
     <TD>-d qspy150831_144229.dic</TD>
     <TD></TD>
@@ -151,7 +159,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
     </TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-T &lt;size&gt;</TD>
     <TD>-T 2</TD>
     <TD>4</TD>
@@ -167,7 +175,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
     <TD>Object pointer size in bytes. Valid values: 1, 2, 4, 8</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-F &lt;size&gt;</TD>
     <TD>-F 2</TD>
     <TD>4</TD>
@@ -183,7 +191,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
     <TD>Signal size in bytes. Valid values: 1, 2, 4</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-E &lt;size&gt;</TD>
     <TD>-E 1</TD>
     <TD>2</TD>
@@ -200,7 +208,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
     <TD>Queue counter size in bytes. Valid values 1, 2, 4</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-P &lt;size&gt;</TD>
     <TD>-P 4</TD>
     <TD>2</TD>
@@ -217,7 +225,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
         memory block size). Valid values 1, 2, 4</TD>
   </TR>
 
-  <TR bgColor="#c0c0c0">
+  <TR bgColor="#e0e0e0">
     <TD>-C &lt;size&gt;</TD>
     <TD>-C 4</TD>
     <TD>2</TD>
@@ -283,8 +291,17 @@ The default QSPY configuration is specifically designed for running @ref qutest 
 The default QSPY configuration (without any parameters) is also backwards-compatible with the following invocation: `qspy -u -t`, which is recommended for running QUTest tests on the host computer. Starting with QSPY version 7.x.y, you can use the simpler `qspy` invocation.
 
 
+@section qspy_terminating Terminating QSPY
+The QSPY host application can be terminated in the following ways:
+
+- by typing `x` or `X` key (works only in the absence of the __-k__ @ref qspy_command "command-line option")
+- by typing `Esc` key (works only in the absence of the __-k__ @ref qspy_command "command-line option")
+- by typing `Ctrl-C` (works also with the `-k` option)
+- by sending the Kill signal to the process running QSPY
+
+
 @section qspy_keyboard QSPY Keyboard Commands
-The QSPY console application accepts keyboard input. The following table shows the currently supported key-strokes:
+In the __absence of the -k (suppress keyboard) command-line option__, the QSPY console application accepts keyboard input. The following table shows the currently supported key-strokes:
 
 
 Key | Action
@@ -304,6 +321,7 @@ Key | Action
 `g`     | toggle @ref qspy_seq "Sequence Output" to a file (open/close)
 
 
+@n
 @note
 QSPY can send many more sophisticated commands to the Target by means of the @ref qview "Front-End extension mechanism".
 

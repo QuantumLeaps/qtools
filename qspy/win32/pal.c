@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.0
-* Last updated on  2020-08-21
+* Last updated for version 6.9.4
+* Last updated on  2021-06-17
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -84,6 +84,8 @@ typedef union {
     struct sockaddr addr;
 } fe_addr;
 
+static bool l_kbd_inp = false;
+
 static HANDLE       l_serHNDL;
 static COMMTIMEOUTS l_timeouts;
 
@@ -95,6 +97,24 @@ static SOCKET l_serverSock = INVALID_SOCKET;
 static SOCKET l_clientSock = INVALID_SOCKET;
 
 static FILE *l_file = (FILE *)0;
+
+/*==========================================================================*/
+/* Keyboard input */
+
+static BOOL WINAPI CtrlHandler(_In_ DWORD dwCtrlType) {
+    (void)dwCtrlType; /* unused parameter */
+    QSPY_cleanup();
+    exit(0);
+}
+
+QSpyStatus PAL_openKbd(bool kbd_inp) {
+    l_kbd_inp = kbd_inp;
+    SetConsoleCtrlHandler(&CtrlHandler, TRUE);
+    return QSPY_SUCCESS;
+}
+/*..........................................................................*/
+void PAL_closeKbd(void) {
+}
 
 /*==========================================================================*/
 /* Win32 serial communication with the Target */
@@ -710,17 +730,19 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
 
 /*..........................................................................*/
 static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes) {
-    wint_t ch = 0;
-    while (_kbhit()) {
-        ch = _getwch();
-        if ((ch == 0x00) || (ch == 0xE0)) {
+    if (l_kbd_inp) {
+        wint_t ch = 0;
+        while (_kbhit()) {
             ch = _getwch();
+            if ((ch == 0x00) || (ch == 0xE0)) {
+                ch = _getwch();
+            }
         }
-    }
-    if (ch != 0) {
-        buf[0]  = (unsigned char)ch;
-        *pBytes = 1; /* number of bytes in the buffer */
-        return QSPY_KEYBOARD_EVT;
+        if (ch != 0) {
+            buf[0]  = (unsigned char)ch;
+            *pBytes = 1; /* number of bytes in the buffer */
+            return QSPY_KEYBOARD_EVT;
+        }
     }
     return QSPY_NO_EVT;
 }

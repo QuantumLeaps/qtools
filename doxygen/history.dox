@@ -4,8 +4,8 @@
 @section qtools_6_9_3 Version 6.9.3, 2021-04-09
 
 __Changes in QSpy__
-- Moved function `QSPY_printInfo()` to `qspy.c`, to enable the direct QSPY output to the console. Please see also discussion thread [QSPY to console in win32-qv and posix-qv ports](https://sourceforge.net/p/qpc/discussion/668726/thread/92e56e9480) 
- 
+- Moved function `QSPY_printInfo()` to `qspy.c`, to enable the direct QSPY output to the console. Please see also discussion thread [QSPY to console in win32-qv and posix-qv ports](https://sourceforge.net/p/qpc/discussion/668726/thread/92e56e9480)
+
 
 __Changes in QUTest__
 - Corrected the @ref qutest_command "DEBUG mode", where the Enter key now correctly skips a test.

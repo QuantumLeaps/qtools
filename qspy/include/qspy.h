@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.3
-* Last updated on  2021-02-24
+* Last updated for version 6.9.4
+* Last updated on  2021-06-17
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -40,7 +40,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.9.3"
+#define QSPY_VER "6.9.4"
 
 #ifdef __cplusplus
 extern "C" {
@@ -160,6 +160,8 @@ KeyType QSPY_findFun(char const *name);
 KeyType QSPY_findUsr(char const *name);
 
 void QSPY_stop(void); /* orderly close all used files */
+void QSPY_cleanup(void); /* cleanup after the run */
+
 char const* QSPY_tstampStr(void);
 
 /* last human-readable line of output from QSPY */
