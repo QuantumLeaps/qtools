@@ -1,13 +1,13 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
-# Last updated for version 6.7.0
-# Last updated on  2019-12-30
+# Last updated for version 6.9.4
+# Last updated on  2021-07-19
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 #
 # This program is open source software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -70,7 +70,7 @@ INCLUDES := -I. \
 
 # C source files...
 C_SRCS := \
-	main.c \
+	main_qspy.c \
 	getopt.c \
 	be.c \
 	pal.c \

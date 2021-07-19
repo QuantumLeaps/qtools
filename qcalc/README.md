@@ -37,7 +37,7 @@ Using "qcalc"
 If you are using `qcalc` as a standalone Python script, you invoke
 it from a console as follows:
 
-`python /path-to-qcalc-script/qcalc.py [<cust_script>`
+`python /path-to-qcalc-script/qcalc.py`
 
 Alternatively, if you've installed `qcalc` with `pip`, you invoke
 it from a console as follows:
