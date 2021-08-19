@@ -1,8 +1,8 @@
 @echo off
 :: ==========================================================================
 :: Product: QTools script for generating Doxygen documentation
-:: Last Updated for Version: 6.8.2
-:: Date of the Last Update:  2020-06-22
+:: Last Updated for Version: 6.9.0
+:: Date of the Last Update:  2020-08-24
 ::
 ::                    Q u a n t u m  L e a P s
 ::                    ------------------------
@@ -37,6 +37,7 @@
 @echo usage:
 @echo make
 @echo make -CHM
+@echo make -awesome
 
 :: Doxygen tool (adjust to your system) ......................................
 @set DOXYGEN=doxygen
@@ -73,7 +74,7 @@ if "%1"=="-CHM" (
     copy images\favicon.ico ..\html
 
     @echo Generating HTML...
-    %DOXYGEN% Doxyfile
+    %DOXYGEN% Doxyfile%1
     @qclean ..\html
 )
 

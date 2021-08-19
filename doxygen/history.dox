@@ -1,6 +1,16 @@
 /**
 @page history Revision History
 
+@section qtools_6_9_4 Version 6.9.4, 2021-08-31
+
+
+__Updated GNU-ARM Toolchain for Windows__
+
+The GNU-ARM toolchain in QTools for Windows has been updated to the latest Version 10.3-2021.07 released on July 29, 2021.
+
+
+
+
 @section qtools_6_9_3 Version 6.9.3, 2021-04-09
 
 __Changes in QSpy__

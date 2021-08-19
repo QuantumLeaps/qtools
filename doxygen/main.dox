@@ -2,9 +2,14 @@
 
 @image html qtools_banner.jpg
 
-@section ab_new What's new?
-To check what's new in QTools, please see @ref history "QTools Revision History".
+@htmlonly
+<a target="_blank" href="https://github.com/QuantumLeaps/qtools" title="QTools on GitHub"><img style="float:right; clear:right;" src="img/github-corner.png"></a>
+@endhtmlonly
 
+@section ab_new What's new?
+To check what's new in QTools, please see @ref history "QTools Revision History". You can also get the latest __QTools code__, with the recent enhancements and bug fixes, from the <a class="extern" target="_blank" href="https://github.com/QuantumLeaps/qtools"><strong>GitHub QTools repository</strong></a>.
+
+<div style="clear:both"></div>
 
 
 @section qtools_about What is it?
