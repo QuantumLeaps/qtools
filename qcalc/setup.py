@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name="qcalc",
-    version="6.9.3",
+    version="6.9.4",
     author="Quantum Leaps",
     author_email="info@state-machine.com",
     description="qcalc programmer's calculator",

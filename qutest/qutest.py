@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
 # Last updated for version 6.9.4
-# Last updated on  2021-06-01
+# Last updated on  2021-09-17
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -126,6 +126,7 @@ class QUTest:
             "expect_pause": self.expect_pause,
             "continue_test": self.continue_test,
             "expect_run": self.expect_run,
+            "ensure": self.ensure,
             "command": self.command,
             "init": self.init,
             "dispatch": self.dispatch,
@@ -260,6 +261,16 @@ class QUTest:
             pass # ignore
         else:
             assert 0, "invalid state in expect: " + exp
+
+    # ensure DSL command .....................................................
+    def ensure(self, bool_expr):
+        if bool_expr:
+            return True
+        else:
+            #code_context = getframeinfo(stack()[1][0]).code_context
+            #self._fail(''.join(code_context).strip())
+            self._fail('ensure')
+            return False
 
     # glb_filter DSL command .................................................
     def glb_filter(self, *args):
@@ -849,7 +860,11 @@ class QUTest:
             lvl += 1
         if exp != "":
             print(QUTest._STR_EXP1 + exp + QUTest._STR_EXP2)
-        if err != "":
+        if err == "ensure":
+            if 2 < max:
+                err = ''.join(getframeinfo(stk[2][0]).code_context).strip()
+            print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
+        elif err != "":
             print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
         QUTest._num_failed += 1
         QUTest._need_reset = True

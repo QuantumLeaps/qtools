@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Product: QCalc in Python (requires Python 3.3+)
-# Last updated for version 6.9.3
-# Last updated on  2021-01-16
+# Last updated for version 6.9.4
+# Last updated on  2021-09-12
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -31,13 +31,14 @@ import traceback
 
 from math import *
 from platform import python_version
+from sys import argv
 
 # the 'ans' global variable
 ans = 0
 
 class QCalc:
     ## current version of QCalc
-    VERSION = 693
+    VERSION = 694
 
     @staticmethod
     def _print(result):
@@ -100,7 +101,19 @@ def main():
               python_version()))
     print("(c) 2005-2021 Quantum Leaps, www.state-machine.com\n")
 
-    # main loop for processing user input...
+    # "batch mode": expression provided in command-line arguments
+    if len(argv) > 1:
+        expr = "".join(argv[1:])
+        print(expr)
+        try:
+            result = eval(expr)
+        except:
+            traceback.print_exc(2)
+        else:
+            QCalc._print(result)
+        return
+
+    # "interactive mode": expressions provided as user input
     while True:
         expr = input('> ')
         if expr:

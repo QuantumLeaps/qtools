@@ -18,8 +18,8 @@
 #
 #-----------------------------------------------------------------------------
 # Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.4
-# Last updated on  2021-05-31
+# Last updated for version 6.9.5
+# Last updated on  2021-09-17
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -172,6 +172,20 @@ def skip(nTests = 9999):
 # @include expect.py
 #
 def expect(match):
+
+## @brief ensures that the provided Boolean expression is true
+#
+# @description
+# This command performs checking of a condition, which is believed to be true
+# in order for a test to pass. If the provided Boolean expression evaluates
+# to false, the test is failed in the usual way.
+#
+# @param[in] bool_expr  the Boolean expression to check
+#
+# @usage
+# @include ensure.py
+#
+def ensure(bool_expr):
 
 ## @brief Send the QS Global Filter to the Target
 #

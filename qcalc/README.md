@@ -37,12 +37,24 @@ Using "qcalc"
 If you are using `qcalc` as a standalone Python script, you invoke
 it from a console as follows:
 
-`python /path-to-qcalc-script/qcalc.py`
+`python /path-to-qcalc-script/qcalc.py [expression]`
 
 Alternatively, if you've installed `qcalc` with `pip`, you invoke
 it from a console as follows:
 
-`qcalc`
+`qcalc [expression]`
+
+
+Batch mode
+----------
+If you provide the optional [expression] argument, qcalc will evaluate
+the expression, print the result and terminate.
+
+
+Interactive mode
+----------------
+Otherwise, if no [expression] argument is provided, qcalc will start in
+the interactive mode, where you can enter expressions via your keyboard.
 
 
 Features
