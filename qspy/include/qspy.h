@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.4
-* Last updated on  2021-06-17
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -112,7 +112,7 @@ typedef int (*QSPY_CustParseFun)(QSpyRecord * const me);
 typedef void (*QSPY_resetFun)(void);
 
 void        QSpyRecord_init     (QSpyRecord * const me,
-                                 uint8_t const *start, size_t tot_len);
+                                 uint8_t const *start, uint32_t tot_len);
 QSpyStatus  QSpyRecord_OK       (QSpyRecord * const me);
 uint32_t    QSpyRecord_getUint32(QSpyRecord * const me, uint8_t size);
 int32_t     QSpyRecord_getInt32 (QSpyRecord * const me, uint8_t size);
@@ -125,22 +125,13 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
 
 /* QSPY configuration and high-level interface .............................*/
 void QSPY_config(QSpyConfig const *config,
-    void   *matFile,
-    void   *seqFile, char const *seqList,
-    QSPY_CustParseFun custParseFun);
-QSpyConfig const *QSPY_getConfig(void);
+                 QSPY_CustParseFun custParseFun);
 void QSPY_configTxReset(QSPY_resetFun txResetFun);
-
 void QSPY_configMatFile(void *matFile);
-void QSPY_configSeqFile(void *seqFile);
 
 void QSPY_reset(void);
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
 void QSPY_txReset(void);
-
-void QSPY_setExternDict(char const *dictName);
-QSpyStatus QSPY_readDict(void);
-QSpyStatus QSPY_writeDict(void);
 
 bool QSPY_command(uint8_t cmdId); /* execute an internal QSPY command */
 void QSPY_sendEvt(QSpyRecord const * const qrec);
@@ -148,18 +139,17 @@ void QSPY_sendObj(QSpyRecord const * const qrec);
 void QSPY_sendCmd(QSpyRecord const * const qrec);
 void QSPY_sendTP (QSpyRecord const * const qrec);
 
-size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
-                   uint8_t const *srcBuf, size_t srcBytes);
-size_t QSPY_encodeResetCmd(uint8_t *dstBuf, size_t dstSize);
-size_t QSPY_encodeInfoCmd (uint8_t *dstBuf, size_t dstSize);
-size_t QSPY_encodeTickCmd (uint8_t *dstBuf, size_t dstSize, uint8_t rate);
+uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
+                   uint8_t const *srcBuf, uint32_t srcBytes);
+uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize);
+uint32_t QSPY_encodeInfoCmd (uint8_t *dstBuf, uint32_t dstSize);
+uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate);
 
 SigType QSPY_findSig(char const *name, ObjType obj);
 KeyType QSPY_findObj(char const *name);
 KeyType QSPY_findFun(char const *name);
 KeyType QSPY_findUsr(char const *name);
 
-void QSPY_stop(void); /* orderly close all used files */
 void QSPY_cleanup(void); /* cleanup after the run */
 
 char const* QSPY_tstampStr(void);
@@ -177,6 +167,110 @@ typedef struct {
 extern QSPY_LastOutput QSPY_output;
 
 void QSPY_onPrintLn(void); /* callback to print the last line of output */
+
+/* prints information message to the QSPY output (without sending it to FE) */
+void QSPY_printInfo(void);
+
+/* prints error message to the QSPY output (sending it to FE) */
+void QSPY_printError(void);
+
+/* begining of QSPY line to print */
+extern char const * const QSPY_line;
+
+typedef struct {
+    KeyType key;
+    char    name[QS_DNAME_LEN_MAX];
+} DictEntry;
+
+typedef struct {
+    DictEntry  notFound;
+    DictEntry* sto;
+    int        capacity;
+    int        entries;
+    int        keySize;
+} Dictionary;
+
+void Dictionary_ctor(Dictionary* const me,
+    DictEntry* sto, uint32_t capacity);
+void Dictionary_config(Dictionary* const me, int keySize);
+char const* Dictionary_at(Dictionary* const me, unsigned idx);
+void Dictionary_put(Dictionary* const me, KeyType key, char const* name);
+char const* Dictionary_get(Dictionary* const me, KeyType key, char* buf);
+int Dictionary_find(Dictionary* const me, KeyType key);
+KeyType Dictionary_findKey(Dictionary* const me, char const* name);
+void Dictionary_reset(Dictionary* const me);
+
+typedef struct SigDictEntryTag {
+    SigType sig;
+    ObjType obj;
+    char    name[QS_DNAME_LEN_MAX];
+} SigDictEntry;
+
+typedef struct SigDictionaryTag {
+    SigDictEntry  notFound;
+    SigDictEntry* sto;
+    int           capacity;
+    int           entries;
+    int           ptrSize;
+} SigDictionary;
+
+void SigDictionary_ctor(SigDictionary* const me,
+    SigDictEntry* sto, uint32_t capacity);
+void SigDictionary_config(SigDictionary* const me, int ptrSize);
+void SigDictionary_put(SigDictionary* const me,
+    SigType sig, ObjType obj, char const* name);
+char const* SigDictionary_get(SigDictionary* const me,
+                              SigType sig, ObjType obj, char* buf);
+int SigDictionary_find(SigDictionary* const me,
+                       SigType sig, ObjType obj);
+SigType SigDictionary_findSig(SigDictionary* const me,
+                             char const* name, ObjType obj);
+void SigDictionary_reset(SigDictionary* const me);
+void QSPY_resetAllDictionaries(void);
+
+/****************************************************************************/
+/* facilities used by the QSPY host app only (but not for QSPY parser) */
+#ifdef QSPY_APP
+
+extern QSpyConfig    QSPY_conf;
+extern Dictionary    QSPY_funDict;
+extern Dictionary    QSPY_objDict;
+extern Dictionary    QSPY_usrDict;
+extern SigDictionary QSPY_sigDict;
+
+void QSPY_setExternDict(char const* dictName);
+QSpyStatus QSPY_readDict(void);
+QSpyStatus QSPY_writeDict(void);
+
+bool QDIC_isActive(void);
+
+void Dictionary_write(Dictionary const* const me, FILE* stream);
+bool Dictionary_read(Dictionary* const me, FILE* stream);
+
+void SigDictionary_write(SigDictionary const* const me, FILE* stream);
+bool SigDictionary_read(SigDictionary* const me, FILE* stream);
+char const* QSPY_getMatDict(char const* s);
+
+void QSEQ_configFile(void *seqFile);
+bool QSEQ_isActive(void);
+void QSEQ_config(void* seqFile, const char* seqList);
+void QSEQ_updateDictionary(char const* name, KeyType key);
+int  QSEQ_find(KeyType key);
+void QSEQ_genHeader(void);
+void QSEQ_genPost(uint32_t tstamp, int src, int dst, char const* sig,
+                bool isAttempt);
+void QSEQ_genPostLIFO(uint32_t tstamp, int src, char const* sig);
+void QSEQ_genTran(uint32_t tstamp, int obj, char const* state);
+void QSEQ_genPublish(uint32_t tstamp, int obj, char const* sig);
+void QSEQ_genAnnotation(uint32_t tstamp, int obj, char const* ann);
+void QSEQ_genTick(uint32_t rate, uint32_t nTick);
+void QSEQ_dictionaryReset(void);
+
+#endif /* QSPY_APP */
+
+#ifdef __cplusplus
+}
+#endif
 
 #define SNPRINTF_LINE(format_, ...) do {                       \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \
@@ -203,17 +297,10 @@ void QSPY_onPrintLn(void); /* callback to print the last line of output */
     }                                                                      \
 } while (0)
 
-/* prints information message to the QSPY output (without sending it to FE) */
-void QSPY_printInfo(void);
-
-/* prints error message to the QSPY output (sending it to FE) */
-void QSPY_printError(void);
-
-/* for backwards compatibility */
-#define QSPY_line (&QSPY_output.buf[QS_LINE_OFFSET])
-
-#ifdef __cplusplus
-}
-#endif
+#define CONFIG_UPDATE(member_, new_, diff_) \
+    if (QSPY_conf.member_ != (new_)) {      \
+        QSPY_conf.member_ =  (new_);        \
+        (diff_) = 1U;                       \
+    } else (void)0
 
 #endif /* QSPY_H */

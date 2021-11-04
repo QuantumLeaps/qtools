@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.4
-* Last updated on  2021-06-17
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -46,7 +46,7 @@ extern "C" {
 
 QSpyStatus PAL_openBE(int portNum); /* open Back-End socket */
 void PAL_closeBE(void);             /* close Back-End socket */
-void PAL_send2FE(unsigned char const *buf, size_t nBytes); /* to Front-End */
+void PAL_send2FE(unsigned char const *buf, uint32_t nBytes); /* to Front-End */
 void PAL_detachFE(void);            /* detach Front-End */
 void PAL_clearScreen(void);
 
@@ -79,25 +79,25 @@ typedef enum {
 * PAL_openTarget???() functions
 */
 typedef struct {
-    QSPYEvtType (*getEvt)(unsigned char *buf, size_t *pBytes);
-    QSpyStatus  (*send2Target)(unsigned char *buf, size_t nBytes);
+    QSPYEvtType (*getEvt)(unsigned char *buf, uint32_t *pBytes);
+    QSpyStatus  (*send2Target)(unsigned char *buf, uint32_t nBytes);
     void (*cleanup)(void);
 } PAL_VtblType;
 
 extern PAL_VtblType PAL_vtbl;
 
-/* QSPY assertions... */
-#ifdef Q_NASSERT /* Q_NASSERT defined--assertion checking disabled */
-    #define Q_ASSERT(test_)  ((void)0)
-#else  /* assertion checking enabled */
-    #define Q_ASSERT(test_) ((test_) \
-        ? (void)0 : Q_onAssert(__FILE__, __LINE__))
-
-    void Q_onAssert(char const * const module, int location);
-#endif
-
 #ifdef __cplusplus
 }
+#endif
+
+/* QSPY assertions... */
+#ifdef Q_NASSERT /* Q_NASSERT defined--assertion checking disabled */
+#define Q_ASSERT(test_)  ((void)0)
+#else  /* assertion checking enabled */
+#define Q_ASSERT(test_) ((test_) \
+        ? (void)0 : Q_onAssert(__FILE__, __LINE__))
+
+void Q_onAssert(char const* const module, int location);
 #endif
 
 #endif /* pal_h */

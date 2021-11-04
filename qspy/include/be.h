@@ -4,8 +4,8 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.3
-* Last updated on  2020-07-28
+* Last updated for version 6.8.4
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-void BE_parse(unsigned char *buf, size_t nBytes);
+void BE_parse(unsigned char *buf, uint32_t nBytes);
 void BE_parseRecFromFE    (QSpyRecord * const qrec);
 int  BE_parseRecFromTarget(QSpyRecord * const qrec); /*see QSPY_CustParseFun*/
 

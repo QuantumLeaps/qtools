@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.4
-* Last updated on  2021-06-17
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
         status = -1;
     }
     else {
-        size_t nBytes;
+        uint32_t nBytes;
         bool isRunning = true;
 
         status = 0; /* assume success */
@@ -213,7 +213,8 @@ void QSPY_cleanup(void) {
         fclose(l_outFile);
     }
 
-    QSPY_stop();  /* update and close all other open files */
+    QSPY_configMatFile((void*)0);
+    QSEQ_configFile((void*)0);
 
     if (l_bePort != 0) {
         PAL_closeBE();          /* close the Back-End connection */
@@ -223,7 +224,7 @@ void QSPY_cleanup(void) {
         (*PAL_vtbl.cleanup)();  /* close the target connection */
     }
 
-    PRINTF_S("\nQSPY Done\n");
+    PRINTF_S("\n%s\n", "QSPY Done");
 }
 
 /*..........................................................................*/
@@ -371,7 +372,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                     STRNCPY_S(l_seqList, sizeof(l_seqList), optarg);
                 }
                 else {
-                    FPRINTF_S(stderr,
+                    FPRINTF_S(stderr, "%s",
                          "empty object-list for sequence diagram");
                     return QSPY_ERROR;
                 }
@@ -382,8 +383,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
             }
             case 'c': { /* COM port */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
-                    FPRINTF_S(stderr,
-                            "The -c option is incompatible with -t/-f\n");
+                    FPRINTF_S(stderr, "%s\n",
+                            "The -c option is incompatible with -t/-f");
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_comPort, sizeof(l_comPort), optarg);
@@ -393,8 +394,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
             }
             case 'b': { /* baud rate */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
-                    FPRINTF_S(stderr,
-                        "The -b option is incompatible with -t/-f\n");
+                    FPRINTF_S(stderr, "%s\n",
+                        "The -b option is incompatible with -t/-f");
                     return QSPY_ERROR;
                 }
                 l_baudRate = (int)strtol(optarg, NULL, 10);
@@ -408,8 +409,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
             }
             case 'f': { /* File input */
                 if (l_link != NO_LINK) {
-                    FPRINTF_S(stderr,
-                            "The -f option is incompatible with -c/-b/-t\n");
+                    FPRINTF_S(stderr, "%s\n",
+                            "The -f option is incompatible with -c/-b/-t");
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_inpFileName, sizeof(l_inpFileName), optarg);
@@ -425,14 +426,14 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 else { /* apply the default */
                     l_dicFileName[0] = '?';
                     l_dicFileName[1] = '\0';
-                    PRINTF_S("-d\n");
+                    PRINTF_S("%s\n", "-d");
                 }
                 break;
             }
             case 't': { /* TCP/IP input */
                 if ((l_link != NO_LINK) && (l_link != TCP_LINK)) {
-                    FPRINTF_S(stderr,
-                            "The -t option is incompatible with -c/-b/-f\n");
+                    FPRINTF_S(stderr, "%s\n",
+                            "The -t option is incompatible with -c/-b/-f");
                     return QSPY_ERROR;
                 }
                 if (optarg != NULL) { /* is optional argument provided? */
@@ -443,8 +444,8 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 break;
             }
             case 'p': { /* TCP/IP port number */
-                FPRINTF_S(stderr,
-                        "The -p option is obsolete, use -t[port]\n");
+                FPRINTF_S(stderr, "%s\n",
+                        "The -p option is obsolete, use -t[port]");
                 return QSPY_ERROR;
                 break;
             }
@@ -573,12 +574,11 @@ static QSpyStatus configure(int argc, char *argv[]) {
         }
     }
     QSPY_config(&config,
-                l_matFile,
-                l_seqFile,
-                l_seqList,
                 (l_bePort != 0)
                     ? &BE_parseRecFromTarget
                     : (QSPY_CustParseFun)0);
+    QSPY_configMatFile(l_matFile);
+    QSEQ_config(l_seqFile, l_seqList);
     QSPY_configTxReset(&QSPY_txReset);
 
     /* NOTE: dictionary file must be set and read AFTER configuring QSPY */
@@ -596,7 +596,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
 }
 /*..........................................................................*/
 bool QSPY_command(uint8_t cmdId) {
-    size_t nBytes;
+    uint32_t nBytes;
     bool isRunning = true;
     QSpyStatus stat;
 
@@ -609,7 +609,7 @@ bool QSPY_command(uint8_t cmdId) {
         case 'h':  /* keyboard help */
             PRINTF_S("\n%s\n", l_kbdHelpStr);
             if (l_quiet < 0) {
-                PRINTF_S("Quiet Mode    [q]: OFF\n");
+                PRINTF_S("Quiet Mode    [q]: %s\n", "OFF");
             }
             else {
                 PRINTF_S("Quiet Mode    [q]: %d\n", l_quiet);
@@ -664,7 +664,7 @@ bool QSPY_command(uint8_t cmdId) {
             else {
                 l_quiet_ctr = l_quiet;
                 l_quiet = -1;
-                PRINTF_S("   <USER-> Quiet Mode [q] Mode=OFF\n");
+                PRINTF_S("   <USER-> Quiet Mode [q] Mode=%s\n", "OFF");
             }
             break;
 
@@ -738,12 +738,12 @@ bool QSPY_command(uint8_t cmdId) {
 
         case 'g':  /* save Sequence file open/close toggle */
             if (l_seqList[0] == '\0') {
-                SNPRINTF_LINE("   <QSPY-> Sequence list NOT provided "
+                SNPRINTF_LINE("   <QSPY-> Sequence list NOT provided %s ",
                               "(no -g option)");
                 QSPY_printError();
             }
             else if (l_seqFile != (FILE *)0) {
-                QSPY_configSeqFile((void *)0); /* close the Sequence file */
+                QSEQ_configFile((void *)0); /* close the Sequence file */
                 l_seqFile = (FILE *)0;
                 STRNCPY_S(l_seqFileName, sizeof(l_seqFileName), "OFF");
             }
@@ -752,7 +752,7 @@ bool QSPY_command(uint8_t cmdId) {
                            "qspy%s.seq", QSPY_tstampStr());
                 FOPEN_S(l_seqFile, l_seqFileName, "w");
                 if (l_seqFile != (FILE *)0) {
-                    QSPY_configSeqFile(l_seqFile);
+                    QSEQ_configFile(l_seqFile);
                 }
                 else {
                     PRINTF_S("   <QSPY-> Cannot open File=%s for writing\n",
@@ -772,4 +772,22 @@ bool QSPY_command(uint8_t cmdId) {
     }
 
     return isRunning;
+}
+/*..........................................................................*/
+char const* QSPY_tstampStr(void) {
+    time_t rawtime = time(NULL);
+    struct tm tstamp;
+    static char tstampStr[64];
+
+    LOCALTIME_S(&tstamp, &rawtime);
+
+    SNPRINTF_S(tstampStr, sizeof(tstampStr), "%02d%02d%02d_%02d%02d%02d",
+        (tstamp.tm_year + 1900) % 100,
+        (tstamp.tm_mon + 1),
+        tstamp.tm_mday,
+        tstamp.tm_hour,
+        tstamp.tm_min,
+        tstamp.tm_sec);
+
+    return &tstampStr[0];
 }

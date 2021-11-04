@@ -5,7 +5,7 @@
 * @cond
 ******************************************************************************
 * Last updated for version 6.9.4
-* Last updated on  2021-06-17
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -42,10 +42,16 @@
 #include <stdbool.h>
 #include <conio.h>
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4255)
+#endif
+
 #include <ws2tcpip.h> /* for Windows socket facilities */
+
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
@@ -56,21 +62,21 @@
 PAL_VtblType PAL_vtbl;   /* global PAL virtual table */
 
 /* specific implementations of the PAL "virutal functions" .................*/
-static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  ser_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  ser_send2Target(unsigned char *buf, uint32_t nBytes);
 static void ser_cleanup(void);
 
-static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  tcp_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  tcp_send2Target(unsigned char *buf, uint32_t nBytes);
 static void tcp_cleanup(void);
 
-static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  file_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  file_send2Target(unsigned char *buf, uint32_t nBytes);
 static void file_cleanup(void);
 
 /* helper functions ........................................................*/
-static QSPYEvtType be_receive (unsigned char *buf, size_t *pBytes);
-static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes);
+static QSPYEvtType be_receive (unsigned char *buf, uint32_t *pBytes);
+static QSPYEvtType kbd_receive(unsigned char *buf, uint32_t *pBytes);
 
 /*..........................................................................*/
 enum PAL_Constants { /* local constants... */
@@ -151,7 +157,7 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         baudRate);
     dcb.DCBlength = sizeof(DCB);
     if (!GetCommState(l_serHNDL, &dcb)) {
-        SNPRINTF_LINE("   <COMMS> ERROR    Getting COM port settings");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s", "Getting COM port settings");
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -159,13 +165,13 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     /* drill in the DCB... */
     dcb.fAbortOnError = 0U; /* don't abort on error */
     if (!BuildCommDCB((LPCSTR)comSettings, &dcb)) {
-        SNPRINTF_LINE("   <COMMS> ERROR    Parsing COM port settings");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s", "Parsing COM port settings");
         QSPY_printError();
         return QSPY_ERROR;
     }
 
     if (!SetCommState(l_serHNDL, &dcb)) {
-        SNPRINTF_LINE("   <COMMS> ERROR    Setting up the COM port");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s", "Setting up the COM port");
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -224,7 +230,7 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
-static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
 
     /* try to receive data from keyboard... */
@@ -264,7 +270,7 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_NO_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus ser_send2Target(unsigned char *buf, size_t nBytes) {
+static QSpyStatus ser_send2Target(unsigned char *buf, uint32_t nBytes) {
     DWORD nBytesWritten;
 
     if (WriteFile(l_serHNDL, buf, (DWORD)nBytes, &nBytesWritten, NULL)) {
@@ -371,7 +377,7 @@ static void tcp_cleanup(void) {
     WSACleanup();
 }
 /*..........................................................................*/
-static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
     struct timeval timeout = {(long)0, (long)(PAL_TOUT_MS*1000)};
     fd_set readSet;
@@ -479,7 +485,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                 l_clientSock = INVALID_SOCKET;
             }
             else {
-                *pBytes = (size_t)nrec;
+                *pBytes = (uint32_t)nrec;
                 return QSPY_TARGET_INPUT_EVT;
             }
         }
@@ -488,7 +494,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_NO_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus tcp_send2Target(unsigned char *buf, size_t nBytes) {
+static QSpyStatus tcp_send2Target(unsigned char *buf, uint32_t nBytes) {
     if (l_clientSock == INVALID_SOCKET) {
         return QSPY_ERROR;
     }
@@ -525,9 +531,9 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
     }
 }
 /*..........................................................................*/
-static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
-    size_t nBytes;
+    uint32_t nBytes;
 
     /* try to receive data from keyboard... */
     evt = kbd_receive(buf, pBytes);
@@ -552,7 +558,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_DONE_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus file_send2Target(unsigned char *buf, size_t nBytes) {
+static QSpyStatus file_send2Target(unsigned char *buf, uint32_t nBytes) {
     (void)buf;
     (void)nBytes;
     return QSPY_ERROR;
@@ -655,7 +661,7 @@ void PAL_closeBE(void) {
     WSACleanup();
 }
 /*..........................................................................*/
-void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
+void PAL_send2FE(unsigned char const *buf, uint32_t nBytes) {
     if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
         if (sendto(l_beSock, (char *)buf, (int)nBytes, 0,
                    &l_feAddr.addr, l_feAddrSize) == SOCKET_ERROR)
@@ -679,7 +685,7 @@ void PAL_clearScreen(void) {
 }
 
 /*--------------------------------------------------------------------------*/
-static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType be_receive(unsigned char *buf, uint32_t *pBytes) {
     fe_addr feAddr;
     int feAddrSize;
     int status;
@@ -707,7 +713,7 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
     else if (l_feAddrSize == 0) { /* not attached yet? */
         memcpy(&l_feAddr, &feAddr, feAddrSize);
         l_feAddrSize = feAddrSize; /* attach connection */
-        *pBytes = (size_t)status;
+        *pBytes = (uint32_t)status;
         return QSPY_FE_INPUT_EVT;
     }
     else { /* already attached */
@@ -716,11 +722,11 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
             && (feAddr.data[1] == l_feAddr.data[1])
             && (feAddr.data[0] == l_feAddr.data[0]))
         {
-            *pBytes = (size_t)status;
+            *pBytes = (uint32_t)status;
             return QSPY_FE_INPUT_EVT;
         }
         else {
-            SNPRINTF_LINE("   <F-END> WARN     UDP socket in use");
+            SNPRINTF_LINE("   <F-END> WARN     %s", "UDP socket in use");
             QSPY_printError();
             /* this packet is from a DIFFERENT front-end -- ignore it */
         }
@@ -729,7 +735,7 @@ static QSPYEvtType be_receive(unsigned char *buf, size_t *pBytes) {
 }
 
 /*..........................................................................*/
-static QSPYEvtType kbd_receive(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType kbd_receive(unsigned char *buf, uint32_t *pBytes) {
     if (l_kbd_inp) {
         wint_t ch = 0;
         while (_kbhit()) {

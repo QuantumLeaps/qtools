@@ -37,7 +37,6 @@
 ******************************************************************************
 * @endcond
 */
-#include <stddef.h>  /* for size_t */
 #include <stdlib.h>  /* for system() */
 #include <stdint.h>
 #include <stdbool.h>
@@ -63,24 +62,24 @@
 PAL_VtblType PAL_vtbl;   /* global PAL virtual table */
 
 /* specific implementations of the PAL "virutal functions" .................*/
-static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  ser_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  ser_send2Target(unsigned char *buf, uint32_t nBytes);
 static void ser_cleanup(void);
 
-static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  tcp_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  tcp_send2Target(unsigned char *buf, uint32_t nBytes);
 static void tcp_cleanup(void);
 
-static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes);
-static QSpyStatus  file_send2Target(unsigned char *buf, size_t nBytes);
+static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  file_send2Target(unsigned char *buf, uint32_t nBytes);
 static void file_cleanup(void);
 
 /* helper functions ........................................................*/
 static QSPYEvtType be_receive (fd_set const *pReadSet,
-                               unsigned char *buf, size_t *pBytes);
+                               unsigned char *buf, uint32_t *pBytes);
 
 static QSPYEvtType kbd_receive(fd_set const *pReadSet,
-                               unsigned char *buf, size_t *pBytes);
+                               unsigned char *buf, uint32_t *pBytes);
 static void updateReadySet(int targetConn);
 
 /*..........................................................................*/
@@ -140,7 +139,8 @@ QSpyStatus PAL_openKbd(bool kbd_inp) {
         /* modify the terminal attributes... */
         /* get the original terminal settings */
         if (tcgetattr(0, &l_termios_saved) == -1) {
-            SNPRINTF_LINE("    <CONS> ERROR    getting terminal attributes");
+            SNPRINTF_LINE("    <CONS> ERROR    %s",
+                          "getting terminal attributes");
             QSPY_printError();
             return QSPY_ERROR;
         }
@@ -148,7 +148,8 @@ QSpyStatus PAL_openKbd(bool kbd_inp) {
         t = l_termios_saved;
         t.c_lflag &= ~(ICANON | ECHO); /* disable canonical mode and echo */
         if (tcsetattr(0, TCSANOW, &t) == -1) {
-            SNPRINTF_LINE("    <CONS> ERROR    setting terminal attributes");
+            SNPRINTF_LINE("    <CONS> ERROR    %s",
+                          "setting terminal attributes");
             QSPY_printError();
             return QSPY_ERROR;
         }
@@ -278,22 +279,26 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     t.c_cflag &= ~(CSTOPB);          /* 1 stop bit */
 
     if (cfsetispeed(&t, spd) == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    setting input speed failed");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                      "setting input speed failed");
         QSPY_printError();
         return QSPY_ERROR;
     }
     if (cfsetospeed(&t, spd) == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    setting output speed failed");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                      "setting output speed failed");
         QSPY_printError();
         return QSPY_ERROR;
     }
     if (tcflush(l_serFD, TCIFLUSH) == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    flushing serial port failed");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                      "flushing serial port failed");
         QSPY_printError();
         return QSPY_ERROR;
     }
     if (tcsetattr(l_serFD, TCSANOW, &t) == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    seting serial attributes failed");
+        SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                      "seting serial attributes failed");
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -303,7 +308,7 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
-static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
@@ -333,9 +338,9 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
 
     /* any input available from the Serial port? */
     if (FD_ISSET(l_serFD, &readSet)) {
-        ssize_t nBytes = read(l_serFD, buf, *pBytes);
+        uint32_t nBytes = read(l_serFD, buf, *pBytes);
         if (nBytes > 0) {
-            *pBytes = (size_t)nBytes;
+            *pBytes = (uint32_t)nBytes;
             return QSPY_TARGET_INPUT_EVT;
         }
     }
@@ -343,9 +348,9 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_NO_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus ser_send2Target(unsigned char *buf, size_t nBytes) {
-    ssize_t nBytesWritten = write(l_serFD, buf, nBytes);
-    if (nBytesWritten == (ssize_t)nBytes) {
+static QSpyStatus ser_send2Target(unsigned char *buf, uint32_t nBytes) {
+    uint32_t nBytesWritten = write(l_serFD, buf, nBytes);
+    if (nBytesWritten == (uint32_t)nBytes) {
         return QSPY_SUCCESS;
     }
     else {
@@ -421,7 +426,7 @@ static void tcp_cleanup(void) {
     }
 }
 /*..........................................................................*/
-static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
     fd_set readSet = l_readSet;
 
@@ -495,7 +500,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
                 updateReadySet(l_serverSock);
             }
             else {
-                *pBytes = (size_t)nrec;
+                *pBytes = (uint32_t)nrec;
                 return QSPY_TARGET_INPUT_EVT;
             }
         }
@@ -504,7 +509,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_NO_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus tcp_send2Target(unsigned char *buf, size_t nBytes) {
+static QSpyStatus tcp_send2Target(unsigned char *buf, uint32_t nBytes) {
     if (l_clientSock == INVALID_SOCKET) {
         return QSPY_ERROR;
     }
@@ -546,9 +551,9 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
-static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
+static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes) {
     QSPYEvtType evt;
-    size_t nBytes;
+    uint32_t nBytes;
     fd_set readSet = l_readSet;
 
     /* block indefinitely until any input source has input */
@@ -586,7 +591,7 @@ static QSPYEvtType file_getEvt(unsigned char *buf, size_t *pBytes) {
     return QSPY_DONE_EVT;
 }
 /*..........................................................................*/
-static QSpyStatus file_send2Target(unsigned char *buf, size_t nBytes) {
+static QSpyStatus file_send2Target(unsigned char *buf, uint32_t nBytes) {
     (void)buf;
     (void)nBytes;
     return QSPY_ERROR;
@@ -690,7 +695,7 @@ void PAL_closeBE(void) {
     }
 }
 /*..........................................................................*/
-void PAL_send2FE(unsigned char const *buf, size_t nBytes) {
+void PAL_send2FE(unsigned char const *buf, uint32_t nBytes) {
     if (l_feAddrSize != FE_DETACHED) { /* front-end attached? */
         if (sendto(l_beSock, (char *)buf, (int)nBytes, 0,
                    &l_feAddr.addr, l_feAddrSize) == SOCKET_ERROR)
@@ -712,18 +717,19 @@ void PAL_detachFE(void) {
 void PAL_clearScreen(void) {
     int status = system("clear");
     if (status < 0) {
-        SNPRINTF_LINE("    <CONS> ERROR    clearing the screen failed");
+        SNPRINTF_LINE("    <CONS> ERROR    %s",
+                      "clearing the screen failed");
         QSPY_printError();
     }
 }
 
 /*--------------------------------------------------------------------------*/
 static QSPYEvtType be_receive(fd_set const *pReadSet,
-                              unsigned char *buf, size_t *pBytes)
+                              unsigned char *buf, uint32_t *pBytes)
 {
     fe_addr feAddr;
     socklen_t feAddrSize;
-    ssize_t nBytes;
+    uint32_t nBytes;
 
     if ((l_beSock == INVALID_SOCKET) /* Back-End socket not initialized? */
         || !FD_ISSET(l_beSock, pReadSet)) /* Front-End socket has no data? */
@@ -759,7 +765,8 @@ static QSPYEvtType be_receive(fd_set const *pReadSet,
             return QSPY_FE_INPUT_EVT;
         }
         else {
-            SNPRINTF_LINE("   <F-END> WARN     UDP socket in use");
+            SNPRINTF_LINE("   <F-END> WARN     %s",
+                          "UDP socket in use");
             QSPY_printError();
             /* this packet is from a DIFFERENT front-end -- ignore it */
         }
@@ -769,7 +776,7 @@ static QSPYEvtType be_receive(fd_set const *pReadSet,
 
 /*..........................................................................*/
 static QSPYEvtType kbd_receive(fd_set const *pReadSet,
-                               unsigned char *buf, size_t *pBytes)
+                               unsigned char *buf, uint32_t *pBytes)
 {
     if (l_kbd_inp && FD_ISSET(0, pReadSet)) {
         *pBytes = read(0, buf, 1); /* the key pressed */
@@ -798,10 +805,10 @@ static void updateReadySet(int targetConn) {
 
 /*..........................................................................*/
 /* simplified strncpy_s() implementation "good enough" for the intended use */
-int strncpy_s(char* strDest, size_t numberOfElements,
-    const char* strSource, size_t count)
+int strncpy_s(char* strDest, uint32_t numberOfElements,
+    const char* strSource, uint32_t count)
 {
-    size_t n;
+    uint32_t n;
     for (n = (numberOfElements < count) ? numberOfElements : count;
          n > 0;
          --n, ++strSource, ++strDest)

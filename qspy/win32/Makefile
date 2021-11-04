@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: Makefile for QSPY console, Win32, MinGW
 # Last updated for version 6.9.4
-# Last updated on  2021-07-19
+# Last updated on  2021-10-19
 #
 #                    Q u a n t u m  L e a P s
 #                    ------------------------
@@ -28,7 +28,7 @@
 # along with this program. If not, see <www.gnu.org/licenses/>.
 #
 # Contact information:
-# <www.state-machine.com>
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
@@ -47,7 +47,7 @@
 #
 
 #-----------------------------------------------------------------------------
-# project name:
+# project name
 #
 PROJECT := qspy
 
@@ -70,16 +70,19 @@ INCLUDES := -I. \
 
 # C source files...
 C_SRCS := \
-	main_qspy.c \
 	getopt.c \
-	be.c \
-	pal.c \
+	qspy_pal.c \
+	qspy_be.c \
+	qspy_main.c \
+	qspy_dict.c \
+	qspy_seq.c \
 	qspy_tx.c \
 	qspy.c
 
 # C++ source files...
 CPP_SRCS :=
 
+DEFINES   := -DQSPY_APP
 LIB_DIRS  :=
 LIBS      := -lws2_32
 
@@ -112,21 +115,21 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
+CFLAGS = -c -g -O -ffunction-sections -fdata-sections \
+	-std=c11 -pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
-	-O -Wall -Wextra $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c -g -O -ffunction-sections -fdata-sections \
+	-pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -ffunction-sections -fdata-sections \
-	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
+CFLAGS = -c -O3 -ffunction-sections -fdata-sections  -DNDEBUG \
+	-std=c11 -pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -ffunction-sections -fdata-sections \
-	-O3 -Wall -Wextra $(INCLUDES) $(DEFINES) -DNDEBUG
+CPPFLAGS = -c -O3 -ffunction-sections -fdata-sections  -DNDEBUG \
+	-pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
 
 endif  # .....................................................................
 

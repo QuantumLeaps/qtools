@@ -1,0 +1,1 @@
+qspy -f dpp-qpcpp.bin -g l_SysTick_Handler,Table::inst,Philo::inst[0],Philo::inst[1],Philo::inst[2],Philo::inst[3],Philo::inst[4]

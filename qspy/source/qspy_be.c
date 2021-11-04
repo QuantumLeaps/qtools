@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-10
+* Last updated for version 6.9.4
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -108,7 +108,7 @@ void BE_onCleanup(void) {
 }
 
 /*..........................................................................*/
-void BE_parse(unsigned char *buf, size_t nBytes) {
+void BE_parse(unsigned char *buf, uint32_t nBytes) {
     /* By nature of UDP, each transmission from the Front-End contains
     * one complete UDP packet, which contains one complete QS record.
     * This is a greatly simplifying assumption in this routine.
@@ -135,7 +135,7 @@ void BE_parse(unsigned char *buf, size_t nBytes) {
         static uint8_t qbuf[QS_RECORD_SIZE_MAX]; /* encoded QS record */
 
         /* encode the packet according to the QS/QSPY protocol */
-        size_t len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
+        uint32_t len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
         if (len > 0U) {
             if ((*PAL_vtbl.send2Target)(qbuf, len) != QSPY_SUCCESS) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Sedning Data "
@@ -189,8 +189,8 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
         case QSPY_DETACH: {   /* detach from the Front-End */
             PAL_detachFE();
             l_channels = 0U; /* detached from a Front-End */
-            SNPRINTF_LINE(
-            "   <F-END> Detached ######################################");
+            SNPRINTF_LINE("   <F-END> Detached %s",
+                          "######################################");
             QSPY_printInfo();
             break;
         }
@@ -303,3 +303,4 @@ void BE_sendLine(void) {
         }
     }
 }
+

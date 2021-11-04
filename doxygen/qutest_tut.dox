@@ -922,7 +922,7 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
   </dd>
   <dt>20</dt><dd> The @ref current_obj() "current_obj(OBJ_AP, "led_power")" command sets the "current application object" to "led_power" (see @ref qutest_mock-spy "spy-object"[4]).
   </dd>
-  <dt>21]</dt>
+  <dt>21</dt>
 @anchor qutest_mock-script21
   <dd> The @ref poke() "poke(0, 4, pack("<LL", 25, 15))" command pokes the given data into the "current application object". Specifically, this poke() command pokes the data starting from offset 0, data-size 4, binary-data `pack("<LL", 25, 15)`.
   </dd>
@@ -938,7 +938,7 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 <dl class="tag">
   <dt>24</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
   </dd>
-  <dt>25]</dt>
+  <dt>25</dt>
 @anchor qutest_mock-script25
   <dd> The @ref probe() "probe("Led_on", 17)" command sends the @ref qutest_fixture-probe "test-probe" value 17 for function `Led_on`
   </dd>

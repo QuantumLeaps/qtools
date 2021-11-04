@@ -4,14 +4,14 @@
 * @ingroup qpspy
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-10
+* Last updated for version 6.9.4
+* Last updated on  2021-11-03
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -88,8 +88,8 @@ static ObjType   l_currSM;       /* current State Machine Object from FE */
     }
 
 /*..........................................................................*/
-size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
-                   uint8_t const *srcBuf, size_t srcBytes)
+uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
+                   uint8_t const *srcBuf, uint32_t srcBytes)
 {
     uint8_t chksum = 0U;
     uint8_t *dst = &dstBuf[0];
@@ -115,19 +115,19 @@ size_t QSPY_encode(uint8_t *dstBuf, size_t dstSize,
     return dst - &dstBuf[0];  /* number of bytes in the destination */
 }
 /*..........................................................................*/
-size_t QSPY_encodeResetCmd(uint8_t *dstBuf, size_t dstSize) {
+uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize) {
     static uint8_t const s_QS_RX_RESET[] = { 0x00U, QS_RX_RESET };
     return QSPY_encode(dstBuf, dstSize,
                        s_QS_RX_RESET, sizeof(s_QS_RX_RESET));
 }
 /*..........................................................................*/
-size_t QSPY_encodeInfoCmd(uint8_t *dstBuf, size_t dstSize) {
+uint32_t QSPY_encodeInfoCmd(uint8_t *dstBuf, uint32_t dstSize) {
     static uint8_t const s_QS_RX_INFO[] = { 0x00U, QS_RX_INFO };
     return QSPY_encode(dstBuf, dstSize,
                        s_QS_RX_INFO, sizeof(s_QS_RX_INFO));
 }
 /*..........................................................................*/
-size_t QSPY_encodeTickCmd (uint8_t *dstBuf, size_t dstSize, uint8_t rate){
+uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate){
     uint8_t a_QS_RX_TICK[] = { 0x00U, QS_RX_TICK, 0U };
     a_QS_RX_TICK[2] = rate;
     return QSPY_encode(dstBuf, dstSize,
@@ -135,13 +135,13 @@ size_t QSPY_encodeTickCmd (uint8_t *dstBuf, size_t dstSize, uint8_t rate){
 }
 /*..........................................................................*/
 void QSPY_sendEvt(QSpyRecord const * const qrec) {
-    unsigned sigSize = QSPY_getConfig()->sigSize;
+    unsigned sigSize = QSPY_conf.sigSize;
     unsigned n = 3U + sigSize;
     unsigned len = (qrec->start[n] | (qrec->start[n + 1U] << 8));
 
     n += (2U + len);
     if (n >= qrec->tot_len - 2U) {
-        SNPRINTF_LINE("   <F-END> ERROR    "
+        SNPRINTF_LINE("   <F-END> ERROR    %s",
                       "command 'SEND_EVENT' incorrect");
         QSPY_printError();
         return;
@@ -151,12 +151,11 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
         SigType sig = QSPY_findSig(name, l_currSM);
         if (sig == (SigType)0) {
             SNPRINTF_LINE("   <F-END> ERROR    "
-                          "Signal Dictionary not found for "
-                          "Sig=%s", name);
+                          "Signal Dictionary not found for Sig=%s", name);
             QSPY_printError();
         }
         else {
-            size_t nBytes;
+            uint32_t nBytes;
             uint8_t *evtPkt = (uint8_t *)&qrec->start[0]; /*cast const away*/
 
             evtPkt[0] = 0U;
@@ -178,7 +177,8 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
             /* encode the QS_RX_EVENT record to the Target */
             nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), evtPkt, n);
             if (nBytes == 0) {
-                SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_EVENT");
+                SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                              "Encoding QS_RX_EVENT");
                 QSPY_printError();
             }
             else {
@@ -190,7 +190,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
 }
 /*..........................................................................*/
 void QSPY_sendObj(QSpyRecord const * const qrec) {
-    unsigned objPtrSize = QSPY_getConfig()->objPtrSize;
+    unsigned objPtrSize = QSPY_conf.objPtrSize;
     unsigned n = 3U + objPtrSize;
     char const *name = (char const *)&qrec->start[n];
 
@@ -202,7 +202,7 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        size_t nBytes;
+        uint32_t nBytes;
         uint8_t *objPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         objPkt[0] = 0U;
@@ -252,7 +252,8 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
 
         nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), objPkt, n);
         if (nBytes == 0) {
-            SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_CURR_OBJ");
+            SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                          "Encoding QS_RX_CURR_OBJ");
             QSPY_onPrintLn();
         }
         else {
@@ -274,7 +275,7 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        size_t nBytes;
+        uint32_t nBytes;
         uint8_t *cmdPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         cmdPkt[0] = 0U;
@@ -283,7 +284,8 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
 
         nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), cmdPkt, n);
         if (nBytes == 0) {
-            SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_COMMAND");
+            SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                          "Encoding QS_RX_COMMAND");
             QSPY_onPrintLn();
         }
         else {
@@ -294,7 +296,7 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
 }
 /*..........................................................................*/
 void QSPY_sendTP(QSpyRecord const * const qrec) {
-    unsigned funPtrSize = QSPY_getConfig()->funPtrSize;
+    unsigned funPtrSize = QSPY_conf.funPtrSize;
     unsigned n = 2U + 4U + funPtrSize;
     char const *name = (char const *)&qrec->start[n];
 
@@ -306,7 +308,7 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
         QSPY_printError();
     }
     else {
-        size_t nBytes;
+        uint32_t nBytes;
         uint8_t *tpPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
 
         tpPkt[0] = 0U;
@@ -329,7 +331,8 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
 
         nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), tpPkt, n);
         if (nBytes == 0) {
-            SNPRINTF_LINE("   <COMMS> ERROR    Encoding QS_RX_PROBE_POINT");
+            SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                          "Encoding QS_RX_PROBE_POINT");
             QSPY_onPrintLn();
         }
         else {

@@ -148,7 +148,7 @@ INPUT                  = main.dox \
                          ../qview/qview.py \
                          ../qwin/qwin_gui.h \
                          ../qwin/qwin_gui.c \
-                         ../../doxygen/help.dox
+                         ../../ql-doxygen/help.dox
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.dox \
                          *.h \
@@ -165,7 +165,7 @@ EXAMPLE_PATH           = snippets
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = images \
-                         ../../doxygen/images
+                         ../../ql-doxygen/images
 INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = NO
@@ -198,12 +198,12 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = ../html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = ../../doxygen/header-awesome.html
-HTML_FOOTER            = ../../doxygen/footer-awesome.html
+HTML_HEADER            = ../../ql-doxygen/header-awesome.html
+HTML_FOOTER            = ../../ql-doxygen/footer-awesome.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ../../doxygen/doxygen-awesome.css \
-                         ../../doxygen/ql-awesome.css
-HTML_EXTRA_FILES       = ../../doxygen/doxygen-awesome-darkmode-toggle.js
+HTML_EXTRA_STYLESHEET  = ../../ql-doxygen/doxygen-awesome.css \
+                         ../../ql-doxygen/ql-awesome.css
+HTML_EXTRA_FILES       = ../../ql-doxygen/doxygen-awesome-darkmode-toggle.js
 HTML_COLORSTYLE_HUE    = 209
 HTML_COLORSTYLE_SAT    = 255
 HTML_COLORSTYLE_GAMMA  = 113

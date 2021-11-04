@@ -31,23 +31,29 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\main.c">
+    <ClCompile Include="..\source\getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\qspy_tx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\qspy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pal.c">
+    <ClCompile Include="..\source\qspy_seq.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\qspy_dic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\qspy_be.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\qspy_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qspy_pal.c">
       <Filter>PAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\getopt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\be.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\qspy_tx.c">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
