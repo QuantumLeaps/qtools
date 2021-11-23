@@ -580,7 +580,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         "%12lu", "%13lu", "%14lu", "%15lu"
     };
     static char const *uhfmt[] = {
-        "0x%0lX",   "0x%01lX",  "0x%02lX",  "0x%uint32_tlX",
+        "0x%0lX",   "0x%01lX",  "0x%02lX",  "0x%03lX",
         "0x%04lX",  "0x%05lX",  "0x%06lX",  "0x%07lX",
         "0x%08lX",  "0x%09lX",  "0x%010lX", "0x%011lX",
         "0x%012lX", "0x%013lX", "0x%014lX", "0x%015lX"
@@ -610,7 +610,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
         SNPRINTF_LINE("%010u %s", u32, Dictionary_at(&QSPY_usrDict, i32));
     }
     else {
-        SNPRINTF_LINE("%010u USER+%uint32_td", u32, (int)(me->rec - l_userRec));
+        SNPRINTF_LINE("%010u USER+%03d", u32, (int)(me->rec - l_userRec));
     }
 
     FPRINF_MATFILE("%d %u", (int)me->rec, u32);
@@ -696,7 +696,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 uint8_t const *mem = QSpyRecord_getMem(me, 1, &u32);
                 for (; u32 > 0U; --u32, ++mem) {
                     SNPRINTF_APPEND(" %02X", (unsigned int)*mem);
-                    FPRINF_MATFILE(" %uint32_td", (unsigned int)*mem);
+                    FPRINF_MATFILE(" %03d", (unsigned int)*mem);
                 }
                 break;
             }
