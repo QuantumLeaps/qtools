@@ -51,7 +51,7 @@ starting with 'q' are contributed by Quantum Leaps)
               in embedded web pages served by the HTTP server
 
 7. Unity    - traditional unit testing harness (framework) for embedded C
-              (version 2.4.3)
+              (version 2.5.2)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
@@ -66,7 +66,7 @@ following 3rd-party tools:
 
 10. GNU C/C++ toolset for Windows (mingw32 version 9.2.0)
 
-11. GNU C/C++ toolset for ARM-EABI (GCC version 9.2.1)
+11. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
 
 12. Python for Windows (version 3.9 32-bit)
 
@@ -173,13 +173,9 @@ The installer gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe has been used.
 ### The GNU make executable for Windows
 Has been taken from the MinGW project at SourceForge.net:
 
-### The file and diff utilities
-Have been taken from the UnixUtils project at SourceForge.net:
-- http://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
-
-### The file and diff utilities source
-(source/fileutils-3.16-src.zip) has been taken from:
-- http://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
+### The UNIX file and directory utilities
+Have been taken from the Gow (Gnu On Windows) project at GitHub:
+- https://github.com/bmatzelle/gow
 
 ### The Unity Unit Testing Harness for Embedded C
 Has been taken from the GitHub at:
