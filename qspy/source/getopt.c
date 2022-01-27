@@ -1,4 +1,4 @@
-/*****************************************************************************
+/*============================================================================
 * getopt.c - competent and free getopt library.
 *
 * getopt() return values:
@@ -32,7 +32,7 @@
 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*****************************************************************************/
+============================================================================*/
 #include <stdlib.h>
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */

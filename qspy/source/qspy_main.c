@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2022-01-27
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief main for QSPY host utility
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #include <stdint.h>
 #include <stddef.h>
@@ -48,6 +41,11 @@
 #include "be.h"       /* Back-End interface */
 #include "pal.h"      /* Platform Abstraction Layer */
 #include "getopt.h"   /* command-line option processor */
+
+#define Q_SPY   1       /* this is QP implementation */
+#define QP_IMPL 1       /* this is QP implementation */
+#include "qpc_qs.h"     /* QS target-resident interface */
+#include "qpc_qs_pkg.h" /* QS package-scope interface */
 
 /*..........................................................................*/
 typedef enum {
@@ -81,8 +79,13 @@ static int   l_bePort   = 7701;   /* default UDP port  */
 static int   l_tcpPort  = 6601;   /* default TCP port */
 static int   l_baudRate = 115200; /* default serial baudrate */
 
+/* color rendeing */
+extern char const * const l_darkPalette[];
+extern char const * const l_lightPalette[];
+static char const * const *l_colorPalette = l_darkPalette;
+
 static char const l_introStr[] = \
-    "QSPY %s Copyright (c) 2005-2021 Quantum Leaps\n" \
+    "QSPY %s Copyright (c) 2005-2022 Quantum Leaps\n" \
     "Documentation: https://www.state-machine.com/qtools/qspy.html\n" \
     "Current timestamp: %s\n";
 
@@ -96,6 +99,7 @@ static char const l_helpStr[] =
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
     "-u [UDP_port|0]   7701    UDP socket with optional port, 0-no UDP\n"
     "-v <QS_version>   6.6     compatibility with QS version\n"
+    "-r <c0|c1|c2>     c1      rendering (c0=no-color, c1-color1, )\n"
     "-k                        suppress keyboard input\n"
     "-o                (key-o) save screen output to a file\n"
     "-s                (key-s) save binary QS data to a file\n"
@@ -123,7 +127,7 @@ static char const l_helpStr[] =
 static char const l_kbdHelpStr[] =
     "Keyboard shortcuts (valid when -k option is absent):\n"
     "KEY(s)            ACTION\n"
-    "-----------------------------------------------------------------\n"
+    "----------------------------------------------------------------\n"
     "<Esc>/x/X         Exit QSPY\n"
     "  h               display keyboard help and QSPY status\n"
     "  c               clear the screen\n"
@@ -140,6 +144,7 @@ static char const l_kbdHelpStr[] =
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]);
+static void colorPrintLn(void);
 static uint8_t l_buf[8*1024]; /* process input in 8K chunks */
 
 /*..........................................................................*/
@@ -237,9 +242,24 @@ void Q_onAssert(char const * const module, int loc) {
 
 /*..........................................................................*/
 void QSPY_onPrintLn(void) {
+    if (l_outFile != (FILE *)0) {
+        /* output file receives all trace records, regardles of -q mode */
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
+        fputc('\n', l_outFile);
+    }
+
+    if (QSPY_output.type != INF_OUT) { /* just an internal info? */
+        BE_sendLine(); /* forward to the back-end */
+    }
+
     if (l_quiet < 0) {
-        fputs(QSPY_line, stdout);
-        fputc('\n', stdout);
+        if (l_colorPalette) {
+            colorPrintLn();
+        }
+        else {
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+            fputc('\n', stdout);
+        }
     }
     else if (l_quiet > 0) {
         if ((l_quiet_ctr == 0U) || (QSPY_output.type != REG_OUT)) {
@@ -247,8 +267,13 @@ void QSPY_onPrintLn(void) {
                 if (l_quiet_ctr != l_quiet - 1) {
                     fputc('\n', stdout);
                 }
-                fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-                fputc('\n', stdout);
+                if (l_colorPalette) {
+                    colorPrintLn();
+                }
+                else {
+                    fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+                    fputc('\n', stdout);
+                }
                 l_quiet_ctr = l_quiet;
             }
         }
@@ -258,23 +283,13 @@ void QSPY_onPrintLn(void) {
         --l_quiet_ctr;
     }
 
-    if (l_outFile != (FILE *)0) {
-        /* the output file receives all trace records, regardles of -q mode */
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
-        fputc('\n', l_outFile);
-    }
-
-    if (QSPY_output.type != INF_OUT) { /* just an internal info? */
-        BE_sendLine(); /* forward to the back-end */
-    }
-
     QSPY_output.type = REG_OUT; /* reset for the next time */
 }
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hq::u::v:kosmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:r:kosmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
     QSpyConfig config = {
@@ -342,6 +357,23 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 else {
                     FPRINTF_S(stderr, "Incorrect version number: %s", optarg);
                     return QSPY_ERROR;
+                }
+                break;
+            }
+            case 'r': { /* rendering options */
+                if (optarg != NULL) { /* is optional argument provided? */
+                    PRINTF_S("-r %s\n", optarg);
+                    if (optarg[0] == 'c') {
+                        if (optarg[1] == '1') {
+                            l_colorPalette = l_darkPalette;
+                        }
+                        else if (optarg[1] == '2') {
+                            l_colorPalette = l_lightPalette;
+                        }
+                        else {
+                            l_colorPalette = (char const * const *)0;
+                        }
+                    }
                 }
                 break;
             }
@@ -507,6 +539,13 @@ static QSpyStatus configure(int argc, char *argv[]) {
         return QSPY_ERROR;
     }
 
+    /* open the keyboard input... */
+    if (PAL_openKbd(l_kbd_inp, (l_colorPalette != (char const * const*)0))
+        != QSPY_SUCCESS)
+    {
+        return QSPY_ERROR;
+    }
+
     /* configure QSPY ......................................................*/
     /* open Back-End link. NOTE: must happen *before* opening Target link */
     if (l_bePort != 0) {
@@ -585,11 +624,6 @@ static QSpyStatus configure(int argc, char *argv[]) {
     if (l_dicFileName[0] != 'O') { /* not "OFF" ? */
         QSPY_setExternDict(l_dicFileName);
         QSPY_readDict();
-    }
-
-    /* open the keyboard input... */
-    if (PAL_openKbd(l_kbd_inp)  != QSPY_SUCCESS) {
-        return QSPY_ERROR;
     }
 
     return QSPY_SUCCESS;
@@ -766,7 +800,7 @@ bool QSPY_command(uint8_t cmdId) {
 
         case 'x':
         case 'X':
-        case '\033': /* Esc */
+        case '\x1b': /* Esc */
             isRunning = false; /* terminate the event loop */
             break;
     }
@@ -791,3 +825,191 @@ char const* QSPY_tstampStr(void) {
 
     return &tstampStr[0];
 }
+
+/*--------------------------------------------------------------------------*/
+/* color output to the terimal */
+
+/* terminal colors */
+#define B_DFLT     "\x1b[0m"
+#define B_BLACK    "\x1b[40m"
+#define B_RED      "\x1b[41m"
+#define B_GREEN    "\x1b[42m"
+#define B_YELLOW   "\x1b[43m"
+#define B_BLUE     "\x1b[44m"
+#define B_MAGENTA  "\x1b[45m"
+#define B_CYAN     "\x1b[46m"
+#define B_WHITE    "\x1b[47m"
+
+#define F_BLACK    "\x1b[30m"
+#define F_RED      "\x1b[31m"
+#define F_GREEN    "\x1b[32m"
+#define F_YELLOW   "\x1b[33m"
+#define F_BLUE     "\x1b[34m"
+#define F_MAGENTA  "\x1b[35m"
+#define F_CYAN     "\x1b[36m"
+#define F_WHITE    "\x1b[37m"
+
+#define F_GRAY     "\x1b[30;1m"
+#define F_BRED     "\x1b[31;1m"
+#define F_BGREEN   "\x1b[32;1m"
+#define F_BYELLOW  "\x1b[33;1m"
+#define F_BBLUE    "\x1b[34;1m"
+#define F_BMAGENTA "\x1b[35;1m"
+#define F_BCYAN    "\x1b[36;1m"
+#define F_BWHITE   "\x1b[37;1m"
+
+/* color palette entries */
+enum {
+    PALETTE_ERR_OUT,
+    PALETTE_INF_OUT,
+    PALETTE_TSTAMP,
+    PALETTE_DSC_SM,
+    PALETTE_DSC_QP,
+    PALETTE_DSC_INF,
+    PALETTE_DSC_TST,
+    PALETTE_SM_TXT,
+    PALETTE_QP_TXT,
+    PALETTE_INF_TXT,
+    PALETTE_DIC_TXT,
+    PALETTE_TST_TXT,
+    PALETTE_USR_TXT,
+};
+
+char const * const l_darkPalette[] = {
+/* PALETTE_ERR_OUT */            B_RED     F_BYELLOW,
+/* PALETTE_INF_OUT */    B_DFLT  B_GREEN   F_BLACK,
+/* PALETTE_TSTAMP  */            B_BLACK   F_GRAY,
+/* PALETTE_DSC_SM  */            B_BLUE    F_WHITE,
+/* PALETTE_DSC_QP  */    B_DFLT  B_MAGENTA F_WHITE,
+/* PALETTE_DSC_INF */    B_DFLT  B_BLUE    F_BYELLOW,
+/* PALETTE_DSC_TST */    B_DFLT  B_CYAN    F_BWHITE,
+/* PALETTE_SM_TXT  */            B_BLACK   F_BWHITE,
+/* PALETTE_QP_TXT  */            B_BLACK   F_WHITE,
+/* PALETTE_INF_TXT */    B_DFLT  B_BLACK   F_BYELLOW,
+/* PALETTE_DIC_TXT */            B_BLACK   F_GRAY,
+/* PALETTE_TST_TXT */    B_DFLT  B_BLACK   F_YELLOW,
+/* PALETTE_USR_TXT */    B_DFLT  B_WHITE   F_BLACK,
+};
+
+char const * const l_lightPalette[] = {
+/* PALETTE_ERR_OUT */            B_RED     F_BYELLOW,
+/* PALETTE_INF_OUT */    B_DFLT  B_GREEN   F_BLACK,
+/* PALETTE_TSTAMP  */            B_WHITE   F_GRAY,
+/* PALETTE_DSC_SM  */            B_BLUE    F_WHITE,
+/* PALETTE_DSC_QP  */    B_DFLT  B_MAGENTA F_WHITE,
+/* PALETTE_DSC_INF */    B_DFLT  B_BLUE    F_BYELLOW,
+/* PALETTE_DSC_TST */    B_DFLT  B_CYAN    F_BWHITE,
+/* PALETTE_SM_TXT  */            B_WHITE   F_BLUE,
+/* PALETTE_QP_TXT  */            B_WHITE   F_MAGENTA,
+/* PALETTE_INF_TXT */    B_DFLT  B_WHITE   F_RED,
+/* PALETTE_DIC_TXT */            B_WHITE   F_GRAY,
+/* PALETTE_TST_TXT */    B_DFLT  B_WHITE   F_BLUE,
+/* PALETTE_USR_TXT */    B_DFLT  B_BLACK   F_WHITE,
+};
+
+enum {
+    COL_TSTAMP = 11,
+    COL_DESC   = 19,
+};
+
+static void colorPrintLn(void) {
+    if (QSPY_output.type == REG_OUT) {
+        int group = QSPY_output.rec < QS_USER
+                   ? QSPY_rec[QSPY_output.rec].group
+                   : GRP_USR;
+
+        /* timestamp */
+        char ch;
+        ch = QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP];
+        QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP] = '\0';
+        fputs(l_colorPalette[PALETTE_TSTAMP], stdout);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP] = ch;
+
+        switch (group) {
+        case GRP_ERR: {
+            fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            break;
+        }
+        case GRP_INF: {
+            /* description section */
+            ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
+            fputs(l_colorPalette[PALETTE_DSC_INF], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
+            if (QSPY_output.len > COL_DESC) {
+                fputs(l_colorPalette[PALETTE_INF_TXT], stdout);
+                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+            }
+            break;
+        }
+        case GRP_DIC: {
+            fputs(l_colorPalette[PALETTE_DIC_TXT], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            break;
+        }
+        case GRP_TST: {
+            /* description section */
+            ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
+            fputs(l_colorPalette[PALETTE_DSC_TST], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
+            if (QSPY_output.len > COL_DESC) {
+                fputs(l_colorPalette[PALETTE_TST_TXT], stdout);
+                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+            }
+            break;
+        }
+        case GRP_SM: {
+            /* description section */
+            ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
+            fputs(l_colorPalette[PALETTE_DSC_SM], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
+            if (QSPY_output.len > COL_DESC) {
+                fputs(l_colorPalette[PALETTE_SM_TXT], stdout);
+                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+            }
+            break;
+        }
+        case GRP_AO:
+        case GRP_EQ:
+        case GRP_MP:
+        case GRP_TE:
+        case GRP_QF:
+        case GRP_SC: {
+            /* description section */
+            ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
+            fputs(l_colorPalette[PALETTE_DSC_QP], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
+            if (QSPY_output.len > COL_DESC) {
+                fputs(l_colorPalette[PALETTE_QP_TXT], stdout);
+                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+            }
+            break;
+        }
+        case GRP_USR: /* intentionally fall through */
+        default: {
+            fputs(l_colorPalette[PALETTE_USR_TXT], stdout);
+            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            break;
+        }
+        }
+    }
+    else if (QSPY_output.type == INF_OUT) {
+        fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+    }
+    else { /* ERR_OUT */
+        fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+    }
+    fputs(B_DFLT "\n", stdout);
+}
+

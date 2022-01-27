@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2022-01-12
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief Platform Abstraction Layer (PAL)
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #ifndef pal_h
 #define pal_h
@@ -43,19 +36,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-QSpyStatus PAL_openBE(int portNum); /* open Back-End socket */
-void PAL_closeBE(void);             /* close Back-End socket */
-void PAL_send2FE(unsigned char const *buf, uint32_t nBytes); /* to Front-End */
-void PAL_detachFE(void);            /* detach Front-End */
-void PAL_clearScreen(void);
-
-QSpyStatus PAL_openTargetSer(char const *comName, int baudRate);
-QSpyStatus PAL_openTargetTcp(int portNum);
-QSpyStatus PAL_openTargetFile(char const *fName);
-
-QSpyStatus PAL_openKbd(bool kbd_inp);
-void       PAL_closeKbd(void);
 
 /* events for the QSPY event loop... */
 typedef enum {
@@ -66,12 +46,6 @@ typedef enum {
     QSPY_DONE_EVT,
     QSPY_ERROR_EVT
 } QSPYEvtType;
-
-/* QP/Spy protocol constants */
-#define QS_FRAME            0x7EU
-#define QS_ESC              0x7DU
-#define QS_ESC_XOR          0x20U
-#define QS_GOOD_CHKSUM      0xFFU
 
 /* The PAL "virtual table" contains operations that are dependent
 * on the choice of target connection. This connection is chosen
@@ -85,6 +59,29 @@ typedef struct {
 } PAL_VtblType;
 
 extern PAL_VtblType PAL_vtbl;
+
+/* typedefs needed for qpc_qs.h */
+typedef int      int_t;
+typedef int      enum_t;
+typedef float    float32_t;
+typedef double   float64_t;
+
+QSpyStatus PAL_openBE(int portNum); /* open Back-End socket */
+void PAL_closeBE(void);             /* close Back-End socket */
+void PAL_send2FE(unsigned char const *buf, uint32_t nBytes); /* to Front-End */
+void PAL_detachFE(void);            /* detach Front-End */
+void PAL_clearScreen(void);
+
+QSpyStatus PAL_openTargetSer(char const *comName, int baudRate);
+QSpyStatus PAL_openTargetTcp(int portNum);
+QSpyStatus PAL_openTargetFile(char const *fName);
+
+QSpyStatus PAL_openKbd(bool kbd_inp, bool color);
+void       PAL_closeKbd(void);
+
+QSPYEvtType PAL_receiveBe (unsigned char *buf, uint32_t *pBytes);
+QSPYEvtType PAL_receiveKbd(unsigned char *buf, uint32_t *pBytes);
+void PAL_updateReadySet(int targetConn);
 
 #ifdef __cplusplus
 }

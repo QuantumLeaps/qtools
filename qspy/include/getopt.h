@@ -4,7 +4,7 @@
 * Copyright (c) 2002-2003, Mark K. Kim
 * Copyright (c) 2012-2017, Kim Grasman <kim.grasman@gmail.com>
 *
-* Modified by Quantum Leaps 2018 <https://www.state-machine.com>
+* Modified by Quantum Leaps 2018 <www.state-machine.com>
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:

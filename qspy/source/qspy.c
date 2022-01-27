@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2021-12-23
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief QSPY host uility: main parser
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #include <stdint.h>
 #include <stdbool.h>
@@ -47,22 +40,10 @@
 #include "qspy.h"     /* QSPY data parser */
 #include "pal.h"      /* Platform Abstraction Layer */
 
-typedef char     char_t;
-typedef float    float32_t;
-typedef double   float64_t;
-typedef int      enum_t;
-typedef int      int_t;
-typedef unsigned uint_t;
-typedef void     QEvt;
-
-#ifndef Q_SPY
-#define Q_SPY 1
-#endif
-
-#define QS_OBJ_PTR_SIZE 4
-#define QS_FUN_PTR_SIZE 4
-#define Q_SIGNAL_SIZE   2
-#include "qs_copy.h"     /* copy of the target-resident QS interface */
+#define Q_SPY   1       /* this is QP implementation */
+#define QP_IMPL 1       /* this is QP implementation */
+#include "qpc_qs.h"     /* QS target-resident interface */
+#include "qpc_qs_pkg.h" /* QS package-scope interface */
 
 /* global objects ..........................................................*/
 QSPY_LastOutput QSPY_output;
@@ -74,10 +55,9 @@ Dictionary    QSPY_objDict;
 Dictionary    QSPY_usrDict;
 SigDictionary QSPY_sigDict;
 
-/****************************************************************************/
-
+/*==========================================================================*/
 enum {
-    OLD_QS_USER    = 70,  /* old QS_USER used in before QS 6.6.0 */
+    OLD_QS_USER = 70,  /* old QS_USER used before QS 6.6.0 */
 };
 
 /*..........................................................................*/
@@ -92,143 +72,141 @@ static uint32_t      l_userRec;
 static QSPY_CustParseFun l_custParseFun;
 static QSPY_resetFun     l_txResetFun;
 
-/* QS record names... NOTE: keep in synch with qs_copy.h */
-static char const *  l_qs_rec[] = {
-    "QS_EMPTY",
+/* QS record names... NOTE: keep in synch with qspy_qs.h */
+QSpyRecRender const QSPY_rec[QS_USER] = {
+    { "QS_EMPTY",                         GRP_INF },
 
     /* [1] QEP records */
-    "QS_QEP_STATE_ENTRY",
-    "QS_QEP_STATE_EXIT",
-    "QS_QEP_STATE_INIT",
-    "QS_QEP_INIT_TRAN",
-    "QS_QEP_INTERN_TRAN",
-    "QS_QEP_TRAN",
-    "QS_QEP_IGNORED",
-    "QS_QEP_DISPATCH",
-    "QS_QEP_UNHANDLED",
+    { "QS_QEP_STATE_ENTRY",               GRP_SM },
+    { "QS_QEP_STATE_EXIT",                GRP_SM },
+    { "QS_QEP_STATE_INIT",                GRP_SM },
+    { "QS_QEP_INIT_TRAN",                 GRP_SM },
+    { "QS_QEP_INTERN_TRAN",               GRP_SM },
+    { "QS_QEP_TRAN",                      GRP_SM },
+    { "QS_QEP_IGNORED",                   GRP_SM },
+    { "QS_QEP_DISPATCH",                  GRP_SM },
+    { "QS_QEP_UNHANDLED",                 GRP_SM },
 
-    /* [10] QF records */
-    "QS_QF_ACTIVE_DEFER",
-    "QS_QF_ACTIVE_RECALL",
-    "QS_QF_ACTIVE_SUBSCRIBE",
-    "QS_QF_ACTIVE_UNSUBSCRIBE",
-    "QS_QF_ACTIVE_POST",
-    "QS_QF_ACTIVE_POST_LIFO",
-    "QS_QF_ACTIVE_GET",
-    "QS_QF_ACTIVE_GET_LAST",
-    "QS_QF_ACTIVE_RECALL_ATTEMPT",
+    /* [10] QF (AP) records */
+    { "QS_QF_ACTIVE_DEFER",               GRP_AO },
+    { "QS_QF_ACTIVE_RECALL",              GRP_AO },
+    { "QS_QF_ACTIVE_SUBSCRIBE",           GRP_AO },
+    { "QS_QF_ACTIVE_UNSUBSCRIBE",         GRP_AO },
+    { "QS_QF_ACTIVE_POST",                GRP_AO },
+    { "QS_QF_ACTIVE_POST_LIFO",           GRP_AO },
+    { "QS_QF_ACTIVE_GET",                 GRP_AO },
+    { "QS_QF_ACTIVE_GET_LAST",            GRP_AO },
+    { "QS_QF_ACTIVE_RECALL_ATTEMPT",      GRP_AO },
 
-    /* [19] Event Queue (EQ) records */
-    "QS_QF_EQUEUE_POST",
-    "QS_QF_EQUEUE_POST_LIFO",
-    "QS_QF_EQUEUE_GET",
-    "QS_QF_EQUEUE_GET_LAST",
+    /* [19] QF (EQ) records */
+    { "QS_QF_EQUEUE_POST",                GRP_EQ },
+    { "QS_QF_EQUEUE_POST_LIFO",           GRP_EQ },
+    { "QS_QF_EQUEUE_GET",                 GRP_EQ },
+    { "QS_QF_EQUEUE_GET_LAST",            GRP_EQ },
 
-    /* [23] Framework (QF) records */
-    "QS_QF_NEW_ATTEMPT",
+    /* [23] QF records */
+    { "QS_QF_NEW_ATTEMPT",                GRP_QF },
 
     /* [24] Memory Pool (MP) records */
-    "QS_QF_MPOOL_GET",
-    "QS_QF_MPOOL_PUT",
+    { "QS_QF_MPOOL_GET",                  GRP_MP },
+    { "QS_QF_MPOOL_PUT",                  GRP_MP },
 
     /* [26] Additional Framework (QF) records */
-    "QS_QF_PUBLISH",
-    "QS_QF_NEW_REF",
-    "QS_QF_NEW",
-    "QS_QF_GC_ATTEMPT",
-    "QS_QF_GC",
-    "QS_QF_TICK",
+    { "QS_QF_PUBLISH",                    GRP_QF },
+    { "QS_QF_NEW_REF",                    GRP_QF },
+    { "QS_QF_NEW",                        GRP_QF },
+    { "QS_QF_GC_ATTEMPT",                 GRP_QF },
+    { "QS_QF_GC",                         GRP_QF },
+    { "QS_QF_TICK",                       GRP_QF },
 
     /* [32] Time Event (TE) records */
-    "QS_QF_TIMEEVT_ARM",
-    "QS_QF_TIMEEVT_AUTO_DISARM",
-    "QS_QF_TIMEEVT_DISARM_ATTEMPT",
-    "QS_QF_TIMEEVT_DISARM",
-    "QS_QF_TIMEEVT_REARM",
-    "QS_QF_TIMEEVT_POST",
+    { "QS_QF_TIMEEVT_ARM",                GRP_TE },
+    { "QS_QF_TIMEEVT_AUTO_DISARM",        GRP_TE },
+    { "QS_QF_TIMEEVT_DISARM_ATTEMPT",     GRP_TE },
+    { "QS_QF_TIMEEVT_DISARM",             GRP_TE },
+    { "QS_QF_TIMEEVT_REARM",              GRP_TE },
+    { "QS_QF_TIMEEVT_POST",               GRP_TE },
 
     /* [38] Additional Framework (QF) records */
-    "QS_QF_DELETE_REF",
-    "QS_QF_CRIT_ENTRY",
-    "QS_QF_CRIT_EXIT",
-    "QS_QF_ISR_ENTRY",
-    "QS_QF_ISR_EXIT",
-    "QS_QF_INT_DISABLE",
-    "QS_QF_INT_ENABLE",
+    { "QS_QF_DELETE_REF",                 GRP_QF },
+    { "QS_QF_CRIT_ENTRY",                 GRP_QF },
+    { "QS_QF_CRIT_EXIT",                  GRP_QF },
+    { "QS_QF_ISR_ENTRY",                  GRP_QF },
+    { "QS_QF_ISR_EXIT",                   GRP_QF },
+    { "QS_QF_INT_DISABLE",                GRP_QF },
+    { "QS_QF_INT_ENABLE",                 GRP_QF },
 
     /* [45] Additional Active Object (AO) records */
-    "QS_QF_ACTIVE_POST_ATTEMPT",
+    { "QS_QF_ACTIVE_POST_ATTEMPT",        GRP_AO },
 
     /* [46] Additional Event Queue (EQ) records */
-    "QS_QF_EQUEUE_POST_ATTEMPT",
+    { "QS_QF_EQUEUE_POST_ATTEMPT",        GRP_EQ },
 
     /* [47] Additional Memory Pool (MP) records */
-    "QS_QF_MPOOL_GET_ATTEMPT",
+    { "QS_QF_MPOOL_GET_ATTEMPT",          GRP_MP },
 
     /* [48] Scheduler (SC) records */
-    "QS_MUTEX_LOCK",
-    "QS_MUTEX_UNLOCK",
-    "QS_SCHED_LOCK",
-    "QS_SCHED_UNLOCK",
-    "QS_SCHED_NEXT",
-    "QS_SCHED_IDLE",
-    "QS_SCHED_RESUME",
+    { "QS_MUTEX_LOCK",                    GRP_SC },
+    { "QS_MUTEX_UNLOCK",                  GRP_SC },
+    { "QS_SCHED_LOCK",                    GRP_SC },
+    { "QS_SCHED_UNLOCK",                  GRP_SC },
+    { "QS_SCHED_NEXT",                    GRP_SC },
+    { "QS_SCHED_IDLE",                    GRP_SC },
+    { "QS_SCHED_RESUME",                  GRP_SC },
 
     /* [55] Additional QEP records */
-    "QS_QEP_TRAN_HIST",
-    "QS_QEP_TRAN_EP",
-    "QS_QEP_TRAN_XP",
+    { "QS_QEP_TRAN_HIST",                 GRP_SM },
+    { "QS_QEP_TRAN_EP",                   GRP_SM },
+    { "QS_QEP_TRAN_XP",                   GRP_SM },
 
     /* [58] Miscellaneous QS records (not maskable) */
-    "QS_TEST_PAUSED",
-    "QS_TEST_PROBE_GET",
-    "QS_SIG_DICT",
-    "QS_OBJ_DICT",
-    "QS_FUN_DICT",
-    "QS_USR_DICT",
-    "QS_TARGET_INFO",
-    "QS_TARGET_DONE",
-    "QS_RX_STATUS",
-    "QS_QUERY_DATA",
-    "QS_PEEK_DATA",
-    "QS_ASSERT_FAIL"
-    "QS_QF_RUN"
+    { "QS_TEST_PAUSED",                   GRP_TST },
+    { "QS_TEST_PROBE_GET",                GRP_TST },
+    { "QS_SIG_DICT",                      GRP_DIC },
+    { "QS_OBJ_DICT",                      GRP_DIC },
+    { "QS_FUN_DICT",                      GRP_DIC },
+    { "QS_USR_DICT",                      GRP_DIC },
+    { "QS_TARGET_INFO",                   GRP_INF },
+    { "QS_TARGET_DONE",                   GRP_TST },
+    { "QS_RX_STATUS",                     GRP_TST },
+    { "QS_QUERY_DATA",                    GRP_TST },
+    { "QS_PEEK_DATA",                     GRP_TST },
+    { "QS_ASSERT_FAIL",                   GRP_ERR },
+    { "QS_QF_RUN",                        GRP_INF },
 
-    /* [71] Reserved QS records */
-    "QS_RESERVED_71",
-    "QS_RESERVED_72",
-    "QS_RESERVED_73",
-    "QS_RESERVED_74",
-    "QS_RESERVED_75",
-    "QS_RESERVED_76",
-    "QS_RESERVED_77",
-    "QS_RESERVED_78",
-    "QS_RESERVED_79",
-    "QS_RESERVED_80",
-    "QS_RESERVED_81",
-    "QS_RESERVED_82",
-    "QS_RESERVED_83",
-    "QS_RESERVED_84",
-    "QS_RESERVED_85",
-    "QS_RESERVED_86",
-    "QS_RESERVED_87",
-    "QS_RESERVED_88",
-    "QS_RESERVED_89",
-    "QS_RESERVED_90",
-    "QS_RESERVED_91",
-    "QS_RESERVED_92",
-    "QS_RESERVED_93",
-    "QS_RESERVED_94",
-    "QS_RESERVED_95",
-    "QS_RESERVED_96",
-    "QS_RESERVED_97",
-    "QS_RESERVED_98",
-    "QS_RESERVED_99",
-
-    /* [100] Application-specific (User) QS records */
+    /* [71] Miscellaneous QS records (not maskable) */
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      GRP_ERR },
 };
 
-/* QS object kinds... NOTE: keep in synch with qs_copy.h */
+/* QS object kinds... NOTE: keep in synch with qspy_qs.h */
 static char const *  l_qs_obj[] = {
     "SM",
     "AO",
@@ -239,7 +217,7 @@ static char const *  l_qs_obj[] = {
     "SM_AO"
 };
 
-/* QS-RX record names... NOTE: keep in synch with qs_copy.h */
+/* QS-RX record names... NOTE: keep in synch with qspy_qs_pkg.h */
 static char const *  l_qs_rx_rec[] = {
     "QS_RX_INFO",
     "QS_RX_COMMAND",
@@ -260,7 +238,7 @@ static char const *  l_qs_rx_rec[] = {
     "QS_RX_EVENT"
 };
 
-/* stuff for QSPY host application only (but not for QSPY parser) */
+/* facilities for QSPY host application only (but not for QSPY parser) */
 #ifdef QSPY_APP
 
 #define FPRINF_MATFILE(format_, ...)                  \
@@ -273,7 +251,6 @@ static char const *  l_qs_rx_rec[] = {
 #define FPRINF_MATFILE(format_, ...)   ((void)0)
 
 #endif /* QSPY_APP */
-
 
 /*==========================================================================*/
 void QSPY_config(QSpyConfig const *config,
@@ -295,7 +272,7 @@ void QSPY_config(QSpyConfig const *config,
     Dictionary_config(&QSPY_usrDict, 1);
     SigDictionary_config(&QSPY_sigDict, QSPY_conf.objPtrSize);
 
-    QSPY_conf.tstamp[5] = 0U;   /* invalidate the year-part of the timestamp */
+    QSPY_conf.tstamp[5] = 0U; /* invalidate the year-part of the timestamp */
     l_userRec = ((QSPY_conf.version < 660U) ? OLD_QS_USER : QS_USER);
 }
 /*..........................................................................*/
@@ -335,8 +312,8 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
         }
 
         /* is this a standard QS record? */
-        if (me->rec < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
-            SNPRINTF_APPEND("Rec=%s", l_qs_rec[me->rec]);
+        if (me->rec < l_userRec) {
+            SNPRINTF_APPEND("Rec=%s", QSPY_rec[me->rec].name);
         }
         else { /* USER-specific record */
             SNPRINTF_APPEND("Rec=USER+%3d", (int)(me->rec - l_userRec));
@@ -560,8 +537,8 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
     return (uint8_t *)0;
 }
 
-/****************************************************************************/
-/* application-specific (user) QSPY records... */
+/*==========================================================================*/
+/* application-specific (user) QS records... */
 static void QSpyRecord_processUser(QSpyRecord * const me) {
     int64_t  i64;
     uint64_t u64;
@@ -758,8 +735,8 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
     FPRINF_MATFILE("%c", '\n');
 }
 
-/****************************************************************************/
-/* predefined QSPY records... */
+/*==========================================================================*/
+/* pre-defined QS records... */
 static void QSpyRecord_process(QSpyRecord * const me) {
     uint32_t t, a, b, c, d, e;
     uint64_t p, q, r;
@@ -1719,7 +1696,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             a = QSpyRecord_getUint32(me, 4U);
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("%010u TstProbe Fun=%s,Data=%d",
-                              t, Dictionary_get(&QSPY_funDict, q, (char *)0), a);
+                              t, Dictionary_get(&QSPY_funDict,
+                              q, (char *)0), a);
                 QSPY_onPrintLn();
             }
             break;
@@ -1851,7 +1829,8 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 CONFIG_UPDATE(tevtCtrSize, (uint8_t)((buf[1] >> 4) & 0xFU),d);
 
                 /* update the user record offset */
-                l_userRec = ((QSPY_conf.version < 660U) ? OLD_QS_USER : QS_USER);
+                l_userRec = ((QSPY_conf.version < 660U)
+                             ? OLD_QS_USER : QS_USER);
 
                 for (e = 0U; e < sizeof(QSPY_conf.tstamp); ++e) {
                     CONFIG_UPDATE(tstamp[e], (uint8_t)buf[7U + e], d);
@@ -1876,7 +1855,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                     SNPRINTF_LINE("   <QSPY-> %s",
                                   "Target info mismatch "
                                   "(dictionaries discarded)");
-                    QSPY_onPrintLn();
+                    QSPY_printInfo();
                     QSPY_resetAllDictionaries();
                 }
 
@@ -2140,7 +2119,7 @@ void QSPY_printError(void) {
     QSPY_onPrintLn();
 }
 
-/****************************************************************************/
+/*==========================================================================*/
 static uint8_t l_record[QS_RECORD_SIZE_MAX];
 static uint8_t *l_pos   = l_record; /* position within the record */
 static uint8_t l_chksum = 0U;
@@ -2173,9 +2152,9 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Record too long at "
                            "Seq=%u(?),", (unsigned)l_seq);
                 /* is it a standard QS record? */
-                if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
+                if (l_record[1] < l_userRec) {
                     SNPRINTF_APPEND("Rec=%s(?)",
-                                    l_qs_rec[l_record[1]]);
+                                    QSPY_rec[l_record[1]].name);
                 }
                 else { /* this is a USER-specific record */
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
@@ -2195,9 +2174,9 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 if (!isJustStarted) {
                     SNPRINTF_LINE("   <COMMS> ERROR    %s",
                                   "Bad checksum in ");
-                    if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
+                    if (l_record[1] < l_userRec) {
                         SNPRINTF_APPEND("Rec=%s(?),",
-                            l_qs_rec[l_record[1]]);
+                            QSPY_rec[l_record[1]].name);
                     }
                     else {
                         SNPRINTF_APPEND("Rec=USER+%u(?),",
@@ -2211,8 +2190,8 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Record too short at "
                            "Seq=%u(?),",
                            (unsigned)l_seq);
-                if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
-                    SNPRINTF_APPEND("Rec=%s", l_qs_rec[l_record[1]]);
+                if (l_record[1] < l_userRec) {
+                    SNPRINTF_APPEND("Rec=%s", QSPY_rec[l_record[1]].name);
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
@@ -2277,8 +2256,8 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 SNPRINTF_LINE("   <COMMS> ERROR    Record too long at "
                            "Seq=%3u,",
                            (unsigned)l_seq);
-                if (l_record[1] < sizeof(l_qs_rec)/sizeof(l_qs_rec[0])) {
-                    SNPRINTF_APPEND("Rec=%s", l_qs_rec[l_record[1]]);
+                if (l_record[1] < l_userRec) {
+                    SNPRINTF_APPEND("Rec=%s", QSPY_rec[l_record[1]].name);
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%3u",
@@ -2605,5 +2584,3 @@ void SigDictionary_reset(SigDictionary * const me) {
     }
     me->entries = 0;
 }
-
-

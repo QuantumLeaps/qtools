@@ -1,46 +1,39 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2021-12-23
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief Host API
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "6.9.4"
+#define QSPY_VER "7.0.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,23 +45,6 @@ typedef enum {
     QSPY_SUCCESS
 } QSpyStatus;
 
-/*! commands to QSPY; @sa "packet IDs" in qspy.tcl script */
-typedef enum {
-    QSPY_ATTACH = 128,    /*!< attach to the QSPY Back-End */
-    QSPY_DETACH,          /*!< detach from the QSPY Back-End */
-    QSPY_SAVE_DICT,       /*!< save dictionaries to a file in QSPY */
-    QSPY_SCREEN_OUT,      /*!< toggle screen output to a file in QSPY */
-    QSPY_BIN_OUT,         /*!< toggle binary output to a file in QSPY */
-    QSPY_MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
-    QSPY_SEQUENCE_OUT,    /*!< toggle Sequence output to a file in QSPY */
-    QSPY_SEND_EVENT,      /*!< send event (QSPY supplying signal) */
-    QSPY_SEND_AO_FILTER,  /*!< send Local Filter (QSPY supplying addr) */
-    QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
-    QSPY_SEND_COMMAND,    /*!< send command (QSPY supplying cmdId) */
-    QSPY_SEND_TEST_PROBE  /*!< send Test-Probe (QSPY supplying apiId) */
-    /* ... */
-} QSpyCommands;
-
 /*! QSPY record being processed */
 typedef struct {
     uint8_t const *start; /*!< start of the record */
@@ -77,26 +53,6 @@ typedef struct {
     int32_t  len;         /*!< current length of the stream */
     uint8_t  rec;         /*!< the record-ID (see enum QSpyRecords in qs.h) */
 } QSpyRecord;
-
-/*! QSPY configuration parameters. @sa QSPY_config() */
-typedef struct {
-    uint16_t version;
-    uint8_t endianness;
-    uint8_t objPtrSize;
-    uint8_t funPtrSize;
-    uint8_t tstampSize;
-    uint8_t sigSize;
-    uint8_t evtSize;
-    uint8_t queueCtrSize;
-    uint8_t poolCtrSize;
-    uint8_t poolBlkSize;
-    uint8_t tevtCtrSize;
-    uint8_t tstamp[6];
-} QSpyConfig;
-
-typedef uint64_t KeyType;
-typedef uint32_t SigType;
-typedef uint64_t ObjType;
 
 /* limits */
 enum {
@@ -124,6 +80,26 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
                                  uint32_t *pNum);
 
 /* QSPY configuration and high-level interface .............................*/
+/*! QSPY configuration parameters. @sa QSPY_config() */
+typedef struct {
+    uint16_t version;
+    uint8_t endianness;
+    uint8_t objPtrSize;
+    uint8_t funPtrSize;
+    uint8_t tstampSize;
+    uint8_t sigSize;
+    uint8_t evtSize;
+    uint8_t queueCtrSize;
+    uint8_t poolCtrSize;
+    uint8_t poolBlkSize;
+    uint8_t tevtCtrSize;
+    uint8_t tstamp[6];
+} QSpyConfig;
+
+typedef uint64_t KeyType;
+typedef uint32_t SigType;
+typedef uint64_t ObjType;
+
 void QSPY_config(QSpyConfig const *config,
                  QSPY_CustParseFun custParseFun);
 void QSPY_configTxReset(QSPY_resetFun txResetFun);
@@ -154,7 +130,15 @@ void QSPY_cleanup(void); /* cleanup after the run */
 
 char const* QSPY_tstampStr(void);
 
-/* last human-readable line of output from QSPY */
+void QSPY_onPrintLn(void); /* callback to print the last line of output */
+
+/* prints information message to the QSPY output (without sending it to FE) */
+void QSPY_printInfo(void);
+
+/* prints error message to the QSPY output (sending it to FE) */
+void QSPY_printError(void);
+
+/* last human-readable line of output from QSPY ............................*/
 #define QS_LINE_OFFSET  8
 enum QSPY_LastOutputType { REG_OUT, INF_OUT, ERR_OUT };
 typedef struct {
@@ -164,19 +148,67 @@ typedef struct {
     int  type; /* the type of the output */
 } QSPY_LastOutput;
 
+enum QSRreRecGroup {
+    GRP_ERR,
+    GRP_INF,
+    GRP_DIC,
+    GRP_TST,
+    GRP_SM,
+    GRP_AO,
+    GRP_EQ,
+    GRP_MP,
+    GRP_TE,
+    GRP_QF,
+    GRP_SC,
+    GRP_USR
+};
+
+typedef struct {
+    char const *name; /* name of the record, e.g. "QS_QF_PUBLISH" */
+    int  const group; /* group of the record (for rendering/coloring) */
+} QSpyRecRender;
+
+/* last output generated */
 extern QSPY_LastOutput QSPY_output;
-
-void QSPY_onPrintLn(void); /* callback to print the last line of output */
-
-/* prints information message to the QSPY output (without sending it to FE) */
-void QSPY_printInfo(void);
-
-/* prints error message to the QSPY output (sending it to FE) */
-void QSPY_printError(void);
 
 /* begining of QSPY line to print */
 extern char const * const QSPY_line;
 
+/* rendering information for QSPY records */
+extern QSpyRecRender const QSPY_rec[];
+
+#define SNPRINTF_LINE(format_, ...) do {                       \
+    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \
+                (QS_LINE_LEN_MAX - QS_LINE_OFFSET),            \
+                format_,  ##__VA_ARGS__);                      \
+    if ((0 < n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) { \
+        QSPY_output.len = n_;                                  \
+    }                                                          \
+    else {                                                     \
+        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;    \
+    }                                                          \
+} while (0)
+
+#define SNPRINTF_APPEND(format_, ...) do {                                 \
+    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
+                (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len),      \
+                format_, ##__VA_ARGS__);                                   \
+    if ((0 < n_)                                                           \
+        && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len)) {    \
+        QSPY_output.len += n_;                                             \
+    }                                                                      \
+    else {                                                                 \
+        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;                \
+    }                                                                      \
+} while (0)
+
+#define CONFIG_UPDATE(member_, new_, diff_) \
+    if (QSPY_conf.member_ != (new_)) {      \
+        QSPY_conf.member_ =  (new_);        \
+        (diff_) = 1U;                       \
+    } else (void)0
+
+/* Dictionaries ............................................................*/
 typedef struct {
     KeyType key;
     char    name[QS_DNAME_LEN_MAX];
@@ -228,9 +260,26 @@ SigType SigDictionary_findSig(SigDictionary* const me,
 void SigDictionary_reset(SigDictionary* const me);
 void QSPY_resetAllDictionaries(void);
 
-/****************************************************************************/
+/*==========================================================================*/
 /* facilities used by the QSPY host app only (but not for QSPY parser) */
 #ifdef QSPY_APP
+
+/*! commands to QSPY; @sa "packet IDs" in qspy.tcl script */
+typedef enum {
+    QSPY_ATTACH = 128,    /*!< attach to the QSPY Back-End */
+    QSPY_DETACH,          /*!< detach from the QSPY Back-End */
+    QSPY_SAVE_DICT,       /*!< save dictionaries to a file in QSPY */
+    QSPY_SCREEN_OUT,      /*!< toggle screen output to a file in QSPY */
+    QSPY_BIN_OUT,         /*!< toggle binary output to a file in QSPY */
+    QSPY_MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
+    QSPY_SEQUENCE_OUT,    /*!< toggle Sequence output to a file in QSPY */
+    QSPY_SEND_EVENT,      /*!< send event (QSPY supplying signal) */
+    QSPY_SEND_AO_FILTER,  /*!< send Local Filter (QSPY supplying addr) */
+    QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
+    QSPY_SEND_COMMAND,    /*!< send command (QSPY supplying cmdId) */
+    QSPY_SEND_TEST_PROBE  /*!< send Test-Probe (QSPY supplying apiId) */
+    /* ... */
+} QSpyCommands;
 
 extern QSpyConfig    QSPY_conf;
 extern Dictionary    QSPY_funDict;
@@ -271,36 +320,5 @@ void QSEQ_dictionaryReset(void);
 #ifdef __cplusplus
 }
 #endif
-
-#define SNPRINTF_LINE(format_, ...) do {                       \
-    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \
-                (QS_LINE_LEN_MAX - QS_LINE_OFFSET),            \
-                format_,  ##__VA_ARGS__);                      \
-    if ((0 < n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) { \
-        QSPY_output.len = n_;                                  \
-    }                                                          \
-    else {                                                     \
-        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;    \
-    }                                                          \
-} while (0)
-
-#define SNPRINTF_APPEND(format_, ...) do {                                 \
-    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
-                (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len),      \
-                format_, ##__VA_ARGS__);                                   \
-    if ((0 < n_)                                                           \
-        && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len)) {    \
-        QSPY_output.len += n_;                                             \
-    }                                                                      \
-    else {                                                                 \
-        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;                \
-    }                                                                      \
-} while (0)
-
-#define CONFIG_UPDATE(member_, new_, diff_) \
-    if (QSPY_conf.member_ != (new_)) {      \
-        QSPY_conf.member_ =  (new_);        \
-        (diff_) = 1U;                       \
-    } else (void)0
 
 #endif /* QSPY_H */

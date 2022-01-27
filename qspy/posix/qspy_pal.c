@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2022-01-25
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief QSPY PAL implementation for POSIX
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-06-17
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #include <stdlib.h>  /* for system() */
 #include <stdint.h>
@@ -73,14 +66,6 @@ static void tcp_cleanup(void);
 static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes);
 static QSpyStatus  file_send2Target(unsigned char *buf, uint32_t nBytes);
 static void file_cleanup(void);
-
-/* helper functions ........................................................*/
-static QSPYEvtType be_receive (fd_set const *pReadSet,
-                               unsigned char *buf, uint32_t *pBytes);
-
-static QSPYEvtType kbd_receive(fd_set const *pReadSet,
-                               unsigned char *buf, uint32_t *pBytes);
-static void updateReadySet(int targetConn);
 
 /*..........................................................................*/
 enum PAL_Constants { /* local constants... */
@@ -120,9 +105,11 @@ static void sigExitHandler(int dummy) {
     exit(0);
 }
 
-QSpyStatus PAL_openKbd(bool kbd_inp) {
+QSpyStatus PAL_openKbd(bool kbd_inp, bool color) {
     struct sigaction sig_act;
     memset(&sig_act, 0, sizeof(sig_act));
+
+    (void)color; /* unused parameter */
 
     /* install the SIGINT (Ctrl-C) signal handler */
     sig_act.sa_handler = &sigExitHandler;
@@ -180,14 +167,16 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
 
     l_serFD = open(comName, O_RDWR | O_NOCTTY | O_NONBLOCK);/* R/W,no-block */
     if (l_serFD == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    Opening serial port Port=%s,Baud=%d",
+        SNPRINTF_LINE("   <COMMS> ERROR    "
+                      "Opening serial port Port=%s,Baud=%d",
                       comName, baudRate);
         QSPY_printError();
         return QSPY_ERROR; /* open failed */
     }
 
     if (tcgetattr(l_serFD, &t) == -1) {
-        SNPRINTF_LINE("   <COMMS> ERROR    cannot get serial attributes errno=%d",
+        SNPRINTF_LINE("   <COMMS> ERROR    "
+                      "cannot get serial attributes errno=%d",
                       errno);
         QSPY_printError();
         return QSPY_ERROR; /* getting attributes failed */
@@ -303,13 +292,13 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
         return QSPY_ERROR;
     }
 
-    updateReadySet(l_serFD); /* Serial port to be checked in select() */
+    PAL_updateReadySet(l_serFD); /* Serial port to be checked in select() */
 
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
 static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
     fd_set readSet = l_readSet;
 
     /* block indefinitely until any input source has input */
@@ -325,15 +314,19 @@ static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes) {
     }
 
     /* any input available from the keyboard? */
-    evt = kbd_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    if (l_kbd_inp && FD_ISSET(0, &readSet)) {
+        evtType = PAL_receiveKbd(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
     /* any input available from the Back-End socket? */
-    evt = be_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    if ((l_beSock != INVALID_SOCKET) && FD_ISSET(l_beSock, &readSet)) {
+        evtType = PAL_receiveBe(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
     /* any input available from the Serial port? */
@@ -367,7 +360,6 @@ static void ser_cleanup(void) {
         l_serFD = 0;
     }
 }
-
 
 /*==========================================================================*/
 /* POSIX TCP/IP communication with the Target */
@@ -415,7 +407,7 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
         return QSPY_ERROR;
     }
 
-    updateReadySet(l_serverSock); /* to be checked in select() */
+    PAL_updateReadySet(l_serverSock); /* to be checked in select() */
 
     return QSPY_SUCCESS;
 }
@@ -427,7 +419,7 @@ static void tcp_cleanup(void) {
 }
 /*..........................................................................*/
 static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
     fd_set readSet = l_readSet;
 
     /* block indefinitely until any input source has input */
@@ -443,15 +435,19 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
     }
 
     /* any input available from the keyboard? */
-    evt = kbd_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    if (l_kbd_inp && FD_ISSET(0, &readSet)) {
+        evtType = PAL_receiveKbd(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
-    /* try to receive data from the Back-End socket... */
-    evt = be_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    /* any input available from the Back-End socket? */
+    if ((l_beSock != INVALID_SOCKET) && FD_ISSET(l_beSock, &readSet)) {
+        evtType = PAL_receiveBe(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
     /* still waiting for the client? */
@@ -477,7 +473,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
             QSPY_printInfo();
 
             /* re-evaluate the ready set and max FD for select() */
-            updateReadySet(l_clientSock);
+            PAL_updateReadySet(l_clientSock);
         }
     }
     else {
@@ -486,8 +482,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
 
             if (nrec <= 0) { /* the client hang up */
                 SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
-                    "Host=%s,Port=%d"
-            "\n----------------------------------------------------------",
+                              "Host=%s,Port=%d",
                               inet_ntoa(l_clientAddr.sin_addr),
                               (int)ntohs(l_clientAddr.sin_port));
                 QSPY_printInfo();
@@ -497,7 +492,7 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
                 l_clientSock = INVALID_SOCKET;
 
                 /* re-evaluate the ready set and max FD for select() */
-                updateReadySet(l_serverSock);
+                PAL_updateReadySet(l_serverSock);
             }
             else {
                 *pBytes = (uint32_t)nrec;
@@ -543,7 +538,7 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
     QSPY_txReset(); /* reset the QSPY transmitter */
 
     fd = fileno(l_file); /* FILE* to file-descriptor */
-    updateReadySet(fd);  /* fd to be checked in select() */
+    PAL_updateReadySet(fd);  /* fd to be checked in select() */
 
     SNPRINTF_LINE("   <COMMS> File     Opened File=%s", fName);
     QSPY_printInfo();
@@ -552,7 +547,7 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
 }
 /*..........................................................................*/
 static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
     uint32_t nBytes;
     fd_set readSet = l_readSet;
 
@@ -568,16 +563,20 @@ static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes) {
         return QSPY_ERROR_EVT;
     }
 
-    /* try to receive data from keyboard... */
-    evt = kbd_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    /* any input available from the keyboard? */
+    if (l_kbd_inp && FD_ISSET(0, &readSet)) {
+        evtType = PAL_receiveKbd(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
-    /* try to receive data from the Back-End socket... */
-    evt = be_receive(&readSet, buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    /* any input available from the Back-End socket? */
+    if ((l_beSock != INVALID_SOCKET) && FD_ISSET(l_beSock, &readSet)) {
+        evtType = PAL_receiveBe(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
     }
 
     /* try to receive data from the File... */
@@ -647,7 +646,8 @@ QSpyStatus PAL_openBE(int portNum) {
     }
     flags |= O_NONBLOCK;
     if (fcntl(l_beSock, F_SETFL, flags) != 0) {
-        SNPRINTF_LINE("   <F-END> ERROR    UDP socket fcntl() set errno=%d", errno);
+        SNPRINTF_LINE("   <F-END> ERROR    "
+                      "UDP socket fcntl() set errno=%d", errno);
         QSPY_printError();
         return QSPY_ERROR;
     }
@@ -657,7 +657,7 @@ QSpyStatus PAL_openBE(int portNum) {
     /* NOTE:
     * The Back-End socket l_beSock needs to be checked in select() just
     * like all other sources of input. However, the l_beSock socket is
-    * added automatically in the updateReadySet() function *later* in
+    * added automatically in the PAL_updateReadySet() function *later* in
     * the initialization phase. This assumes that PAL_openBE() is called
     * always *before* opening the specific Target link (see configure() in
     * main.c).
@@ -684,7 +684,8 @@ void PAL_closeBE(void) {
                        &writeSet, (fd_set *)0, &delay)
                 == SOCKET_ERROR)
             {
-                SNPRINTF_LINE("   <F-END> ERROR    UDP socket select errno=%d",
+                SNPRINTF_LINE("   <F-END> ERROR    "
+                             "UDP socket select errno=%d",
                         errno);
                 QSPY_printError();
             }
@@ -724,16 +725,12 @@ void PAL_clearScreen(void) {
 }
 
 /*--------------------------------------------------------------------------*/
-static QSPYEvtType be_receive(fd_set const *pReadSet,
-                              unsigned char *buf, uint32_t *pBytes)
-{
+QSPYEvtType PAL_receiveBe(unsigned char *buf, uint32_t *pBytes) {
     fe_addr feAddr;
     socklen_t feAddrSize;
     uint32_t nBytes;
 
-    if ((l_beSock == INVALID_SOCKET) /* Back-End socket not initialized? */
-        || !FD_ISSET(l_beSock, pReadSet)) /* Front-End socket has no data? */
-    {
+    if (l_beSock == INVALID_SOCKET) { /* Back-End socket not initialized? */
         return QSPY_NO_EVT;
     }
 
@@ -775,19 +772,15 @@ static QSPYEvtType be_receive(fd_set const *pReadSet,
 }
 
 /*..........................................................................*/
-static QSPYEvtType kbd_receive(fd_set const *pReadSet,
-                               unsigned char *buf, uint32_t *pBytes)
-{
-    if (l_kbd_inp && FD_ISSET(0, pReadSet)) {
-        *pBytes = read(0, buf, 1); /* the key pressed */
-        if (*pBytes > 0) {
-            return QSPY_KEYBOARD_EVT;
-        }
+QSPYEvtType PAL_receiveKbd(unsigned char *buf, uint32_t *pBytes) {
+    *pBytes = read(0, buf, 1); /* the key pressed */
+    if (*pBytes > 0) {
+        return QSPY_KEYBOARD_EVT;
     }
     return QSPY_NO_EVT;
 }
 /*..........................................................................*/
-static void updateReadySet(int targetConn) {
+void PAL_updateReadySet(int targetConn) {
     FD_ZERO(&l_readSet);
     FD_SET(0, &l_readSet); /* terminal to be checked in select */
     l_maxFd = 1;

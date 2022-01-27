@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2022-01-25
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief QSPY PAL implementation for Win32
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #include <stdlib.h>   /* for system() */
 #include <stdint.h>
@@ -74,10 +67,6 @@ static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes);
 static QSpyStatus  file_send2Target(unsigned char *buf, uint32_t nBytes);
 static void file_cleanup(void);
 
-/* helper functions ........................................................*/
-static QSPYEvtType be_receive (unsigned char *buf, uint32_t *pBytes);
-static QSPYEvtType kbd_receive(unsigned char *buf, uint32_t *pBytes);
-
 /*..........................................................................*/
 enum PAL_Constants { /* local constants... */
     FE_DETACHED = 0,   /* Front-End detached */
@@ -91,6 +80,7 @@ typedef union {
 } fe_addr;
 
 static bool l_kbd_inp = false;
+static bool l_color = false;
 
 static HANDLE       l_serHNDL;
 static COMMTIMEOUTS l_timeouts;
@@ -105,21 +95,29 @@ static SOCKET l_clientSock = INVALID_SOCKET;
 static FILE *l_file = (FILE *)0;
 
 /*==========================================================================*/
-/* Keyboard input */
-
+/* Ctrl-C handler */
 static BOOL WINAPI CtrlHandler(_In_ DWORD dwCtrlType) {
     (void)dwCtrlType; /* unused parameter */
     QSPY_cleanup();
     exit(0);
 }
 
-QSpyStatus PAL_openKbd(bool kbd_inp) {
+/* Keyboard input */
+QSpyStatus PAL_openKbd(bool kbd_inp, bool color) {
     l_kbd_inp = kbd_inp;
+    l_color = color;
     SetConsoleCtrlHandler(&CtrlHandler, TRUE);
+    if (l_color) {
+        system("color"); /* to support color output */
+        fputs("\033[0m", stdout); /* switch default colors */
+    }
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
 void PAL_closeKbd(void) {
+    if (l_color) {
+        fputs("\033[0m", stdout); /* switch default colors */
+    }
 }
 
 /*==========================================================================*/
@@ -231,18 +229,18 @@ QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {
 }
 /*..........................................................................*/
 static QSPYEvtType ser_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
 
     /* try to receive data from keyboard... */
-    evt = kbd_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveKbd(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* try to receive data from the Back-End socket... */
-    evt = be_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveBe(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* try to receive data from the Target... */
@@ -378,7 +376,7 @@ static void tcp_cleanup(void) {
 }
 /*..........................................................................*/
 static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
     struct timeval timeout = {(long)0, (long)(PAL_TOUT_MS*1000)};
     fd_set readSet;
     int status;
@@ -386,15 +384,15 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
     char client_hostname[128];
 
     /* try to receive data from keyboard... */
-    evt = kbd_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveKbd(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* try to receive data from the Back-End socket... */
-    evt = be_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveBe(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* still waiting for the client? */
@@ -475,9 +473,9 @@ static QSPYEvtType tcp_getEvt(unsigned char *buf, uint32_t *pBytes) {
                     sizeof(client_hostname) - 1U);
 #endif
                 SNPRINTF_LINE("   <COMMS> TCP-IP   Disconn from "
-                    "Host=%s,Port=%d"
-            "\n----------------------------------------------------------",
-                    client_hostname, (int)ntohs(l_clientAddr.sin_port));
+                              "Host=%s,Port=%d",
+                              client_hostname,
+                              (int)ntohs(l_clientAddr.sin_port));
                 QSPY_printInfo();
 
                 /* go back to waiting for a client */
@@ -532,19 +530,19 @@ QSpyStatus PAL_openTargetFile(char const *fName) {
 }
 /*..........................................................................*/
 static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes) {
-    QSPYEvtType evt;
+    QSPYEvtType evtType;
     uint32_t nBytes;
 
     /* try to receive data from keyboard... */
-    evt = kbd_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveKbd(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* try to receive data from the Back-End socket... */
-    evt = be_receive(buf, pBytes);
-    if (evt != QSPY_NO_EVT) {
-        return evt;
+    evtType = PAL_receiveBe(buf, pBytes);
+    if (evtType != QSPY_NO_EVT) {
+        return evtType;
     }
 
     /* try to receive data from the File... */
@@ -685,7 +683,7 @@ void PAL_clearScreen(void) {
 }
 
 /*--------------------------------------------------------------------------*/
-static QSPYEvtType be_receive(unsigned char *buf, uint32_t *pBytes) {
+QSPYEvtType PAL_receiveBe(unsigned char *buf, uint32_t *pBytes) {
     fe_addr feAddr;
     int feAddrSize;
     int status;
@@ -735,7 +733,7 @@ static QSPYEvtType be_receive(unsigned char *buf, uint32_t *pBytes) {
 }
 
 /*..........................................................................*/
-static QSPYEvtType kbd_receive(unsigned char *buf, uint32_t *pBytes) {
+QSPYEvtType PAL_receiveKbd(unsigned char *buf, uint32_t *pBytes) {
     if (l_kbd_inp) {
         wint_t ch = 0;
         while (_kbhit()) {

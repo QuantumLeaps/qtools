@@ -1,32 +1,36 @@
-#-----------------------------------------------------------------------------
-# Product: QCalc in Python (requires Python 3.3+)
-# Last updated for version 6.9.4
-# Last updated on  2021-09-12
+#=============================================================================
+# QCalc programmer's Calculator
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
-#                    Q u a n t u m  L e a P s
-#                    ------------------------
-#                    Modern Embedded Software
+# SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# This software is dual-licensed under the terms of the open source GNU
+# General Public License version 3 (or any later version), or alternatively,
+# under the terms of one of the closed source Quantum Leaps commercial
+# licenses.
 #
-# This program is open source software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# The terms of the open source GNU General Public License version 3
+# can be found at: <www.gnu.org/licenses/gpl-3.0>
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
+# The terms of the closed source Quantum Leaps commercial licenses
+# can be found at: <www.state-machine.com/licensing>
 #
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <www.gnu.org/licenses/>.
+# Redistributions in source code must retain this top-level comment block.
+# Plagiarizing this software to sidestep the license obligations is illegal.
 #
 # Contact information:
 # <www.state-machine.com>
 # <info@state-machine.com>
-#-----------------------------------------------------------------------------
+#=============================================================================
+##
+# @date Last updated on: 2022-01-27
+# @version Last updated for version: 7.0.0
+#
+# @file
+# @brief QCalc programmer's Calculator
+# @ingroup qtools
 
+import os
 import traceback
 
 from math import *
@@ -38,7 +42,7 @@ ans = 0
 
 class QCalc:
     ## current version of QCalc
-    VERSION = 694
+    VERSION = 700
 
     @staticmethod
     def _print(result):
@@ -49,7 +53,7 @@ class QCalc:
         if isinstance(ans, int):
             # outside the 64-bit range?
             if ans < -0xFFFFFFFFFFFFFFFF or 0xFFFFFFFFFFFFFFFF < ans:
-                print("! out of range")
+                print("\x1b[41m\x1b[1;37m! out of range\x1b[0m")
                 return
 
             #inside the 32-bit range?
@@ -93,13 +97,16 @@ class QCalc:
 #=============================================================================
 # main entry point to QCalc
 def main():
+    if os.name == "nt":
+        os.system("color")
+
     print("QCalc Programmer's Calculator {0:d}.{1:d}.{2:d} " \
           "running on Python {3}".format(
               QCalc.VERSION//100,
               (QCalc.VERSION//10) % 10,
               QCalc.VERSION % 10,
               python_version()))
-    print("(c) 2005-2021 Quantum Leaps, www.state-machine.com\n")
+    print("(c) 2005-2022 Quantum Leaps, www.state-machine.com\n")
 
     # "batch mode": expression provided in command-line arguments
     if len(argv) > 1:
@@ -122,7 +129,9 @@ def main():
             except:
                 traceback.print_exc(2)
             else:
+                print("\x1b[47m\x1b[30m", end = "")
                 QCalc._print(result)
+                print("\x1b[0m", end = "")
         else:
             break
 

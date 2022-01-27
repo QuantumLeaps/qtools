@@ -1,38 +1,34 @@
-##
-# @file
-#-----------------------------------------------------------------------------
-# Product: QUTest Python scripting (requires Python 3.3+)
-# Last updated for version 6.9.4
-# Last updated on  2021-09-17
+#=============================================================================
+# QUTest Python scripting support
+# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
-#                    Q u a n t u m  L e a P s
-#                    ------------------------
-#                    Modern Embedded Software
+# SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 #
-# Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+# This software is dual-licensed under the terms of the open source GNU
+# General Public License version 3 (or any later version), or alternatively,
+# under the terms of one of the closed source Quantum Leaps commercial
+# licenses.
 #
-# This program is open source software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# The terms of the open source GNU General Public License version 3
+# can be found at: <www.gnu.org/licenses/gpl-3.0>
 #
-# Alternatively, this program may be distributed and modified under the
-# terms of Quantum Leaps commercial licenses, which expressly supersede
-# the GNU General Public License and are specifically designed for
-# licensees interested in retaining the proprietary status of their code.
+# The terms of the closed source Quantum Leaps commercial licenses
+# can be found at: <www.state-machine.com/licensing>
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <www.gnu.org/licenses/>.
+# Redistributions in source code must retain this top-level comment block.
+# Plagiarizing this software to sidestep the license obligations is illegal.
 #
 # Contact information:
-# <www.state-machine.com/licensing>
+# <www.state-machine.com>
 # <info@state-machine.com>
-#-----------------------------------------------------------------------------
+#=============================================================================
+##
+# @date Last updated on: 2022-01-27
+# @version Last updated for version: 7.0.0
+#
+# @file
+# @brief QUTest Python scripting support (implementation)
+# @ingroup qutest
 
 import socket
 import struct
@@ -56,7 +52,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 694
+    VERSION = 700
 
     # class variables
     _host_exe = ""
@@ -84,17 +80,19 @@ class QUTest:
     _OPT_NORESET = 0x01
 
     # output strings with decorations (colors/backgrounds)
-    _STR_TEST_PASS  = "PASS" # no decorations
-    _STR_TEST_FAIL  = "\033[1;91mFAIL\033[0m"
-    _STR_ERR1       = "\033[41m\033[37m" # WHITE on RED
-    _STR_ERR2       = "\033[0m"    # expectation end DEFAULT
-    _STR_EXP1       = "\033[44m\033[37m" # WHITE on BLUE
-    _STR_EXP2       = "\033[0m"    # expectation end DEFAULT
-    _STR_EXC1       = "\033[31m" # exception text begin RED
-    _STR_EXC2       = "\033[0m"    # exception text end   DEFAULT
-    _STR_FINAL_OK   = "\033[42m    \033[30m OK     \033[0m"
-    _STR_FINAL_FAIL = "\033[41m   \033[1;37m FAIL    \033[0m"
-    _STR_QSPY_FAIL  = "\033[1;91mFAIL\033[0m"
+    _STR_TEST_PASS  = "\x1b[32mPASS\x1b[0m" # GREEN on DEFAULT
+    _STR_TEST_FAIL  = "\x1b[31;1mFAIL\x1b[0m" # B-RED on DEFAULT
+    _STR_ERR1       = "\x1b[41m\x1b[37m" # WHITE on RED
+    _STR_ERR2       = "\x1b[0m"    # expectation end DEFAULT
+    _STR_EXP1       = "\x1b[44m\x1b[37m" # WHITE on BLUE
+    _STR_EXP2       = "\x1b[0m"    # expectation end DEFAULT
+    _STR_EXC1       = "\x1b[31m"   # exception text begin RED
+    _STR_EXC2       = "\x1b[0m"    # exception text end   DEFAULT
+    _STR_GRP1       = "\x1b[32;1m" # test-group text begin B-YELLOW
+    _STR_GRP2       = "\x1b[0m"    # test-group test end   DEFAULT
+    _STR_FINAL_OK   = "\x1b[42m\x1b[30m     OK     \x1b[0m"
+    _STR_FINAL_FAIL = "\x1b[41m\x1b[1;37m    FAIL    \x1b[0m"
+    _STR_QSPY_FAIL  = "\x1b[1;91mFAIL\x1b[0m"
 
     def __init__(self):
         QUTest._have_target = False
@@ -724,8 +722,8 @@ class QUTest:
     # helper methods ---------------------------------------------------------
     @staticmethod
     def _run_script(fname):
-        print("--------------------------------------------------"
-              "\nGroup:", fname)
+        print("--------------------------------------------------")
+        print(QUTest._STR_GRP1 + "Group:" + fname + QUTest._STR_GRP2)
         QUTest._num_groups += 1
 
         err = 0 # assume no errors

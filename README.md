@@ -128,23 +128,28 @@ installation directory of QTools.
 
 ---------------------------------------------------------------------------
 # Licensing
+The various Licenses for distributed components are located in the
+LICENSES/ sub-directory of this QTools distribution.
+
 Most tools included in this collection are distributed under the terms
 of the GNU General Public License (GPL) as published by the Free
 Software Foundation, either version 2 of the License, or (at your
 option) any later version. The text of GPL version 2 is included in the
-file GPLv2.txt in the licenses/ subdirectory of the QTools distribution.
+file GPL-2.0-or-later.txt in the LICENSES/ sub-directory.
 
 Some of the tools are distributed under the terms of the MIT open source
-license. The complete text of the MIT license is included in the comments.
+license. The complete text of the MIT license is included in the comments
+and also in the file LICENSE-MIT.txt in the LICENSES/ sub-directory.
+
 
 The Python package is distributed under the terms of the PYTHON LICENSE
-AGREEMENT, included in the file PYTHON_LICENSE.txt in the licenses/
-subdirectory of the QTools distribution.
+AGREEMENT, included in the file LICENSE-Python.txt in the LICENSES/
+sub-directory.
 
 The LMFlash utility for Windows is is distributed under the terms of the
-LMFlash license, included in the file LMFlash_LICENSE.rtf in the licenses/
-subdirectory of the QTools distribution. Specifically, the LMFlash utility
-is distributed according to Section 2a "Demonstration License".
+LMFlash license, included in the file LICENSE-LMFlash.txt in the LICENSES/
+sub-directory. Specifically, the LMFlash utility is distributed according
+to Section 2a "Demonstration License".
 
 
 ---------------------------------------------------------------------------

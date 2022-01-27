@@ -1,41 +1,34 @@
-/**
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+*
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
+*
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
+*
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
+*
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
+*
+* Contact information:
+* <www.state-machine.com>
+* <info@state-machine.com>
+============================================================================*/
+/*!
+* @date Last updated on: 2021-12-23
+* @version Last updated for version: 7.0.0
+*
 * @file
 * @brief QSPY transmit facilities
 * @ingroup qpspy
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-11-03
-*
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
-*
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
-*
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
-*
-* Contact information:
-* <www.state-machine.com/licensing>
-* <info@state-machine.com>
-******************************************************************************
-* @endcond
 */
 #include <stdint.h>
 #include <stdbool.h>
@@ -47,21 +40,10 @@
 #include "qspy.h"     /* QSPY data parser */
 #include "pal.h"      /* Platform Abstraction Layer */
 
-typedef char     char_t;
-typedef float    float32_t;
-typedef double   float64_t;
-typedef int      enum_t;
-typedef int      int_t;
-typedef unsigned uint_t;
-typedef void     QEvt;
-
-#ifndef Q_SPY
-#define Q_SPY 1
-#endif
-#define QS_OBJ_PTR_SIZE 4
-#define QS_FUN_PTR_SIZE 4
-#define Q_SIGNAL_SIZE   2
-#include "qs_copy.h"     /* copy of the target-resident QS interface */
+#define Q_SPY   1       /* this is QP implementation */
+#define QP_IMPL 1       /* this is QP implementation */
+#include "qpc_qs.h"     /* QS target-resident interface */
+#include "qpc_qs_pkg.h" /* QS package-scope interface */
 
 /*..........................................................................*/
 static uint8_t   l_dstBuf[1024]; /* for encoding from FE to Target */
