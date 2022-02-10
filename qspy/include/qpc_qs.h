@@ -613,43 +613,43 @@ enum {
 
 /*! Output formatted int8_t to the QS record */
 #define QS_I8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I8_T, (data_)))
+    (QS_u8_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_I8_T), (data_)))
 
 /*! Output formatted uint8_t to the QS record */
 #define QS_U8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U8_T, (data_)))
+    (QS_u8_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_U8_T), (data_)))
 
 /*! Output formatted int16_t to the QS record */
 #define QS_I16(width_, data_) \
-    (QS_u16_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I16_T, (data_)))
+    (QS_u16_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_I16_T), (data_)))
 
 /*! Output formatted uint16_t to the QS record */
 #define QS_U16(width_, data_) \
-    (QS_u16_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U16_T, (data_)))
+    (QS_u16_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_U16_T), (data_)))
 
 /*! Output formatted int32_t to the QS record */
 #define QS_I32(width_, data_) \
-    (QS_u32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I32_T, (data_)))
+    (QS_u32_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_I32_T), (data_)))
 
 /*! Output formatted uint32_t to the QS record */
 #define QS_U32(width_, data_) \
-    (QS_u32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U32_T, (data_)))
+    (QS_u32_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_U32_T), (data_)))
 
 /*! Output formatted 32-bit floating point number to the QS record */
 #define QS_F32(width_, data_) \
-    (QS_f32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_F32_T, (data_)))
+    (QS_f32_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_F32_T), (data_)))
 
 /*! Output formatted 64-bit floating point number to the QS record */
 #define QS_F64(width_, data_) \
-    (QS_f64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_F64_T, (data_)))
+    (QS_f64_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_F64_T), (data_)))
 
 /*! Output formatted int64_t to the QS record */
 #define QS_I64(width_, data_) \
-    (QS_u64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I64_T, (data_)))
+    (QS_u64_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_I64_T), (data_)))
 
 /*! Output formatted uint64_t to the QS record */
 #define QS_U64(width_, data_) \
-    (QS_u64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U64_T, (data_)))
+    (QS_u64_fmt_((uint8_t)((((width_) << 4)) | (uint8_t)QS_U64_T), (data_)))
 
 /*! Output formatted zero-terminated ASCII string to the QS record */
 #define QS_STR(str_)            (QS_str_fmt_((str_)))
