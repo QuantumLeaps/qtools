@@ -1,0 +1,92 @@
+/*! @page gs Getting Started
+
+@tableofcontents
+@nav{index,qpspy}
+
+@section gs_obtain Downloading &amp; Installing QTools&trade;
+@tableofcontents
+
+<p>The most recommended way of obtaining QTools&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QTools&trade; as well as all QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/qm/">QM&trade; modeling tool</a>. The main advantage of obtaining QTools&trade; bundled together like that is that you get all components, tools and examples ready to go.
+
+@note
+<a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><strong>QP-bundle&trade;</strong></a><strong> is the most recommended way of downloading and installing QTools&trade;.</strong>@n
+It is also highly recommended that you keep checking the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads">QP-bundle&trade; download page</a> for newer releases.
+
+
+Alternatively, you can download QTools&trade; separately as described below.
+
+
+
+@section install_win32 Installing QTools&trade; on Windows
+On Windows, you simply unzip the `qtools-windows_<x.y.z>.zip` archive to the installation folder of your choice (`C:\qp\qtools` is the recommended default). After the installation, you still need to:
+
+- add the `<qtools>\bin` and `<qtools>\MinGW\bin` directories to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (e.g., `C:\qp\qtools\bin;C:\qp\qtools\MinGW\bin`).
+
+@note
+Adding `<qtools>\bin` and `<qtools>\MinGW\bin` directories to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>\bin` directory.
+
+- define the `QTOOLS` environment variable, for example:
+
+@verbatim
+set QTOOLS=C:\qp\qtools
+@endverbatim
+
+@note
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qview "QView Visualization and Monitoring" utilities.
+
+
+
+@section install_posix Installing QTools&trade; on POSIX (Linux/MacOS)
+On POSIX (Linux/MacOS), you simply unzip the `qtools-posix_<x.y.z>.zip` archive to the installation folder of your choice (`~/qp/qtools` is the recommended default). After the installation, you still need to:
+
+- add the `<qtools>/bin` directory to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (e.g., `~/qp/qtools`).
+
+@note
+Adding `<qtools>/bin` to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>/bin` directory.
+
+- define the `QTOOLS` environment variable, for example:
+
+@verbatim
+export QTOOLS=~/qp/qtools
+@endverbatim
+
+@note
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qview "QView Visualization and Monitoring" utilities.
+
+
+
+@section files Directories and Files
+The following annotated directory tree in the standard <strong>QTools&trade;</strong> distribution lists the top-level directories and files:
+
+<ul class="tag">
+  <li><span class="img folder">qtools</span></li>
+  <ul class="tag">
+    <li><span class="img folder">bin</span> &mdash; binaries (executables and libraries)</li>
+    <ul class="tag">
+      <li><span class="img file">`qspy.exe`</span> &mdash; @ref qspy "QSPY executable"</li>
+      <li><span class="img file">`qclean.exe`</span> &mdash; @ref qclean</li>
+      <li><span class="img file">`qfsgen.exe`</span> &mdash; @ref qfsgen</li>
+      <li>~ ~ ~</li>
+      <li><span class="img file">`make.exe`</span> &mdash; make utility</li>
+      <li><span class="img file">`rm.exe`</span> &mdash; rm (remove) utility</li>
+      <li><span class="img file_py">`python.bat`</span> &mdash; Batch file to call Python</li>
+    </ul>
+    <li><span class="img folder">qspy</span> &mdash; @ref qspy "QSPY tool" for software tracing and testing</li>
+    <ul class="tag">
+      <li><span class="img folder">include</span> &mdash; QSPY includes</li>
+      <li><span class="img folder">source</span> &mdash; QSPY sources</li>
+      <li><span class="img folder">posix</span> &mdash; QSPY port to POSIX (Linux, macOS)</li>
+      <li><span class="img folder">py</span> &mdash; Python support (@ref qutest "QUTest")</li>
+      <li><span class="img folder">win32</span> &mdash; QSPY port to Windows</li>
+    </ul>
+    <li>&nbsp;</li>
+    <li><b>The following directories are present in QTools for Windows only</b></li>
+    <li><span class="img folder">qwin</span> &mdash; @ref qwin</li>
+    <li><span class="img folder">MinGW</span> &mdash; GNU C/C++ toolset for Windows (32-bit)</li>
+    <li><span class="img folder">gnu_arm-none-eabi</span> &mdash; GNU ARM-EABI toolset for Windows</li>
+    <li><span class="img folder">Python38</span> &mdash; Python 3.8 for Windows</li>
+  </ul>
+</ul>
+
+@nav{index,qpspy}
+*/
