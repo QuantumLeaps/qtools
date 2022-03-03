@@ -1,4 +1,4 @@
-/*###########################################################################*/
+F/*###########################################################################*/
 /*! @page qutest_fixture QUTest&trade; Fixture Reference
 
 @tableofcontents
@@ -17,8 +17,8 @@ However, QUTest is particularly useful for testing QP applications, which is ill
 The QP API implementation linked with the *test fixture* is **not** the actual QP framework, but instead just a **QUTest QP Stub**, which differs from the real QP implementation in the following aspects:
 
 - the `QActive_start()` implementation initializes the event queue for the AO and registers it with the QP framework, but it does **not** start a new thread for the AO.
-- the `QF_run()` implementation calls the `QS_onTestLoop()` to wait for the commands from the @ref qutest_script "test script"
-- the stub provides `QActiveDummy` class for instantiating "dummy" active objects for testing
+- the `QF_run()` implementation calls the `QS_onTestLoop()` to wait for the commands from the @ref qutest_script "test script".
+- the stub provides the `QActiveDummy` class for instantiating "dummy" active objects for testing.
 
 @note
 The **QUTest QP Stub** is implemented in the file <a href="https://www.state-machine.com/qpc/qutest_8c.html" target="_blank" class="extern">qutest.c</a> as well as Target-specific QUTest port `qutest_port.c`.
@@ -45,14 +45,14 @@ QUTest "Test Probes" are a very flexible mechanism to alter the behavior of code
 - to alter the flow of control to execute paths through the code otherwise hard to reach (to improve the test coverage of the code)
 - to cause various error conditions
 - to alter return values from functions
-- many others
+- many others.
 
 
 The "Test Probes" are just 32-bit values (`uint32_t`) sent from the test script to the Target (see the probe() command), where they are stored in the FIFO (First-In-First-Out) data structure. The "Test Probes" can be then retrieved from C or C++ code on the Target, by means of the following macros:
 
 - @ref QS_TEST_PROBE_DEF() "QS_TEST_PROBE_DEF( function_pointer )"
 - @ref QS_TEST_PROBE() "QS_TEST_PROBE( code )"
-- @ref QS_TEST_PROBE_ID() "QS_TEST_PROBE_ID( ID, code )"
+- @ref QS_TEST_PROBE_ID() "QS_TEST_PROBE_ID( ID, code )".
 
 @note
 The QUTest Test Probes macros can be used both in **production code** and in **test code** (intended for testing only). These macros are active only when #Q_UTEST is defined, and otherwise resolve to nothing, which means that you can **leave** the Test Probe macros in your production code.
@@ -61,7 +61,7 @@ The typical use of the "Test Probe" macros is as follows:
 
 A C or C++ function calls the macro QS_TEST_PROBE_DEF(), which defines the test-probe variable `qs_tp_` of type `uint32_t`. If any test probes **for this function** have been sent from the test script, the test-probe is retrieved and assigned to the test-probe variable. Otherwise the test-probe variable is initialized to zero.
 
-Once the the test-probe variable is defined and initialized, it can be tested with the QS_TEST_PROBE() and QS_TEST_PROBE_ID() macros. The QS_TEST_PROBE() macro executes the code snippet specified as the parameter to the macro when the test probe is not zero. The QS_TEST_PROBE_ID() executes the specified code snippet only when the test-probe has a given ID value.
+Once the test-probe variable is defined and initialized, it can be tested with the QS_TEST_PROBE() and QS_TEST_PROBE_ID() macros. The QS_TEST_PROBE() macro executes the code snippet specified as the parameter to the macro when the test probe is not zero. The QS_TEST_PROBE_ID() executes the specified code snippet only when the test-probe has a given ID value.
 
 
 @nav{qutest_rtc,qutest_script}
@@ -93,12 +93,12 @@ The Python test scripts are executed by the Python module <span class="img file_
 python3 <qutest-dir>qutest.py [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
 @endverbatim
 
-where:@n
+where:<br>
 `<qutest-dir>` is the directory with the `qutest.py` script@n
 
 @param [test_scripts] optional specification of the Python test scripts to run.
                  If not specified, qutest will try to run all *.py files
-                 in the current directory as test scripts
+                 in the current directory as test scripts.
 
 @param [host_exe]  optional specification of the host executable to
                  launch for testing embedded code on the host computer.
@@ -113,7 +113,7 @@ where:@n
                  running the QSpy utility. If not specified, the default
                  is localhost:7701.
 
-@param [tcp_port] optional the QSpy TCP port number for connecting
+@param [tcp_port] optional QSpy TCP port number for connecting
                  host executables.
 
 Usage examples (for Windows):
@@ -153,7 +153,7 @@ The "preamble" section of a test script file specifies include scripts and defin
 - include()
 - on_reset()
 - on_setup()
-- on_teardown()
+- on_teardown().
 
 The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "test commands".
 
@@ -162,7 +162,7 @@ The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "
 The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
 
 - test()
-- skip()
+- skip().
 
 
 @subsection qutest_dsl-commands Commands
@@ -189,7 +189,7 @@ The commands that you can place in the tests (as well as inside the callback fun
 - pack()
 - test_file()
 - test_dir()
-- last_rec()
+- last_rec().
 
 
 @section qutest_qspy Categories of QSPY Output

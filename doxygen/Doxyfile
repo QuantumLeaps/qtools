@@ -134,16 +134,16 @@ INPUT                  = main.dox \
                          qclean.dox \
                          qfsgen.dox \
                          history.dox \
-                         ../help.dox \
+                         ../../ql-doxygen/help.dox \
                          modules.dox \
                          macros.h \
-                         qspy/include/qspy.h \
-                         qspy/include/qpc_qs.h \
-                         qspy/include/qpc_qs_pkg.h \
-                         qutest/qutest_dsl.py \
-                         qview/qview.py \
-                         qwin/qwin_gui.h \
-                         qwin/qwin_gui.c
+                         ../qspy/include/qspy.h \
+                         ../qspy/include/qpc_qs.h \
+                         ../qspy/include/qpc_qs_pkg.h \
+                         ../qutest/qutest_dsl.py \
+                         ../qview/qview.py \
+                         ../qwin/qwin_gui.h \
+                         ../qwin/qwin_gui.c
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.dox \
                          *.h \

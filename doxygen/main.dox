@@ -26,7 +26,7 @@ QTools&trade; is a collection of open source tools for embedded software develop
 
 
 @section qtools_win QTools&trade; on Windows
-The QTools Collection for Windows contains additionally the following open-source, third-party tools:
+The QTools Collection for Windows additionally contains the following open-source, third-party tools:
 
 - GNU-make for Windows (version 4.2.1)
 - GNU C/C++ toolchain for Windows (MinGW version 9.2.0)
@@ -42,7 +42,7 @@ The Python package is distributed under the terms of the PYTHON SOFTWARE FOUNDAT
 
 
 @section qtools_source Source Code
-In compliance with GPL, this distribution contains the source code for
+In compliance with the GPL, this distribution contains the source code for
 the utilities contributed by Quantum Leaps in the `<qtools>/source/`
 subdirectory, except for the QSPY source code, which is provided in the
 `<qtools>/qspy/source/` directory. All tools with names starting with 'q'

@@ -6,10 +6,10 @@
 @section gs_obtain Downloading &amp; Installing QTools&trade;
 @tableofcontents
 
-<p>The most recommended way of obtaining QTools&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QTools&trade; as well as all QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/qm/">QM&trade; modeling tool</a>. The main advantage of obtaining QTools&trade; bundled together like that is that you get all components, tools and examples ready to go.
+<p>The recommended way of obtaining QTools&trade; is by downloading the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><b>QP-bundle&trade;</b></a>, which includes QTools&trade; as well as all QP frameworks and also the <a class="extern" target="_blank" href="https://www.state-machine.com/qm/">QM&trade; modeling tool</a>. The main advantage of obtaining QTools&trade; bundled together like that is that you get all components, tools and examples ready to go.
 
 @note
-<a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><strong>QP-bundle&trade;</strong></a><strong> is the most recommended way of downloading and installing QTools&trade;.</strong>@n
+<a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads"><strong>QP-bundle&trade;</strong></a><strong> is the recommended way of downloading and installing QTools&trade;.</strong><br>
 It is also highly recommended that you keep checking the <a class="extern" target="_blank" href="https://www.state-machine.com/#Downloads">QP-bundle&trade; download page</a> for newer releases.
 
 
@@ -18,12 +18,12 @@ Alternatively, you can download QTools&trade; separately as described below.
 
 
 @section install_win32 Installing QTools&trade; on Windows
-On Windows, you simply unzip the `qtools-windows_<x.y.z>.zip` archive to the installation folder of your choice (`C:\qp\qtools` is the recommended default). After the installation, you still need to:
+On Windows, you simply unzip the `qtools-windows_<x.y.z>.zip` archive to the installation folder of your choice; (`C:\qp\qtools` is the recommended default). After the installation, you still need to:
 
 - add the `<qtools>\bin` and `<qtools>\MinGW\bin` directories to the global `PATH` on your system, where `<qtools>` denotes the directory where you have installed QTools (e.g., `C:\qp\qtools\bin;C:\qp\qtools\MinGW\bin`).
 
 @note
-Adding `<qtools>\bin` and `<qtools>\MinGW\bin` directories to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>\bin` directory.
+Adding `<qtools>\bin` and `<qtools>\MinGW\bin` directories to your `PATH` will enable you to invoke all QTools utilities (like @ref qspy "QSpy" or @ref qclean "QClean") by simply typing `qspy` or `qclean` at the command prompt, regardless of your current directory. This will come in handy, because typically you will not invoke `qspy` or  `qclean` from the `<qtools>\bin` directory.
 
 - define the `QTOOLS` environment variable, for example:
 
@@ -32,7 +32,7 @@ set QTOOLS=C:\qp\qtools
 @endverbatim
 
 @note
-Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and @ref qview "QView Visualization and Monitoring" utilities.
+Defining the `QTOOLS` environment variable is required to run @ref qutest "QUTest Unit Testing" and the @ref qview "QView Visualization and Monitoring" utilities.
 
 
 
@@ -90,3 +90,4 @@ The following annotated directory tree in the standard <strong>QTools&trade;</st
 
 @nav{index,qpspy}
 */
+

@@ -2,13 +2,13 @@
 
 @nav{qutest,qutest_unity}
 
-<p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first couple of examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests shipping with the <a href="http://www.throwtheswitch.org/unity" target="_blank" class="extern"><b>Unity test framework</b></a>. Later examples in this Tutorial show how to test <a href="https://www.state-machine.com/doc/concepts#HSM" target="_blank" class="extern"><b>hierarchical state machines</b></a> and <a href="https://www.state-machine.com/doc/concepts#Active" target="_blank" class="extern"><b>active objects</b></a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
+<p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests shipping with the <a href="http://www.throwtheswitch.org/unity" target="_blank" class="extern"><b>Unity test framework</b></a>. Later examples in this Tutorial show how to test <a href="https://www.state-machine.com/doc/concepts#HSM" target="_blank" class="extern"><b>hierarchical state machines</b></a> and <a href="https://www.state-machine.com/doc/concepts#Active" target="_blank" class="extern"><b>active objects</b></a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
 </p>
 
-As mentioned in the Section \"@ref qutest_how "How it works?"\", testing with QUTest&trade; always involves two components: (1) a @ref qutest_fixture "test fixture" code written in <b>C</b> (or <b>C++</b>) that runs on the target and (2) one or more @ref qutest_script "test scipts" that are written in <b>Python</b> and run on the host. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
+As mentioned in the Section \"@ref qutest_how "How does it work?"\", testing with QUTest&trade; always involves two components: (1) a @ref qutest_fixture "test fixture" code written in <b>C</b> (or <b>C++</b>) that runs on the <b>target</b> and (2) one or more @ref qutest_script "test scripts" that are written in <b>Python</b> and run on the <b>host</b>. This Tutorial starts each example with the description of how to run the tests and then explains the *test fixture* and the *test scripts* comprising the test.
 
 @note
-This Tutorial should run on any host computer (Windows, Linux, or MacOS), where both QTools&trade; and [<b>QP/C framework</b>](/qpc) have been installed and also that the **QTOOLS** environment variable has been defined. Please refer to the @ref gs_obtain "QTools Installation" section for more information about downloading and installing QTools&trade;.
+This Tutorial should run on any host computer (Windows, Linux, or MacOS), where both QTools&trade; and [<b>QP/C framework</b>](/qpc) have been installed and also the **QTOOLS** environment variable has been defined. Please refer to the @ref gs_obtain "QTools Installation" section for more information about downloading and installing QTools&trade;.
 
 
 This Tutorial consists of the following lessons:
@@ -33,14 +33,14 @@ This Tutorial consists of the following lessons:
 
 @remark
 This simple example runs QUTest tests on the host (Windows, Linux, or MacOS) for both Unity and QUTest. The QUTest version also runs on embedded boards (TivaC LaunchPad from Texas Instruments and EFM32 Pearl-Gecko board from Silicon Labs). The instructions for building and running the code on the embedded boards are located at the end of this lesson.
-@n
+<br>
 @image html platforms.png
 
 
 @section qutest_unity-cut Code Under Test (CUT)
 
 @note
-Because it uses pure C code, the Basic Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc) (and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp)).
+Because it uses pure C code, the Basic Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc), and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp).
 
 
 The CUT in this example is the file <span class="img file_c">`ProductionCode.c`</span> located in the directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\src`</span>. The CUT contains just two functions with some fairly obvious errors. The purpose of the example is to find these errors by unit-testing this "production code":
@@ -51,14 +51,14 @@ The CUT in this example is the file <span class="img file_c">`ProductionCode.c`<
 
 
 @section qutest_unity-run0 Running the Test with Unity
-The complete code for the basic Unity example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test_unity`</span>. To run the basic Unity test (on Windows), open a command-prompt and type:
+The complete code for the basic Unity example is provided in the QP/C framework directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test_unity`</span>. To run the basic Unity test (on Windows), open a command-prompt and type:
 @verbatim
 cd C:\qp\qpc\examples\qutest\unity_basic\test_unity
 make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Winows is that you open a terminal window and change directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_basic/test_unity`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_basic/test_unity`</span>.
 
 
 This will build the @ref qutest_unity-fixture "test fixture" as a host executable and then it will run it. The screen shot below shows the output produced from the make command.
@@ -72,7 +72,7 @@ As you can see, two out of five Unity tests **fail**. This is intentional, becau
 
 
 @section qutest_unity-run Running the Test with QUTest
-The complete code for the basic Unity example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test`</span>. To run the basic test (on Windows), open a command prompt and type:
+The complete code for the basic Unity example is provided in the QP/C framework directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test`</span>. To run the basic test (on Windows), open a command prompt and type:
 
 @verbatim
 qspy
@@ -88,7 +88,7 @@ make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_basic/test`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_basic/test`</span>.
 
 
 This will build the @ref qutest_unity-fixture "test fixture" as a host executable and then it will run the @ref qutest_unity-script "test script" (in Python). The screen shot below shows the output produced in these two command-prompt windows.
@@ -101,7 +101,7 @@ As you can see, two out of five QUTest tests **fail**. These are the same tests 
 
 
 @section qutest_unity-fixture Test Fixture
-The job of a @ref qutest_fixture "test fixture" is to exercise the <a href="https://www.state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (<span class="img file_c">`ProductionCode.c`</span> in this case) and report the results back to the @ref qspy "QSPY host application". Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_unity-script "test script"(s). A properly written test fixture can be typically used for many tests (implemented in multiple test scripts).
+The job of a @ref qutest_fixture "test fixture" is to exercise the <a href="https://www.state-machine.com/glossary#CUT" class="extern"><b>CUT</b></a> (<span class="img file_c">`ProductionCode.c`</span> in this case) and report the results back to the @ref qspy "QSPY host application". Note that a *test fixture* in QUTest&trade; is **not** supposed to perform any checks whether the CUT operates "correctly". Instead, your *test fixture* should only provide facilities to thoroughly exercise the **CUT** remotely from the  @ref qutest_unity-script "test script"(s). A properly written test fixture can typically be used for many tests (implemented in multiple test scripts).
 
 @remark
 Coming up with a "good" *test fixture* requires some practice, but when you study the examples in this Tutorial, you will see some instances of flexible *test fixtures* that allow you to to run a wide variety of tests on them.
@@ -173,7 +173,7 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
                  break;
          }
 
-         /* unused parametrers... */
+         /* unused parameters... */
          //(void)param1;
          (void)param2;
          (void)param3;
@@ -198,9 +198,8 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
      }
 @endcode
 
-
 <dl class="tag">
-  <dt>1</dt><dd> The `"qpc.h"` header file contains the [QP/C framework](https://www.state-machine.com/qpc/) API, which includes the QUTest interface. Typically, you need to include this header file in QUTest test doubles.
+  <dt>1</dt><dd> The `"qpc.h"` header file contains the [QP/C framework](https://www.state-machine.com/qpc/) API, which includes the QUTest interface. Typically, you need to include this header file in QUTest <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" class="extern">test doubles</a>.
 > **NOTE:** for test fixtures based on the [QP/C++ framework](https://www.state-machine.com/qpcpp/), you need to include the `"qpcpp.h"` header file.
   </dd>
   <dt>2</dt><dd> You also need to include the interface to the CUT, which is `ProductionCode.h` in this case.
@@ -214,10 +213,10 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
   </dd>
   <dt>6</dt><dd> The `main()` function must start with calling `QF_init()` to initialize the QP framework.
   </dd>
-  <dt>7</dt><dd> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://www.state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails. (In which case continuationon of the test makes no sense).
+  <dt>7</dt><dd> Next, you need to initialize the @ref qs "QS" target-resident component (QS_INIT()). This macro is wrapped with the <a class="extern" href="https://www.state-machine.com/qpc/qassert_8h.html#aa0c75140aa3855c94e453b06567dcc28"><b>Q_ALLEGE()</b></a> assertion, which will fire if the QS initialization fails (in which case continuation of the test makes no sense).
   </dd>
   <dt>8-10</dt><dd> Next, you produce @ref qs_dict "QS dictionaries" for all functions you wish to test as well as objects you might need to inspect.
-> <b>NOTE:</b> you need to do this, so that the test scripts can refer to the functions and objects by the same symbolic names as the CUT/test-fixture.
+> <b>NOTE:</b> you need to do this so that the test scripts can refer to the functions and objects by the same symbolic names as the CUT/test-fixture.
   </dd>
   <dt>11</dt><dd> The QS_FILTER_ON() macro sets the @ref qs_global "global filter" in the Target. Here all output is enabled (::QS_ALL_RECORDS).
   </dd>
@@ -234,7 +233,7 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
   </dd>
   <dt>17</dt><dd> The `QS_BEGIN()` macro starts the @ref qs_app "application-specific" trace record that will report results of calling the `FindFunction_WhichIsBroken()` CUT to the test script.
   </dd>
-  <dt>18</dt><dd> The `QS_FUN()` macro sends the address of the function to the test script. This address will be converted to the name of the function, because the dictionary for this function has been generated in setp 8.
+  <dt>18</dt><dd> The `QS_FUN()` macro sends the address of the function to the test script. This address will be converted to the name of the function, because the dictionary for this function has been generated in step 8.
   </dd>
   <dt>19</dt><dd> The `QS_I32()` macro sends a 32-bit signed integer (`int32_t`) to the test script. Here you output the return value from `FindFunction_WhichIsBroken()`.
   </dd>
@@ -244,7 +243,7 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
   </dd>
   <dt>22</dt><dd> The command with `cmdId==1` will be used to call the `FunctionWhichReturnsLocalVariable()` CUT.
   </dd>
-  <dt>23-26</dt><dd> Again, the @ref qs_app "application-specific" trace record gets generated that reports the function address and the return value from this function call.
+  <dt>23-26</dt><dd> Again, the @ref qs_app "application-specific" trace record that gets generated reports the function address and the return value from this function call.
   </dd>
   <dt>27</dt><dd> The `QS_onTestEvt()` callback function is not used in this test, but needs to be provided to satisfy the linker.
   </dd>
@@ -255,7 +254,7 @@ The following listing shows the complete QUTest *test fixture* for the basic tes
 
 
 @section qutest_unity-script Test Script
-A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send inputs to the *test fixture* running in the Target and to compare the produced @ref qspy_text "QSPY textual output" with the <b>expectations</b> of the test. The following listing shows the *test script* (Python) for the Unity basic tests (file <span class="img file_py">`test_ProductionCode.py`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+A **test script** contains a group of related tests (a <em>"test group"</em>). The basic job of these tests is to send inputs to the *test fixture* running in the Target and to compare the @ref qspy_text "QSPY textual output" produced with the <b>expectations</b> of the test. The following listing shows the *test script* (Python) for the Unity basic tests (file <span class="img file_py">`test_ProductionCode.py`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @remark
 Even though a *test script* uses **Python** under the hood, you don't need to be a Python expert to write effective test scripts. The actual set of commands that you use and need to know about forms a small @ref qutest_script "Domain Specific Language (DSL) for unit testing", which just happens to be implemented with Python as a command interpreter.
@@ -323,7 +322,7 @@ The following test script performs the same tests as the Unity test fixture <spa
 
      test("FunctionWhichReturnsLocalVariable() Should Return Current Counter, But Fails Because This Test Is Actually Flawed", NORESET)
      # Sometimes you get the test wrong.  When that happens, you get a failure too... and a quick look should tell
-     # you what actually happened...which in this case was a failure to setup the initial condition.
+     # you what actually happened...which in this case was a failure to set up the initial condition.
      command(1)
      expect("@timestamp USER+001 FunctionWhichReturnsLocalVariable 0x1234")
      expect("@timestamp Trg-Done QS_RX_COMMAND")
@@ -338,11 +337,11 @@ The following test script performs the same tests as the Unity test fixture <spa
 
 <strong>"preamble"</strong> defines the startup code common to all tests in the group:
 <dl class="tag">
-  <dt>2</dt><dd> The function on_setup() is executed at the beginning of each test in the group (see test()), including both tests that reset and do not reset the Target.
+  <dt>2</dt><dd> The function on_setup() is executed at the beginning of each test in the group (see test()), including both tests that reset and that do not reset the Target.
   </dd>
   <dt>3</dt><dd> The current_obj() command sets the "current object" of the application-specific kind (`OBJ_AP`) in the Target. Subsequent commands (such as poke() in the next step) will act on this "current object".
   </dd>
-  <dt>4</dt><dd> The poke() command pokes the specified "Application Current Object" starting with the specified offset from the beginning of the object in memory (here 0) with the data elements of size 4 (the second argument) with the data provided in the third argument `pack()` "pack("<L", 0x5A5A)" into the previously established "Application Current Object".
+  <dt>4</dt><dd> The poke() command pokes the specified "Application Current Object" starting with the specified offset from the beginning of the object in memory (which here is 0) with the data elements of size 4 (the second argument) with the data provided in the third argument `pack()` "pack("<L", 0x5A5A)" into the previously established "Application Current Object".
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -350,18 +349,18 @@ The following test script performs the same tests as the Unity test fixture <spa
 
 <strong>Test: "FindFunction_WhichIsBroken() Should Return Zero..."</strong> checks that the CUT returns 0 when a given number is not found:
 <dl class="tag">
-  <dt>5</dt><dd> The test() command starts a test and gives it a name (in double quotes). The name of test will be displayed as the test is executed and should be a quick reminder about the objective of this test. This test command also @ref qutest_reset "resets the Target", which brings the Target into a well-defined initial state and produces the @ref qs_dict "QS dictionary records" (see @ref qutest_unity-fixture "test-fixture"[12])
-> <b>NOTE:</b> The ability to perform the <b>full Target reset</b> is a unique feature of QUTest. Other unit testing frameworks, including Unity and CppUTest, don't reset the Target. They merely call the test `setup()/tearDown()` functions at the beginning and end of the test, respectively. QUTest also calls `onReset()/onSetup()/onTeardown()`, but obviously the full Target reset is a much better guarantee that the Target starts in exactly the same state.
+  <dt>5</dt><dd> The test() command starts a test and gives it a name (in double quotes). The name of the test will be displayed as the test is executed and should be a quick reminder about the objective of this test. This test command also @ref qutest_reset "resets the Target", which brings the Target into a well-defined initial state and produces the @ref qs_dict "QS dictionary records" (see @ref qutest_unity-fixture "test-fixture"[12]).
+> <b>NOTE:</b> The ability to perform the <b>full Target reset</b> is a unique feature of QUTest. Other unit testing frameworks, including Unity and CppUTest, don't reset the Target. They merely call the test `setup() / tearDown()` functions at the beginning and end of the test, respectively. QUTest also calls `onReset() / onSetup() / onTeardown()`, but obviously the full Target reset is a much better guarantee that the Target starts in exactly the same state.
   </dd>
-  <dt>6</dt><dd> The command() command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_unity-fixture "test-fixture"[16])
-> **NOTE:** The first parameter of command() "command" here is just a number (0), but it is also possible to use a **symbolic name** for the first parameter. This symbolic name will be looked up in the user dictionary (QS_USR_DICTIONARY())
+  <dt>6</dt><dd> The command() command causes the invocation of the `QS_onCommand()` callback inside the Target. The argument 0 is the `cmdId` parameter (see @ref qutest_unity-fixture "test-fixture"[16]).
+> **NOTE:** The first parameter of command() "command" here is just a number (0), but it is also possible to use a **symbolic name** for the first parameter. This symbolic name will be looked up in the user dictionary (QS_USR_DICTIONARY()).
   </dd>
   <dt>7</dt><dd> The expect() command represents an <b>expectation</b> of this test (a.k.a. <a href="https://www.state-machine.com/glossary#test_assertion">test assertion</a>). This is the expected output generated by the `command(0)` command from the previous step. You need to consult the test fixture to determine what you should expect in this case.
 > <b>NOTE:</b> the expected string starts with a number `0000000001`, which is the @ref qs_tstamp "Target Time-Stamp". In QUTest, the "timestamp" simply counts all the QS trace records produced, so that you know that no entries have been lost. In the later tests you will see how you can count the steps <b>automatically</b> with the `@timestamp` placeholder.
   </dd>
   <dt>8</dt><dd> The test finishes with the expectation for the `Trg-Done QS_RX_COMMAND` trace record, which means that all output generated by command() has been generated.
   </dd>
-  <dt>9</dt><dd> This expect() command illustrate the use of the `@timestamp` placeholder to account for the test steps <b>automatically</b>.
+  <dt>9</dt><dd> This expect() command illustrates the use of the `@timestamp` placeholder to account for the test steps <b>automatically</b>.
   </dd>
   <dt>10</dt><dd> This command() illustrates how to pass **negative numbers** as arguments. As you can see, you need to binary-and the number with the all-bits-on bitmask `0xFFFFFFFF`.
   </dd>
@@ -400,7 +399,7 @@ The  QSPY host application limits the @ref qs_dict "QS dictionaries" to the **fi
 <strong>Test: "FunctionWhichReturnsLocalVariable() Should Return The Current Counter..."</strong> checks whether `FunctionWhichReturnsLocalVariable()` CUT returns the value poked into the `Counter` variable:
 <dl class="tag">
   <dt>17</dt><dd> The test() command starts a next test.
-> <b>NOTE:</b> Unlike all previous tests so far, this test does **not** reset the Target (argument @ref qutest_reset "NORESET")
+> <b>NOTE:</b> Unlike all previous tests so far, this test does **not** reset the Target (argument @ref qutest_reset "NORESET").
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -410,7 +409,7 @@ As an exercise you should modify the file `ProductionCode.c` to fix the bug and 
 
 
 @section qutest_unity-embed Running the Test on Embedded Targets
-As mentioned at the initial description of this example, the directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test`</span> contains makefiles to build the code and run the tests on the embedded boards (TivaC LaunchPad from Texas Instruments and EFM32 Pearl-Gecko board from Silicon Labs). Both these boards open a virtual COM port on the machine they are attached to via the USB cable. This virtual COM port provides an ideal connection for the @ref qs "QS communication" with the @ref qspy "QSPY host utility".
+As mentioned in the initial description of this example, the directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_basic\test`</span> contains makefiles to build the code and run the tests on the embedded boards (TivaC LaunchPad from Texas Instruments and EFM32 Pearl-Gecko board from Silicon Labs). Both these boards open a virtual COM port on the machine they are attached to via the USB cable. This virtual COM port provides an ideal connection for the @ref qs "QS communication" with the @ref qspy "QSPY host utility".
 
 @image html platforms.png "Targets for running QUTests. From the left: host computer, TivaC LaunchPad and EFM32 Pearl-Gecko"
 
@@ -448,25 +447,25 @@ To run the tests on the TivaC LaunchPad (TM4C123 board), you use the `make_tm4c1
 </p>
 
 @note
-To better understand this QUTest example, it is highly recommended to watch the <a href="https://vimeo.com/256590562" target="_blank" class="extern"><b>Chernosky's video blog</b></a>.
+To better understand this QUTest example, it is highly recommended to watch <a href="https://vimeo.com/256590562" target="_blank" class="extern"><b>Chernosky's video blog</b></a>.
 
 
-The main purpose of this example is to show the traditional approach (with the mock object) and contrast it with the much simpler solution enabled by the QUTest approach. Of course, to  make comparisons meaningfull, both approaches test the @ref qutest_mock-cut "same CUT".
+The main purpose of this example is to show the traditional approach (with the mock object) and contrast it with the much simpler solution enabled by the QUTest approach. Of course, to  make comparisons meaningful, both approaches test the @ref qutest_mock-cut "same CUT".
 
 @note
 Because of the different design philosophy of QUTest, which is *not* based on xUnit, the classic "mock object" is actually not needed and can be replaced with a simpler "spy" <a href="https://en.wikipedia.org/wiki/Test_double" target="_blank" target="_blank" class="extern"><b>test double</b></a>. To dynamically alter the behavior of this "spy" test double, this example applies @ref qutest_fixture-probe "QUTest Test Probes". Test Probes can be changed interactively from the @ref qutest_mock-script "test script".
 
 
 @remark
-Since the @ref qutest_mock-cut "CUT" is in C, the Mock Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc) (and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp)).@n
-@n
+Since the @ref qutest_mock-cut "CUT" is in C, the Mock Unity example is only available in the [<b>QP/C framework</b>](https://www.state-machine.com/qpc) (and is **not** available in the [QP/C++ framework](https://www.state-machine.com/qpcpp)).<br>
+<br>
 This example runs QUTest tests on the host (Windows, Linux, or MacOS) for both Unity and QUTest. The QUTest version also runs on embedded boards (TivaC LaunchPad from Texas Instruments and EFM32 Pearl-Gecko board from Silicon Labs). The instructions for building and running the code on the embedded boards are located at the end of this lesson.
-@n
+<br>
 @image html platforms.png
 
 
 @section qutest_mock-cut Code Under Test (CUT)
-The CUT in this example implements a simple bar of 5 LEDs that display percentage, as shown in the animation below. The "LedBar device" interacts with the discrete LEDs by turning them on and off, to achieve the desired effect. The main objective of this example is to demonstrate how to verify the **collaboration** with the discrete LEDs, even without the actual hardware.
+The CUT in this example implements a simple bar of 5 LEDs that displays percentage, as shown in the animation below. The "LedBar device" interacts with the discrete LEDs by turning them on and off to achieve the desired effect. The main objective of this example is to demonstrate how to verify the **collaboration** with the discrete LEDs, even without the actual hardware.
 
 @image html ledbar5.gif "Bar of 5 LEDs displaying the percentage."
 
@@ -523,7 +522,7 @@ The Unity test fixture uses the `MockLed.c` implementation of the `Led.h` interf
 The `test_LedBar.c` file implements the @ref qutest_mock-fixture "QUTest test fixture", which calls the CUT, but it does **NOT** check whether it performs as expected.
   </dd>
   <dt>6</dt><dd>
-The QUTest test fixture uses the `spy_Led.c` implementation of the `Led.h` interface. This spy test double is much simpler than mock-object used by Unity, so it can easily be @ref qutest_mock-spy "coded manually".
+The QUTest test fixture uses the `spy_Led.c` implementation of the `Led.h` interface. This spy test double is much simpler than the mock-object used by Unity, so it can easily be @ref qutest_mock-spy "coded manually".
   </dd>
   <dt>7</dt><dd>
 The QUTest test is driven by the `test_LedBar.py` @ref qutest_mock-script "test script". This test script sends commands to the `test_LedBar.c` fixture and verifies the generated output against the expectations of the test.
@@ -533,14 +532,14 @@ The QUTest test is driven by the `test_LedBar.py` @ref qutest_mock-script "test 
 
 
 @section qutest_mock-run0 Running the Test with Unity
-The complete code for the mock Unity example is provided in the QP/C framework, directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_mock\test_unity`</span>. To run the mock Unity test (on Windows), open a command-prompt and type:
+The complete code for the mock Unity example is provided in the QP/C framework directory <span class="img folder">`C:\qp\qpc\examples\qutest\unity_mock\test_unity`</span>. To run the mock Unity test (on Windows), open a command-prompt and type:
 @verbatim
 cd C:\qp\qpc\examples\qutest\unity_mock\test_unity
 make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Winows is that you open a terminal window and change directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_mock/test_unity`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_mock/test_unity`</span>.
 
 
 This will build the @ref qutest_mock-fixture "test fixture" as a host executable and then it will run it. The screen shot below shows the output produced from the make command.
@@ -565,7 +564,7 @@ make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_mock/test`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/qpc/examples/qutest/unity_mock/test`</span>.
 
 
 This will build the @ref qutest_mock-fixture "test fixture" as a host executable and then it will run the @ref qutest_mock-script "test script" (in Python). The screen shot below shows the output produced in these two command-prompt windows.
@@ -607,7 +606,7 @@ The following listing shows the "spy-object" (file <span class="img file_c">`spy
          QS_END()
      }
 
-     /* turns a given LED on and retruns the power drawn by it in uW */
+     /* turns a given LED on and returns the power drawn by it in uW */
  [7] uint32_t Led_on(uint8_t index) {
  [8]     uint32_t ret = led_power[index]; /* assume default power */
  [9]     QS_TEST_PROBE_DEF(&Led_on)
@@ -637,7 +636,7 @@ The following listing shows the "spy-object" (file <span class="img file_c">`spy
   </dd>
   <dt>4</dt><dd> The `led_power[]` array contains the default power ratings for the individual LEDs in the LED-bar. These values will be returned from the fake `Led_on()` implementation (if not overridden by the "Test Probe").
   </dd>
-  <dt>5</dt><dd> The `Led_DICTIONARY()` function produced the dictionaries for the spy-object. This function is not part of the real LED interface (see `Led.h` in the `src` directory), but is needed only for testing.
+  <dt>5</dt><dd> The `Led_DICTIONARY()` function produces the dictionaries for the spy-object. This function is not part of the real LED interface (see `Led.h` in the `src` directory), but is needed only for testing.
   </dd>
   <dt>6</dt><dd> This is a fake `Led_off()` implementation, which generates an @ref qs_app "application-specific QS trace record" to report the call and the parameter to QSPY.
   </dd>
@@ -645,16 +644,16 @@ The following listing shows the "spy-object" (file <span class="img file_c">`spy
   </dd>
   <dt>8</dt><dd> The `ret` variable will be the power rating for this LED returned from this function. The variable is initialized from the `led_power[]` array, which contains the default power rating for the LEDs.
   </dd>
-  <dt>9</dt><dd> The macro `QS_TEST_PROBE_DEF()` defines a @ref qutest_fixture-probe "Test Probe" for this function (notice the @c &Led_on function-pointer parameter). This Test Probe retreives a value set for this function from the test-script. (If no value has been set, the `QS_TEST_PROBE_DEF()` retreives value 0).
+  <dt>9</dt><dd> The macro `QS_TEST_PROBE_DEF()` defines a @ref qutest_fixture-probe "Test Probe" for this function (notice the @c &Led_on function-pointer parameter). This Test Probe retrieves a value set for this function from the test-script. (If no value has been set, the `QS_TEST_PROBE_DEF()` retrieves value 0).
   </dd>
   <dt>10</dt><dd> The `QS_TEST_PROBE()` macro executes the enclosed snipped of code only if the Test Probe (defined at label [9]) is not zero.
   </dd>
   <dt>11</dt><dd> If the Test Probe is not zero (it has been set from the test script), the `ret` value is updated from the value of the Test Probe `qs_tp_`.
   </dd>
 
-> <b>NOTE:</b> this demonstrates how to program a **return value** in a spy-object. This corresponds directly to the same capability of traditional mock-objects.
+> <b>NOTE:</b> This demonstrates how to program a **return value** in a spy-object. This corresponds directly to the same capability of traditional mock-objects.
 
-> <b>NOTE:</b> Test Probe is just one way in which a pre-programmed value can be returned from a fake function. This option is illustrated in @ref qutest_mock-script25 "test script [25]". Another way in QUTest is to use the poke() test command to alter the values in the `led_power[]` array. This option is illustrated in @ref qutest_mock-script21 "test script [21]"
+> <b>NOTE:</b> Test Probe is just one way in which a pre-programmed value can be returned from a fake function. This option is illustrated in @ref qutest_mock-script25 "test script [25]". Another way in QUTest is to use the poke() test command to alter the values in the `led_power[]` array. This option is illustrated in @ref qutest_mock-script21 "test script [21]".
 
 <dl class="tag">
   <dt>12</dt><dd> An @ref qs_app "application-specific QS trace record" is generated to report the call, the parameter, and the return value to QSPY.
@@ -720,7 +719,7 @@ The following listing shows the test fixture for the LedBar tests (file <span cl
                  break;
          }
 
-         /* unused parametrers... */
+         /* unused parameters... */
          //(void)param1;
          (void)param2;
          (void)param3;
@@ -753,17 +752,17 @@ The following listing shows the test fixture for the LedBar tests (file <span cl
   </dd>
   <dt>3</dt><dd> The `Led_DICTIONARY()` function prototype is declared directly in the test fixture. This is the only extension from the `"Led.h"` interface implemented in the @ref qutest_mock-spy "spy-object".
   </dd>
-  <dt>4</dt><dd> As usual the `main()` funciton of the test fixture initialzies the QF framework.
+  <dt>4</dt><dd> As usual the `main()` function of the test fixture initialzies the QF framework.
   </dd>
-  <dt>5</dt><dd> As usual the `main()` funciton of the test fixture initalizes the QS software tracing.
+  <dt>5</dt><dd> As usual the `main()` function of the test fixture initalizes the QS software tracing.
   </dd>
-  <dt>6</dt><dd> The call to the `Led_DICTIONARY()` funciton outputs the @ref qs_dict "QS dictionaries" for the @ref qutest_mock-spy "spy-object".
+  <dt>6</dt><dd> The call to the `Led_DICTIONARY()` function outputs the @ref qs_dict "QS dictionaries" for the @ref qutest_mock-spy "spy-object".
   </dd>
   <dt>7</dt><dd> The @ref qs_dict "QS dictionary" for the  `LedBar_setPercentn()` CUT is produced as well.
   </dd>
   <dt>8</dt><dd> The @ref qs_global "QS global filter" is set up to output all QS records.
   </dd>
-  <dt>9</dt><dd> The `QF_run()` funciton enters the event loop to wait for commands from the @ref qutest_mock-script "test script".
+  <dt>9</dt><dd> The `QF_run()` function enters the event loop to wait for commands from the @ref qutest_mock-script "test script".
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -773,10 +772,10 @@ The following listing shows the test fixture for the LedBar tests (file <span cl
 The following listing shows the *test script* for the LedBar tests (file <span class="img file_py">`test_LedBar.py`</span>). The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @note
-The following test script performs the same tests as the `TestLedBar.c` Unity test fixture. Compared to the mock-object approach, however, the QUTest test script has the more intuitive structure in which a command triggering CUT is **followed** by the expecations. In contrast, the traditional @ref qutest_mock-unity "Unity tests with mock-object" were structured "backwards" (the expectations **preceeded** the call to CUT).
+The following test script performs the same tests as the `TestLedBar.c` Unity test fixture. Compared to the mock-object approach, however, the QUTest test script has the more intuitive structure, in which a command triggering CUT is **followed** by the expecations. In contrast, the traditional @ref qutest_mock-unity "Unity tests with mock-object" were structured "backwards" (the expectations **preceded** the call to CUT).
 
 @code{py}
- [1] # preambe...
+ [1] # preamble...
 
      # tests...
  [2] test("LedBar 0% all off")
@@ -847,15 +846,15 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 @endcode
 
 <dl class="tag">
-  <dt>1</dt><dd> The preamble is empty, because no special actionas are needed on reset/setup/teardown.
+  <dt>1</dt><dd> The preamble is empty, because no special actions are needed on reset/setup/teardown.
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
-<b>Test: "LedBar 0% all off"</b> checks that that all LEDs are turned off to display 0%
+<b>Test: "LedBar 0% all off"</b> checks that all LEDs are turned off to display 0%
 <dl class="tag">
-  <dt>2</dt><dd> The test() command starts the test
+  <dt>2</dt><dd> The test() command starts the test.
   </dd>
   <dt>3</dt><dd> The @ref command() "command(0, 0)" calls the `LedBar_setPercent()` CUT with the 0 percent argument.
   </dd>
@@ -863,29 +862,29 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
   </dd>
   <dt>5</dt><dd> This expect() command verifies the output produced by calling the `LedBar_setPercent()` function from the CUT. Note that the returned total power consumption is zero.
   </dd>
-  <dt>6</dt><dd> This expect() command verifies that all output from the origianl @ref command() "command(0, 0)" has been produced.
+  <dt>6</dt><dd> This expect() command verifies that all output from the original @ref command() "command(0, 0)" has been produced.
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
-<b>Test: "LedBar 100% all on"</b> checks that that all LEDs are turned on to display 100%
+<b>Test: "LedBar 100% all on"</b> checks that all LEDs are turned on to display 100%
 <dl class="tag">
-  <dt>8</dt><dd> The test() command starts the test
+  <dt>8</dt><dd> The test() command starts the test.
   </dd>
   <dt>9</dt><dd> The @ref command() "command(0, 100)" calls the `LedBar_setPercent()` CUT with the 100 percent argument.
   </dd>
   <dt>10</dt><dd> This expect() command verifies the output produced by calling the `LedBar_setPercent()` function from the CUT. Note that the returned total power consumption is 70.
   </dd>
-  <dt>11</dt><dd> This expect() command verifies that all output from the origianl @ref command() "command(0, 100)" has been produced.
+  <dt>11</dt><dd> This expect() command verifies that all output from the original @ref command() "command(0, 100)" has been produced.
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
-<b>Test: "LedBar 19% all off"</b> checks that that all LEDs are turned off to display 19%
+<b>Test: "LedBar 19% all off"</b> checks that all LEDs are turned off to display 19%
 <dl class="tag">
-  <dt>12</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
+  <dt>12</dt><dd> The test() command starts the test (NOTE: this is a NORESET test).
   </dd>
   <dt>13</dt><dd> The @ref command() "command(0, 19)" calls the `LedBar_setPercent()` CUT with the 19 percent argument.
   </dd>
@@ -896,10 +895,9 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 </dl>
 <div style="clear:both;"></div>
 
-
-<b>Test: "LedBar 20% one on"</b> checks that that all LEDs are turned off to display 20%
+<b>Test: "LedBar 20% one on"</b> checks that one LED is turned on to display 20%
 <dl class="tag">
-  <dt>16</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
+  <dt>16</dt><dd> The test() command starts the test (NOTE: this is a NORESET test).
   </dd>
   <dt>17</dt><dd> The @ref command() "command(0, 20)" calls the `LedBar_setPercent()` CUT with the 20 percent argument.
   </dd>
@@ -909,9 +907,9 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 <div style="clear:both;"></div>
 
 
-<b>Test: "LedBar 50% two on"</b> checks that that two LEDs is turned on to display 50%
+<b>Test: "LedBar 50% two on"</b> checks that two LEDs are turned on to display 50%
 <dl class="tag">
-  <dt>19</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
+  <dt>19</dt><dd> The test() command starts the test (NOTE: this is a NORESET test).
   </dd>
   <dt>20</dt><dd> The @ref current_obj() "current_obj(OBJ_AP, "led_power")" command sets the "current application object" to "led_power" (see @ref qutest_mock-spy "spy-object"[4]).
   </dd>
@@ -927,23 +925,23 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 <div style="clear:both;"></div>
 
 
-<b>Test: "LedBar 99% two on"</b> checks that that two LEDs is turned on to display 99%
+<b>Test: "LedBar 99% two on"</b> checks that two LEDs are turned on to display 99%
 <dl class="tag">
-  <dt>24</dt><dd> The test() command starts the test (NOTE: this is a NORESET test)
+  <dt>24</dt><dd> The test() command starts the test (NOTE: this is a NORESET test).
   </dd>
   <dt>25</dt>
 @anchor qutest_mock-script25
   <dd> The @ref probe() "probe("Led_on", 17)" command sends the @ref qutest_fixture-probe "test-probe" value 17 for function `Led_on`
   </dd>
-  <dt>26</dt><dd> The @ref probe() "probe("Led_on", 13)" command sends another the @ref qutest_fixture-probe "test-probe" value 13 for function `Led_on`
+  <dt>26</dt><dd> The @ref probe() "probe("Led_on", 13)" command sends the @ref qutest_fixture-probe "test-probe" another value 13 for function `Led_on`
   </dd>
   <dt>27</dt><dd> The @ref command() "command(0, 99)" calls the `LedBar_setPercent()` CUT with the 99 percent argument.
   </dd>
-  <dt>28</dt><dd> This expect() command verifies the test-probe sent at step [25] has been retreived.
+  <dt>28</dt><dd> This expect() command verifies the test-probe sent at step [25] has been retrieved.
   </dd>
   <dt>29</dt><dd> This expect() command verifies the function `Led_on` has been called, and that it returned 17.
   </dd>
-  <dt>30</dt><dd> This expect() command verifies the test-probe sent at step [26] has been retreived.
+  <dt>30</dt><dd> This expect() command verifies the test-probe sent at step [26] has been retrieved.
   </dd>
   <dt>31</dt><dd> This expect() command verifies the function `Led_on` has been called, and that it returned 13.
   </dd>
@@ -966,7 +964,7 @@ The following test script performs the same tests as the `TestLedBar.c` Unity te
 
 - **Functional tests** focus on the *actions* performed by the state machine.
 
-> <b>NOTE:</b> As described in the @ref qutest_mock, testing of complex, multi-stage interactions (such as a state machine) typically requires application of a "mock object" test double. However, the QUTest design philosophy allows you to use much simpler "spy object" test double instead. The **functional testing** strategy illustrates this approach.
+> <b>NOTE:</b> As described in the @ref qutest_mock, testing of complex, multi-stage interactions (such as a state machine) typically requires application of a "mock object" test double. However, the QUTest design philosophy allows you to use a much simpler "spy object" test double instead. The **functional testing** strategy illustrates this approach.
 
 - **Structural tests** focus on the state machine structure, such as entering/exiting *states* and executing *state transitions*.
 
@@ -1103,7 +1101,7 @@ The following listing shows the test fixture for the QHsm tests (file <span clas
   </dd>
   <dt>5</dt><dd> The "constructor" of the state machine object is called.
   </dd>
-> **NOTE:** The explicit "constructor" call is needed only in C. In C++ static constructors are called automatically as part of the startup sequence.
+> **NOTE:** The explicit "constructor" call is needed only in C. In C++, static constructors are called automatically as part of the startup sequence.
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -1121,7 +1119,7 @@ For functional testing, which is focused on the **actions** performed by a state
   </dd>
 </dl>
 <div style="clear:both;"></div>
-@n
+<br>
 
 @remark
 In practice, you will likely use both functional and structural testing at the same time. Simple actions that do not perform any hardware-specific operations could be instrumented (with @ref qs_app "QS application-specific trace records") directly in the CUT (your state machines). The hardware-specific actions need to be abstracted anyway (in the BSP for "dual targeting"), in which case you can place the QS instrumentation in the BSP only.
@@ -1168,11 +1166,11 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
 @endcode
 
 <dl class="tag">
-  <dt>1</dt><dd> The script procedure `on_reset()` is executed after each reset of the target. This is in contrast to the procedure `on_setup()`, which is executed at the begin of all tests, including tests that don't reset the target.
+  <dt>1</dt><dd> The script procedure `on_reset()` is executed after each reset of the target. This is in contrast to the procedure `on_setup()`, which is executed at the beginning of all tests, including tests that don't reset the target.
   </dd>
   <dt>2</dt><dd> The @ref qs_global "global filter" is set to `GRP_UA`, which means &laquo;<b>group-user-all</b>&raquo; trace records. This filter setting determines the character of the test to be a **functional** test, because the focus is on the trace records produced by actions (@ref qs_app "user-defined" records) rather than the @ref qs_pre "pre-defined records" generated by executing a state machine.
   </dd>
-  <dt>3</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
+  <dt>3</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callback, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -1194,7 +1192,7 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
 <dl class="tag">
   <dt>7</dt><dd> The test() command starts the test.
   </dd>
-  <dt>8</dt><dd> The dispatch() command dispatches a given event to the state machine
+  <dt>8</dt><dd> The dispatch() command dispatches a given event to the state machine.
   </dd>
   <dt>9</dt><dd> The expect() commands verify that the state machine **actions** (`BSP_display()` function) happened.
   </dd>
@@ -1249,11 +1247,11 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
 @endcode
 
 <dl class="tag">
-  <dt>1</dt><dd> The script procedure `on_reset()` is executed after each reset of the target. This is in contrast to the procedure `on_setup()`, which is executed at the begin of all tests, including tests that don't reset the target.
+  <dt>1</dt><dd> The script procedure `on_reset()` is executed after each reset of the target. This is in contrast to the procedure `on_setup()`, which is executed at the beginning of all tests, including tests that don't reset the target.
   </dd>
   <dt>2</dt><dd> The @ref qs_global "global filter" is set to `GRP_SM`, which means &laquo;<b>group-state-machine</b>&raquo; trace records. This filter setting determines the character of the test to be a **structural** test, because the focus is on the @ref qs_pre "pre-defined records" generated by executing a state machine, rather than trace records produced by actions (user trace records).
   </dd>
-  <dt>3</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callack, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
+  <dt>3</dt><dd> The command current_obj() sets the current state machine object to `"the_hsm"`. Because this is performed in the on_reset() callback, this current object will be set before every test (except the NORESET-tests, which do not call on_reset()).
   </dd>
 </dl>
 <div style="clear:both;"></div>
@@ -1293,12 +1291,12 @@ The following listing shows the *test script* for the QHsm tests (file <span cla
 @tableofcontents
 @nav{qutest_qhsm,qutest_dpp}
 
-<p>This example shows how to unit-test a simple active object (AO) called "Blinky". This Blinky AO turns on and off an LED, which is driven by a [<b>QP time event</b>](https://www.state-machine.com/qpc/qf_8h.html#struct_q_time_evt).
+<p>This example shows how to unit-test a simple active object (AO) called "Blinky". This Blinky AO, which is driven by a [<b>QP time event</b>](https://www.state-machine.com/qpc/qf_8h.html#struct_q_time_evt), turns on and off an LED.
 </p>
 
 
 @section qutest_blinky-cut Code Under Test (CUT)
-This example is available in both [<b>QP/C</b>](https://www.state-machine.com/qpc) as well as in [<b>QP/C++</b>](https://www.state-machine.com/qpcpp) frameworks. The complete code for the Blinky example is provided in the directory <span class="img folder">`<qpc|qpcpp>\examples\qutest\blinky\test`</span>.
+This example is available in both the [<b>QP/C</b>](https://www.state-machine.com/qpc) as well as the [<b>QP/C++</b>](https://www.state-machine.com/qpcpp) frameworks. The complete code for the Blinky example is provided in the directory <span class="img folder">`<qpc|qpcpp>\examples\qutest\blinky\test`</span>.
 
 @image html qutest_blinky_qm.png "Blinky model in QM."
 
@@ -1320,7 +1318,7 @@ make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change directory to <span class="img folder">`~/qp/<qpc|qpcpp>/examples/qutest/blinky/test`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/<qpc|qpcpp>/examples/qutest/blinky/test`</span>.
 
 
 This will build the @ref qutest_fixture "test fixture" as a host executable and then it will run the @ref qutest_script "test script" (in Python). The screen shot below shows the output produced in these two command-prompt windows.
@@ -1336,12 +1334,12 @@ This will build the @ref qutest_fixture "test fixture" as a host executable and 
 @tableofcontents
 @nav{qutest_blinky,qutest_rtc}
 
-<p>The DPP (Dining Philosopher Problem) example shows how to use QUTest in various stages of application development, including not only unit testing, but also **integration testing** as well.
+<p>The DPP (Dining Philosophers Problem) example shows how to use QUTest in various stages of application development, including not only unit testing, but **integration testing** as well.
 </p>
 
 
 @section qutest_dpp-cut  Code Under Test (CUT)
-This example is available in both [<b>QP/C</b>](https://www.state-machine.com/qpc) as well as in [<b>QP/C++</b>](https://www.state-machine.com/qpcpp) frameworks. The complete code for the DPP example is provided in the directory <span class="img folder">`<qpc|qpcpp>\examples\qutest\dpp\test`</span>.
+This example is available in both the [<b>QP/C</b>](https://www.state-machine.com/qpc) as well as the [<b>QP/C++</b>](https://www.state-machine.com/qpcpp) frameworks. The complete code for the DPP example is provided in the directory <span class="img folder">`<qpc|qpcpp>\examples\qutest\dpp\test`</span>.
 
 
 @section qutest_dpp-run Running the Test with QUTest
@@ -1361,13 +1359,12 @@ make
 @endverbatim
 
 @note
-The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change directory to <span class="img folder">`~/qp/<qpc|qpcpp>/examples/qutest/blinky/test`</span>.
+The provided `Makefile` will also work on Linux and MacOS. The only difference from Windows is that you open a terminal window and change the directory to <span class="img folder">`~/qp/<qpc|qpcpp>/examples/qutest/blinky/test`</span>.
 
 
 This will build the @ref qutest_fixture "test fixture" as a host executable and then it will run the @ref qutest_script "test script" (in Python). The screen shot below shows the output produced in these two command-prompt windows.
 
 @image html test_dpp.png "DPP test build and run with QUTest (left) and QSPY output (right)."
-
 
 @nav{qutest_blinky,qutest_rtc}
 */

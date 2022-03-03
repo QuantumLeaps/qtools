@@ -23,14 +23,14 @@ The problems caused by whitespace in the source code are particularly insidious,
 
 
 <h1>QClean Source Code Cleanup Utility</h1>
-<strong>QClean</strong> is a simple and blazingly fast command-line utility to **automatically clean whitespace** in your source code. QClean is deployed as natively compiled executable and is located in the sub-directory <span class="img folder">qtools/bin/</span>. QClean is available in portable source code and can be compiled on all desktop platforms (Windows and POSIX -- Linux, macOS...).
+<strong>QClean</strong> is a simple and blazingly fast command-line utility to **automatically clean whitespace** in your source code. QClean is deployed as a natively compiled executable and is located in the sub-directory <span class="img folder">qtools/bin/</span>. QClean is available in portable source code and can be compiled on all desktop platforms (Windows and POSIX&mdash;Linux, macOS...).
 
 @attention
-QClean is very simple to use (no parameters are needed in most cases) and is blazingly fast (it can easily cleanup hundreds of files per second). All this is designed so that you can use QClean frequently. In fact, the use of QClean after editing your code should become part of your **basic hygiene**--like washing hands after going to the bathroom.
+QClean is very simple to use (no parameters are needed in most cases) and is blazingly fast (it can easily clean up hundreds of files per second). All this is designed so that you can use QClean frequently. In fact, the use of QClean after editing your code should become part of your **basic hygiene**&mdash;like washing hands after going to the bathroom.
 
 
 @section qclean_usage QClean Usage
-Typically, you invoke QClean from a command-line prompt without any parameters. In that case, QClean will cleanup white space in the current directory and **recursively** in all its sub-directories.
+Typically, you invoke QClean from a command-line prompt without any parameters. In that case, QClean will clean up white space in the current directory and **recursively** in all its sub-directories.
 
 @note
 If you have added the <span class="img folder">qtools/bin/</span> directory to your `PATH` environment variable (see @ref qtools_install "Installing QTools"), you can run `qclean` directly from your terminal window.
@@ -66,7 +66,7 @@ QClean fixes the following whitespace problems:
 - optionally, scan the source code for long lines exceeding the specified limit (`-l` option, default 80 characters per line).
 
 @note
-QClean can optionally check the code for **long lines of code** that exceed a specified limit (80 characters by default) to reduce the need to either wrap the long lines (which destroys indentation), or the need to scroll the text horizontally. (All GUI usability guidelines universally agree that horizontal scrolling of text is always a bad idea.) In practice, the source code is very often copied-and-pasted and then modified, rather than created from scratch. For this style of editing, it’s very advantageous to see simultaneously and side-by-side both the original and the modified copy. Also, differencing the code is a routinely performed action of any VCS (Version Control System) whenever you check-in or merge the code. Limiting the line length allows to use the horizontal screen real estate much more efficiently for side-by-side-oriented text windows instead of much less convenient and error-prone top-to-bottom differencing.
+QClean can optionally check the code for **long lines of code** that exceed a specified limit (80 characters by default) to reduce the need to either wrap the long lines (which destroys indentation), or to scroll the text horizontally. (All GUI usability guidelines universally agree that horizontal scrolling of text is always a bad idea.) In practice, the source code is very often copied-and-pasted and then modified, rather than created from scratch. For this style of editing, it’s very advantageous to see simultaneously and side-by-side both the original and the modified copy. Also, differencing the code is a routinely performed action of any VCS (Version Control System) whenever you check-in or merge the code. Limiting the line length allows us to use the horizontal screen real estate much more efficiently for side-by-side-oriented text windows instead of much less convenient and error-prone top-to-bottom differencing.
 
 
 @subsection qclean_files QClean File Types
@@ -76,36 +76,36 @@ QClean applies the following rules for cleaning the whitespace depending on the 
 <center>
 FILE TYPE      | END-OF-LINE | TRAILING WS | TABS    | LONG-LINES
 :--------------|:------------|:-----------:|:--------:|:------------:
-`.c`           | Unix (LF)   | remove  | remove  | check
-`.h`           | Unix (LF)   | remove  | remove  | check
-`.cpp`         | Unix (LF)   | remove  | remove  | check
-`.hpp`         | Unix (LF)   | remove  | remove  | check
-`.s`           | Unix (LF)   | remove  | remove  | check
-`.asm`         | Unix (LF)   | remove  | remove  | check
-`.lnt`         | Unix (LF)   | remove  | remove  | check
-`.txt`         | DOS (CR,LF) | remove  | remove  | don't check
-`.md`          | DOS (CR,LF) | remove  | remove  | don't check
-`.bat`         | DOS (CR,LF) | remove  | remove  | don't check
-`.ld`          | Unix (LF)   | remove  | remove  | check
-`.py`          | Unix (LF)   | remove  | remove  | check
-`.pyw`         | Unix (LF)   | remove  | remove  | check
-`.tcl`         | Unix (LF)   | remove  | remove  | check
-`.java`        | Unix (LF)   | remove  | remove  | check
+`.c`           | Unix (LF)   | remove  | replace | check
+`.h`           | Unix (LF)   | remove  | replace | check
+`.cpp`         | Unix (LF)   | remove  | replace | check
+`.hpp`         | Unix (LF)   | remove  | replace | check
+`.s`           | Unix (LF)   | remove  | replace | check
+`.asm`         | Unix (LF)   | remove  | replace | check
+`.lnt`         | Unix (LF)   | remove  | replace | check
+`.txt`         | Unix (LF)   | remove  | replace | don't check
+`.md`          | Unix (LF)   | remove  | replace | don't check
+`.bat`         | DOS (CR,LF) | remove  | replace | don't check
+`.ld`          | Unix (LF)   | remove  | replace | check
+`.py`          | Unix (LF)   | remove  | replace | check
+`.pyw`         | Unix (LF)   | remove  | replace | check
+`.tcl`         | Unix (LF)   | remove  | replace | check
+`.java`        | Unix (LF)   | remove  | replace | check
 `Makefile`     | Unix (LF)   | remove  | leave   | check
 `.mak`         | Unix (LF)   | remove  | leave   | check
-`.html`        | Unix (LF)   | remove  | remove  | don't check
-`.htm`         | Unix (LF)   | remove  | remove  | don't check
-`.php`         | Unix (LF)   | remove  | remove  | don't check
-`.dox`         | Unix (LF)   | remove  | remove  | don't check
-`.m`           | Unix (LF)   | remove  | remove  | check
+`.html`        | Unix (LF)   | remove  | replace | don't check
+`.htm`         | Unix (LF)   | remove  | replace | don't check
+`.php`         | Unix (LF)   | remove  | replace | don't check
+`.dox`         | Unix (LF)   | remove  | replace | don't check
+`.m`           | Unix (LF)   | remove  | replace | check
 </center>
 
-@n
+<br>
 @note
-The cleanup rules specified in the table above can be easily customized by editing the array `l_fileTypes` in the `qclean/source/main.c` file. Also, you can change the **Tab size** by modifying the `TAB_SIZE` constant (currently set to 4) as well as the default **line-limit** by modifying the `LINE_LIMIT` constant (currently set to 80) at the top of the the `qclean/source/main.c` file. Of course, after any such modification, you need to re-build the QClean executable and copy it into the qtools/bin directory.
+The cleanup rules specified in the table above can be easily customized by editing the array `l_fileTypes` in the `qclean/source/main.c` file. Also, you can change the **Tab size** by modifying the `TAB_SIZE` constant (currently set to 4) as well as the default **line-limit** by modifying the `LINE_LIMIT` constant (currently set to 80) at the top of the `qclean/source/main.c` file. Of course, after any such modification, you need to re-build the QClean executable and copy it into the qtools/bin directory.
 
 
-@n
+<br>
 @attention
 For best code portability, QClean enforces the consistent use of the specified End-Of-Line convention (typically Unix (LF)), **regardless of the native EOL of the platform**. The DOS/Windows EOL convention (CR,LF) is typically not applied because it causes compilation problems on Unix-like systems (Specifically, the C preprocessor doesn't correctly parse the multi-line macros.) On the other hand, most DOS/Windows compilers seem to tolerate the Unix EOL convention without problems.
 

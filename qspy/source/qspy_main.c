@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-01-27
+* @date Last updated on: 2022-03-02
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -827,9 +827,10 @@ char const* QSPY_tstampStr(void) {
 }
 
 /*--------------------------------------------------------------------------*/
-/* color output to the terimal */
+/* color output to the terminal */
 
 /* terminal colors */
+#define B_DFLT_EOL "\x1b[K\x1b[0m"
 #define B_DFLT     "\x1b[0m"
 #define B_BLACK    "\x1b[40m"
 #define B_RED      "\x1b[41m"
@@ -1001,15 +1002,17 @@ static void colorPrintLn(void) {
             break;
         }
         }
+        fputs(B_DFLT "\n", stdout);
     }
     else if (QSPY_output.type == INF_OUT) {
         fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        fputs(B_DFLT_EOL "\n", stdout);
     }
     else { /* ERR_OUT */
         fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        fputs(B_DFLT_EOL "\n", stdout);
     }
-    fputs(B_DFLT "\n", stdout);
 }
 

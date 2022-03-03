@@ -15,13 +15,13 @@
 <p>QView&trade; is a powerful **Visualization and Monitoring** facility, which allows embedded developers to rapidly create **remote graphical user-interfaces** to monitor and control their embedded devices from a host (desktop) computer. The interfaces created by QView&trade; can visualize the tracing data produced by @ref qpspy "QP/Spy" and can also **interact with the target** by sending commands and injecting events to the embedded target.
 </p>
 
-As you can see in the screen shots below, a QView&trade; user interface consists of the text box with extensible menus plus a **customizable canvas** that can serve as a remote graphical user-interface to your embedded device. The canvas can contain various "widgets", such as buttons, sliders, guages, graphs, animations etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QView&trade; provides only a skeleton, which is then @ref qview_cust "customized" by user-supplied scripts written in <a href="https://www.python.org" class="extern"><b>Python</b></a> (version 3).
+As you can see in the screen shots below, a QView&trade; user interface consists of a text box with extensible menus plus a **customizable canvas** that can serve as a remote graphical user-interface to your embedded device. The canvas can contain various "widgets", such as buttons, sliders, gauges, graphs, animations, etc. The actual functionality of the _virtual GUI_ obviously depends on the target system and the embedded code it is running. Therefore, the QView&trade; provides only a skeleton, which is then @ref qview_cust "customized" by user-supplied scripts written in <a href="https://www.python.org" class="extern"><b>Python</b></a> (version 3).
 
 <div style="clear:both;"></div>
 
 @image html qview_ex.gif "Example of a QView&trade; session on an embedded board (Windows host)"
 
-@n
+<br>
 @image html qview_dpp-fedora.gif "Example of a QView&trade; session (Linux host)"
 
 
@@ -38,17 +38,17 @@ Out of the box, QView&trade; supports the following @ref qview_ui "commands" (<s
 - Peek data inside the Target and send to QView&trade;
 - Poke data (supplied from QView&trade;) into the Target
 - Execute clock tick inside the Target
-- Remotely reset the Target
+- Remotely reset the Target.
 
 @note
-A visualization and monitoring system like QView&trade; can be used in all stages of development, manufacturing, and after the deployment, for in-field servicing of embedded devices.
+A visualization and monitoring system like QView&trade; can be used in all stages of development, during manufacturing, and also after deployment for in-field servicing of embedded devices.
 
 
 @section qview_struct QView&trade; Structure
 The sequence diagram below shows the general structure of QView&trade;. The embedded Target is running an instrumented code that communicates with the @ref qspy "QSPY Host application" over the @ref qspy_link "Target data link" (<span style="color:red"><strong>red arrows</strong></span>). This communication is based on the @ref qpspy_proto "QP/Spy Protocol".
 
 @attention
-The Target must be running the "Spy" build configuration, in which the @ref qpspy is enabled. Additionally, the QP/Spy implementation in the Target must support the @ref qpspy_rx "bi-directional" communication with @ref qspy "QSPY".
+The Target must be running the "Spy" build configuration, in which the @ref qpspy is enabled. Additionally, the QP/Spy implementation in the Target must support @ref qpspy_rx "bi-directional" communication with @ref qspy "QSPY".
 
 
 The QView&trade; (Python script) attaches to the QSPY host application by means of the @ref qspy_udp "UDP socket" that QSPY opens specifically for attaching various "front-ends". This communication (<span style="color:blue"><strong>blue arrows</strong></span>) uses the same packet structure as the @ref qpspy_proto "QP/Spy Protocol", but without the HDLC framing, without transparency (escaping), and without the checksum.
@@ -79,7 +79,7 @@ The <span class="img file_py">qview.py</span> script can be used standalone, wit
 The <span class="img file_py">qview.py</span> script is included in the @ref qtools_about "QTools&trade; collection". Also, the @ref qtools_win "QTools&trade; collection for Windows" already includes Python (3.8), so you don't need to install anything extra.
 
 
-Alternatively, you can use *your own Python** installation, into which you can install the latest QView&trade; with `pip` from the [<b>PyPi index</b>](https://pypi.org/project/qview/) by executing the following command:
+Alternatively, you can use **your own Python** installation, into which you can install the latest QView&trade; with `pip` from the [<b>PyPi index</b>](https://pypi.org/project/qview/) by executing the following command:
 
 @verbatim
 pip install qview
@@ -101,11 +101,11 @@ qview [cust_script] [qspy_host[:udp_port]] [local_port]
 
 
 @subsection qview_command Command-line Options
-- `cust_script` - optional @ref qview_cust "customization Python script" for your specific target system. If not specified, qview will provide only the @ref qview_ui "generic user interface" for interacting with the target (e.g., reset, setting QS filters, posting events, etc.)
+- `cust_script` &mdash; optional @ref qview_cust "customization Python script" for your specific target system. If not specified, qview will provide only the @ref qview_ui "generic user interface" for interacting with the target (e.g., reset, setting QS filters, posting events, etc.).
 
-- `qspy_host[:udp_port]` - optional host-name/IP-address:port for the host running the QSPY host utility. If not specified, the default is 'localhost:7701'.
+- `qspy_host[:udp_port]` &mdash; optional host-name/IP-address:port for the host running the QSPY host utility. If not specified, the default is 'localhost:7701'.
 
-- `local_port` - optional the local UDP port to be used by "qview". If not specified, the default is '0', which means that the operating system will choose an open port.
+- `local_port` &mdash; optional local UDP port to be used by "qview". If not specified, the default is '0', which means that the operating system will choose an open port.
 
 
 @subsection qview_exa Examples
@@ -165,21 +165,21 @@ opens "qview" (**installed with pip**) with the customization provided in the dp
 
 
 @note
-In practice, the easiest way to launch QView&trade; is to define a <strong>shortcut</strong>, like the one provided with the DPP example:@n@n
+In practice, the easiest way to launch QView&trade; is to define a <strong>shortcut</strong>, like the one provided with the DPP example:<br>@n
 @image html qview_shortcut.gif "qview shortcut properties"
 
 
 @section qview_attaching Attaching QView to QSPY
 In contrast to TCP, which is stream-oriented, UDP is packet-oriented, so the only way to "attach" two ends of communication is to exchange packets. Consequently, immediately after QView&trade; is launched, it tries to **attach** by sending the @ref udp_ATTACH "ATTACH" packet to QSPY. If QSPY responds with the @ref udp_in_ATTACH "ATTACH" response, QView&trade; considers that it is "attached".
 
-However, if the @ref udp_in_ATTACH "ATTACH" response does not arrive within a second or two (because perhaps QSPY is not running), QView&trade; opens a modal dialog box that reminds you to run QSPY, as shown in the screen-shot below:
+However, if the @ref udp_in_ATTACH "ATTACH" response does not arrive within a second or two (perhaps because QSPY is not running), QView&trade; opens a modal dialog box that reminds you to run QSPY, as shown in the screen-shot below:
 
 @image html qview_attach.gif "Attach to QSPY dialog box"
-qview_before.gif
-Depending how you start @ref qspy "QSPY", the dialog box might close automatically, which means that QView has successfully **attached** to QSPY. However, if the dialog box does not close, you need to click the **Attach** button to send @ref udp_ATTACH "ATTACH" packet to QSPY, until QView&trade; receives the @ref udp_in_ATTACH "ATTACH" response from QSPY. If you can't "attach", you can click the **Close** button to close QView&trade;.
+
+Depending how you start @ref qspy "QSPY", the dialog box might close automatically, which means that QView has successfully **attached** to QSPY. However, if the dialog box does not close, you need to click the **Attach** button to send @ref udp_ATTACH "ATTACH" packets to QSPY, until QView&trade; receives the @ref udp_in_ATTACH "ATTACH" response from QSPY. If you can't "attach", you can click the **Close** button to close QView&trade;.
 
 @note
-Because UDP works over networks, the QSPY Back-End can run on a **different machine** (e.g., a lab computer) that the the QView&trade; Front-End (e.g., office computer). These two machines can even run different operating systems, for example Linux on the lab computer and Windows in the office, or vice versa. All you need to do is to provide the host-name parameter as the <em>third</em> command-line argument to the <span class="img file_py">qview.py</span> script (e.g., `python3 qview.py dpp.py 192.168.1.101`).
+Because UDP works over networks, the QSPY Back-End can run on a **different machine** (e.g., a lab computer) than the QView&trade; Front-End (e.g., office computer). These two machines can even run different operating systems, for example Linux on the lab computer and Windows in the office, or vice versa. All you need to do is to provide the host-name parameter as the <em>third</em> command-line argument to the <span class="img file_py">qview.py</span> script (e.g., `python3 qview.py dpp.py 192.168.1.101`).
 
 
 @subsection qview_tstamp Recognizing the Target
@@ -214,7 +214,7 @@ The **main menu** includes several useful commands, which are quickly reviewed a
 
 
 @section qview_file File Menu
-The File menu provides interface to the @ref qspy_saving "QSPY saving files" feature. This menu allows you to trigger QSPY to save @ref qspy_dict "dictionaries", as well as to open/close all other file formats supported by QSPY.
+The File menu provides an interface to the @ref qspy_saving "QSPY saving files" feature. This menu allows you to trigger QSPY to save @ref qspy_dict "dictionaries", as well as to open/close all other file formats supported by QSPY.
 
 @image html qview_file.gif
 
@@ -239,9 +239,9 @@ The Global Filter menu opens dialog boxes for each *group* of global filters. Fo
 
 @note
 The Global-Filters menu reflects the status of the whole group by the following status-indicators:
-- `[-]`- no filters in the group selected
-- `[+-]` - some filters in the group selected
-- `[+]` - all filters in the group selected
+- `[-]`  &mdash;  no filters in the group are selected
+- `[+-]` &mdash; some filters in the group are selected
+- `[+]` &mdash; all filters in the group are selected.
 
 
 @section qview_loc Local Filters Menu
@@ -253,9 +253,9 @@ The Local Filter menu opens dialog boxes for each *group* of local filters. For 
 
 @note
 The Local-Filters menu reflects the status of the whole group by the following status-indicators:
-- `[-]`- no filters in the group selected
-- `[+-]` - some filters in the group selected
-- `[+]` - all filters in the group selected
+- `[-]` &mdash; no filters in the group are selected
+- `[+-]` &mdash; some filters in the group are selected
+- `[+]` &mdash; all filters in the group are selected.
 
 
 @section qview_curr Current-Obj Menu
@@ -266,11 +266,11 @@ The Curr-Obj menu opens dialog boxes for each local current object. For example,
 @image html qview_curr_dlg.gif "Current Object AO_OBJ Dialog Box"
 
 @note
-The Curr-Obj menu reflects the selected current objects, which are listed to the right of the filter (e.g. `Table_inst`).
+The Curr-Obj menu reflects the selected current objects, which are listed to the right of the filter (e.g., `Table_inst`).
 
 
 @section qview_commands Commands Menu
-The Commands menu allows you to execute simple commands (without parameters) in the Target, such as Reset the Target, Query the Target, and clock Tick at rate 0 and rate 1. Also, this menu allows you to execute commands with parameters, which are quickly discussed below
+The Commands menu allows you to execute simple commands (without parameters) in the Target, such as Reset the Target, Query the Target, and clock Tick at rate 0 and rate 1. Also, this menu allows you to execute commands with parameters, which are briefly discussed below.
 
 @image html qview_cmd.gif "Commands Menu"
 
@@ -280,7 +280,7 @@ The "User Command..." menu allows you to invoke a command in the Target and pass
 
 @image html qview_cmd_dlg.gif "Command Dialog Box"
 
-The screen shot above shows how to execute User Command number `0` with the parameters: `12345`, `0xDEADBEEF` and `0` (default). Both the command number and the parameters can be specified in hexadecimal (with the `0x` prefix).
+The screen shot above shows how to execute User Command number `0` with the parameters `12345`, `0xDEADBEEF` and `0` (default). Both the command number and the parameters can be specified in hexadecimal (with the `0x` prefix).
 
 
 @subsection qview_peek Peek Command
@@ -297,9 +297,9 @@ The Peek Command can be used to view any **readable** address, such as ROM, RAM,
 As shown in the screen shot below, the PEEK command takes additionally the offset into the object [bytes] (offset of 0 is default if not specified), the size of the item [8-bit, 16-bit, 32-bit] and the number of units (n-units) [1..255] you wish to "peek".
 
 @image html qview_cmd_peek.gif "Peek Command Dialog Box"
-@n
+<br>
 
-The Target responds with a #QS_PEEK_DATA trace record, which you can view in QSPY human-readable output (the packet is also sent to QView, where you can react to it in your @ref qview_cust "customization".)
+The Target responds with a #QS_PEEK_DATA trace record, which you can view in QSPY human-readable output (the packet is also sent to QView, where you can react to it in your @ref qview_cust "customization").
 
 @verbatim
 4294965703 Trg-Peek Offs=0,Size=4,Num=4,Data=<20000D2C,20000D2C,20000D74,000A0008>
@@ -320,7 +320,7 @@ The Poke Command can be used to change any **writable** address, such as RAM, bu
 As shown in the screen shot below, the POKE command takes additionally the  offset into the object [bytes], the size of the item [8-bit, 16-bit, 32-bit], and the data to "poke", which can be either decimal or hexadecimal (`0x` prefix).
 
 @image html qview_cmd_poke.gif "Poke Command Dialog Box"
-@n
+<br>
 
 The Target responds with `Trg-Ack  QS_RX_POKE`:
 
@@ -333,11 +333,11 @@ The Target responds with `Trg-Ack  QS_RX_POKE`:
 The "Events" menu allows you to Publish, Post, or Dispatch an event to the Target. Additionally, you can also "Initialize" a state machine by triggering the top-most initial transition in it.
 
 @attention
-The "Post..." menu requires the "Current-Obj AO_OBJ" to be set in the @ref qview_curr, because this is the Ative Object within the Target which will be "posted". The "Dispatch..." and "Init SM..." menus require the "Current-Obj SM_OBJ" to be set in the @ref qview_curr, because this is the State Machine within the Target which will be "dispatched" or "initialized". These menus are **inactive** (grayed-out) when the expected "Current-Objects" are not specified.
+The "Post..." menu requires the "Current-Obj AO_OBJ" to be set in the @ref qview_curr, because this is the Active Object within the Target which will be "posted". The "Dispatch..." and "Init SM..." menus require the "Current-Obj SM_OBJ" to be set in the @ref qview_curr, because this is the State Machine within the Target which will be "dispatched" or "initialized". These menus are **inactive** (grayed-out) when the expected "Current-Objects" are not specified.
 
 @image html qview_evt_dlg.gif "Events Menu with Post-Event Dialog Box"
 
-As shown in the screen-shot above, you define the custom event by providing the sig (signal), which can be either symbolic name (must correspond to the Signal Dictionary) or a numerical value.
+As shown in the screen-shot above, you define the custom event by providing the sig (signal), which can be either its symbolic name (must correspond to the Signal Dictionary) or a numerical value.
 
 The signal is followed by up to 9 optional event parameters par1..par9. Each parameter is specified as a pair of the size of the parameter [8-bit, 16-bit, 32-bit], and the value of the parameter, which can be either decimal or hexadecimal (`0x` prefix).
 
@@ -346,7 +346,7 @@ The parameters are sent using the **endianness** reported by the Target. Also, a
 
 
 @section qview_custom Custom Menu
-This top-level menu is provided for your customization. It's intent is to let you add your own commands in your script.
+This top-level menu is provided for your customization. Its intent is to let you add your own commands in your script.
 
 @image html qview_cust.gif
 
@@ -368,7 +368,7 @@ This menu allows you to access the online Q-SPY help in HTML, and also allows yo
 QView&trade; has been specifically designed for extensibility, so that you can customize its behavior to your specific project. In fact, as mentioned in the section about @ref qview_run "running QView", the <span class="img file_py"><b>qview.py</b></span> script takes the `<cust-script>` @ref qview_command "command-line parameter", which is another Python script designed specifically to extend and customize the basic functionality. This section describes how to write this @ref qview_script "customization script", so that you can turn QView&trade; into a powerful remote **Human-Machine Interface** (HMI) for your embedded system.
 
 @remark
-You don't need to change the <span class="img file_py"><b>qview.py</b></span> script to customize and extend it for your project. The customization you make go into a separate script, which is specific to your project. That way, you can have many different customization scripts and you don't pollute (and possibly break) the original code.
+You don't need to change the <span class="img file_py"><b>qview.py</b></span> script to customize and extend it for your project. The customizations you make go into a separate script, which is specific to your project. That way, you can have many different customization scripts and you don't pollute (and possibly break) the original code.
 
 
 @section qview_cust_menu Custom Menu
@@ -382,15 +382,15 @@ The main part of the QView&trade; interface that you customize for your specific
 
 @image html qview_canv_dpp.gif "Custom Canvas for the DPP Application"
 
-@n
+<br>
 @note
-QView&trade; GUI is based on the [<b>Tkinter</b>](https://docs.python.org/3/library/tkinter.html) and therefore it is highly recommended that you get familiar with this Python library. Specifically of interest for customizing QView&trade; is the [<b>Tkinter Canvas</b>](https://www.tutorialspoint.com/python/tk_canvas.htm).@n
-@n
-Many Python widget libraries (e.g. [tk_tools](https://github.com/slightlynybbled/tk_tools), etc.) are available to aid you in developing your custom canvas. With such widget libraries, you can display the data in an attractive form: as gauges, bars, graphs, and sliders. The attractiveness of the GUI is limited only by your creativity.
+QView&trade; GUI is based on [<b>Tkinter</b>](https://docs.python.org/3/library/tkinter.html) and therefore it is highly recommended that you get familiar with this Python library. Specifically of interest for customizing QView&trade; is the [<b>Tkinter Canvas</b>](https://www.tutorialspoint.com/python/tk_canvas.htm).<br>
+<br>
+Many Python widget libraries (e.g., [tk_tools](https://github.com/slightlynybbled/tk_tools), etc.) are available to aid you in developing your custom canvas. With such widget libraries, you can display the data in an attractive form: as gauges, bars, graphs, and sliders. The attractiveness of the GUI is limited only by your creativity.
 
 
 @section qview_script Customization Script
-The easiest way to customize QView is to copy the provided example script (<span class="img file_py">dpp.py</span> located in <span class="img folder"><qpc|qpcpp>/examples/workstation/dpp/qview</span> folder), rename it, and add your own extensions. The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
+The easiest way to customize QView is to copy the provided example script (<span class="img file_py">dpp.py</span>, located in <span class="img folder"><qpc|qpcpp>/examples/workstation/dpp/qview</span> folder), rename it, and add your own extensions. The explanation section following the listing clarifies the interesting lines of code (lines starting with `[xx]` labels).
 
 @code{py}
 [1]  class DPP:
@@ -490,28 +490,28 @@ The easiest way to customize QView is to copy the provided example script (<span
 @subsection qview_cust_init Initialization
 
 <dl class="tag">
-  <dt>1</dt><dd> Every QView&trade; customization consists of a Python __class__, which does not extend any other class and can be called with any name you see fit.
+  <dt>1</dt><dd> Every QView&trade; customization consists of a Python __class__ which does not extend any other class and can be called with any name you see fit.
   </dd>
   <dt>2</dt><dd> The constructor of your customization class sets up the GUI and optionally resets the target.
   </dd>
   <dt>3</dt><dd> The reset_target() command allows you to remotely reset the embedded Target.
-> **NOTE:** Normally, for an embedded application you would like to start with resetting the Target, to start clean with @ref qs_dict "QS dictionaries", etc. However, if you run your application on the **host** (e.g., `<qpc|qpcpp>/examples/workstation/dpp`), you typically don't want to reset the target. Instead, you simply launch the host executable *after* opening QView&trade;, so that it will "see" all the QS dictionaries, etc. This alternative is shown in the DPP example for the host located in `<qpc|qpcpp>/examples/workstation/dpp`).
+> **NOTE:** Normally for an embedded application, you would like to start with resetting the Target, to start clean with @ref qs_dict "QS dictionaries", etc. However, if you run your application on the **host** (e.g., `<qpc|qpcpp>/examples/workstation/dpp`), you typically *don't* want to reset the target. Instead, you simply launch the host executable *after* opening QView&trade;, so that it will "see" all the QS dictionaries, etc. This alternative is shown in the DPP example for the host located in `<qpc|qpcpp>/examples/workstation/dpp`).
   </dd>
   <dt>4</dt><dd> The @ref qview.QView.custom_menu "QView.custom_menu" object allows you to extend the @ref qview_custom "Custom Menu" with your own commands. Here, you just add the command "Custom command". Later you will write the function that handles this menu item.
-> **NOTE:** The @ref qview.QView.custom_menu "QView.custom_menu" object uses the [Tkinter Menu interface](https://www.tutorialspoint.com/python/tk_menu.htm)
+> **NOTE:** The @ref qview.QView.custom_menu "QView.custom_menu" object uses the [Tkinter Menu interface](https://www.tutorialspoint.com/python/tk_menu.htm).
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
 @subsection qview_cust_canvas Setting Up the Canvas
-The Custom Canvas is setup in the **constructor** of the customization clss `__init__(self)`) using the @ref qview.QView.canvas "QView.canvas" object:
+The Custom Canvas is set up in the **constructor** of the customization class `__init__(self)`) using the @ref qview.QView.canvas "QView.canvas" object:
 
 <dl class="tag">
   <dt>5</dt><dd> The @ref qview.QView.show_canvas() "QView.show_canvas()" function lets you @ref  show the canvas from the beginning. This corresponds to setting the Canvas checkbox in the @ref qview_view.
   </dd>
-  <dt>6</dt><dd> The @ref qview.QView.canvas "QView.canvas" object can be configured to the desired size using the standard tkinter functionality.
-> **NOTE:** The @ref qview.QView.canvas "QView.canvas" object uses the [Tkinter Canvas interface](https://www.tutorialspoint.com/python/tk_canvas.htm)
+  <dt>6</dt><dd> The @ref qview.QView.canvas "QView.canvas" object can be configured to the desired size using the standard Tkinter functionality.
+> **NOTE:** The @ref qview.QView.canvas "QView.canvas" object uses the [Tkinter Canvas interface](https://www.tutorialspoint.com/python/tk_canvas.htm).
   </dd>
   <dt>7-8</dt><dd> You need to organize the GUI elements for the canvas, so that they easily map to your specific customization. Here, the images representing the Dining Philosophers activities and Philosophers themselves sitting around the table are represented as [Python tuples](https://www.tutorialspoint.com/python/python_tuples.htm).
 > **NOTE:** The proper design of the data structures for your application can vastly simplify the customization script. Please remember to take advantage of the rich Python data structures, such as lists, tuples, dictionaries and arrays.
@@ -523,10 +523,10 @@ The Custom Canvas is setup in the **constructor** of the customization clss `__i
 
 
 @subsection qview_cust_reset The on_reset() Callback
-The main <span class="img file_py"><b>qview.py</b></span> script calls the on_reset() callback function in your customization script when it receives the @ref #QS_TARGET_INFO "reset packet" from the Target. This gives you an opportunity to clear your internal data structures to get them ready for new data coming from the Target (e.g. @ref qs_dict).
+The main <span class="img file_py"><b>qview.py</b></span> script calls the on_reset() callback function in your customization script when it receives the @ref #QS_TARGET_INFO "reset packet" from the Target. This gives you an opportunity to clear your internal data structures to get them ready for new data coming from the Target (e.g., @ref qs_dict).
 
 <dl class="tag">
-  <dt>10</dt><dd> The @ref on_reset() callback must be member of the customization class (note the `self` parameter).
+  <dt>10</dt><dd> The @ref on_reset() callback must be a member of the customization class (note the `self` parameter).
   </dd>
   <dt>11</dt><dd> Here, the callback clears the internal lists used by customization.
   </dd>
@@ -542,7 +542,7 @@ The **symbolic names** inside the Target are known to QSPY only *after* the Targ
 
 
 <dl class="tag">
-  <dt>20</dt><dd> The @ref on_run() callback must be member of the customization class (note the `self` parameter).
+  <dt>20</dt><dd> The @ref on_run() callback must be a member of the customization class (note the `self` parameter).
   </dd>
   <dt>21</dt><dd> Here, the callback sets the @ref qs_global "Global Filter" by means of the glb_filter() facility provided in the <span class="img file_py"><b>qview.py</b></span> script.
   </dd>
@@ -554,20 +554,20 @@ The **symbolic names** inside the Target are known to QSPY only *after* the Targ
 <div style="clear:both;"></div>
 
 @note
-The glb_filter(), current_obj(), and loc_filter() facilities in QView&trade; are **identical** as in the @ref qutest "QUTest". This commonality between @ref qview "QView&trade;" and @ref qutest "QUTest&trade;" is intentional.
+The glb_filter(), current_obj(), and loc_filter() facilities in QView&trade; are **identical** to those in the @ref qutest "QUTest". This commonality between @ref qview "QView&trade;" and @ref qutest "QUTest&trade;" is intentional.
 
 
 @subsection qview_cust_cmd Custom Commands
-The Custom Command added either to the @ref qview.QView.custom_menu "QView.custom_menu" or attached to the Canvas elements need to be implemented as a member functions of the customization class:
+The Custom Commands, added either to the @ref qview.QView.custom_menu "QView.custom_menu" or attached to the Canvas elements, need to be implemented as member functions of the customization class:
 
 <dl class="tag">
-  <dt>30</dt><dd> The function name must match the `command=self.cust_command` parameter in the `menu.add_command()` (see step [4] of the script)
+  <dt>30</dt><dd> The function name must match the `command=self.cust_command` parameter in the `menu.add_command()` (see step [4] of the script).
   </dd>
   <dt>31</dt><dd> Here, the function invokes the command() facility provided in the <span class="img file_py"><b>qview.py</b></span> script.
   </dd>
   <dt> </dt><dd>&nbsp;
   </dd>
-  <dt>40</dt><dd> The function name must match the `...tag_bind(... self.cust_pause)` parameter (see step [9] of the script)
+  <dt>40</dt><dd> The function name must match the `...tag_bind(... self.cust_pause)` parameter (see step [9] of the script).
   </dd>
   <dt>41</dt><dd> Here, the function **checks the Canvas elements** (using the standard Tkinter functionality).
   </dd>
@@ -581,11 +581,12 @@ The Custom Command added either to the @ref qview.QView.custom_menu "QView.custo
 <div style="clear:both;"></div>
 
 @note
-The command() and post() facilities in QView&trade; are **identical** as in the @ref qutest "QUTest". This commonality between @ref qview "QView&trade;" and @ref qutest "QUTest&trade;" is intentional.
+The command() and post() facilities in QView&trade; are **identical** to those in the @ref qutest "QUTest". This commonality between @ref qview "QView&trade;" and @ref qutest "QUTest&trade;" is intentional.
 
 
 @subsection qview_cust_handler Custom Packet Handlers
 The most important feature of QView&trade; is that it can display the **live** status of the embedded system. QView&trade; achieves it by receiving the QS software tracing packets from the Target. Consequently, one of the most important activities of the customization script is to intercept and parse the incoming packets.
+
 
 To this end, the <span class="img file_py"><b>qview.py</b></span> script provides special accumulations:
 
@@ -595,28 +596,28 @@ To this end, the <span class="img file_py"><b>qview.py</b></span> script provide
 
 
 <dl class="tag">
-  <dt>50</dt><dd> The packet-handler name must match the enumeration #QSpyRecords. Here, the packet-handler is for the #QS_USER_00 trace record
+  <dt>50</dt><dd> The packet-handler name must match the enumeration #QSpyRecords. Here, the packet-handler is for the #QS_USER_00 trace record.
   </dd>
-  <dt>51</dt><dd> Here, the packet-handler calls the qunpack() facility to "unpack" the binary data form the received packet into the Python tuple `data`. Each element in this tuple corresponds to the explicitly specified format. For example, with the format "xxTxBxZ": the "T" format (timestamp) is unpacked into `data[0]`, the "B" format (byte) is unpacked into `data[1]`, and the "Z" format (zero-terminated ASCII string) is unpacked into `data[2]`. Subsequently, in the body of the function the `data[]` elements are used according to their meaning.
+  <dt>51</dt><dd> Here, the packet-handler calls the qunpack() facility to "unpack" the binary data from the received packet into the Python tuple `data`. Each element in this tuple corresponds to the explicitly specified format. For example, with the format "xxTxBxZ": the "T" format (timestamp) is unpacked into `data[0]`, the "B" format (byte) is unpacked into `data[1]`, and the "Z" format (zero-terminated ASCII string) is unpacked into `data[2]`. Subsequently, in the body of the function, the `data[]` elements are used according to their meaning.
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 @note
-The qunpack() facility "understands" all formats supported by the Python `struct.unpack()` plus formats specific to the QP/Spy, such as: "T" for timestamp, "S" for event signal, ""
+The qunpack() facility "understands" all formats supported by the Python `struct.unpack()` plus formats specific to QP/Spy, such as: "T" for timestamp, "S" for event signal, ""
 
 
 @subsection qview_cust_set Registering Customization in QView&trade;
 
 <dl class="tag">
-  <dt>60</dt><dd> Every QView&trade; customization script must end with a call to @ref qview.QView.customize() "QView.customize()" function, to which you need to pass the instance of your Customization class (here your `DPP` class).
+  <dt>60</dt><dd> Every QView&trade; customization script must end with a call to the @ref qview.QView.customize() "QView.customize()" function, to which you need to pass the instance of your Customization class (here, your `DPP` class).
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
-@subsection qview_pre App-Specific Vs. Predefined Trace Records
-The customization script discussed in the previous section was based on the @ref qs_app "application-specific trace record" (`QS_USER_00`), which was specifically produced by the DPP application. This trace record delivered the information abou the changing status of the Dining Philosophers, which allowed the customization script to animate the Philosopher images on the custom canvas.
+@subsection qview_pre App-Specific vs. Predefined Trace Records
+The customization script discussed in the previous section was based on the @ref qs_app "application-specific trace record" (`QS_USER_00`), which was specifically produced by the DPP application. This trace record delivered the information about the changing status of the Dining Philosophers, which allowed the customization script to animate the Philosopher images on the custom canvas.
 
 However, it is also possible to use a different strategy based on the @ref qs_pre "predefined QS trace records". The advantage is that **no additional instrumentation** is needed in the application, because the information is already produced by the framework. All you need to do is to enable (in the global filter) the appropriate QS trace record.
 
@@ -680,7 +681,7 @@ class DPP:
     . . .
 @endcode
 
-@n
+<br>
 @note
 The presented strategy of intercepting the @ref qs_dict "QS dictionary" records #QS_OBJ_DICT and #QS_FUN_DICT is quite generic and can be easily adapted in your own customization scripts.
 
@@ -702,8 +703,7 @@ Here is the summary of commands that you can use in the QView scripts:
 - publish()
 - init()
 - dispatch()
-- qunpack()
+- qunpack().
 
 @nav{qutest,qwin}
 */
-

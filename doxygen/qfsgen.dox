@@ -3,23 +3,23 @@
 @tableofcontents
 @nav{qclean,history}
 
-<p><strong>QFSGen</strong> is a cross-platform, command-line utility that generates a ROM-based file system, which can be incorporated in a C source code. Specifically, QFSGen utility generates a C header file that contains a bunch of constant byte arrays representing your files and directories. This generated header file (named `fsdata.h` by default) can be subsequently included in the ROM-Based File System implementation.
+<p><strong>QFSGen</strong> is a cross-platform, command-line utility that generates a ROM-based file system, which can be incorporated in a C source. Specifically, the QFSGen utility generates a C header file that contains multiple constant byte arrays representing your files and directories. This generated header file (named `fsdata.h` by default) can be subsequently included in a ROM-Based File System implementation.
 </p>
 
-QFSGen is deployed as natively compiled executable and is located in the sub-directory <span class="img folder">qtools/bin/</span>. QFSGen is available in portable source code and can be compiled on all desktop platforms (Windows and POSIX -- Linux, macOS...).
+QFSGen is deployed as a natively compiled executable and is located in the sub-directory <span class="img folder">qtools/bin/</span>. QFSGen is available in portable source code and can be compiled on all desktop platforms (Windows and POSIX&mdash;Linux, macOS...).
 
 @note
 The main motivation for the QFSGen utility is to generate ROM-based file systems for embedded HTTP servers. However, the utility can be used for any ROM-based file systems.
 
 
 @section qfsgen_usage QFSGen Usage
-You use the QFSGen utility from command-prompt. First, change current directory to the directory, where you wish to generate the C header file (named `fsdata.h` by default) and type:
+You use the QFSGen utility from a command-prompt. First, change the current directory to the directory where you wish to generate the C header file (named `fsdata.h` by default) and type:
 
 @verbatim
 qfsgen website -h
 @endverbatim
 
-where `website` is a directory, which contains the files and sub-directories you wish to include into your ROM-based file system. This particular QFSGen invocation will generate the file-system found in the directory `website` with HTTP headers (`-h` option).
+where `website` is a directory which contains the files and sub-directories you wish to include into your ROM-based file system. This particular QFSGen invocation will generate the file-system found in the directory `website` with HTTP headers (`-h` option).
 
 @image html qfsgen_run.png "Example run of the QFSGen utility"
 

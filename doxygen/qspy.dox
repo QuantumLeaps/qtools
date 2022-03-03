@@ -4,22 +4,22 @@
 @nav{qs,qspy_text}
 
 @section qspy_about About QSPY
-<p>As described in the @ref qpspy "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a simple console application without a GUI, because its main purpose is to provide @ref qspy_link "communication" with the @ref qs "QS target-resident component", parsing of the @ref qpspy_proto "QP/Spy Data Protocol" and displaying the data in a simple @ref qspy_text "human-readable format".
+<p>As described in the @ref qpspy "previous section", **QSPY** is the host-resident component in the QP/Spy software tracing system. QSPY is a simple console application without a GUI, because its main purpose is to provide @ref qspy_link "communication" with the @ref qs "QS target-resident component", parsing of the @ref qpspy_proto "QP/Spy Data Protocol", and displaying the data in a simple @ref qspy_text "human-readable format".
 </p>
 
 ![QSPY host application](qspy.png)
 
 
-QSPY can also export the data in various other formats, such as format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and format suitable for generating @ref qspy_seq "sequence diagrams". Additionally, QSPY can also save the symbolic information about the Target objects in form of @ref qspy_dict "QSPY dictionaries". An example of a @ref qpspy_exa "QSPY session" is shown in the Introduction to QP/Spy.
+QSPY can also export the data in various other formats, such as a format suitable for @ref qspy_matlab "MATLAB/GNU-Octave", and a format suitable for generating @ref qspy_seq "sequence diagrams". Additionally, QSPY can also save the symbolic information about the Target objects in the form of @ref qspy_dict "QSPY dictionaries". An example of a @ref qpspy_exa "QSPY session" is shown in the Introduction to QP/Spy.
 
-Finally, QSPY supports also extensible @ref qspy_udp "UDP-socket" connection, which allows it to serve as a <em>"Back-End"</em> for attaching various "Front-Ends" (such as the @ref qutest "QUTest" Front-End and @ref qview "QView" Front-End).
+Finally, QSPY also supports an extensible @ref qspy_udp "UDP-socket" connection, which allows it to serve as a <em>"Back-End"</em> for attaching various "Front-Ends" (such as the @ref qutest "QUTest" Front-End and @ref qview "QView" Front-End).
 
 @remark
 QSPY is written in portable C with ports to Windows and POSIX (Linux, macOS) provided. QSPY is also designed to be adaptable to various target-host communication links. Out of the box, the QSPY host application supports serial (RS232), TCP/IP, and file communication links. Adding other communication links is straightforward, because the data link is accessed only through a generic Platform Abstraction Layer (PAL).
 
 
 @section qspy_command QSPY Command-Line Parameters
-<p>The QSPY application accepts several command-line parameters to configure the data link to the Target, backwards-compatibly with previous versions, and target dependencies, such as pointer sizes, signal sizes, etc. This means that the single QSPY host application can process data from any Target running the QS component. QSPY has been tested with wide range of 8-, 16-, 32-, and 64-bit CPUs.
+<p>The QSPY application accepts several command-line parameters to configure the data link to the Target, backwards-compatibly with previous versions, and target dependencies, such as pointer sizes, signal sizes, etc. This means that the single QSPY host application can process data from any Target running the QS component. QSPY has been tested with a wide range of 8-, 16-, 32-, and 64-bit CPUs.
 </p>
 
 The general form of invoking QSPY is as follows:
@@ -65,7 +65,7 @@ Usage: qspy [options]     <arg> = required, [arg] = optional
     <td>-u</td>
     <td>7701</td>
     <td></td>
-    <td>UDP socket for "Front-Ends".<br>`-u0` suppresses opening the UPD socket </td>
+    <td>UDP socket for "Front-Ends".<br>`-u0` suppresses opening the UDP socket </td>
   </tr>
 
   <tr>
@@ -167,7 +167,7 @@ Usage: qspy [options]     <arg> = required, [arg] = optional
 
   <tr>
     <TD colspan="5"><strong>Options for configuring Target object sizes:</strong>
-The Target can **report** it's configuration to QSPY, which means that you don't need to provide any upper-case options (such as: `-T`, `-O`, `-F`, etc.).
+The Target can **report** its configuration to QSPY, which means that you don't need to provide any upper-case options (such as: `-T`, `-O`, `-F`, etc.).
     </td>
   </tr>
 
@@ -255,12 +255,7 @@ The Target can **report** it's configuration to QSPY, which means that you don't
 </table>
 
 
-Your main concern when invoking QSPY is to match exactly the target system you
-are using. The fourth column of the table above lists the configuration macros
-used by the target system as well as the platform-specific QP header files
-where those macros are defined. You need to use the corresponding QSPY
-command-line option only when the QP macro differs from the default. The
-default values assumed by QSPY are consistent with the defaults used in QP.
+Your main concern when invoking QSPY is to match exactly the target system you are using. The fourth column of the table above lists the configuration macros used by the target system as well as the platform-specific QP header files where those macros are defined. You need to use the corresponding QSPY command-line option only when the QP macro differs from the default. The default values assumed by QSPY are consistent with the defaults used in QP.
 
 @note
 When you do not match the QSPY host application with the QS target
@@ -302,11 +297,11 @@ Current timestamp: 190811_124028
 Specifically, by default QSPY **opens the UDP socket** at the default port (`-u 7701`) for "back-ends" (such as @ref qutest "QUTest") and **opens the TCP/IP socket** at the default port (`-t 6601`) for communication with the Targets.
 
 
-The other parameters correspond to 32-bit Target CPUs, such as ARM and x86 compiled in 32-bit mode. The x86 is relevant for running the embedded software on host machines based on the x86 processors.
+The other parameters correspond to 32-bit Target CPUs, such as ARM and x86 compiled in 32-bit mode. The x86 is relevant for running the embedded software on host machines based on x86 processors.
 
 @remark
-The default QSPY configuration is specifically designed for running @ref qutest "QUTest" tests on the x86-based hosts with target executables compiled in the 32-bit x86 mode. This default configuration also matches 32-bit ARM CPUs, but typically requires the single `-c <COM>` parameter to communicate with the embedded Target via a serial port.@n
-@n
+The default QSPY configuration is specifically designed for running @ref qutest "QUTest" tests on x86-based hosts with target executables compiled in 32-bit x86 mode. This default configuration also matches 32-bit ARM CPUs, but typically requires the single `-c <COM>` parameter to communicate with the embedded Target via a serial port.<br>
+<br>
 The default QSPY configuration (without any parameters) is also backwards-compatible with the following invocation: `qspy -u -t`, which is recommended for running QUTest tests on the host computer. Starting with QSPY version 7.x.y, you can use the simpler `qspy` invocation.
 
 
@@ -316,7 +311,7 @@ The QSPY host application can be terminated in the following ways:
 - by typing `x` or `X` key (works only in the absence of the __-k__ @ref qspy_command "command-line option")
 - by typing `Esc` key (works only in the absence of the __-k__ @ref qspy_command "command-line option")
 - by typing `Ctrl-C` (works also with the `-k` option)
-- by sending the Kill signal to the process running QSPY
+- by sending the Kill signal to the process running QSPY.
 
 
 @section qspy_keyboard QSPY Keyboard Commands
@@ -328,9 +323,9 @@ Key | Action
 `&lt;Esc&gt;` | Exit QSPY
 `h`     | display keyboard help and QSPY status
 `c`     | clear the screen
-`q`     | toggle quite mode (no Target output to the screen)
+`q`     | toggle quiet mode (no Target output to the screen)
 `r`     | send RESET command to the Target
-`i`     | send the INFO request to the Target (see also @ref qspy_dict)
+`i`     | send INFO request to the Target (see also @ref qspy_dict)
 `t`     | send TIKC[0] command to the Target
 `u`     | send TICK[1] command to the Target
 `d`     | save @ref qspy_dict "QP/Spy Dictionaries" to a file
@@ -340,7 +335,7 @@ Key | Action
 `g`     | toggle @ref qspy_seq "Sequence Output" to a file (open/close)
 
 
-@n
+<br>
 @note
 QSPY can send many more sophisticated commands to the Target by means of the @ref qview "Front-End extension mechanism".
 
@@ -353,8 +348,8 @@ Communication Link | Command-Line Option
 :------------------|:--------------------
 TCP/IP             | `-t [TCP_port]` (default)
 Serial port        | `-c <COM_port>` and `-b<baud_rate>`
-Binaly File        | `-f <file_name>`
-Other link@n(e.g., JTAG debug probe) | can be added to the QSPY Platform Abstraction Layer
+Binary File        | `-f <file_name>`
+Other link<br>(e.g., JTAG debug probe) | can be added to the QSPY Platform Abstraction Layer
 
 
 @section qspy_saving Saving Files from QSPY
@@ -364,10 +359,10 @@ QSPY can save the tracing data from the Target in various formats into files. QS
 @attention
 QSPY saves all files into the <strong>current directory</strong> from which `qspy` has been launched.
 
-QSPY uses a very simple naming convention to assign file names. All names start with `qspy<time-stamp>`, where the  time-stamp format is: `YYMMDD_hhmmss`, where `YY` is 2-digit year, `MM` is a 2-digit month, `DD` is a 2-digit day of the month, `hh` is a 2-digit hour, `mm` is a 2-digit minute, and `ss` is a 2-digit second. The time-stamp is accurate to a one second, so its virtually impossible to have name conflicts for files generated on the same machine. The various types of files are distinguished by the following extensions:
+QSPY uses a very simple naming convention to assign file names. All names start with `qspy<time-stamp>`, where the  time-stamp format is: `YYMMDD_hhmmss`, where `YY` is 2-digit year, `MM` is a 2-digit month, `DD` is a 2-digit day of the month, `hh` is a 2-digit hour, `mm` is a 2-digit minute, and `ss` is a 2-digit second. The time-stamp is accurate to a one second, so it's virtually impossible to have name conflicts for files generated on the same machine. The various types of files are distinguished by the following extensions:
 
-Command-Line@n Option | Keyboard@n Option| File@n Extension |  Example |  Comment
-:-------------------:|:-----------------:|:----------------:|----------|----------
+Command-Line<br>Option | Keyboard<br>Option| File<br>Extension |  Example |  Comment
+:-------------------:|:-----------------:|:-------------------:|----------|----------
 `-o`                | `o`            | `.txt`    | `qspy150914_132234.txt`| @ref qspy_text "text (screen) output"
 `-s`                | `s`            | `.qs`     | `qspy150914_132234.qs`  | @ref qpspy_proto "raw binary output"
 `-d`                | `d`            | `.dic`    | `qspy150901_101203.dic` | @ref qspy_dict "dictionary output"
@@ -376,7 +371,6 @@ Command-Line@n Option | Keyboard@n Option| File@n Extension |  Example |  Commen
 
 @note
 All files except the dictionary output are time-stamped with the <strong>local</strong> time of the Host. The **dictionary** output is time-stamped with the build-time of the Target image.
-
 
 
 The following sub-sections explain the following QSPY features:
@@ -396,11 +390,11 @@ The following sub-sections explain the following QSPY features:
 @tableofcontents
 @nav{qspy,qspy_dict}
 
-<p>QSPY provides a simple consolidated, human-readable textual output to the screen. The readability of this output depends strongly on the availability of the <em>symbolic information</em> about the various objects in the Target code, called @ref qspy_dict "dictionaries". If the "dictionaries" are not available, QSPY can output only the hexadecimal values of various object addresses and event signals. However, if QSPY has acquired the @ref qs_dict "dictionaries" from the Target, or has @ref qspy_dict "read them from a file", it can apply the symbolic information to output the provided identifiers for objects, signals, and states.
+<p>QSPY provides a simple, consolidated, human-readable textual output to the screen. The readability of this output depends strongly on the availability of the <em>symbolic information</em> about the various objects in the Target code, called @ref qspy_dict "dictionaries". If the "dictionaries" are not available, QSPY can output only the hexadecimal values of various object addresses and event signals. However, if QSPY has acquired the @ref qs_dict "dictionaries" from the Target, or has @ref qspy_dict "read them from a file", it can apply the symbolic information to output the provided identifiers for objects, signals, and states.
 </p>
 
 @note
-In the process of adapting QSPY for supporting @ref qutest "QUTest Unit Testing", the QSPY human-redable output has been changed to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textuall output with the expected output.
+In the process of adapting QSPY to support @ref qutest "QUTest Unit Testing", the QSPY human-readable output has been changed to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textual output with the expected output.
 
 
 @section qspy_text_exa Screen Output Example
@@ -503,24 +497,23 @@ The QS trace log shown in the listing above contains quite detailed information,
 
 - After the dictionaries, you see the active object initialization. For example, the `===RTC===> St-Init` record indicates that the top-most initial transition in the active object `l_table` has been taken. After this, the `===RTC===> St-Entry` record informs you that the state `Table_serving` has been entered, and finally the record `==>Init` tells you that the top-most initial transition sequence has completed. This trace record has a high-resolution @ref qs_tstamp "time-stamp" (the first 10-digit number) generated by the Target. The time units used by this time-stamp depend on the specific hardware timer used in the Target, but typically it is sub-microsecond.
 
-- After this you see that at the time-stamp `0000380805` an event was dispatched (`Disp===>` record) to `l_table`, but it was subsequently `Ignored`, while `l_table` was in the state `Table_serving`.
+- After this you see that at time-stamp `0000380805` an event was dispatched (`Disp===>` record) to `l_table`, but it was subsequently `Ignored`, while `l_table` was in the state `Table_serving`.
 
 
 @section qspy_pre Predefined Trace Records
 The following table summarizes the text output format used for all predefined QS trace records (see ::QSpyRecords).
 
 @note
-To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY human-redable output has been changed at @ref qtools_5_9_0 "version 5.9.0" to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textuall output with the expected output.
-
+To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY human-readable output has been changed at @ref qtools_5_9_0 "version 5.9.0" to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textual output with the expected output.
 
 <table>
   <tr>
-      <TD colspan="4"><strong>State Machine Trace Records (QEP)</strong></td>
+      <td colspan="4"><strong>State Machine Trace Records (QEP)</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -592,30 +585,30 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
     <td>55</td>
     <td>#QS_QEP_TRAN_HIST</td>
     <td>`===RTC===> St-Hist`</td>
-    <td>an a transition to history was taken </td>
+    <td>a transition to history was taken</td>
   </tr>
 
   <tr>
     <td>56</td>
     <td>#QS_QEP_TRAN_EP</td>
     <td>`===RTC===> St-EP`</td>
-    <td>an a transition to entry point into a submachine </td>
+    <td>a transition was taken to an entry point into a submachine</td>
   </tr>
 
   <tr>
     <td>57</td>
     <td>#QS_QEP_TRAN_XP</td>
     <td>`===RTC===> St-XP`</td>
-    <td>an a transition to exit  point out of a submachine </td>
+    <td>a transition was taken to an exit point out of a submachine</td>
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Active Object Trace Records</strong></td>
+      <td colspan="4"><strong>Active Object Trace Records</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -631,7 +624,7 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
     <td>13</td>
     <td>#QS_QF_ACTIVE_UNSUBSCRIBE</td>
     <td>`<timestamp> AO-Unsub`</td>
-    <td>an AO unsubscribed to an event</td>
+    <td>an AO unsubscribed from an event</td>
   </tr>
 
   <tr>
@@ -666,16 +659,16 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
     <td>45</td>
     <td>#QS_QF_ACTIVE_POST_ATTEMPT</td>
     <td>`<timestamp> AO-PostA`</td>
-    <td>attempt to post an evt to AO failed</td>
+    <td>attempt to post an event to AO failed</td>
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Raw Event Queue Trace Records</strong></td>
+      <td colspan="4"><strong>Raw Event Queue Trace Records</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -698,30 +691,30 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
     <td>21</td>
     <td>#QS_QF_EQUEUE_GET</td>
     <td>`<timestamp> EQ-Get`</td>
-    <td>get an event and queue still not empty</td>
+    <td>got an event and queue still not empty</td>
   </tr>
 
   <tr>
     <td>22</td>
     <td>#QS_QF_EQUEUE_GET_LAST</td>
     <td>`<timestamp> EQ-GetL`</td>
-    <td>get the last event from the queue</td>
+    <td>got the last event from the queue</td>
   </tr>
 
   <tr>
     <td>46</td>
     <td>#QS_QF_EQUEUE_POST_ATTEMPT</td>
     <td>`<timestamp> EQ-PostA`</td>
-    <td>attempt to post an evt to QEQueue failed</td>
+    <td>attempt to post an event to QEQueue failed</td>
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Raw Memory Pool Trace Records</strong></td>
+      <td colspan="4"><strong>Raw Memory Pool Trace Records</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -755,12 +748,12 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Event Management (QF)</strong></td>
+      <td colspan="4"><strong>Event Management (QF)</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -836,12 +829,12 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Time Events (TE)</strong></td>
+      <td colspan="4"><strong>Time Events (TE)</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -864,14 +857,14 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
     <td>34</td>
     <td>#QS_QF_TIMEEVT_DISARM_ATTEMPT</td>
     <td>`<timestamp> TE-DisA`</td>
-    <td>attempt to disarmed a disarmed tevent</td>
+    <td>attempt to disarm a disarmed tevent</td>
   </tr>
 
   <tr>
     <td>35</td>
     <td>#QS_QF_TIMEEVT_DISARM</td>
     <td>`<timestamp> TE-Dis`</td>
-    <td>true disarming of an armed time event</td>
+    <td>successful disarming of an armed time event</td>
   </tr>
 
   <tr>
@@ -896,12 +889,12 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Scheduler Trace Records</strong></td>
+      <td colspan="4"><strong>Scheduler Trace Records</strong></td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -942,15 +935,15 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>Miscellaneous Trace Records@n
+      <td colspan="4"><strong>Miscellaneous Trace Records@n
       NOT MASKABLE WITH THE @ref qs_global "QS GLOBAL FILTER"!
       </strong>
       </td>
   </tr>
 
   <tr>
-    <th>Rec.@n Num</th>
-    <th>Rec.@n Enum</th>
+    <th>Rec.<br> Num</th>
+    <th>Rec.<br> Enum</th>
     <th>Start of record</th>
     <th>Comment</th>
   </tr>
@@ -1040,7 +1033,7 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
   </tr>
 
   <tr>
-      <TD colspan="4"><strong>User (Application Specific) Records</strong></td>
+      <td colspan="4"><strong>User (Application Specific) Records</strong></td>
   </tr>
 
   <tr>
@@ -1065,17 +1058,17 @@ By the time you compile and load your application image to the Target, the symbo
 
 The QS Target-resident component provides special @ref qs_dict "dictionary trace records" designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records:
 
-- object dictionary -- for identifying objects (HSMs, AOs, Time events, etc)
-- function dictionary -- for identifying functions (state-handlers)
-- signal dictionary -- for identifying event signals
-- user dictionary -- for identifying @ref qs_app "application-specific" (user) records
+- object dictionary &mdash; for identifying objects (HSMs, AOs, Time events, etc.)
+- function dictionary &mdash; for identifying functions (state-handlers)
+- signal dictionary &mdash; for identifying event signals
+- user dictionary &mdash; for identifying @ref qs_app "application-specific" (user) records
 
 @note
-QSPY does not absolutely require the presence of dictionary trace records to generate the human-readable output, in the same way as the symbolic information in the object files is not absolutely required to debug code. However, in both cases, the availability of the symbolic information greatly improves the readability of the disassembly code shown in the debugger.
+QSPY does not absolutely require the presence of dictionary trace records to generate the human-readable output, in the same way that the symbolic information in the object files is not absolutely required to be able to debug code. However, in both cases, the availability of the symbolic information greatly improves the readability of the disassembly code shown in the debugger.
 
 
 For instance, the following listing shows an example of the QSPY text output when the "dictionaries" are **not** available. (<b>NOTE:</b> dictionaries might not be available because (1) the Target does not produce @ref qs_dict "dictionary trace records" for all relevant objects or (2) the Target does produce all dictionaries, but QSPY has never seen them, because it was attached to the Target after the dictionaries have been transmitted):
-@n
+<br>
 @verbatim
 . . . . . .
 0009692721 Disp===> Obj=0x2000133C,Sig=00000010,Obj=0x2000133C,State=0x000010C5
@@ -1134,7 +1127,7 @@ As you can see, the difference in readability is quite dramatic.
 
 
 @section qspy_dict_get Acquiring Dictionaries
-The QS Target-resident component generates the dictionary trace records during the initialization of active objects components in the Target code, that is, typically right after the reset. Consequently, the best way to acquire the dictionaries is to capture the trace when the Target performs the reset. This can be done in a couple of ways:
+The QS Target-resident component generates the dictionary trace records during the initialization of active object components in the Target code, that is, typically right after the reset. Consequently, the best way to acquire the dictionaries is to capture the trace when the Target performs the reset. This can be done in a couple of ways:
 - Start QSPY **before** the Target resets
 - Manually reset the Target while QSPY is running (e.g., press a Reset button on the Target board)
 - Send the @ref qspy_keyboard "RESET command" to the Target from QSPY while it is running
@@ -1251,7 +1244,7 @@ Current timestamp: 200827_093625
 @endverbatim
 </div>
 
-Once QSPY acquires the dictionaries, it keeps them in the memory and applies them to display the data in symbolic form (rather than hex addresses).
+Once QSPY acquires the dictionaries, it keeps them in memory and applies them to display the data in symbolic form rather than hex addresses.
 
 @note
 The dictionaries do not need to be complete to be useful. QSPY simply applies the symbolic information whenever it can find a match in the dictionaries acquired so far. When a dictionary entry is not available, QSPY displays only hex addresses.
@@ -1262,13 +1255,13 @@ The dictionaries do not need to be complete to be useful. QSPY simply applies th
 QSPY can save the dictionaries acquired thus far into a file. This is triggered by the #QS_QF_RUN trace record from the Target, but it can also be triggered by the user (by means of the `d` @ref qspy_keyboard "keyboard command" or from @ref qview_file "QView menu File->Save Dictionaries"), because QSPY does not "know" when the dictionaries are "complete", therefore it cannot know when to save them automatically.
 
 @note
-For dictionaries to be saved to a file, the QSPY host application must be launched with the `-d` @ref qspy_command "command-line option", with of without the optional `[file]` parameter.
+In order for dictionaries to be saved to a file, the QSPY host application must be launched with the `-d` @ref qspy_command "command-line option", with or without the optional `[file]` parameter.
 
 
-On the other hand, QSPY generates automatically the file name for saving dictionaries. This file name has always the form `qspy<target-time-stamp>.dic`, where `<target-time-stamp>` unambiguously identifies the Target build date and time. For example, the Target code last built on August 31, 2015 at 14:42:29 will have the name `qspy150831_144229.dic`.
+On the other hand, QSPY automatically generates the file name for saving dictionaries. This file name always has the form `qspy<target-time-stamp>.dic`, where `<target-time-stamp>` unambiguously identifies the Target build date and time. For example, the Target code last built on August 31, 2015 at 14:42:29 will have the name `qspy150831_144229.dic`.
 
 @attention
-The internal addresses of objects can change by every code re-build, so dictionaries are applicable only to the specific Target build and must be freshly re-acquired after every new Target code build.
+The internal addresses of objects can change with every code re-build, so dictionaries are applicable only to the specific Target build and must be freshly re-acquired after every new Target code build.
 
 
 The dictionaries are saved to a file in ASCII format. The following listing shows the dictionaries from the DPP example application running on a STM32 NUCLEO board:
@@ -1342,12 +1335,12 @@ Sig-Dic:
 </div>
 
 
-@section qspy_dict_use Using Dictionary File
+@section qspy_dict_use Using the Dictionary File
 The dictionary file saved in previous QSPY sessions can be used in two ways:
 
-- you can specify the dictionary file in the `-d <dictionary_file>` @ref qspy_command "command-line option" to QSPY. In this case QSPY reads the dictionaries from the provided `<dictionary_file>` before processing any trace records from the Target. (**NOTE:** in this case you don't need to provide any of the upper-case command-line options, because they are read from the dictionary file.) For example: command line: `qspy -d qspy180117_155932.dic` will attempt to read the dictionaries from the specified file.
+- you can specify the dictionary file in the `-d <dictionary_file>` @ref qspy_command "command-line option" to QSPY. In this case QSPY reads the dictionaries from the provided `<dictionary_file>` before processing any trace records from the Target. (**NOTE:** in this case you don't need to provide any of the upper-case command-line options, because they are read from the dictionary file.) For example: the command line `qspy -d qspy180117_155932.dic` will attempt to read the dictionaries from the specified file.
 
-- you can specify the dictionary option without the dictionary file `-d` @ref qspy_command "command-line option" to QSPY. Subsequently, once you run QSPY, you can query the Target information (by means of the `i` or `r` @ref qspy_keyboard "keyboard command" or from @ref qview_menu "QView menu Commands->Query Target Info"). When the Target replies and provides its build-time-stamp, QSPY looks for the corresponding dictionary file in the current directory and if such a file is found, QSPY reads the dictionaries from it.
+- you can specify the dictionary option without the dictionary file `-d` @ref qspy_command "command-line option" to QSPY. Subsequently, once you run QSPY, you can query the Target information (by means of the `i` or `r` @ref qspy_keyboard "keyboard command" or from @ref qview_menu "QView menu Commands->Query Target Info"). When the Target replies and provides its build-time-stamp, QSPY looks for the corresponding dictionary file in the current directory, and if such a file is found, QSPY reads the dictionaries from it.
 
 
 @note
@@ -1366,14 +1359,14 @@ That last option requires that the Target implements the @ref qs_rx "QS receive 
 </p>
 
 @image html qspy_comm.gif "Communication between Target, QSPY, and QView"
-@n
+<br>
 
 
 @section udp_top General UDP Packet Structure
 
 @image html qspy_udp.gif "UDP packet structure"
 
-The UDP packets exchanged between the QSPY Back-End and the `QView` Front-End consists of:
+The UDP packets exchanged between the QSPY Back-End and the `QView` Front-End consist of:
 
 - 1-byte **Sequence-No**, which increments by 1 for every packet and wraps naturally from 0xFF to 0. The sequence number allows `QView` to detect any data discontinuities.
 
@@ -1403,9 +1396,9 @@ The binary-channel (0x01) is used by the @ref qview "QView" GUI front-end, while
 This packet has Record-ID==INFO and has no Data Payload.
 
 @note
-To understand the following detailed UDP packet descriptions, it is highly recommended to read the Python documentation for the  <a href="https://docs.python.org/2.6/library/struct.html" target="_blank" class="extern"><b>Python struct.pack() command</b></a>.@n
-@n
-All data to and from the Target are sent according to the @ref qpspy_proto "QP/Spy&trade; Data Protocol" in **little endian**.
+To understand the following detailed UDP packet descriptions, it is highly recommended to read the Python documentation for the  <a href="https://docs.python.org/2.6/library/struct.html" target="_blank" class="extern"><b>Python struct.pack() command</b></a>.<br>
+<br>
+All data to and from the Target is sent according to the @ref qpspy_proto "QP/Spy&trade; Data Protocol" in **little endian**.
 
 
 <strong>Code Example:</strong>
@@ -1440,7 +1433,7 @@ This packet has Record-ID==PEEK and Data Payload of the form:
 
 Data item  | binary format | description
 -----------|---------------|-------------
-Peek-addr  | Target-dependent@n Typically I | Address of the data in the Target
+Peek-addr  | Target-dependent<br>Typically I | Address of the data in the Target
 Peek-length| B (byte)      | Number of bytes to peek
 
 
@@ -1449,7 +1442,7 @@ This packet has Record-ID==POKE and Data Payload of the form:
 
 Data item  | binary format | description
 -----------|---------------|-------------
-Poke-addr  | Target-dependent@n Typically I | Address of the data in the Target
+Poke-addr  | Target-dependent<br>Typically I | Address of the data in the Target
 Poke-length| B (byte)      | Number of bytes to poke (<= 8)
 Poke-data  | user-defined  | Binary data to poke to the Target (8 bytes maximum)
 
@@ -1463,7 +1456,7 @@ This packet has Record-ID==GLB_FILTER and Data Payload of the form:
 Data item  | binary format | description
 -----------|---------------|-------------
 Data Len   | B (byte)      | Number of bytes sent (currently 16)
-Filters    | 16B           | 8-bytes (128-bits), each bit corresponding to Global Filter
+Filters    | 16B           | 8-bit bytes (128-bits), each bit corresponding to Global Filter
 
 
 @subsection udp_LOC_FILTER  Set Local Filters in the Target (LOC_FILTER)
@@ -1472,7 +1465,7 @@ This packet has Record-ID==LOC_FILTER and Data Payload of the form:
 Data item  | binary format | description
 -----------|---------------|-------------
 Local filter #| B (byte)         | The Number of the Local Filter
-Object-addr   | Target-dependent@n Typically I | Address of the object in the Target
+Object-addr   | Target-dependent<br>Typically I | Address of the object in the Target
 
 The Local filters are numbered as follows:
 
@@ -1500,14 +1493,14 @@ This packet has Record-ID==EVENT and Data Payload of the form:
 Data item  | binary format | description
 -----------|---------------|-------------
 AO prio    | B (byte)      | Priority of the recipient AO (0 to publish the event)
-signal     | Target-dependent@n Typically H | signal of the event
+signal     | Target-dependent<br>Typically H | signal of the event
 parameters | user-defined  | Binary data corresponding to all event parameters
 
-The Event signal `sig` must be formatted according to the Target configuration (see <a href="https://www.state-machine.com/qpc/qep_8h.html#afdaa94c40e947b0340b4259eddce3561" target="_blank" class="extern">Q_SIGNAL_SIZE</a>)
+The Event signal `sig` must be formatted according to the Target configuration (see <a href="https://www.state-machine.com/qpc/qep_8h.html#afdaa94c40e947b0340b4259eddce3561" target="_blank" class="extern">Q_SIGNAL_SIZE</a>).
 
 The Event **parameters** must be formatted with the particular **endianness** of the Target and with any padding required for proper alignment of objects in the Target memory.
 
-The parameters need to match exactly the event memory layout in your Target, including the endianness and any padding that the Target compiler might be using. (To test the right binary format and padding, you can use the @ref qview_events "Generate Event..." command).
+The parameters need to match exactly the event memory layout in your Target, including the endianness and any padding that the Target compiler might be using. (To test the correct binary format and padding, you can use the @ref qview_events "Generate Event..." command).
 
 For example, let's assume that the parameters of your event are: a byte, followed by a 2-byte integer, followed by a 4-byte integer. Also, let's assume that your Target is little endian. From the @ref qview_events "Generate Event..." command you discover that to format this event correctly you need to use the following event parameters:
 
@@ -1577,12 +1570,12 @@ This packet has Record-ID==DETACH and has no Data Payload.
 <p>The QSPY host application can also present the tracing data as a **sequence diagram**. To generate a Sequence file, you need to invoke QSPY with  the `-g [obj-list]` @ref qspy_command "command-line option".
 </p>
 
-The `[obj-list]` is a comma-separated list of objects shown in the sequence. The names in the list must correspond exactly to the @ref qs_dict "object dictionaries" produced by the Target. Examples of the valid `-g` options are shown below:
+The `[obj-list]` is a comma-separated list of objects shown in the desired sequence. The names in the list must correspond exactly to the @ref qs_dict "object dictionaries" produced by the Target. Examples of the valid `-g` options are shown below:
 
 - `-g -g l_SysTick_Handler,Table::inst,Philo::inst[0],Philo::inst[1]`
 - `-g l_QF_onClockTick,TServer::inst`
 
-Additionally, the list could include `?` (questionmark), which denotes @ref qspy_seq_sys "System Border".
+Additionally, the list could include a `?` (question mark), which denotes @ref qspy_seq_sys "System Border".
 
 - `-g -g Table::inst,Philo::inst[0],Philo::inst[1],?`
 - `-g ?,l_QF_onClockTick,TServer::inst`
@@ -1645,31 +1638,31 @@ The sequence output generated by QSPY is a **simple ASCII file**, which you can 
 <dl class="tag">
   <dt>1</dt><dd> The sequence diagram starts with repeating the `-g [obj-list]` option, so that you can conveniently copy-and-paste this option to run the same sequence again.
   </dd>
-  <dt>2</dt><dd> Below that, you can see the header containing the boxes of participating objects from the `[obj-list]`. From each box descends a **lifeline** that runs vertically down the page and represents the ordering of exchanged events and other interesting occurrences involving a given object.
-> **NOTE:** This first object in this particular sequence diagram, denoted as`?', is the @ref qspy_seq_sys explained below.
+  <dt>2</dt><dd> Below that, you can see the header containing the boxes of participating objects from the `[obj-list]`. From each box descends a **lifeline** that runs vertically down the page and represents the ordering of exchanged events and other interesting occurrences involving the object.
+> **NOTE:** This first object in this particular sequence diagram, denoted as `?', is @ref qspy_seq_sys explained below.
 
 > **NOTE:** The names in the sequence diagram are **truncated** to the first 15 characters.
 
 > **NOTE:** The sequence header is **repeated** every 100 lines of the sequence output.
   </dd>
-  <dt>3</dt><dd> Each output line starts with the **timestamp** followed by the life-lines of all participating objects with event arrows or annotations.
+  <dt>3</dt><dd> Each output line starts with the **timestamp** followed by the lifelines of all participating objects with event arrows or annotations.
   </dd>
-  <dt>4</dt><dd> This line shows a **event posting** (with FIFO policy), which corresponds to the QS records #QS_QF_ACTIVE_POST and #QS_QF_ACTIVE_POST_ATTEMPT. The event **source** is marked with `*`, the event **target** is pointed to with `>` or `<`. The source and target are connected with a line `*----->`. The line is annotated with the **signal** of the posted event.
+  <dt>4</dt><dd> This line shows an **event posting** (with FIFO policy), which corresponds to the QS records #QS_QF_ACTIVE_POST and #QS_QF_ACTIVE_POST_ATTEMPT. The event **source** is marked with `*`, the event **target** is pointed to with `>` or `<`. The source and target are connected with a line `*----->`. The line is annotated with the **signal** of the posted event.
   </dd>
-  <dt>5</dt><dd> This line shows a **state change**, which corresponds to the QS record #QS_QEP_TRAN. The lifeline of the object is annotated with new **state** assumed by the object. The state-name is placed between  `<` or `>`.
+  <dt>5</dt><dd> This line shows a **state change**, which corresponds to the QS record #QS_QEP_TRAN. The lifeline of the object is annotated with the new **state** assumed by the object. The state-name is placed between  `<` or `>`.
   </dd>
-  <dt>6</dt><dd> This line shows a **event recall**, which corresponds to the QS records #QS_QF_ACTIVE_RECALL, and #QS_QF_ACTIVE_RECALL_ATTEMPT. The lifeline of the object is annotated with `(Rcall)` or `(RcallA)`, respectively.
+  <dt>6</dt><dd> This line shows an **event recall**, which corresponds to the QS records #QS_QF_ACTIVE_RECALL, and #QS_QF_ACTIVE_RECALL_ATTEMPT. The lifeline of the object is annotated with `(Rcall)` or `(RcallA)`, respectively.
   </dd>
-  <dt>7</dt><dd> This line shows a **event deferral**, which corresponds to the QS record #QS_QF_ACTIVE_DEFER. The lifeline of the object is annotated with `(Defer)`.
+  <dt>7</dt><dd> This line shows an **event deferral**, which corresponds to the QS record #QS_QF_ACTIVE_DEFER. The lifeline of the object is annotated with `(Defer)`.
   </dd>
-  <dt>8</dt><dd> This line shows a **event self-posting** with LIFO policy, which corresponds to the QS record #QS_QF_ACTIVE_POST_LIFO. The event **source/target** is marked with `*<`, the LIFO policy of the event posting is denoted by the `=` line right before the **signal** of the posted event.
+  <dt>8</dt><dd> This line shows an **event self-posting** with LIFO policy, which corresponds to the QS record #QS_QF_ACTIVE_POST_LIFO. The event **source/target** is marked with `*<`; the LIFO policy of the event posting is denoted by the `=` line right before the **signal** of the posted event.
   </dd>
 </dl>
 <div style="clear:both;"></div>
 
 
 @section qspy_seq_sys The System Border Object
-As mentioned before, the `[obj-list]` that specifies objects participating in the sequence might include `?` (questionmark), which denotes @ref qspy_seq_sys "System Border". The system border is the "environment" that can produce and consume events. The "System Border" denotes possibly **multiple objects** that are not explicitly listed in the `[obj-list]`, including even objects without @ref qs_dict "object dictionaries". The sequence diagram in the previous section shows the "System Border", labeled as `?` and life-line shown as `//////`.
+As mentioned before, the `[obj-list]` that specifies objects participating in the sequence might include `?` (question mark), which denotes @ref qspy_seq_sys "System Border". The system border is the "environment" that can produce and consume events. The "System Border" denotes possibly **multiple objects** that are not explicitly listed in the `[obj-list]`, including even objects without @ref qs_dict "object dictionaries". The sequence diagram in the previous section shows the "System Border", labeled as `?` and lifeline shown as `//////`.
 
 @note
 You can place the "System Border" (the `?`) anywhere in the `[obj-list]`. However, it is customary to place it either as the very first or the very last object in the list, as shown in the sequence diagram below:
@@ -1687,7 +1680,7 @@ The listing below shows an example of a more involved sequence diagram output (`
 `-g l_SysTick_Handler,Table::inst,Philo::inst[0],Philo::inst[1],Philo::inst[2],Philo::inst[3],Philo::inst[4]`
 
 
-In addition to the elements described above, this sequence diagram illustrates the **event publishing**, which corresponds to the #QS_QF_PUBLISH trace record. The event multicasting is represented as a horizontal line `. . . .`, with the event **source** marked as `*`.
+In addition to the elements described above, this sequence diagram illustrates **event publishing**, which corresponds to the #QS_QF_PUBLISH trace record. The event multicasting is represented as a horizontal line `. . . .`, with the event **source** marked as `*`.
 
 
 <div style="height:40em;overflow:auto;">
@@ -1788,8 +1781,8 @@ In addition to the elements described above, this sequence diagram illustrates t
 @note
 The QSPY MATLAB interface is also compatible with the <a href="http://www.gnu.org/software/octave/" target="_blank" class="extern">GNU Octave</a> environment, which is an open source alternative to MATLAB and is compatible with the QSPY MATLAB interface described below.
 
-The following sections provide a reference manual for all 11 the MATLAB matrices generated by the @c qspy.m script. By MATLAB convention, the different variables are put into columns, allowing observations to vary down
-through the rows. Therefore, a data set consisting of twenty four time samples of six variables is stored in a matrix of size 24-by-6. The pound sign '#' in a given cell of the matrix represents data available from the target. Other values, represent data added by the @c qspy.m script to allow unambiguous identification of the trace records.
+The following sections provide a reference manual for all 11 of the MATLAB matrices generated by the @c qspy.m script. By MATLAB convention, the different variables are put into columns, allowing observations to vary down
+through the rows. Therefore, a data set consisting of twenty-four time samples of six variables is stored in a matrix of size 24-by-6. The pound sign '#' in a given cell of the matrix represents data available from the target. Other values represent data added by the @c qspy.m script to allow unambiguous identification of the trace records.
 
 - @ref MATLAB_Q_STATE
 - @ref MATLAB_Q_ACTIVE
@@ -1821,13 +1814,13 @@ through the rows. Therefore, a data set consisting of twenty four time samples o
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
     <th>Signal</th>
-    <th>State@n Machine@n Object</th>
-    <th>Source@n State</th>
-    <th>New@n State</th>
-    <th>Event@n Hanlder</th>
+    <th>State<br>Machine<br>Object</th>
+    <th>Source<br>State</th>
+    <th>New<br>State</th>
+    <th>Event<br>Handler</th>
   </tr>
 
   <tr>
@@ -1974,13 +1967,13 @@ records from the @c Q_STATE matrix:
 </table>
 </center>
 
-For example, the following MATLAB plot shows the timing diagrams for all Philo state machines in the DPP example application made by the `philo_timing.m` script located in the directory `qtools/qspy/matlab` (see Section @ref qspy_files). The vertical axis represents states "thinking" (lowest), "hungry" (middle) and "eating" (top) states.
+For example, the following MATLAB plot shows the timing diagrams for all Philo state machines in the DPP example application made by the `philo_timing.m` script located in the directory `qtools/qspy/matlab` (see Section @ref qspy_files). The vertical axis represents states "thinking" (lowest), "hungry" (middle), and "eating" (top).
 
 @image html FigQSPY.01.jpg "Timing diagrams for all Philo state machines."
 
 
 @section MATLAB_Q_ACTIVE Q_ACTIVE Matrix
-<p>The N-by-5 @c Q_ACTIVE matrix stores QS records pertaining to adding/removing active objects and subscribing/unsubscribing to events from active objects. The following table summarizes how the QS records are stored in the matrix:
+<p>The N-by-5 @c Q_ACTIVE matrix stores QS records pertaining to adding/removing active objects and subscribing to/unsubscribing from events from active objects. The following table summarizes how the QS records are stored in the matrix:
 </p>
 
 <center>
@@ -1995,11 +1988,11 @@ For example, the following MATLAB plot shows the timing diagrams for all Philo s
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
     <th>Signal</th>
-    <th>Active@n Object</th>
-    <th>QF@n Priority</th>
+    <th>Active<br>Object</th>
+    <th>QF<br>Priority</th>
     <th>Delta</th>
   </tr>
 
@@ -2046,7 +2039,7 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 
 @section MATLAB_Q_EQUEUE Q_EQUEUE Matrix
-<p>The N-by-10 @c Q_EQUEUE matrix stores QS records pertaining to queuing events in the QF. Both the active object event queues and the "raw" thread-safe queues are included. The 'nUsed' field denotes the current number of used entries in the queue. The 'Maximum nUsed' filed denotes the maximum number of used entries since initialization (high watermark). Both fields contain the number of used entries in the queues ring-buffer plus one, to account for the extra location at the front of the queue. The following table summarizes how the QS records are stored in the matrix:
+<p>The N-by-10 @c Q_EQUEUE matrix stores QS records pertaining to queuing events in the QF. Both the active object event queues and the "raw" thread-safe queues are included. The 'nUsed' field denotes the current number of used entries in the queue. The 'Maximum nUsed' field denotes the maximum number of used entries since initialization (high watermark). Both fields contain the number of used entries in the queue's ring-buffer plus one, to account for the extra location at the front of the queue. The following table summarizes how the QS records are stored in the matrix:
 </p>
 
 <center>
@@ -2066,15 +2059,15 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
     <th>Sender</th>
-    <th>Event@n Queue (1)</th>
+    <th>Event<br>Queue (1)</th>
     <th>nFree</th>
-    <th>Minimum@n Used</th>
+    <th>Minimum<br>Used</th>
     <th>Signal</th>
     <th>Pool ID</th>
-    <th>Ref.@n Count</th>
+    <th>Ref.<br> Count</th>
     <th>LIFO</th>
     <th>Delta</th>
   </tr>
@@ -2248,7 +2241,7 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 
 @section MATLAB_Q_MPOOL Q_MPOOL Matrix
-<p>The N-by-5 @c Q_MPOOL matrix stores QS records pertaining to memory pools in the QF. The 'nFree' field denotes the current number of free blocks in the event pool. The 'Minimum nFree' filed denotes the minimal number of free blocks since initialization (low watermark). The following table summarizes how the QS records are stored in the matrix:
+<p>The N-by-5 @c Q_MPOOL matrix stores QS records pertaining to memory pools in the QF. The 'nFree' field denotes the current number of free blocks in the event pool. The 'Minimum nFree' field denotes the minimum number of free blocks since initialization (low watermark). The following table summarizes how the QS records are stored in the matrix:
 </p>
 
 <center>
@@ -2263,11 +2256,11 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>Pool@n Object</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>Pool<br>Object</th>
     <th>nFree</th>
-    <th>Minimal@n nFree</th>
+    <th>Minimal<br>nFree</th>
     <th>Delta</th>
   </tr>
 
@@ -2335,12 +2328,12 @@ records from the @c Q_MPOOL matrix:
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
     <th>Signal</th>
     <th>PoolID</th>
-    <th>Ref.@n Count</th>
-    <th>Event@n Size</th>
+    <th>Ref.<br> Count</th>
+    <th>Event<br>Size</th>
     <th>Delta</th>
   </tr>
 
@@ -2426,13 +2419,13 @@ records from the @c Q_NEW matrix:
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
     <th>Sender</th>
     <th>Signal</th>
     <th>PoolID</th>
-    <th>Ref.@n Count</th>
-    <th># Events@n Multicast</th>
+    <th>Ref.<br> Count</th>
+    <th># Events<br>Multicast</th>
     <th>Delta</th>
   </tr>
 
@@ -2485,14 +2478,14 @@ records from the @c Q_PUB matrix:
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>QTimeEvt@n Object</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>QTimeEvt<br>Object</th>
     <th>Signal</th>
-    <th>QActive@n Object</th>
-    <th>QTimeEvt@n Counter</th>
-    <th>QTimeEvt@n Interval</th>
-    <th>QTimeEvt@n Delta</th>
+    <th>QActive<br>Object</th>
+    <th>QTimeEvt<br>Counter</th>
+    <th>QTimeEvt<br>Interval</th>
+    <th>QTimeEvt<br>Delta</th>
   </tr>
 
   <tr>
@@ -2643,10 +2636,10 @@ records from the @c Q_TIME matrix:
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>Interrupt@n Nesting</th>
-    <th>Nesting@n Delta</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>Interrupt<br>Nesting</th>
+    <th>Nesting<br>Delta</th>
   </tr>
 
   <tr>
@@ -2706,11 +2699,11 @@ records from the @c Q_INT matrix:
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>Interrupt@n Nesting</th>
-    <th>ISR@n Priority</th>
-    <th>Nesting@n Delta</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>Interrupt<br>Nesting</th>
+    <th>ISR<br>Priority</th>
+    <th>Nesting<br>Delta</th>
   </tr>
 
   <tr>
@@ -2770,11 +2763,11 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>Original@n Priority</th>
-    <th>Priority@n Ceiling</th>
-    <th>Nesting@n Delta</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>Original<br>Priority</th>
+    <th>Priority<br>Ceiling</th>
+    <th>Nesting<br>Delta</th>
   </tr>
 
   <tr>
@@ -2796,7 +2789,7 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 </center>
 
 
-The cumulative sum over the 'Delta' column indicates QK scheduler lock nesting level.
+The cumulative sum over the 'Delta' column indicates the QK scheduler lock nesting level.
 
 @image html FigQSPY.05.jpg "Plot stairs(Q_MUTEX(:,1), cumsum(Q_MUTEX(:,4)), 'r') (red)"
 
@@ -2824,7 +2817,7 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 
 @section MATLAB_Q_SCHED Q_SCHED Matrix
-<p>The N-by-3 @c Q_SCHED matrix stores QS records pertaining to scheduling next task in QK. The following table summarizes how the QS records are stored in the matrix:
+<p>The N-by-3 @c Q_SCHED matrix stores QS records pertaining to scheduling the next task in QK. The following table summarizes how the QS records are stored in the matrix:
 </p>
 
 <center>
@@ -2837,10 +2830,10 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
   </tr>
 
   <tr>
-    <th>QS Record@n |@n V</th>
-    <th>Time@n Stamp</th>
-    <th>Preempted@n Priority</th>
-    <th>New@n Priority</th>
+    <th>QS Record |<br> V</th>
+    <th>Time<br>Stamp</th>
+    <th>Preempted<br>Priority</th>
+    <th>New<br>Priority</th>
   </tr>
 
   <tr>

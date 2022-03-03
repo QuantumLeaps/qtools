@@ -7,11 +7,11 @@
 
 So the questions are: How can you monitor the behavior of a running real-time system without degrading the system itself? How can you discover and document elusive, intermittent bugs that are caused by subtle interactions among concurrent components? How do you design and execute repeatable @ref qutest "unit tests" and **integration tests** of your system? How do you ensure that a system runs reliably for long periods of time and achieves optimal performance?
 
-Techniques based on **software tracing** can answer many of these questions. Software tracing is a method for obtaining diagnostic information in a live environment without the need to stop the application to get the system feedback. Software tracing always involves some form of a target system instrumentation to log interesting discrete events for subsequent retrieval from the system and analysis.
+Techniques based on **software tracing** can answer many of these questions. Software tracing is a method for obtaining diagnostic information in a live environment without the need to stop the application to get system feedback. Software tracing always involves some form of target system instrumentation to log interesting discrete events for subsequent retrieval from the system and analysis.
 
 @anchor qpspy_framework
 @note
-Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://www.state-machine.com/products/#QP">QP&trade; real-time frameworks</a>. Due to the inversion of a control, a real-time framework controls almost all interesting interactions in the system, so an instrumented real-time framework can provide much more comprehensive and detailed information than any traditional RTOS.
+Software tracing is particularly effective and powerful in combination with the event-driven **reactive programming** model, such as the one implemented in <a class="extern" target="_blank" href="https://www.state-machine.com/products/#QP">QP&trade; real-time frameworks</a>. Due to the inversion of control, a real-time framework controls almost all interesting interactions in the system, so an instrumented real-time framework can provide much more comprehensive and detailed information than can any traditional RTOS.
 
 
 @section ab_about What is it?
@@ -23,27 +23,27 @@ Software tracing is particularly effective and powerful in combination with the 
 QP/Spy can also (optionally) send commands and data **to the embedded target** (see @ref qpspy_rx "Bi-Directional QP/Spy"), which serves as the basis for @ref qutest "Unit Testing" and for @ref qview "Visualization and Monitoring" subsystems of the QP/Spy system.
 
 
-@section ab_how How it works?
-In a nutshell, working with QP/Spy&trade; is similar to peppering the code with `printf` or similar (like `sprintf`) statements for logging and debugging, except that QP/Spy&trade; is much less intrusive, more lightweight, portable and @ref qs_filters "selective" than the primitive `printf`. Additionally, unlike the `printf` output, the data produced by QP/Spy&trade; contain the data *integrity* and *continuity* checks, so the host computer can tell when it receives corrupt data or incomplete data.
+@section ab_how How does it work?
+In a nutshell, working with QP/Spy&trade; is similar to peppering the code with `printf` or similar (like `sprintf`) statements for logging and debugging, except that QP/Spy&trade; is much less intrusive, more lightweight, portable and @ref qs_filters "selective" than the primitive `printf`. Additionally, unlike the `printf` output, the data produced by QP/Spy&trade; contains the data *integrity* and *continuity* checks, so the host computer can tell if it receives corrupt or incomplete data.
 
 The main advantages of the QP/Spy&trade; tracing system over peppering the code with `printf` statements are:
 
-- When you use `printfs`, the data formatting and sending occur in the *time-critical* paths through the embedded code. In contrast, QP/Spy produces raw *binary data*, so all the time-consuming formatting is removed from the embedded system and is done after the fact in the host computer.
+- When you use `printf`s, the data formatting and sending occur in the *time-critical* paths through the embedded code. In contrast, QP/Spy produces raw *binary data*, so all the time-consuming formatting is removed from the embedded system and is done after the fact in the host computer.
 
 - in QP/Spy, data logging and sending to the host are **separated** so that the embedded system can typically perform the transmission outside of the time-critical path, for example in the *idle processing* of the embedded CPU.
 
 - Data produced by `printf` gives you no clue if the data gets corrupted or lost in transmission. In contrast, the @ref qpspy_proto "QP/Spy transmission protocol" checks for data **integrity** and **continuity**.
 
-- The QP/Spy tracing provides flexible @ref qs_filters "filtering" mechanisms, which allow you to selectively trace only the aspects of the system that you choose and suppress the data that is not interesting at the moment.
+- The QP/Spy tracing provides flexible @ref qs_filters "filtering" mechanisms, which allow you to selectively trace only the aspects of the system that you choose, and to suppress the data that is not interesting at the moment.
 
 - The QP/Spy tracing is implemented as macros that are active only in the "Spy" build configuration and are inactive in the Release or Debug build configurations. This means that you can safely leave the instrumentation in the code for future maintenance, development and testing.
 
-- The QP/Spy trace data contain precise, high-granularity **timestamps**, so you can tie the data to the common timeline.
+- The QP/Spy trace data contains precise, high-granularity **timestamps**, so you can tie the data to the common timeline.
 
 - The code size of the @ref qs "target-resident component" in QP/Spy is merely a few hundred bytes, which contrasts with several kilobytes of code required by a full-blown `printf` formatter.
 
 
-The picture below shows a typical setup for software tracing. The embedded Target system is executing instrumented code, which logs the trace data into a RAM buffer inside the Target. From that buffer the trace data is sent over a data link to a Host computer, which stores, displays, and analyzes the information. This configuration means that a software tracing always requires two components: a "Target resident component" for generating and sending the trace data (@ref qs "QS" in QP/Spy&trade;), and a "Host resident component" to receive, decompress, visualize, and analyze the data (@ref qspy "QSPY" in QP/SPy&trade;).
+The picture below shows a typical setup for software tracing. The embedded Target system is executing instrumented code, which logs the trace data into a RAM buffer inside the Target. From that buffer the trace data is sent over a data link to a Host computer, which stores, displays, and analyzes the information. This configuration means that software tracing always requires two components: a "Target resident component" for generating and sending the trace data (@ref qs "QS" in QP/Spy&trade;), and a "Host resident component" to receive, decompress, visualize, and analyze the data (@ref qspy "QSPY" in QP/SPy&trade;).
 
 @image html qspy1.gif "Typical setup for software tracing with  QP/Spy&trade;"
 
@@ -53,11 +53,11 @@ Software tracing instrumentation logs interesting discrete events that occur in 
 
 A good tracing solution, such as QP/Spy, is minimally intrusive, which means that it can provide visibility into the running code with minimal impact on the target system behavior. Properly implemented and used, it will let you diagnose a live system without interrupting or significantly altering the behavior of the system under investigation.
 
-Of course, it's always possible that the overhead of software tracing, no matter how small, will have some effect on the target system behavior, which is known as the <em>probe effect</em> (a.k.a. the "Heisenberg effect"). To help you determine whether that is occurring, you must be able to configure the instrumentation in and out both at compile-time as well as at run-time.
+Of course, it's always possible that the overhead of software tracing, no matter how small, will have some effect on the target system behavior, which is known as the <em>probe effect</em> (a.k.a. the "Heisenberg effect"). To help you determine whether that is occurring, you must be able to configure the instrumentation in and out, both at compile-time as well as at run-time.
 
-To minimize the "probe effect", a good trace system performs efficient, selective logging of trace records using as little processing and memory resources of the target as possible. Selective logging means that the tracing system provides user-definable, fine granularity filters so that the target-resident component only collects events of interest you can filter as many or as few instrumented events as you need. That way you can make the tracing as noninvasive as necessary.
+To minimize the "probe effect", a good trace system performs efficient, selective logging of trace records using as little processing and memory resources of the target as possible. Selective logging means that the tracing system provides user-definable, fine-granularity filters so that the target-resident component only collects events of interest, and you can filter as many or as few instrumented events as you need. That way you can make the tracing as noninvasive as necessary.
 
-To minimize the RAM usage, the target-resident trace component typically uses a circular trace buffer that is continuously updated, and new data overwrites the old when the buffer "wraps around" due to limited size or transmission rate to the host. This reflects the typically applied <em>last-is-best</em> policy in collecting the trace data. In order to focus on certain periods of time, software trace provides configurable software triggers that can start and stop trace collection before the new data overwrites the old data of interest in the circular buffer.
+To minimize RAM usage, the target-resident trace component typically uses a circular trace buffer that is continuously updated, and new data overwrites the old when the buffer "wraps around" due to limited size or transmission rate to the host. This reflects the typically applied <em>last-is-best</em> policy in collecting the trace data. In order to focus on certain periods of time, software trace provides configurable software triggers that can start and stop trace collection before the new data overwrites the old data of interest in the circular buffer.
 
 To further maximize the amount of data collected in the trace buffer, the Target-resident component typically applies some form of <em>data compression</em> to squeeze more trace information into the buffer and to minimize the bandwidth required to uplink the data to the Host.
 
@@ -73,11 +73,11 @@ While traditional software tracing systems support only uni-directional output o
 
 
 @subsection qpspy_udp UDP Socket Extension
-The QP/Spy system provides a  @ref qspy_udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). Currently, the UDP connection point is used by the  @ref qutest "QUTest" headless (console-based) front-end and GUI-based @ref qview "QView" front-end.
+The QP/Spy system provides a  @ref qspy_udp "UDP socket", which is open for communication with various Front-Ends (GUI-based or "headless"). Currently, the UDP connection point is used by the  @ref qutest "QUTest" headless (console-based) front-end and the GUI-based @ref qview "QView" front-end.
 
 
 @subsection qpspy_exa QP/Spy Session Example
-To give you a better idea how QP/Spy works, the listing below shows an example output from a QP/Spy session. The left-hand side shows the raw, @ref qpspy_proto "binary output" generated by the target-resident component (@ref qs "QS"). The right-hand side shows the @ref qspy_text "human-readable format" generated from the same data by the host-resident component (@ref qspy "QSPY"). The compression ratio between the binary and textual outputs in this data sample is about 3.7.
+To give you a better idea how QP/Spy works, the listing below shows some example output from a QP/Spy session. The left-hand side shows the raw, @ref qpspy_proto "binary output" generated by the target-resident component (@ref qs "QS"). The right-hand side shows the @ref qspy_text "human-readable format" generated from the same data by the host-resident component (@ref qspy "QSPY"). The compression ratio between the binary and textual outputs in this data sample is about 3.7.
 
 @image html qpspy_exa.png "Example of the QP/Spy output"
 
@@ -98,7 +98,7 @@ The following sections explain the concepts and components of QP/Spy&trade;:
 <p>One of the greatest strengths of the QP/Spy&trade; tracing system is the data transmission protocol. The QP/Spy protocol is very lightweight, but contains the mechanisms for checking both data **integrity** and **continuity**.
 </p>
 
-The QP/Spy&trade; data protocol has many elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to the trace buffer overruns. The protocol has not only provisions for detecting gaps in the data and other errors, but allows for instantaneous re-synchronization after any bufferning or transmission error to minimize loss of useful data.
+The QP/Spy&trade; data protocol has many elements of the High Level Data Link Control (<a href="https://en.wikipedia.org/wiki/High-Level_Data_Link_Control" target="_blank" class="extern">HDLC</a>) protocol defined by the International Standards Organization (ISO). The QP/Spy protocol has been specifically designed to simplify the data management overhead in the target, yet to allow detection of any data dropouts due to trace buffer overruns. The protocol not only has provisions for detecting gaps in the data and other errors, but it allows for instantaneous re-synchronization after any buffering or transmission error to minimize loss of useful data.
 
 @image html qspy6.gif "QP/Spy transmission protocol"
 
@@ -106,13 +106,13 @@ The QS protocol transmits each trace record in an HDLC-like frame. The upper par
 
 1. Each frame starts with the Frame **Sequence-No** byte. The target QS component increments the Frame Sequence Number for every frame inserted into the circular buffer. The Sequence Number naturally rolls-over from 255 to 0. The Frame Sequence Number allows the QSPY host component to detect any data discontinuities.
 
-2. Following the Fame Sequence Number is the **Record-Type** byte, which is one of the predefined QS records, or an application-specific record.
+2. Following the Frame Sequence Number is the **Record-Type** byte, which is one of the predefined QS records, or an application-specific record.
 
 3. Following the Record-Type is zero or more **Data** bytes.
 
-4. Following the data is the **Checksum**. The Checksum is computed over the Fame Sequence Number, the Record ID, and all the Data bytes. The next section gives the detailed Checksum computation formula.
+4. Following the data is the **Checksum**. The Checksum is computed over the Frame Sequence Number, the Record ID, and all the Data bytes. The next section gives the detailed Checksum computation formula.
 
-5. Following the Checksum is the **HDLC Flag**, which delimits the frame. The HDLC flag is the `01111110` binary string (`0x7E` hexadecimal). Please note that the QP/Spy protocol uses only one HDLC Flag at the end of each frame an no HDLC Flag at the beginning of a frame. In other words, only one Flag is inserted between frames.
+5. Following the Checksum is the **HDLC Flag**, which delimits the frame. The HDLC flag is the `01111110` binary string (`0x7E` hexadecimal). Please note that the QP/Spy protocol uses only one HDLC Flag at the end of each frame and no HDLC Flag at the beginning of a frame. In other words, only one Flag is inserted between frames.
 
 The QS target component performs the HDLC-like framing described above at the time the bytes are inserted into the circular trace buffer. This means that the data in the buffer is already cleanly divided into frames and can be transmitted in any chunks, typically not aligned with the frame boundaries.
 
@@ -122,21 +122,21 @@ One of the most important characteristics of HDLC-type protocols is establishing
 
 Of course, now the Escape byte itself must also be transparent to avoid interpreting an unintentional Escape byte as the two-byte escape sequence. The procedure of escaping the Escape byte is identical to that of escaping the Flag byte.
 
-The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Fame Sequence Number, the Record-Type, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
+The transparency of the Flag and Escape bytes complicates slightly the computation of the Checksum. The transmitter computes the Checksum over the Frame Sequence Number, the Record-Type, and all Data bytes before performing any “byte-stuffing”. The receiver must apply the exact reversed procedure of performing the “byte-un-stuffing” before computing the Checksum.
 
-An example may make this clearer. Suppose that the following trace record needs to be inserted to the trace buffer (the transparent bytes are shown in bold):
+An example may make this clearer. Suppose that the following trace record needs to be inserted into the trace buffer (the transparent bytes are shown in bold):
 
-     Record-Type = 0x7D, Record Data = 0x7D 0x08 0x01
+> Record-Type = <b>0x7D</b>, Record Data = <b>0x7D</b> 0x08 0x01
 
-Assuming that the current Fame Sequence Number is, say `0x7E`, the Checksum will be computed over the following bytes:
+Assuming that the current Frame Sequence Number is, say `0x7E`, the Checksum will be computed over the following bytes:
 
-     Checksum == (uint8_t)(~(0x7E + 0x7D + 0x7D + 0x08 + 0x01)) == 0x7E
+> Checksum == (uint8_t)(~(0x7E + <b>0x7D</b> + <b>0x7D</b> + 0x08 + 0x01)) == 0x7E
 
 and the actual frame inserted into the QS trace buffer will be as follows:
 
-     0x7D 0x5E 0x7D 0x5D 0x7D 0x5D 0x08 0x01 0x7D 0x5E 0x7E
+> 0x7D <b>0x5E</b> 0x7D <b>0x5D</b> 0x7D <b>0x5D</b> 0x08 0x01 0x7D <b>0x5E</b> 0x7E
 
-Obviously, this is a degenerated example, where the Frame Sequence Number, the Record-Type, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
+Obviously, this is a degenerate example, where the Frame Sequence Number, the Record-Type, a Data byte, and the Checksum itself turned out to be the transparent bytes. Typical overhead of transparency with real trace data is one escape sequence per several trace records.
 
 
 @section qpspy_endianness Endianness
@@ -146,9 +146,9 @@ In addition to the HDLC-like framing, the QS transmission protocol specifies the
 @section qpspy_last_is_best Last-is-Best Data Policy
 The QS Trace Buffers (transmit QS buffer and receive QS-RX buffer) store only complete HDLC frames, which is the pivotal point in the design of the QS target component and has two important consequences.
 
-First, the use of HDLC frames in the buffers enables the <strong>last is best</strong> tracing policy. The QS transmission protocol maintains both the Frame Sequence Number and the Checksum over each trace record, which means that any data corruption caused by overrunning the old data with the new data can be always reliably detected. Therefore, the new trace data is simply inserted into the circular trace buffers, regardless if it perhaps overwrites the old data that hasn't been sent out yet, or is in the process of being sent. The burden of detection any data corruption is placed on the QSPY host component. When you start missing the frames (which the host component easily detects by discontinuities in the Frame Sequence Number), you have several options. Your can apply some additional filtering, increase the size of the buffer, or improve the data transfer throughput.
+First, the use of HDLC frames in the buffers enables the <strong>last is best</strong> tracing policy. The QS transmission protocol maintains both the Frame Sequence Number and the Checksum over each trace record, which means that any data corruption caused by overrunning the old data with the new data can be always reliably detected. Therefore, the new trace data is simply inserted into the circular trace buffers, regardless if it perhaps overwrites the old data that hasn't been sent out yet, or is in the process of being sent. The burden of detecting any data corruption is placed on the QSPY host component. When you start missing frames (which the host component easily detects by discontinuities in the Frame Sequence Number), you have several options. You can apply some additional filtering, increase the size of the buffer, or improve the data transfer throughput.
 
-Second, the use of HDLC-formatted data in the trace buffers allows decoupling the data insertion into the trace buffers from the data removal out of the trace buffers. You can simply remove the data in whichever chunks you like, without any consideration for frame boundaries. You can employ just about any available physical data link available on the target for transferring the trace data from the target to the host.
+Second, the use of HDLC-formatted data in the trace buffers allows decoupling data insertion into the trace buffers from data removal out of the trace buffers. You can simply remove the data in whichever chunks you like, without any consideration for frame boundaries. You can employ just about any available physical data link available on the target for transferring the trace data from the target to the host.
 
 @nav{qpspy,qs}
 */
