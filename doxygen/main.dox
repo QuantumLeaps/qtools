@@ -30,8 +30,8 @@ The QTools Collection for Windows additionally contains the following open-sourc
 
 - GNU-make for Windows (version 4.2.1)
 - GNU C/C++ toolchain for Windows (MinGW version 9.2.0)
-- GNU C/C++ toolchain for ARM Cortex-M and Cortex-R ([GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/))
-- Python for Windows (version 3.8 with tkinter)
+- GNU C/C++ toolchain for ARM Cortex-M/R (GNU Arm Embedded Toolchain)
+- Python for Windows (version 3.9 with tkinter)
 
 
 @section qtools_licensing Licensing QTools&trade;
@@ -52,7 +52,7 @@ have been developed and are copyrighted by Quantum Leaps.
 @subsection qtools_mingw The MinGW C and C++ compilers for Windows
 Have been taken from the MinGW project at:
 
-http://www.mingw.org/
+https://www.mingw-w64.org/
 
 The installer `mingw-get-setup.exe` has been used and after the
 installation, the files have been pruned to reduce the size of the
@@ -70,7 +70,7 @@ The source code is available from the download page under "Source Invariant".
 @subsection qtools_make The GNU make executable for Windows
 Has been taken from the MinGW project at:
 
-http://www.mingw.org/
+https://www.mingw-w64.org/
 
 The "GNU Make" manual (make.pdf) has been copied from the GNU make
 project at:
@@ -79,15 +79,9 @@ http://www.gnu.org/software/make
 
 
 @subsection qtools_util The file and diff utilities
-Have been taken from the UnixUtils project at SourceForge.net:
+Have been taken from the GOW project at GitHub:
 
-https://prdownloads.sourceforge.net/unxutils/UnxUtils.zip
-
-
-The file and diff utilities source (source/fileutils-3.16-src.zip) has
-been taken from:
-
-https://prdownloads.sourceforge.net/unxutils/UnxUtilsSrc.zip
+https://github.com/bmatzelle/gow
 
 
 @section qtools_help How to get help?
