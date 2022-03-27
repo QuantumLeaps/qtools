@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
+* @date Last updated on: 2022-03-12
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -146,6 +146,7 @@ typedef struct {
     int  len;  /* the length of the composed string */
     int  rec;  /* the corresponding QS record ID */
     int  type; /* the type of the output */
+    int  rx_status; /* the type of the RX status */
 } QSPY_LastOutput;
 
 enum QSRreRecGroup {

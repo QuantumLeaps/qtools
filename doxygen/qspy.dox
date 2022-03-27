@@ -34,224 +34,37 @@ where `options` are described in the following table:
 Usage: qspy [options]     <arg> = required, [arg] = optional
 @endverbatim
 
-
 <table>
-  <tr>
-    <th style="width:10%">Option</th>
-    <th style="width:10%">Example</th>
-    <th style="width:10%">Default (key)</th>
-    <th style="width:20%">Must match<br>QP macro</th>
-    <th style="width:50%">Comments</th>
-  </tr>
-
-  <tr>
-    <td>-h</td>
-    <td>-h</td>
-    <td>(key-h)</td>
-    <td></td>
-    <td>Help. Prints the summary of options</td>
-  </tr>
-
-  <tr>
-    <td>-q [num]</td>
-    <td>-q 99</td>
-    <td>(key-q)</td>
-    <td></td>
-    <td>Quiet mode (reduced stdout output)</td>
-  </tr>
-
-  <tr>
-    <td>-u [UDP_port|0]</td>
-    <td>-u</td>
-    <td>7701</td>
-    <td></td>
-    <td>UDP socket for "Front-Ends".<br>`-u0` suppresses opening the UDP socket </td>
-  </tr>
-
-  <tr>
-    <td>-v &lt;QS_version&gt;</td>
-    <td>-v 6.2</td>
-    <td>6.6</td>
-    <td></td>
-    <td>Enforce backwards-compatibility with the specific QS version</td>
-  </tr>
-
-  <tr>
-    <td>-r &lt;c0|c1|c2&gt;</td>
-    <td>-r c2</td>
-    <td>c1</td>
-    <td></td>
-    <td>Rendering options (c0=no-color|c1-color1|c2-color2)</td>
-  </tr>
-
-  <tr>
-    <td>-k</td>
-    <td>-k</td>
-    <td></td>
-    <td></td>
-    <td>suppress keyboard input</td>
-  </tr>
-
-  <tr>
-    <td>-o</td>
-    <td>-o</td>
-    <td>(key-o)</td>
-    <td></td>
-    <td>Produce output to the specified file</td>
-  </tr>
-
-  <tr>
-    <td>-s</td>
-    <td>-s</td>
-    <td>(key-s)</td>
-    <td></td>
-    <td>Save the binary input to a file. Not compatible with `-f`
-    </td>
-  </tr>
-
-  <tr>
-    <td>-m</td>
-    <td>-m</td>
-    <td>(key-m)</td>
-    <td></td>
-    <td>Produce @ref qspy_matlab "MATLAB/GNU-Octave output" to a file</td>
-  </tr>
-
-  <tr>
-    <td>-g [object-list]</td>
-    <td>-g obj1,obj2</td>
-    <td>(key-g)</td>
-    <td></td>
-    <td>Produce @ref qspy_seq "Sequence diagram output" to a file</td>
-  </tr>
-
-  <tr>
-    <td>-t [TCP-port]</td>
-    <td>-t </td>
-    <td>6601</td>
-    <td></td>
-    <td>TCP/IP input selection. Not compatible with `-c`, `-b`, `-f`</td>
-  </tr>
-
-  <tr>
-    <td>-c &lt;port&gt;</td>
-    <td>-c COM2</td>
-    <td>COM1</td>
-    <td></td>
-    <td>COM port selection. Not compatible with `-t`, `-p`, `-f`</td>
-  </tr>
-
-  <tr>
-    <td>-b &lt;baud&gt;</td>
-    <td>-b 38400</td>
-    <td>115200</td>
-    <td></td>
-    <td>Baud rate selection. Not compatible with `-t`, `-p`, `-f`</td>
-  </tr>
-
-  <tr>
-    <td>-f &lt;file&gt;</td>
-    <td>-f qs.spy</td>
-    <td></td>
-    <td></td>
-    <td>File input selection. Not compatible with `-c`, `-b`, `-t`, `-p`</td>
-  </tr>
-
-  <tr>
-    <td>-d [file]</td>
-    <td>-d my_app.dic</td>
-    <td></td>
-    <td></td>
-    <td>Read @ref qspy_dict "dictionaries" from a file.</td>
-  </tr>
-
-  <tr>
-    <TD colspan="5"><strong>Options for configuring Target object sizes:</strong>
+<tr><th style="width:10%">Option <th style="width:10%">Example <th style="width:10%">Default (key) <th style="width:20%">Must match<br>QP macro <th style="width:50%">Comments
+<tr><td>-h                    <td>-h           <td>(key-h) <td> <td>Help. Prints the summary of options
+<tr><td>-q [num]              <td>-q 99        <td>(key-q) <td> <td>Quiet mode (reduced stdout output)
+<tr><td>-u [UDP_port|0]       <td>-u           <td>7701    <td> <td>UDP socket for "Front-Ends".<br>`-u0` suppresses opening the UDP socket
+<tr><td>-v &lt;QS_version&gt; <td>-v 6.2       <td>6.6     <td> <td>Enforce backwards-compatibility with the specific QS version
+<tr><td>-r &lt;c0|c1|c2&gt;   <td>-r c2        <td>c1      <td> <td>Rendering options (c0=no-color|c1-color1|c2-color2)
+<tr><td>-k                    <td>-k           <td>        <td> <td>suppress keyboard input
+<tr><td>-o                    <td>-o           <td>(key-o) <td> <td>Produce output to the specified file
+<tr><td>-s                    <td>-s           <td>(key-s) <td> <td>Save the binary input to a file. Not compatible with `-f`
+<tr><td>-m                    <td>-m           <td>(key-m) <td> <td>Produce @ref qspy_matlab "MATLAB/GNU-Octave output" to a file
+<tr><td>-g [object-list]      <td>-g obj1,obj2 <td>(key-g) <td> <td>Produce @ref qspy_seq "Sequence diagram output" to a file
+<tr><td>-t [TCP-port]         <td>-t           <td>6601    <td> <td>TCP/IP input selection. Not compatible with `-c`, `-b`, `-f`
+<tr><td>-c &lt;port&gt;       <td>-c COM2      <td>COM1    <td> <td>COM port selection. Not compatible with `-t`, `-p`, `-f`
+<tr><td>-b &lt;baud&gt;       <td>-b 38400     <td>115200  <td> <td>Baud rate selection. Not compatible with `-t`, `-p`, `-f`
+<tr><td>-f &lt;file&gt;       <td>-f qs.spy    <td>        <td> <td>File input selection. Not compatible with `-c`, `-b`, `-t`, `-p`
+<tr><td>-d [file]             <td>-d my_app.dic <td>       <td> <td>Read @ref qspy_dict "dictionaries" from a file.
+<tr><td colspan="5"><strong>Options for configuring Target object sizes:</strong>
 The Target can **report** its configuration to QSPY, which means that you don't need to provide any upper-case options (such as: `-T`, `-O`, `-F`, etc.).
-    </td>
-  </tr>
-
-  <tr>
-    <th>Option</th>
-    <th>Example</th>
-    <th>Default (key)</th>
-    <th>Must match QP macro</th>
-    <th>Comments</th>
-  </tr>
-
-  <tr>
-    <td>-T &lt;size&gt;</td>
-    <td>-T 2</td>
-    <td>4</td>
-    <td>`QS_TIME_SIZE`</td>
-    <td>Time stamp size in bytes. Valid values: 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-O &lt;size&gt;</td>
-    <td>-O 2</td>
-    <td>4</td>
-    <td>`QS_OBJ_PTR_SIZE`</td>
-    <td>Object pointer size in bytes. Valid values: 1, 2, 4, 8</td>
-  </tr>
-
-  <tr>
-    <td>-F &lt;size&gt;</td>
-    <td>-F 2</td>
-    <td>4</td>
-    <td>`QS_FUN_PTR_SIZE`</td>
-    <td>Function pointer size in bytes. Valid values: 1, 2, 4, 8</td>
-  </tr>
-
-  <tr>
-    <td>-S &lt;size&gt;</td>
-    <td>-S 1</td>
-    <td>2</td>
-    <td>`Q_SIGNAL_SIZE`</td>
-    <td>Signal size in bytes. Valid values: 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-E &lt;size&gt;</td>
-    <td>-E 1</td>
-    <td>2</td>
-    <td>`QF_EVENT_SIZ_SIZE`</td>
-    <td>Event-size size in bytes (i.e., the size of variables that hold
-        event size). Valid values: 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-Q &lt;size&gt;</td>
-    <td>-Q 2</td>
-    <td>1</td>
-    <td>`QF_EQUEUE_CTR_SIZE`</td>
-    <td>Queue counter size in bytes. Valid values 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-P &lt;size&gt;</td>
-    <td>-P 4</td>
-    <td>2</td>
-    <td>`QF_MPOOL_CTR_SIZE`</td>
-    <td>Pool counter size in bytes. Valid values: 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-B &lt;size&gt;</td>
-    <td>-B 1</td>
-    <td>2</td>
-    <td>`QF_MPOOL_SIZ_SIZE`</td>
-    <td>Block size size in bytes. (i.e., the size of variables that hold
-        memory block size). Valid values 1, 2, 4</td>
-  </tr>
-
-  <tr>
-    <td>-C &lt;size&gt;</td>
-    <td>-C 4</td>
-    <td>2</td>
-    <td>`QF_TIMEEVT_CTR_SIZE`</td>
-    <td>Time event counter size. Valid values: 1, 2, 4</td>
-  </tr>
+<tr><th>Option <th>Example <th>Default (key) <th>Must match QP macro <th>Comments
+<tr><td>-T &lt;size&gt;       <td>-T 2         <td>4       <td>`QS_TIME_SIZE`       <td>Time stamp size in bytes. Valid values: 1, 2, 4
+<tr><td>-O &lt;size&gt;       <td>-O 2         <td>4       <td>`QS_OBJ_PTR_SIZE`    <td>Object pointer size in bytes. Valid values: 1, 2, 4, 8
+<tr><td>-F &lt;size&gt;       <td>-F 2         <td>4       <td>`QS_FUN_PTR_SIZE`    <td>Function pointer size in bytes. Valid values: 1, 2, 4, 8
+<tr><td>-S &lt;size&gt;       <td>-S 1         <td>2       <td>`Q_SIGNAL_SIZE`      <td>Signal size in bytes. Valid values: 1, 2, 4
+<tr><td>-E &lt;size&gt;       <td>-E 1         <td>2       <td>`QF_EVENT_SIZ_SIZE`  <td>Event-size size in bytes (i.e., the size of variables that hold
+        event size). Valid values: 1, 2, 4
+<tr><td>-Q &lt;size&gt;       <td>-Q 2         <td>1       <td>`QF_EQUEUE_CTR_SIZE` <td>Queue counter size in bytes. Valid values 1, 2, 4
+<tr><td>-P &lt;size&gt;       <td>-P 4         <td>2       <td>`QF_MPOOL_CTR_SIZE`  <td>Pool counter size in bytes. Valid values: 1, 2, 4
+<tr><td>-B &lt;size&gt;       <td>-B 1         <td>2       <td>`QF_MPOOL_SIZ_SIZE`  <td>Block size size in bytes. (i.e., the size of variables that hold
+        memory block size). Valid values 1, 2, 4
+<tr><td>-C &lt;size&gt;       <td>-C 4         <td>2       <td>`QF_TIMEEVT_CTR_SIZE` <td>Time event counter size. Valid values: 1, 2, 4
 </table>
 
 
@@ -381,6 +194,7 @@ The following sub-sections explain the following QSPY features:
 - @subpage qspy_seq  "Sequence diagram output"
 - @subpage qspy_matlab "MATLAB output"
 
+<div style="clear:both;"></div>
 @nav{qs,qspy_text}
 */
 /*###########################################################################*/
@@ -507,543 +321,89 @@ The following table summarizes the text output format used for all predefined QS
 To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY human-readable output has been changed at @ref qtools_5_9_0 "version 5.9.0" to avoid any special characters used in regular expressions, such as `*, [, ], ?, !`. This is because the QUTest scripts use regular expressions to match QSPY textual output with the expected output.
 
 <table>
-  <tr>
-      <td colspan="4"><strong>State Machine Trace Records (QEP)</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>1</td>
-    <td>#QS_QEP_STATE_ENTRY</td>
-    <td>`===RTC===> St-Entry`</td>
-    <td>a state was entered</td>
-  </tr>
-
-  <tr>
-    <td>2</td>
-    <td>#QS_QEP_STATE_EXIT</td>
-    <td>`===RTC===> St-Exit`</td>
-    <td>a state was exited</td>
-  </tr>
-
-  <tr>
-    <td>3</td>
-    <td>#QS_QEP_STATE_INIT</td>
-    <td>`<timestamp> St-Init`</td>
-    <td>an initial transition was taken in a state</td>
-  </tr>
-
-  <tr>
-    <td>4</td>
-    <td>#QS_QEP_INIT_TRAN</td>
-    <td>`<timestamp> Init===>`</td>
-    <td>the top-most initial transition was taken</td>
-  </tr>
-
-  <tr>
-    <td>5</td>
-    <td>#QS_QEP_INTERN_TRAN</td>
-    <td>`<timestamp> =>Intern`</td>
-    <td>an internal transition was taken</td>
-  </tr>
-
-  <tr>
-    <td>6</td>
-    <td>#QS_QEP_TRAN</td>
-    <td>`<timestamp> ===>Tran `</td>
-    <td>a regular transition was taken</td>
-  </tr>
-
-  <tr>
-    <td>7</td>
-    <td>#QS_QEP_IGNORED</td>
-    <td>`<timestamp> =>Ignore`</td>
-    <td>an event was ignored (silently discarded)</td>
-  </tr>
-
-  <tr>
-    <td>8</td>
-    <td>#QS_QEP_DISPATCH</td>
-    <td>`<timestamp> Disp===>`</td>
-    <td>an event was dispatched (begin of RTC step)</td>
-  </tr>
-
-  <tr>
-    <td>9</td>
-    <td>#QS_QEP_UNHANDLED</td>
-    <td>`===RTC===> St-Unhnd`</td>
-    <td>a guard prevented handling of an event</td>
-  </tr>
-
-  <tr>
-    <td>55</td>
-    <td>#QS_QEP_TRAN_HIST</td>
-    <td>`===RTC===> St-Hist`</td>
-    <td>a transition to history was taken</td>
-  </tr>
-
-  <tr>
-    <td>56</td>
-    <td>#QS_QEP_TRAN_EP</td>
-    <td>`===RTC===> St-EP`</td>
-    <td>a transition was taken to an entry point into a submachine</td>
-  </tr>
-
-  <tr>
-    <td>57</td>
-    <td>#QS_QEP_TRAN_XP</td>
-    <td>`===RTC===> St-XP`</td>
-    <td>a transition was taken to an exit point out of a submachine</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Active Object Trace Records</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>12</td>
-    <td>#QS_QF_ACTIVE_SUBSCRIBE</td>
-    <td>`<timestamp> AO-Subsc`</td>
-    <td>an AO subscribed to an event</td>
-  </tr>
-
-  <tr>
-    <td>13</td>
-    <td>#QS_QF_ACTIVE_UNSUBSCRIBE</td>
-    <td>`<timestamp> AO-Unsub`</td>
-    <td>an AO unsubscribed from an event</td>
-  </tr>
-
-  <tr>
-    <td>14</td>
-    <td>#QS_QF_ACTIVE_POST</td>
-    <td>`<timestamp> AO-Post`</td>
-    <td>an event was posted (FIFO) directly to AO</td>
-  </tr>
-
-  <tr>
-    <td>15</td>
-    <td>#QS_QF_ACTIVE_POST_LIFO</td>
-    <td>`<timestamp> AO-LIFO`</td>
-    <td>an event was posted (LIFO) directly to AO</td>
-  </tr>
-
-  <tr>
-    <td>16</td>
-    <td>#QS_QF_ACTIVE_GET</td>
-    <td>`<timestamp> AO-Get`</td>
-    <td>AO got an event and its queue is still not empty</td>
-  </tr>
-
-  <tr>
-    <td>17</td>
-    <td>#QS_QF_ACTIVE_GET_LAST</td>
-    <td>`<timestamp> AO-GetL`</td>
-    <td>AO got an event and its queue is empty</td>
-  </tr>
-
-  <tr>
-    <td>45</td>
-    <td>#QS_QF_ACTIVE_POST_ATTEMPT</td>
-    <td>`<timestamp> AO-PostA`</td>
-    <td>attempt to post an event to AO failed</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Raw Event Queue Trace Records</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>19</td>
-    <td>#QS_QF_EQUEUE_POST</td>
-    <td>`<timestamp> EQ-Post`</td>
-    <td>an event was posted (FIFO) to a raw queue</td>
-  </tr>
-
-  <tr>
-    <td>20</td>
-    <td>#QS_QF_EQUEUE_POST_LIFO</td>
-    <td>`<timestamp> EQ-LIFO`</td>
-    <td>an event was posted (LIFO) to a raw queue</td>
-  </tr>
-
-  <tr>
-    <td>21</td>
-    <td>#QS_QF_EQUEUE_GET</td>
-    <td>`<timestamp> EQ-Get`</td>
-    <td>got an event and queue still not empty</td>
-  </tr>
-
-  <tr>
-    <td>22</td>
-    <td>#QS_QF_EQUEUE_GET_LAST</td>
-    <td>`<timestamp> EQ-GetL`</td>
-    <td>got the last event from the queue</td>
-  </tr>
-
-  <tr>
-    <td>46</td>
-    <td>#QS_QF_EQUEUE_POST_ATTEMPT</td>
-    <td>`<timestamp> EQ-PostA`</td>
-    <td>attempt to post an event to QEQueue failed</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Raw Memory Pool Trace Records</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>24</td>
-    <td>#QS_QF_MPOOL_GET</td>
-    <td>`<timestamp> MP-Get`</td>
-    <td>a memory block was removed from a memory pool</td>
-  </tr>
-
-  <tr>
-    <td>24</td>
-    <td>#QS_QF_MPOOL_GET_ATTEMPT</td>
-    <td>`<timestamp> MP-GetA`</td>
-    <td>a memory block was removed from a memory pool</td>
-  </tr>
-
-  <tr>
-    <td>25</td>
-    <td>#QS_QF_MPOOL_PUT</td>
-    <td>`<timestamp> MP-Put`</td>
-    <td>a memory block was returned to a memory pool</td>
-  </tr>
-
-  <tr>
-    <td>47</td>
-    <td>#QS_QF_MPOOL_GET_ATTEMPT</td>
-    <td>`<timestamp> MP-GetA`</td>
-    <td>attempt to get a memory block failed </td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Event Management (QF)</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>26</td>
-    <td>#QS_QF_PUBLISH</td>
-    <td>`<timestamp> QF-Pub`</td>
-    <td>an event was published</td>
-  </tr>
-
-  <tr>
-    <td>27</td>
-    <td>RESERVED</td>
-    <td></td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>28</td>
-    <td>#QS_QF_NEW</td>
-    <td>`<timestamp> QF-New`</td>
-    <td>new event creation</td>
-  </tr>
-
-  <tr>
-    <td>29</td>
-    <td>#QS_QF_GC_ATTEMPT</td>
-    <td>`<timestamp> QF-gcA`</td>
-    <td>garbage collection attempt</td>
-  </tr>
-
-  <tr>
-    <td>30</td>
-    <td>#QS_QF_GC</td>
-    <td>`<timestamp> QF-gc`</td>
-    <td>garbage collection performed</td>
-  </tr>
-
-  <tr>
-    <td>31</td>
-    <td>#QS_QF_TICK</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tick`</td>
-    <td>QF system clock tick processing was called</td>
-  </tr>
-
-  <tr>
-    <td>39</td>
-    <td>#QS_QF_CRIT_ENTRY</td>
-    <td>`<timestamp> QF-CritE`</td>
-    <td>critical section was entered</td>
-  </tr>
-
-  <tr>
-    <td>40</td>
-    <td>#QS_QF_CRIT_EXIT</td>
-    <td>`<timestamp> QF-CritX`</td>
-    <td>critical section was exited</td>
-  </tr>
-
-  <tr>
-    <td>41</td>
-    <td>#QS_QF_ISR_ENTRY</td>
-    <td>`<timestamp> QF-IsrE`</td>
-    <td>an ISR was entered</td>
-  </tr>
-
-  <tr>
-    <td>42</td>
-    <td>#QS_QF_ISR_EXIT</td>
-    <td>`<timestamp> QF-IsrX`</td>
-    <td>an ISR was exited</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Time Events (TE)</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>32</td>
-    <td>#QS_QF_TIMEEVT_ARM</td>
-    <td>`<timestamp> TE-Arm`</td>
-    <td>a time event was armed</td>
-  </tr>
-
-  <tr>
-    <td>33</td>
-    <td>#QS_QF_TIMEEVT_AUTO_DISARM</td>
-    <td>`<timestamp> TE-ADis`</td>
-    <td>a time event expired and was disarmed</td>
-  </tr>
-
-  <tr>
-    <td>34</td>
-    <td>#QS_QF_TIMEEVT_DISARM_ATTEMPT</td>
-    <td>`<timestamp> TE-DisA`</td>
-    <td>attempt to disarm a disarmed tevent</td>
-  </tr>
-
-  <tr>
-    <td>35</td>
-    <td>#QS_QF_TIMEEVT_DISARM</td>
-    <td>`<timestamp> TE-Dis`</td>
-    <td>successful disarming of an armed time event</td>
-  </tr>
-
-  <tr>
-    <td>36</td>
-    <td>#QS_QF_TIMEEVT_REARM</td>
-    <td>`<timestamp> TE-Rarm`</td>
-    <td>rearming of a time event</td>
-  </tr>
-
-  <tr>
-    <td>37</td>
-    <td>#QS_QF_TIMEEVT_POST</td>
-    <td>`<timestamp> TE-Post`</td>
-    <td>a time event posted itself directly to an AO</td>
-  </tr>
-
-  <tr>
-    <td>38</td>
-    <td>#QS_QF_TIMEEVT_CTR</td>
-    <td>`<timestamp> TE-Ctr`</td>
-    <td>a time event counter was requested </td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Scheduler Trace Records</strong></td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>50</td>
-    <td>#QS_SCHED_LOCK</td>
-    <td>`<timestamp> Sch-Lock`</td>
-    <td>scheduler was locked</td>
-  </tr>
-
-  <tr>
-    <td>51</td>
-    <td>#QS_SCHED_UNLOCK</td>
-    <td>`<timestamp> Sch-Unlk`</td>
-    <td>scheduler was unlocked</td>
-  </tr>
-
-  <tr>
-    <td>52</td>
-    <td>#QS_SCHED_NEXT</td>
-    <td>`<timestamp> Sch-Next`</td>
-    <td>scheduler found next task to execute</td>
-  </tr>
-
-  <tr>
-    <td>53</td>
-    <td>#QS_SCHED_IDLE</td>
-    <td>`<timestamp> Sch-Idle`</td>
-    <td>scheduler became idle</td>
-  </tr>
-
-  <tr>
-    <td>54</td>
-    <td>#QS_SCHED_RESUME</td>
-    <td>`<timestamp> Sch-Rsme`</td>
-    <td>scheduler resumed previous task (not idle)</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>Miscellaneous Trace Records@n
-      NOT MASKABLE WITH THE @ref qs_global "QS GLOBAL FILTER"!
-      </strong>
-      </td>
-  </tr>
-
-  <tr>
-    <th>Rec.<br> Num</th>
-    <th>Rec.<br> Enum</th>
-    <th>Start of record</th>
-    <th>Comment</th>
-  </tr>
-
-  <tr>
-    <td>58</td>
-    <td>#QS_TEST_PAUSED</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TstPause`</td>
-    <td>test has been paused</td>
-  </tr>
-
-  <tr>
-    <td>59</td>
-    <td>#QS_TEST_PROBE_GET</td>
-    <td>`<timestamp> TstProbe`</td>
-    <td>reports that Test-Probe has been used</td>
-  </tr>
-
-  <tr>
-    <td>60</td>
-    <td>#QS_SIG_DICTIONARY</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sig-Dict`</td>
-    <td>signal dictionary entry</td>
-  </tr>
-
-  <tr>
-    <td>61</td>
-    <td>#QS_OBJ_DICTIONARY</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Obj-Dict`</td>
-    <td>object dictionary entry</td>
-  </tr>
-
-  <tr>
-    <td>62</td>
-    <td>#QS_FUN_DICTIONARY</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fun-Dict`</td>
-    <td>function dictionary entry</td>
-  </tr>
-
-  <tr>
-    <td>63</td>
-    <td>#QS_USR_DICTIONARY</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Usr-Dict`</td>
-    <td>User record dictionary entry</td>
-  </tr>
-
-  <tr>
-    <td>64</td>
-    <td>#QS_TARGET_INFO</td>
-    <td>`########## Trg-Info`</td>
-    <td>reports the Target information</td>
-  </tr>
-
-  <tr>
-    <td>65</td>
-    <td>#QS_TARGET_DONE</td>
-    <td>`<timestamp> Trg-Done`</td>
-    <td>reports completion of a user callback</td>
-  </tr>
-
-  <tr>
-    <td>66</td>
-    <td>#QS_RX_STATUS</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Ack`</td>
-    <td>reports QS data receive status</td>
-  </tr>
-
-  <tr>
-    <td>66</td>
-    <td>RESERVED</td>
-    <td></td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>66</td>
-    <td>#QS_PEEK_DATA</td>
-    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Peek`</td>
-    <td>reports the data from the PEEK query</td>
-  </tr>
-
-  <tr>
-    <td>67</td>
-    <td>#QS_ASSERT_FAIL</td>
-    <td>`<timestamp> =ASSERT=`</td>
-    <td>Assertion fired</td>
-  </tr>
-
-  <tr>
-      <td colspan="4"><strong>User (Application Specific) Records</strong></td>
-  </tr>
-
-  <tr>
-    <td>100</td>
-    <td>#QS_USER + xxx</td>
-    <td>`<timestamp> USER+xxx`</td>
-    <td>@ref qs_app "application-specific" (user) QS records (100..124)</td>
-  </tr>
+<tr><td colspan="4"><strong>State Machine Trace Records (QEP)</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>1  <td>#QS_QEP_STATE_ENTRY <td>`===RTC===> St-Entry`   <td>a state was entered
+<tr><td>2  <td>#QS_QEP_STATE_EXIT  <td>`===RTC===> St-Exit`    <td>a state was exited
+<tr><td>3  <td>#QS_QEP_STATE_INIT  <td>`<timestamp> St-Init`   <td>an initial transition was taken in a state
+<tr><td>4  <td>#QS_QEP_INIT_TRAN   <td>`<timestamp> Init===>`  <td>the top-most initial transition was taken
+<tr><td>5  <td>#QS_QEP_INTERN_TRAN <td>`<timestamp> =>Intern`  <td>an internal transition was taken
+<tr><td>6  <td>#QS_QEP_TRAN        <td>`<timestamp> ===>Tran ` <td>a regular transition was taken
+<tr><td>7  <td>#QS_QEP_IGNORED     <td>`<timestamp> =>Ignore`  <td>an event was ignored (silently discarded)
+<tr><td>8  <td>#QS_QEP_DISPATCH    <td>`<timestamp> Disp===>`  <td>an event was dispatched (begin of RTC step)
+<tr><td>9  <td>#QS_QEP_UNHANDLED   <td>`===RTC===> St-Unhnd`   <td>a guard prevented handling of an event
+<tr><td>55 <td>#QS_QEP_TRAN_HIST   <td>`===RTC===> St-Hist`    <td>a transition to history was taken
+<tr><td>56 <td>#QS_QEP_TRAN_EP     <td>`===RTC===> St-EP`      <td>a transition was taken to an entry point into a submachine
+<tr><td>57 <td>#QS_QEP_TRAN_XP     <td>`===RTC===> St-XP`      <td>a transition was taken to an exit point out of a submachine
+<tr><td colspan="4"><strong>Active Object Trace Records</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>12 <td>#QS_QF_ACTIVE_SUBSCRIBE    <td>`<timestamp> AO-Subsc`  <td>an AO subscribed to an event
+<tr><td>13 <td>#QS_QF_ACTIVE_UNSUBSCRIBE  <td>`<timestamp> AO-Unsub`  <td>an AO unsubscribed from an event
+<tr><td>14 <td>#QS_QF_ACTIVE_POST         <td>`<timestamp> AO-Post`   <td>an event was posted (FIFO) directly to AO
+<tr><td>15 <td>#QS_QF_ACTIVE_POST_LIFO    <td>`<timestamp> AO-LIFO`   <td>an event was posted (LIFO) directly to AO
+<tr><td>16 <td>#QS_QF_ACTIVE_GET          <td>`<timestamp> AO-Get`    <td>AO got an event and its queue is still not empty
+<tr><td>17 <td>#QS_QF_ACTIVE_GET_LAST     <td>`<timestamp> AO-GetL`   <td>AO got an event and its queue is empty
+<tr><td>45 <td>#QS_QF_ACTIVE_POST_ATTEMPT <td>`<timestamp> AO-PostA`  <td>attempt to post an event to AO failed
+<tr><td colspan="4"><strong>Raw Event Queue Trace Records</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>19 <td>#QS_QF_EQUEUE_POST         <td>`<timestamp> EQ-Post`   <td>an event was posted (FIFO) to a raw queue
+<tr><td>20 <td>#QS_QF_EQUEUE_POST_LIFO    <td>`<timestamp> EQ-LIFO`   <td>an event was posted (LIFO) to a raw queue
+<tr><td>21 <td>#QS_QF_EQUEUE_GET          <td>`<timestamp> EQ-Get`    <td>got an event and queue still not empty
+<tr><td>22 <td>#QS_QF_EQUEUE_GET_LAST     <td>`<timestamp> EQ-GetL`   <td>got the last event from the queue
+<tr><td>46 <td>#QS_QF_EQUEUE_POST_ATTEMPT <td>`<timestamp> EQ-PostA`  <td>attempt to post an event to QEQueue failed
+<tr><td colspan="4"><strong>Raw Memory Pool Trace Records</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>24 <td>#QS_QF_MPOOL_GET           <td>`<timestamp> MP-Get`    <td>a memory block was removed from a memory pool
+<tr><td>25 <td>#QS_QF_MPOOL_PUT           <td>`<timestamp> MP-Put`    <td>a memory block was returned to a memory pool
+<tr><td>47 <td>#QS_QF_MPOOL_GET_ATTEMPT   <td>`<timestamp> MP-GetA`   <td>attempt to get a memory block failed
+<tr><td colspan="4"><strong>Event Management (QF)</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>26 <td>#QS_QF_PUBLISH             <td>`<timestamp> QF-Pub`    <td>an event was published
+<tr><td>27 <td>#QS_QF_NEW_REF             <td>`<timestamp> New-Ref`   <td>new event reference was created
+<tr><td>28 <td>#QS_QF_NEW                 <td>`<timestamp> QF-New`    <td>new event creation
+<tr><td>29 <td>#QS_QF_GC_ATTEMPT          <td>`<timestamp> QF-gcA`    <td>garbage collection attempt
+<tr><td>30 <td>#QS_QF_GC                  <td>`<timestamp> QF-gc`     <td>garbage collection performed
+<tr><td>31 <td>#QS_QF_TICK                <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tick`<td>QF system clock tick processing was called
+<tr><td>39 <td>#QS_QF_CRIT_ENTRY          <td>`<timestamp> QF-CritE`  <td>critical section was entered
+<tr><td>40 <td>#QS_QF_CRIT_EXIT           <td>`<timestamp> QF-CritX`  <td>critical section was exited
+<tr><td>41 <td>#QS_QF_ISR_ENTRY           <td>`<timestamp> QF-IsrE`   <td>an ISR was entered
+<tr><td>42 <td>#QS_QF_ISR_EXIT            <td>`<timestamp> QF-IsrX`   <td>an ISR was exited
+<tr><td colspan="4"><strong>Time Events (TE)</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>32 <td>#QS_QF_TIMEEVT_ARM         <td>`<timestamp> TE-Arm`    <td>a time event was armed
+<tr><td>33 <td>#QS_QF_TIMEEVT_AUTO_DISARM <td>`<timestamp> TE-ADis`   <td>a time event expired and was disarmed
+<tr><td>34 <td>#QS_QF_TIMEEVT_DISARM_ATTEMPT <td>`<timestamp> TE-DisA` <td>attempt to disarm a disarmed Time Event
+<tr><td>35 <td>#QS_QF_TIMEEVT_DISARM      <td>`<timestamp> TE-Dis`    <td>successful disarming of an armed time event
+<tr><td>36 <td>#QS_QF_TIMEEVT_REARM       <td>`<timestamp> TE-Rarm`   <td>rearming of a time event
+<tr><td>37 <td>#QS_QF_TIMEEVT_POST        <td>`<timestamp> TE-Post`   <td>a time event posted itself directly to an AO
+<tr><td>38 <td>#QS_QF_DELETE_REF          <td>`<timestamp> QF-DelRf`    <td>an event reference is about to be deleted
+<tr><td colspan="4"><strong>Scheduler Trace Records</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>50 <td>#QS_SCHED_LOCK             <td>`<timestamp> Sch-Lock`  <td>scheduler was locked
+<tr><td>51 <td>#QS_SCHED_UNLOCK           <td>`<timestamp> Sch-Unlk`  <td>scheduler was unlocked
+<tr><td>52 <td>#QS_SCHED_NEXT             <td>`<timestamp> Sch-Next`  <td>scheduler found next task to execute
+<tr><td>53 <td>#QS_SCHED_IDLE             <td>`<timestamp> Sch-Idle`  <td>scheduler became idle
+<tr><td>54 <td>#QS_SCHED_RESUME           <td>`<timestamp> Sch-Rsme`  <td>scheduler resumed previous task (not idle)
+<tr><td colspan="4"><strong>Miscellaneous Trace Records<br>NOT MASKABLE WITH THE @ref qs_global "QS GLOBAL FILTER"!</strong>
+<tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
+<tr><td>58 <td>#QS_TEST_PAUSED    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TstPause` <td>test has been paused
+<tr><td>59 <td>#QS_TEST_PROBE_GET <td>`<timestamp> TstProbe` <td>reports that Test-Probe has been used
+<tr><td>60 <td>#QS_SIG_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sig-Dict` <td>signal dictionary entry
+<tr><td>61 <td>#QS_OBJ_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Obj-Dict` <td>object dictionary entry
+<tr><td>62 <td>#QS_FUN_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fun-Dict` <td>function dictionary entry
+<tr><td>63 <td>#QS_USR_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Usr-Dict` <td>User record dictionary entry
+<tr><td>64 <td>#QS_TARGET_INFO    <td>`########## Trg-Info`   <td>reports the Target information
+<tr><td>65 <td>#QS_TARGET_DONE    <td>`<timestamp> Trg-Done`  <td>reports completion of a user callback
+<tr><td>66 <td>#QS_RX_STATUS      <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Ack`  <td>reports QS data receive status
+<tr><td>67 <td>#QS_QUERY_DATA     <td>`<timestamp> Query-xxx` <td>reports the data from "current object" query
+<tr><td>68 <td>#QS_PEEK_DATA      <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Peek` <td>reports the data from the PEEK query
+<tr><td>69 <td>#QS_ASSERT_FAIL    <td>`<timestamp> =ASSERT=`   <td>Assertion failed in the target
+<tr><td>70 <td>#QS_QF_RUN         <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QF RUN`   <td>`QF_run()` called
+<tr><td colspan="4"><strong>User (Application Specific) Records</strong>
+<tr><td>100 <td>#QS_USER + xxx    <td>`<timestamp> USER+xxx` <td>@ref qs_app "application-specific" (user) QS records (100..124)
 </table>
 
+<div style="clear:both;"></div>
 @nav{qspy,qspy_dict}
 */
 /*###########################################################################*/
@@ -1346,6 +706,8 @@ The dictionary file saved in previous QSPY sessions can be used in two ways:
 @note
 That last option requires that the Target implements the @ref qs_rx "QS receive channel, QS-RX" so that it can receive commands from QSPY.
 
+
+<div style="clear:both;"></div>
 @nav{qspy_text,qspy_udp}
 */
 /*##########################################################################*/
@@ -1405,7 +767,6 @@ All data to and from the Target is sent according to the @ref qpspy_proto "QP/Sp
 @code
 ::qspy::sendPkt [binary format c $::qspy::QS_RX(INFO)]
 @endcode
-
 
 
 @subsection udp_COMMAND Execute a User-Defined Command in the Target (COMMAND)
@@ -1766,7 +1127,8 @@ In addition to the elements described above, this sequence diagram illustrates *
 @endverbatim
 </div>
 
-@next{qspy_matlab}
+<div style="clear:both;"></div>
+@nav{qspy_udp,qspy_matlab}
 */
 /*###########################################################################*/
 /**
@@ -1803,115 +1165,17 @@ through the rows. Therefore, a data set consisting of twenty-four time samples o
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Signal</th>
-    <th>State<br>Machine<br>Object</th>
-    <th>Source<br>State</th>
-    <th>New<br>State</th>
-    <th>Event<br>Handler</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_ENTRY</td>
-    <td>NaN</td>
-    <td>1</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_EXIT</td>
-    <td>NaN</td>
-    <td>2</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_INIT</td>
-    <td>NaN</td>
-    <td>3</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_INIT_TRAN</td>
-    <td>#</td>
-    <td>3</td>
-    <td>#(2)</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_INTERN_TRAN</td>
-    <td>#</td>
-    <td>#(1)</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_TRAN</td>
-    <td>#</td>
-    <td>#(1)</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>#</td>
-    <td>1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_IGNORED</td>
-    <td>#</td>
-    <td>#(1)</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_DISPATCH</td>
-    <td>#</td>
-    <td>#(1)</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_UNHANDLED</td>
-    <td>NaN</td>
-    <td>#(1)</td>
-    <td>#(2)</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5 <th>6
+<tr><th>QS Record <th>Time<br>Stamp <th>Signal <th>State<br>Machine<br>Object <th>Source<br>State <th>New<br>State <th>Event<br>Handler
+<tr><td>#QS_QEP_STATE_ENTRY <td>NaN <td>1    <td>#(2) <td>#   <td>NaN <td>1
+<tr><td>#QS_QEP_STATE_EXIT  <td>NaN <td>2    <td>#(2) <td>#   <td>NaN <td>1
+<tr><td>#QS_QEP_STATE_INIT  <td>NaN <td>3    <td>#    <td>#   <td>#   <td>1
+<tr><td>#QS_QEP_INIT_TRAN   <td>#   <td>3    <td>#(2) <td>NaN <td>#   <td>1
+<tr><td>#QS_QEP_INTERN_TRAN <td>#   <td>#(1) <td>#(2) <td>#   <td>NaN <td>1
+<tr><td>#QS_QEP_TRAN        <td>#   <td>#(1) <td>#(2) <td>#   <td>#   <td>1
+<tr><td>#QS_QEP_IGNORED     <td>#   <td>#(1) <td>#(2) <td>#   <td>NaN <td>0
+<tr><td>#QS_QEP_DISPATCH    <td>#   <td>#(1) <td>#(2) <td>#   <td>NaN <td>0
+<tr><td>#QS_QEP_UNHANDLED   <td>NaN <td>#(1) <td>#(2) <td>#   <td>NaN <td>0
 </table>
 </center>
 
@@ -1925,45 +1189,14 @@ records from the @c Q_STATE matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_ENTRY</td>
-    <td>`Q_STATE(:,2) == 1`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_EXIT</td>
-    <td>`Q_STATE(:,2) == 2`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_STATE_INIT</td>
-    <td>`Q_STATE(:,2) == 3`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_INIT_TRAN</td>
-    <td>`isnan(Q_STATE(:,4))`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_INTERN_TRAN</td>
-    <td>`Q_STATE(:,2) &gt; 3 & isnan(Q_STATE(:,5))`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_TRAN</td>
-    <td>`Q_STATE(:,2) > &gt; & ~isnan(Q_STATE(:,5))`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QEP_IGNORED</td>
-    <td>`~Q_STATE(:,6)`</td>
-  </tr>
+<tr><th>QS Record              <th>MATLAB Matrix Index
+<tr><td>#QS_QEP_STATE_ENTRY <td>`Q_STATE(:,2) == 1`
+<tr><td>#QS_QEP_STATE_EXIT  <td>`Q_STATE(:,2) == 2`
+<tr><td>#QS_QEP_STATE_INIT  <td>`Q_STATE(:,2) == 3`
+<tr><td>#QS_QEP_INIT_TRAN   <td>`isnan(Q_STATE(:,4))`
+<tr><td>#QS_QEP_INTERN_TRAN <td>`Q_STATE(:,2) &gt; 3 & isnan(Q_STATE(:,5))`
+<tr><td>#QS_QEP_TRAN        <td>`Q_STATE(:,2) > &gt; & ~isnan(Q_STATE(:,5))`
+<tr><td>#QS_QEP_IGNORED     <td>`~Q_STATE(:,6)`
 </table>
 </center>
 
@@ -1978,41 +1211,10 @@ For example, the following MATLAB plot shows the timing diagrams for all Philo s
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Signal</th>
-    <th>Active<br>Object</th>
-    <th>QF<br>Priority</th>
-    <th>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_SUBSCRIBE</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_UNSUBSCRIBE</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5
+<tr><th>QS Record <th>Time<br>Stamp <th>Signal <th>Active<br>Object <th>QF<br>Priority <th>Delta
+<tr><td>#QS_QF_ACTIVE_SUBSCRIBE   <td>#  <td># <td># <td>NaN <td>+1
+<tr><td>#QS_QF_ACTIVE_UNSUBSCRIBE <td>#  <td># <td># <td>NaN <td>-1
 </table>
 </center>
 
@@ -2020,20 +1222,9 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_SUBSCRIBE</td>
-    <td>`isnan(Q_ACTIVE(:,4)) & Q_ACTIVE(:,5) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_UNSUBSCRIBE</td>
-    <td>`isnan(Q_ACTIVE(:,4)) & Q_ACTIVE(:,5) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_ACTIVE_SUBSCRIBE   <td>`isnan(Q_ACTIVE(:,4)) & Q_ACTIVE(:,5) &gt; 0`
+<tr><td>#QS_QF_ACTIVE_UNSUBSCRIBE <td>`isnan(Q_ACTIVE(:,4)) & Q_ACTIVE(:,5) &lt; 0`
 </table>
 </center>
 
@@ -2044,145 +1235,16 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-    <th>8</th>
-    <th>9</th>
-    <th>10</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Sender</th>
-    <th>Event<br>Queue (1)</th>
-    <th>nFree</th>
-    <th>Minimum<br>Used</th>
-    <th>Signal</th>
-    <th>Pool ID</th>
-    <th>Ref.<br> Count</th>
-    <th>LIFO</th>
-    <th>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_POST</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>0</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_POST_LIFO</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>1</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_GET</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>0</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_GET_LAST</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>0</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_POST</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>1</td>
-    <td>#</td>
-    <td>0</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_POST_LIFO</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>1</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_GET</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>0</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_GET_LAST</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>0</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5 <th>6 <th>7 <th>8 <th>9 <th>10
+<tr><th>QS Record <th>Time<br>Stamp <th>Sender <th>Event<br>Queue (1) <th>nFree <th>Minimum<br>Used <th>Signal <th>Pool ID <th>Ref.<br> Count <th>LIFO <th>Delta
+<tr><td>#QS_QF_ACTIVE_POST      <td># <td>#   <td># <td>#   <td>#   <td># <td># <td># <td>0 <td>+1
+<tr><td>#QS_QF_ACTIVE_POST_LIFO <td># <td>#   <td># <td>#   <td>#   <td># <td># <td># <td>1 <td>+1
+<tr><td>#QS_QF_ACTIVE_GET       <td># <td>NaN <td># <td>#   <td>NaN <td># <td># <td># <td>0 <td>-1
+<tr><td>#QS_QF_ACTIVE_GET_LAST  <td># <td>NaN <td># <td>NaN <td>NaN <td># <td># <td># <td>0 <td>-1
+<tr><td>#QS_QF_EQUEUE_POST      <td># <td>NaN <td># <td>#   <td>#   <td># <td>1 <td># <td>0 <td>+1
+<tr><td>#QS_QF_EQUEUE_POST_LIFO <td># <td>NaN <td># <td>#   <td>#   <td># <td># <td># <td>1 <td>+1
+<tr><td>#QS_QF_EQUEUE_GET       <td># <td>NaN <td># <td>#   <td>#   <td># <td># <td># <td>0 <td>-1
+<tr><td>#QS_QF_EQUEUE_GET_LAST  <td># <td>NaN <td># <td>NaN <td>NaN <td># <td># <td># <td>0 <td>-1
 </table>
 </center>
 
@@ -2192,50 +1254,15 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_POST</td>
-    <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & ~Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_POST_LIFO</td>
-    <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_GET</td>
-    <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & ~isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ACTIVE_GET_LAST</td>
-    <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_POST</td>
-    <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & ~Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_POST_LIFO</td>
-    <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_GET</td>
-    <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & ~isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_EQUEUE_GET_LAST</td>
-    <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_ACTIVE_POST      <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & ~Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`
+<tr><td>#QS_QF_ACTIVE_POST_LIFO <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`
+<tr><td>#QS_QF_ACTIVE_GET       <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & ~isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`
+<tr><td>#QS_QF_ACTIVE_GET_LAST  <td>`Q_EQUEUE(:,3) == &lt;active obj&gt; & isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`
+<tr><td>#QS_QF_EQUEUE_POST      <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & ~Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`
+<tr><td>#QS_QF_EQUEUE_POST_LIFO <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & Q_EQUEUE(:,9) & Q_EQUEUE(:,10) &gt; 0`
+<tr><td>#QS_QF_EQUEUE_GET       <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & ~isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`
+<tr><td>#QS_QF_EQUEUE_GET_LAST  <td>`Q_EQUEUE(:,3) == &lt;raw queue&gt; & isnan(Q_EQUEUE(:,4) & Q_EQUEUE(:,10) &lt; 0`
 </table>
 </center>
 
@@ -2246,41 +1273,10 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Pool<br>Object</th>
-    <th>nFree</th>
-    <th>Minimal<br>nFree</th>
-    <th>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_MPOOL_GET</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_MPOOL_PUT</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>+1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5
+<tr><th>QS Record <th>Time<br>Stamp <th>Pool<br>Object <th>nFree <th>Minimal<br>nFree <th>Delta
+<tr><td>#QS_QF_MPOOL_GET <td># <td># <td># <td>#   <td>-1
+<tr><td>#QS_QF_MPOOL_PUT <td># <td># <td># <td>NaN <td>+1
 </table>
 </center>
 
@@ -2293,20 +1289,9 @@ records from the @c Q_MPOOL matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_MPOOL_GET</td>
-    <td>`Q_MPOOL(:,5) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_MPOOL_PUT</td>
-    <td>`Q_MPOOL(:,5) &gt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_MPOOL_GET <td>`Q_MPOOL(:,5) &lt; 0`
+<tr><td>#QS_QF_MPOOL_PUT <td>`Q_MPOOL(:,5) &gt; 0`
 </table>
 </center>
 
@@ -2317,55 +1302,11 @@ records from the @c Q_MPOOL matrix:
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Signal</th>
-    <th>PoolID</th>
-    <th>Ref.<br> Count</th>
-    <th>Event<br>Size</th>
-    <th>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_NEW</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_GC_ATTEMPT</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_GC</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5 <th>6
+<tr><th>QS Record <th>Time<br>Stamp <th>Signal <th>PoolID <th>Ref.<br> Count <th>Event<br>Size <th>Delta
+<tr><td>#QS_QF_NEW        <td># <td># <td>NaN <td>NaN <td>#   <td>+1
+<tr><td>#QS_QF_GC_ATTEMPT <td># <td># <td>#   <td>#   <td>NaN <td>0
+<tr><td>#QS_QF_GC         <td># <td># <td>#   <td>NaN <td>NaN <td>-1
 </table>
 </center>
 
@@ -2378,25 +1319,10 @@ records from the @c Q_NEW matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_NEW</td>
-    <td>`Q_NEW(:,6) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_GC_ATTEMPT</td>
-    <td>`Q_NEW(:,6) == 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_GC</td>
-    <td>`Q_NEW(:,6) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_NEW        <td>`Q_NEW(:,6) &gt; 0`
+<tr><td>#QS_QF_GC_ATTEMPT <td>`Q_NEW(:,6) == 0`
+<tr><td>#QS_QF_GC         <td>`Q_NEW(:,6) &lt; 0`
 </table>
 </center>
 
@@ -2407,38 +1333,9 @@ records from the @c Q_NEW matrix:
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Sender</th>
-    <th>Signal</th>
-    <th>PoolID</th>
-    <th>Ref.<br> Count</th>
-    <th># Events<br>Multicast</th>
-    <th>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_PUBLISH</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5 <th>6 <th>7
+<tr><th>QS Record <th>Time<br>Stamp <th>Sender <th>Signal <th>PoolID <th>Ref.<br> Count <th># Events<br>Multicast <th>Delta
+<tr><td>#QS_QF_PUBLISH <td># <td># <td># <td># <td># <td># <td>#
 </table>
 </center>
 
@@ -2447,15 +1344,8 @@ records from the @c Q_PUB matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_PUBLISH</td>
-    <td>`Q_PUB(:,7) &gt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_PUBLISH <td>`Q_PUB(:,7) &gt; 0`
 </table>
 </center>
 
@@ -2466,104 +1356,15 @@ records from the @c Q_PUB matrix:
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>QTimeEvt<br>Object</th>
-    <th>Signal</th>
-    <th>QActive<br>Object</th>
-    <th>QTimeEvt<br>Counter</th>
-    <th>QTimeEvt<br>Interval</th>
-    <th>QTimeEvt<br>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TICK</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>#(1)</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_ARM</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_DISARM</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_AUTO_DISARM</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>-1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_DISARM_ATTEMPT</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_REARM</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#(2)</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_POST</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>NaN</td>
-    <td>NaN</td>
-    <td>0</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4 <th>5 <th>6 <th>7
+<tr><th>QS Record <th>Time<br>Stamp <th>QTimeEvt<br>Object <th>Signal <th>QActive<br>Object <th>QTimeEvt<br>Counter <th>QTimeEvt<br>Interval <th>QTimeEvt<br>Delta
+<tr><td>#QS_QF_TICK                   <td>NaN <td>NaN <td>NaN <td>NaN <td>#(1) <td>NaN <td>0
+<tr><td>#QS_QF_TIMEEVT_ARM            <td>#   <td>#   <td>NaN <td>#   <td>#    <td>#   <td>+1
+<tr><td>#QS_QF_TIMEEVT_DISARM         <td>#   <td>#   <td>NaN <td>#   <td>#    <td>#   <td>-1
+<tr><td>#QS_QF_TIMEEVT_AUTO_DISARM    <td>NaN <td>#   <td>NaN <td>#   <td>NaN  <td>NaN <td>-1
+<tr><td>#QS_QF_TIMEEVT_DISARM_ATTEMPT <td>#   <td>#   <td>NaN <td>#   <td>NaN  <td>NaN <td>0
+<tr><td>#QS_QF_TIMEEVT_REARM          <td>#   <td>#   <td>NaN <td>#   <td>#    <td>#   <td>#(2)
+<tr><td>#QS_QF_TIMEEVT_POST           <td>#   <td>#   <td>#   <td>#   <td>NaN  <td>NaN <td>0
 </table>
 </center>
 
@@ -2580,45 +1381,14 @@ records from the @c Q_TIME matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TICK</td>
-    <td>`isnan(Q_TIME(:,2))`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_ARM</td>
-    <td>`Q_TIME(:,7) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_DISARM</td>
-    <td>`~isnan(Q_TIME(:,1)) & Q_TIME(:,7) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_AUTO_DISARM</td>
-    <td>`isnan(Q_TIME(:,1)) & Q_TIME(:,7) &lt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_DISARM_ATTEMPT</td>
-    <td>`isnan(Q_TIME(:,3)) & isnan(Q_TIME(:,5)) & Q_TIME(:,7) == 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_REARM</td>
-    <td>`isnan(Q_TIME(:,3)) & ~isnan(Q_TIME(:,5))`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_TIMEEVT_POST</td>
-    <td>`~isnan(Q_TIME(:,3)) & ~isnan(Q_TIME(:,4))`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_TICK                   <td>`isnan(Q_TIME(:,2))`
+<tr><td>#QS_QF_TIMEEVT_ARM            <td>`Q_TIME(:,7) &gt; 0`
+<tr><td>#QS_QF_TIMEEVT_DISARM         <td>`~isnan(Q_TIME(:,1)) & Q_TIME(:,7) &lt; 0`
+<tr><td>#QS_QF_TIMEEVT_AUTO_DISARM    <td>`isnan(Q_TIME(:,1)) & Q_TIME(:,7) &lt; 0`
+<tr><td>#QS_QF_TIMEEVT_DISARM_ATTEMPT <td>`isnan(Q_TIME(:,3)) & isnan(Q_TIME(:,5)) & Q_TIME(:,7) == 0`
+<tr><td>#QS_QF_TIMEEVT_REARM          <td>`isnan(Q_TIME(:,3)) & ~isnan(Q_TIME(:,5))`
+<tr><td>#QS_QF_TIMEEVT_POST           <td>`~isnan(Q_TIME(:,3)) & ~isnan(Q_TIME(:,4))`
 </table>
 </center>
 
@@ -2628,33 +1398,10 @@ records from the @c Q_TIME matrix:
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Interrupt<br>Nesting</th>
-    <th>Nesting<br>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_INT_DISABLE</td>
-    <td>#</td>
-    <td>#</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_INT_ENABLE</td>
-    <td>#</td>
-    <td>#</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt;<th>1          <th>2                <th>3
+<tr><th>QS Record            <th>Time<br>Stamp  <th>Interrupt<br>Nesting <th>Nesting<br>Delta
+<tr><td>#QS_QF_INT_DISABLE<td>#          <td>#                <td>+1
+<tr><td>#QS_QF_INT_ENABLE <td>#          <td>#                <td>-1
 </table>
 </center>
 
@@ -2666,20 +1413,9 @@ records from the @c Q_INT matrix:
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_INT_DISABLE</td>
-    <td>`Q_INT(:,3) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_INT_ENABLE</td>
-    <td>`Q_INT(:,3) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_INT_DISABLE <td>`Q_INT(:,3) &gt; 0`
+<tr><td>#QS_QF_INT_ENABLE  <td>`Q_INT(:,3) &lt; 0`
 </table>
 </center>
 
@@ -2690,37 +1426,10 @@ records from the @c Q_INT matrix:
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Interrupt<br>Nesting</th>
-    <th>ISR<br>Priority</th>
-    <th>Nesting<br>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ISR_ENTRY</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ISR_EXIT</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt;   <th>1 <th>2 <th>3 <th>4
+<tr><th>QS Record <th>Time<br>Stamp <th>Interrupt<br>Nesting <th>ISR<br>Priority <th>Nesting<br>Delta
+<tr><td>#QS_QF_ISR_ENTRY     <td># <td># <td># <td>+1
+<tr><td>#QS_QF_ISR_EXIT      <td># <td># <td># <td>-1
 </table>
 </center>
 
@@ -2730,20 +1439,9 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ISR_ENTRY</td>
-    <td>`Q_ISR(:,4) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_QF_ISR_EXIT</td>
-    <td>`Q_ISR(:,4) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_QF_ISR_ENTRY <td>`Q_ISR(:,4) &gt; 0`
+<tr><td>#QS_QF_ISR_EXIT <td>`Q_ISR(:,4) &lt; 0`
 </table>
 </center>
 
@@ -2754,37 +1452,10 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Original<br>Priority</th>
-    <th>Priority<br>Ceiling</th>
-    <th>Nesting<br>Delta</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_MUTEX_LOCK</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>+1</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_MUTEX_UNLOCK</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-    <td>-1</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3 <th>4
+<tr><th>QS Record <th>Time<br>Stamp <th>Original<br>Priority <th>Priority<br>Ceiling <th>Nesting<br>Delta
+<tr><td>#QS_MUTEX_LOCK   <td># <td># <td># <td>+1
+<tr><td>#QS_MUTEX_UNLOCK <td># <td># <td># <td>-1
 </table>
 </center>
 
@@ -2798,20 +1469,9 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>QS Record</th>
-    <th>MATLAB Index Matrix</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_MUTEX_LOCK</td>
-    <td>`Q_MUTEX(:,4) &gt; 0`</td>
-  </tr>
-
-  <tr>
-    <td>@c #QS_MUTEX_UNLOCK</td>
-    <td>`Q_MUTEX(:,4) &lt; 0`</td>
-  </tr>
+<tr><th>QS Record <th>MATLAB Matrix Index
+<tr><td>#QS_MUTEX_LOCK   <td>`Q_MUTEX(:,4) &gt; 0`
+<tr><td>#QS_MUTEX_UNLOCK <td>`Q_MUTEX(:,4) &lt; 0`
 </table>
 </center>
 
@@ -2822,28 +1482,12 @@ The following criteria (index matrices in MATLAB) unambiguously select the QS re
 
 <center>
 <table>
-  <tr>
-    <th>&nbsp;MATLAB index --&gt;</th>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-  </tr>
-
-  <tr>
-    <th>QS Record |<br> V</th>
-    <th>Time<br>Stamp</th>
-    <th>Preempted<br>Priority</th>
-    <th>New<br>Priority</th>
-  </tr>
-
-  <tr>
-    <td>@c #QS_SCHED_NEXT</td>
-    <td>#</td>
-    <td>#</td>
-    <td>#</td>
-  </tr>
+<tr><th>&nbsp;MATLAB index --&gt; <th>1 <th>2 <th>3
+<tr><th>QS Record <th>Time<br>Stamp <th>Preempted<br>Priority <th>New<br>Priority
+<tr><td>#QS_SCHED_NEXT <td># <td># <td>#
 </table>
 </center>
 
+<div style="clear:both;"></div>
 @nav{qspy_seq,qutest}
 */

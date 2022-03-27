@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
+* @date Last updated on: 2022-03-12
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -299,6 +299,7 @@ void QSpyRecord_init(QSpyRecord * const me,
 
     /* set the current QS record-ID for any subsequent output */
     QSPY_output.rec  = me->rec;
+    QSPY_output.rx_status = -1;
 }
 /*..........................................................................*/
 QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
@@ -1905,6 +1906,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                 t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
             }
             a = QSpyRecord_getUint32(me, 1U);
+            QSPY_output.rx_status = (int)a;
             if (QSpyRecord_OK(me)) {
                 if (a < 128U) { /* Ack? */
                     if (a < sizeof(l_qs_rx_rec)/sizeof(l_qs_rx_rec[0])) {

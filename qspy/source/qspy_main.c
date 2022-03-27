@@ -915,13 +915,19 @@ enum {
 
 static void colorPrintLn(void) {
     if (QSPY_output.type == REG_OUT) {
+        /* output a visible marker before the start of each test */
+        if ( QSPY_output.rx_status == QS_RX_TEST_SETUP) {
+            fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
+            fputs("----------------------------------------------------------"
+                  B_DFLT_EOL "\n", stdout);
+        }
+
         int group = QSPY_output.rec < QS_USER
                    ? QSPY_rec[QSPY_output.rec].group
                    : GRP_USR;
 
         /* timestamp */
-        char ch;
-        ch = QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP];
+        char ch = QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP];
         QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP] = '\0';
         fputs(l_colorPalette[PALETTE_TSTAMP], stdout);
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
