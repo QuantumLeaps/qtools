@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-03-02
+* @date Last updated on: 2022-05-08
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -879,7 +879,7 @@ enum {
 char const * const l_darkPalette[] = {
 /* PALETTE_ERR_OUT */            B_RED     F_BYELLOW,
 /* PALETTE_INF_OUT */    B_DFLT  B_GREEN   F_BLACK,
-/* PALETTE_TSTAMP  */            B_BLACK   F_GRAY,
+/* PALETTE_TSTAMP  */            B_BLACK   F_CYAN,
 /* PALETTE_DSC_SM  */            B_BLUE    F_WHITE,
 /* PALETTE_DSC_QP  */    B_DFLT  B_MAGENTA F_WHITE,
 /* PALETTE_DSC_INF */    B_DFLT  B_BLUE    F_BYELLOW,
@@ -887,7 +887,7 @@ char const * const l_darkPalette[] = {
 /* PALETTE_SM_TXT  */            B_BLACK   F_BWHITE,
 /* PALETTE_QP_TXT  */            B_BLACK   F_WHITE,
 /* PALETTE_INF_TXT */    B_DFLT  B_BLACK   F_BYELLOW,
-/* PALETTE_DIC_TXT */            B_BLACK   F_GRAY,
+/* PALETTE_DIC_TXT */            B_BLACK   F_CYAN,
 /* PALETTE_TST_TXT */    B_DFLT  B_BLACK   F_YELLOW,
 /* PALETTE_USR_TXT */    B_DFLT  B_WHITE   F_BLACK,
 };

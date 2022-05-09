@@ -64,7 +64,7 @@ Additionally, QTools for Windows contains the following open-source,
 Additionally, the QTools directory in the QP-bundle contains the
 following 3rd-party tools:
 
-10. GNU C/C++ toolset for Windows (mingw32 version 11.2.0)
+10. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
 
 11. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
 
@@ -155,17 +155,18 @@ to Section 2a "Demonstration License".
 ---------------------------------------------------------------------------
 # Source Code
 In compliance with GPL, this distribution contains the source code for
-the utilities contributed by Quantum Leaps in the <qtools>\source\
+the utilities contributed by Quantum Leaps in the `<qtools>\source`
 subdirectory, except for the QSPY source code, which is provided in the
-<qtools>\qspy\source directory. All tools with names starting with 'q'
+`<qtools>\qspy\source` directory. All tools with names starting with 'q'
 have been developed and are copyrighted by Quantum Leaps.
 
 ### The GCC C and C++ compilers for Windows
-WinLibs standalone build of GCC and MinGW-w64 for Windows project at
-- https://winlibs.com/
+Have been taken from the MSYS2 project at
+- https://www.msys2.org/
 
-The installer for 32-bit version with the MSVCRT runtime library has
-been used.
+The installer mingw-get-setup.exe has been used and after the installation,
+the files have been pruned to reduce the size of the distribution.
+Please refer to the MinGW project for the source code.
 
 ### The GNU-ARM Embedded Toolchain for Windows
 Have been takend from:

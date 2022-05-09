@@ -7,7 +7,6 @@
 @subpage qutest_fixture "&nbsp;"
 @subpage qutest_script "&nbsp;"
 
-
 @section qutest_about About QUTest&trade;
 <strong>QUTest&trade;</strong> (pronounced "cutest") is a **unit testing harness** (a.k.a. *unit testing framework*), which is specifically designed for deeply embedded systems, but also supports unit testing of embedded code on host computers ("dual targeting"). QUTest&trade; is the fundamental tooling for <a href="https://en.wikipedia.org/wiki/Test-driven_development" target="_blank" class="extern"><strong>Test-Driven Development (TDD)</strong></a> of <a href="https://www.state-machine.com/products/#QP" target="_blank" class="extern">QP/C/C++ applications</a>, which is a highly recommended best-practice.
 
@@ -20,12 +19,12 @@ In a nutshell, working with QUTest&trade; is similar to "debugging with printf" 
 
 The process of testing embedded code with QUTest&trade; involves the following components:
 
--# The **Target**, which runs an instrumented @ref qutest_fixture "test fixture" code, whose job is to exercise your <b>C</b>ode <b>U</b>nder <b>T</b>est (**CUT**). Please note that a *test fixture* only exercises the CUT  and reports the results to the host using @ref qpspy "QP/Spy", but the *test fixture* does **not** check if the CUT operates "correctly".<br>
-> NOTE: Several examples of *test fixtures* are explained in the @ref qutest_tut "QUTest Tutorial". The details of *test fixtures* are described in @ref qutest_fixture "QUTest Fixture Reference".
+-# The **Target**, which runs an instrumented @ref qutest_fixture "test fixture" code, whose job is to exercise your <b>C</b>ode <b>U</b>nder <b>T</b>est (<b>CUT</b>). Please note that a *test fixture* only exercises the CUT  and reports the results to the host using @ref qpspy "QP/Spy", but the *test fixture* does **not** check if the CUT operates "correctly".<br>
+> NOTE: Of course, the *test fixture* is written in the same programming language as the CUT (C or C++) and it links statically with the CUT. Several examples of *test fixtures* are explained in the @ref qutest_tut "QUTest Tutorial". The details of *test fixtures* are described in @ref qutest_fixture "QUTest Fixture Reference".
 
--# The @ref qspy "QSPY" "back-end" application, which receives the tracing data from the Target and also opens a communication channel for the QUTest "front-end".
+-# The @ref qspy "QSPY" "back-end" application running on the host, which receives the tracing data from the Target and also opens a communication channel for the QUTest "front-end".
 
--# The **QUTest** "front-end", which executes @ref qutest_script "test scripts", which drive the tests and check the QSPY output against the expectations ("test-assertions").<br>
+-# The **QUTest** "front-end" also running on the host that executes @ref qutest_script "test scripts". The *test scripts* (written in Python) drive the tests and check the QSPY output against the expectations ("test-assertions").<br>
 > NOTE: Several examples of *test scripts* are explained in the @ref qutest_tut "QUTest Tutorial".  The details of *test scripts* are described in @ref qutest_script "QUTest Script Reference".
 
 
@@ -39,7 +38,7 @@ The separation between CUT execution and checking the test results has many bene
 @image html img/logo_python3.gif
 
 
-The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the QSPY host application via a TCP/IP socket (QSPY started with the `-t` @ref qspy_command "command-line option"). In this case all QUTest&trade; components execute on the host computer.
+The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the **test fixture** is a host executable that communicates with the @ref qspy_command "QSPY host application" via a TCP/IP socket. In this case all QUTest&trade; components execute on the host computer.
 
 
 @image html qutest_host.gif "QUTest with Host Executable"
@@ -83,7 +82,7 @@ The <span class="img file_py">qutest.py</span> script can be used standalone, wi
 The <span class="img file_py">qutest.py</span> script is included in the @ref qtools_about "QTools&trade; collection". Also, the @ref qtools_win "QTools&trade; collection for Windows" already includes Python (3.8), so you don't need to install anything extra.
 
 
-Alternatively, you can use *your own Python** installation, into which you can install the latest QUTest&trade; with `pip` from the [<b>PyPi index</b>](https://pypi.org/project/qutest/) by executing the following command:
+Alternatively, you can use **your own Python** installation, into which you can install the latest QUTest&trade; with `pip` from the [<b>PyPi index</b>](https://pypi.org/project/qutest/) by executing the following command:
 
 @verbatim
 pip install qutest

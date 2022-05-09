@@ -1,6 +1,6 @@
 @echo off
 :: ==========================================================================
-:: Product: QTools script for generating Doxygen documentation
+:: Product: batch script for generating Doxygen documentation
 :: Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 ::
 :: SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -28,7 +28,7 @@
 @echo usage:
 @echo make
 @echo make -CHM
-@echo make -awesome
+@echo make ...
 
 :: Doxygen tool (adjust to your system) ......................................
 @set DOXYGEN=doxygen
@@ -64,12 +64,12 @@ if "%1"=="-CHM" (
     @echo Cleanup...
     rmdir /S /Q  %HTML_OUT%
 
-    @echo Adding custom images...
-    xcopy img %HTML_OUT%\img\
-    copy images\favicon.ico %HTML_OUT%
-
     @echo Generating HTML...
     %DOXYGEN% Doxyfile%1
+
+    @echo Adding custom images...
+    xcopy img %HTML_OUT%\img\
+    xcopy /Y ..\..\ql-doxygen\jquery.js %HTML_OUT%
     @qclean %HTML_OUT%
 )
 
