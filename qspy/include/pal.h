@@ -75,6 +75,7 @@ void PAL_clearScreen(void);
 QSpyStatus PAL_openTargetSer(char const *comName, int baudRate);
 QSpyStatus PAL_openTargetTcp(int portNum);
 QSpyStatus PAL_openTargetFile(char const *fName);
+QSpyStatus PAL_openTargetRtt(char const *coreName, uint32_t const serNo);
 
 QSpyStatus PAL_openKbd(bool kbd_inp, bool color);
 void       PAL_closeKbd(void);

@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-01-25
+* @date Last updated on: 2022-07-27
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -45,6 +45,8 @@
 #include <errno.h>
 #include <time.h>
 #include <signal.h>
+#include <pthread.h>
+#include <rtt_link.h>
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
 #include "qspy.h"     /* QSPY data parser */
@@ -66,6 +68,10 @@ static void tcp_cleanup(void);
 static QSPYEvtType file_getEvt(unsigned char *buf, uint32_t *pBytes);
 static QSpyStatus  file_send2Target(unsigned char *buf, uint32_t nBytes);
 static void file_cleanup(void);
+
+static QSPYEvtType rtt_getEvt(unsigned char *buf, uint32_t *pBytes);
+static QSpyStatus  rtt_send2Target(unsigned char *buf, uint32_t nBytes);
+static void rtt_cleanup(void);
 
 /*..........................................................................*/
 enum PAL_Constants { /* local constants... */
@@ -603,6 +609,134 @@ static void file_cleanup(void) {
     }
 }
 
+/*==========================================================================*/
+/* RTT communication with the "Target" via a J-Link probe */
+
+static pthread_t l_threadRTT;
+static rtt_link_worker_arg_t l_rtt_link_args;
+
+QSpyStatus PAL_openTargetRtt(char const *device, uint32_t const serNo) {
+
+	/* setup the PAL virtual table for the RTT Target connection... */
+    PAL_vtbl.getEvt      = &rtt_getEvt;
+    PAL_vtbl.send2Target = &rtt_send2Target;
+    PAL_vtbl.cleanup     = &rtt_cleanup;
+
+    l_rtt_link_args.device = device;
+    l_rtt_link_args.serNo = serNo;
+    if ((pipe(l_rtt_link_args.fdT2H) == -1) || (pipe(l_rtt_link_args.fdH2T) == -1)) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot open pipe for J-Link");
+        QSPY_printError();
+        return QSPY_ERROR;
+    }
+    if ((fcntl(l_rtt_link_args.fdT2H[0], F_SETFL, O_NONBLOCK) == -1)
+    		|| (fcntl(l_rtt_link_args.fdT2H[1], F_SETFL, O_NONBLOCK) == -1)
+			|| (fcntl(l_rtt_link_args.fdH2T[0], F_SETFL, O_NONBLOCK) == -1)
+			|| (fcntl(l_rtt_link_args.fdH2T[1], F_SETFL, O_NONBLOCK) == -1)) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot manipulate pipe(s) for J-Link");
+        QSPY_printError();
+        return QSPY_ERROR;
+    }
+    signal(SIGPIPE, SIG_IGN);
+
+    if (pthread_create(&l_threadRTT, NULL, rtt_link_worker, &l_rtt_link_args) != 0) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot create thread for J-Link");
+        QSPY_printError();
+        return QSPY_ERROR;
+    }
+	SNPRINTF_LINE("   <COMMS> RTT      Connecting...");
+    PAL_updateReadySet(l_rtt_link_args.fdT2H[0]);
+ 	QSPY_reset();   /* reset the QSPY parser to start over cleanly */
+	QSPY_txReset(); /* reset the QSPY transmitter */
+	QSPY_printInfo();
+	return QSPY_SUCCESS;
+}
+/*..........................................................................*/
+static QSPYEvtType rtt_getEvt(unsigned char *buf, uint32_t *pBytes) {
+    QSPYEvtType evtType;
+    int nrec;
+    fd_set readSet = l_readSet;
+
+    /* block indefinitely until any input source has input */
+    do {
+     	nrec = select(l_maxFd, &readSet, 0, 0, NULL);
+    } while (nrec == 0);
+
+    if (nrec == 0) {
+        return QSPY_NO_EVT;
+    }
+    else if (nrec < 0) {
+        SNPRINTF_LINE("   <COMMS> ERROR    select() errno=%d", errno);
+        QSPY_printError();
+        return QSPY_ERROR_EVT;
+    }
+
+    /* any input available from the keyboard? */
+    if (l_kbd_inp && FD_ISSET(0, &readSet)) {
+        evtType = PAL_receiveKbd(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
+    }
+
+    /* any input available from the Back-End socket? */
+    if ((l_beSock != INVALID_SOCKET) && FD_ISSET(l_beSock, &readSet)) {
+        evtType = PAL_receiveBe(buf, pBytes);
+        if (evtType != QSPY_NO_EVT) {
+            return evtType;
+        }
+    }
+
+    /* any input available from the RTT? */
+    if (l_rtt_link_args.fdT2H[0] && FD_ISSET(l_rtt_link_args.fdT2H[0], &readSet)) {
+        ssize_t nBytes = read(l_rtt_link_args.fdT2H[0], buf, *pBytes);
+		if (nBytes > 0) {
+            *pBytes = (uint32_t)nBytes;
+            PAL_updateReadySet(l_rtt_link_args.fdT2H[0]);
+            return QSPY_TARGET_INPUT_EVT;
+		}
+		if (nBytes <= 0) {
+			// A reason will be known at pthread_join()
+			return QSPY_ERROR_EVT;
+		}
+    }
+
+    return QSPY_NO_EVT;
+}
+/*..........................................................................*/
+static QSpyStatus rtt_send2Target(unsigned char *buf, uint32_t nBytes) {
+    uint32_t nBytesWritten = write(l_rtt_link_args.fdH2T[1], buf, nBytes);
+    if (nBytesWritten == (uint32_t)nBytes) {
+        return QSPY_SUCCESS;
+    }
+    else {
+        SNPRINTF_LINE("   <COMMS> ERROR    writing RTT errno=%d",
+                      errno);
+        QSPY_printError();
+        return QSPY_ERROR;
+    }
+	return QSPY_SUCCESS;
+ }
+/*..........................................................................*/
+static void rtt_cleanup(void) {
+	char const * p;
+	if ((close(l_rtt_link_args.fdT2H[0]) == -1) || close(l_rtt_link_args.fdH2T[1])) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot close pipe ends for J-Link");
+        QSPY_printError();
+	}
+	if (pthread_join(l_threadRTT, (void **)&p) != 0) {
+        SNPRINTF_LINE("   <COMMS> ERROR    Cannot close thread for J-Link");
+        QSPY_printError();
+	}
+	if (p == NULL) {
+		SNPRINTF_LINE("   <COMMS> RTT      J-Link Done");
+		QSPY_printInfo();
+	}
+	else {
+        SNPRINTF_LINE("   <COMMS> ERROR    %s", p);
+        QSPY_printError();
+	}
+}
 
 /*==========================================================================*/
 /* Front-End interface  */

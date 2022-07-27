@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-05-08
+* @date Last updated on: 2022-07-27
 * @version Last updated for version: 7.0.0
 *
 * @file
@@ -52,7 +52,8 @@ typedef enum {
     NO_LINK,
     FILE_LINK,
     SERIAL_LINK,
-    TCP_LINK
+    TCP_LINK,
+	RTT_LINK
 } TargetLink;
 
 static TargetLink l_link = NO_LINK;
@@ -65,6 +66,7 @@ static FILE *l_matFile = (FILE *)0;
 static FILE *l_seqFile = (FILE *)0;
 
 static char  l_comPort    [QS_FNAME_LEN_MAX];
+static char  l_device[QS_FNAME_LEN_MAX];
 static char  l_inpFileName[QS_FNAME_LEN_MAX];
 static char  l_outFileName[QS_FNAME_LEN_MAX];
 static char  l_savFileName[QS_FNAME_LEN_MAX];
@@ -78,6 +80,7 @@ static char  l_seqList[QS_SEQ_LIST_LEN_MAX];
 static int   l_bePort   = 7701;   /* default UDP port  */
 static int   l_tcpPort  = 6601;   /* default TCP port */
 static int   l_baudRate = 115200; /* default serial baudrate */
+static uint32_t l_jlinkSerNo = 0; /* default: will be selected from the list */
 
 /* color rendeing */
 extern char const * const l_darkPalette[];
@@ -113,6 +116,7 @@ static char const l_helpStr[] =
 #endif
     "-b <baud_rate>    115200  baud rate for the com port\n"
     "-f <file_name>            file input (postprocessing)\n"
+	"-j <processor>[:<ser-num>] processor[:JLink serial number]\n"
     "-d [file_name]            dictionary files\n"
     "-T <tstamp_size>  4       QS timestamp size     (bytes)\n"
     "-O <pointer_size> 4       object pointer size   (bytes)\n"
@@ -289,7 +293,7 @@ void QSPY_onPrintLn(void) {
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]) {
     static char const getoptStr[] =
-        "hq::u::v:r:kosmg:c:b:t::p:f:d::T:O:F:S:E:Q:P:B:C:";
+        "hq::u::v:r:kosmg:c:b:t::p:f:j:d::T:O:F:S:E:Q:P:B:C:";
 
     /* default configuration options... */
     QSpyConfig config = {
@@ -416,7 +420,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 'c': { /* COM port */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
                     FPRINTF_S(stderr, "%s\n",
-                            "The -c option is incompatible with -t/-f");
+                            "The -c option is incompatible with -t/-f/-j");
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_comPort, sizeof(l_comPort), optarg);
@@ -427,7 +431,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 'b': { /* baud rate */
                 if ((l_link != NO_LINK) && (l_link != SERIAL_LINK)) {
                     FPRINTF_S(stderr, "%s\n",
-                        "The -b option is incompatible with -t/-f");
+                        "The -b option is incompatible with -t/-f/-j");
                     return QSPY_ERROR;
                 }
                 l_baudRate = (int)strtol(optarg, NULL, 10);
@@ -442,12 +446,38 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 'f': { /* File input */
                 if (l_link != NO_LINK) {
                     FPRINTF_S(stderr, "%s\n",
-                            "The -f option is incompatible with -c/-b/-t");
+                            "The -f option is incompatible with -c/-b/-t/-j");
                     return QSPY_ERROR;
                 }
                 STRNCPY_S(l_inpFileName, sizeof(l_inpFileName), optarg);
                 PRINTF_S("-f %s\n", l_inpFileName);
                 l_link = FILE_LINK;
+                break;
+            }
+            case 'j': { /* J-Link's setup */
+            	char const * pColon;
+                if ((l_link != NO_LINK) && (l_link != RTT_LINK)) {
+                    FPRINTF_S(stderr, "%s\n",
+                            "The -j option is incompatible with -c/-b/-t/-f");
+                    return QSPY_ERROR;
+                }
+                pColon = strchr(optarg, ':');
+                if (pColon >= (optarg + sizeof(l_device))) {
+                    FPRINTF_S(stderr, "%s\n",
+                            "The core name is missing or too long");
+                    return QSPY_ERROR;
+                }
+                if (pColon == NULL) {
+                    STRNCPY_S(l_device, sizeof(l_device), optarg);
+                    PRINTF_S("-j %s\n", l_device);
+                }
+                else {
+                	pColon++;
+                    STRNCPY_S(l_device, pColon - optarg, optarg);
+                    l_jlinkSerNo = (uint32_t)strtoul(pColon, NULL, 10);
+                    PRINTF_S("-j %s:%u\n", l_device, l_jlinkSerNo);
+                }
+                l_link = RTT_LINK;
                 break;
             }
             case 'd': { /* Dictionary file */
@@ -465,7 +495,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 't': { /* TCP/IP input */
                 if ((l_link != NO_LINK) && (l_link != TCP_LINK)) {
                     FPRINTF_S(stderr, "%s\n",
-                            "The -t option is incompatible with -c/-b/-f");
+                            "The -t option is incompatible with -c/-b/-f/-j");
                     return QSPY_ERROR;
                 }
                 if (optarg != NULL) { /* is optional argument provided? */
@@ -574,6 +604,12 @@ static QSpyStatus configure(int argc, char *argv[]) {
         }
         case FILE_LINK: {   /* input QS data from a file */
             if (PAL_openTargetFile(l_inpFileName) != QSPY_SUCCESS) {
+                return QSPY_ERROR;
+            }
+            break;
+        }
+        case RTT_LINK: {   /* connect to the Target via RTT */
+            if (PAL_openTargetRtt(l_device, l_jlinkSerNo) != QSPY_SUCCESS) {
                 return QSPY_ERROR;
             }
             break;

@@ -4,6 +4,12 @@
 View QTools Revision History at: 
 https://www.state-machine.com/qtools/history.html
 
+---------------------------------------------------------------------------
+# Changes
+This repository contains QSPY utility with added RTT (POSIX only).
+Use -j switch to use it on the host.
+
+How to use it on the target - see qspy/contrib directory for an example.
 
 ---------------------------------------------------------------------------
 # Documentation

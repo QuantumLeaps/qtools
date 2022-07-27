@@ -569,6 +569,14 @@ static void file_cleanup(void) {
     }
 }
 
+/*==========================================================================*/
+/* RTT communication with the "Target" via a J-Link probe */
+
+QSpyStatus PAL_openTargetRtt(char const *device, uint32_t const serNo) {
+    SNPRINTF_LINE("   <COMMS> ERROR    TBD: Win32 RTT");
+    QSPY_printError();
+    return QSPY_ERROR;
+}
 
 /*==========================================================================*/
 /* Front-End interface  */

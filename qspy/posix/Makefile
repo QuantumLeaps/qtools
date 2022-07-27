@@ -71,14 +71,15 @@ C_SRCS := \
 	qspy_dict.c \
 	qspy_seq.c \
 	qspy_tx.c \
-	qspy.c
+	qspy.c \
+	rtt_link.c
 
 # C++ source files...
 CPP_SRCS :=
 
 DEFINES   := -DQSPY_APP
 LIB_DIRS  :=
-LIBS      :=
+LIBS      := -ldl -lpthread
 
 #-----------------------------------------------------------------------------
 # GNU toolset:
