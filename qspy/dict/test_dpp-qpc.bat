@@ -1,0 +1,1 @@
+qspy -f dpp-qpc-no-dict.bin -d qspy211020_120243.dic

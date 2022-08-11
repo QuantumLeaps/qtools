@@ -1,0 +1,117 @@
+/*! @page qcalc QCalc Programmer's Calculator
+@nav{qwin,qclean}
+
+<p><strong>QCalc</strong> is a powerful, cross-platform calculator specifically designed for embedded systems programmers. The calculator accepts *whole expressions* in the @ref qcalc_expr "C-syntax" and displays results simultaneously in decimal, hexadecimal, and binary without the need to explicitly convert the result to these bases.
+</p>
+
+@image html qcalc.png "QCalc user interface"
+
+@note
+The calculator is a console application, where you can type **complete C expressions**. You can also **copy-and-paste** expressions into and from the calculator console to use them almost directly in **your C code**.
+
+
+@section qcalc_usage QCalc Usage
+<strong>QCalc</strong> is included in the QTools Collection in the sub-directory <span class="img folder">qtools/qcalc/</span> and consists of a single file <b>qcalc.py</b>. To launch QCalc, you need to open this file with <span class="img file_py">python</span>.
+
+You use QCalc by typing (or pasting) an expression at the `> ` prompt and pressing <span class="img key_ret">Enter</span> to evaluate the expression. You can conveniently edit any expression already inside the *user input* field, and you can @ref qcacl_hist "recall the previous expressions" by means of the <span class="img key_up">Up</span> and <span class="img key_down">Down</span> keys.
+
+@note
+You **quit** the calculator by <span class="img key_ret">Enter</span> without entering an expression.
+
+
+@subsection qcalc_batch Batch Mode
+If you provide the optional [expression] argument, <strong>QCalc</strong> will evaluate the expression, print the result and terminate. For example:
+
+@verbatim
+qcalc "2*3 + (1 << 3)"
+QCalc Programmer's Calculator 6.9.4 running on Python 3.9.1
+(c) 2005-2021 Quantum Leaps, www.state-machine.com
+
+2*3 + (1 << 3)
+= 14 | 0x0000'000E | 0b00000000'00000000'00000000'00001110
+
+@endverbatim
+
+@subsection qcalc_interact Interactive Mode
+Otherwise, if no [expression] argument is provided, <strong>QCalc</strong> will start in the interactive mode, where you can enter expressions via your keyboard.
+
+
+@subsection qcalc_win QCalc on Windows
+The <span class="img file_py">python</span> interpreter is included in the QTools collection for Windows. The `%QTOOLS%\bin` directory also contains the `qcalc.bat` batch file and a shortcut <span class="img file_py">qcalc</span>, which you can copy to your desktop:
+
+@image html qcalc_lnk.png "Shortcut for launching QCalc"
+
+
+@section qcalc_features QCalc Features
+
+@subsection qcalc_expr Expressions in C-Syntax
+The most important feature of QCalc is that it accepts expressions in the **C-syntax**&mdash;with the same operands and precedence rules as in the C or C++ source code. Among others, the expressions can contain all bit-wise operators (`<<`, `>>`, `|`, `&`, `^`, `~`) as well as mixed decimal, **hexadecimal** and even @ref qcalc_bin "binary" constants. QCalc is also a powerful floating-point scientific calculator and supports all mathematical functions (`sin()`, `cos()`, `tan()`, `exp()`, `ln()`, ...). Some examples of acceptable expressions are:
+
+`((0xBEEF << 16) | 1280) & ~0xFF`&mdash;binary operators, mixed hex and decimal numbers@n
+`($1011 << 24) | (1280 >> 8) ^ 0xFFF0`&mdash;mixed @ref qcalc_bin "binary", dec and hex numbers@n
+`(1234 % 55) + 4321//33`&mdash;remainder, integer division (note the `//` integer division operator@n
+`pi/6`&mdash;pi-constant@n
+`pow(sin(ans),2) + pow(cos(ans),2)`&mdash;scientific floating-point calculations, @ref qcalc_ans "ans-variable"<br>
+
+
+@note
+QCalc internally uses the Python command <b>eval</b> to evaluate the expressions. Please refer to the documentation of <a href="https://en.wikibooks.org/wiki/Python_Programming/Basic_Math" target="_blank" class="extern"> Python math expressions</a> for more details of supported syntax and features.
+
+
+@subsection qcalc_conv Automatic Conversion to Hexadecimal and Binary
+If the result of expression evaluation is integer (as opposed to floating point), QCalc automatically displays the result in hexadecimal and binary formats (see QCalc screenshot). For better readability, the hex display shows an apostrophe between the two 16-bit half-words (e.g., `0xDEAD'BEEF`). Similarly, the binary output shows an apostrophe between the four 8-bit bytes (e.g., `0b11011110'10101101'10111110'11101111`).
+
+
+@subsection qcalc_base Hexadecimal and Binary Numbers
+As an extension to the C-syntax, QCalc supports both **hexadecimal numbers** and **binary numbers**. These numbers are represented as `0x...` and`0b...`, respectively, and can be mixed into expressions. Here are a few examples of such expressions:
+
+@verbatim
+(0b0110011 << 14) & 0xDEADBEEF
+(0b0010 | 0b10000) * 123
+@endverbatim
+
+
+@subsection qcalc_hist History of Inputs
+As a console application QCalc "remembers" the history of the recently entered expressions. You can recall and navigate the history of previously entered expressions by pressing the <span class="img key_up">Up</span> / <span class="img key_down">Down</span> keys.
+
+
+@subsection qcalc_ans The ans Variable
+QCalc stores the result of the last computation in the `ans` variable. Here are some examples of expressions with the `ans` variable:
+
+`1/ans`&mdash;find the inverse of the last computation@n
+`log(ans)/log(2)`&mdash;find log-base-2 of the last computation@n
+
+
+@subsection qcalc_64bit 64-bit Range
+QCalc supports the 64-bit range and switches to 64-bit arithmetic automatically when an **integer** result of a computation exceeds the 32-bit range. Here are some examples of the 64-bit output:
+
+@verbatim
+> 0xDEADBEEF << 27
+= 501427843159293952 | 0x06F5'6DF7'7800'0000
+= 0b00000110'11110101'01101101'11110111'01111000'00000000'00000000'00000000
+> 0xDEADBEEF << 24
+= 62678480394911744 | 0x00DE'ADBE'EF00'0000
+= 0b00000000'11011110'10101101'10111110'11101111'00000000'00000000'00000000
+> 0xDEADBEEF << 34
+! out of range
+>
+@endverbatim
+
+
+@subsection qcalc_error Error handling
+Expressions that you enter into QCalc might have all kinds of errors: syntax errors,  computation errors (e.g., division by zero), etc. In each of these cases, QCalc responds with the `Error` message and an explanation of the error:
+
+@verbatim
+> (2*4) + )
+Traceback (most recent call last):
+  File "C:\qp\qtools\qcalc\qcalc.py", line 54, in _main
+    result = eval(expr)
+  File "<string>", line 1
+    (2*4) + )
+            ^
+SyntaxError: unmatched ')'
+>
+@endverbatim
+
+@nav{qwin,qclean}
+*/

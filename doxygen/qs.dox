@@ -1,0 +1,337 @@
+/*! @page qs QS Target Component
+@nav{qpspy_proto,qspy}
+
+<p>The target-resident component of the QP/Spy&trade; tracing system is called **QS**. The purpose of QS is to provide facilities for **instrumenting** the target code so it will produce an interesting real-time trace from code execution. In this sense it is similar to peppering the code with `printf` statements. However, the main difference between QS and `printf` is *where* the data **formatting** and **sending** is done. When you use `printf`s, the data formatting and sending occur in the time-critical paths through your embedded code. In contrast, the QS target-resident component inserts raw binary data into the QS ring buffer, so all the time-consuming formatting is removed from the Target system and is done *after* the fact in the Host. Additionally, in QS, data logging and sending to the Host are separated so that the target system can typically perform the transmission outside of the time-critical path, for example in the *idle processing* of the target CPU.
+</p>
+
+The QS target component consists of the QS ring buffer, the QS filters, as well as the instrumentation added to the QP framework and the application, as shown in figure below. Additionally, the QS target component contains the receive-channel (@ref qs_rx "QS-RX") with its own receive buffer, which can receive data from the QSPY host component.
+
+@anchor fig_struct
+@image html qspy5.gif "Structure of the QP/Spy software tracing system"
+
+A nice byproduct of removing the data formatting from the Target is a natural **data compression**. For example, formatted output of a single byte takes two hexadecimal digits (and 3 decimal digits), so avoiding the formatting gives at least a factor of two in data density. On top of this natural compression, QS uses such techniques as data dictionaries, and compressed format information, which in practice result in a compression factor of 4-5 compared to the expanded human-readable format.
+
+@attention
+The QS instrumentation is designed such that it is active only in the *Spy build configuration* (when the external macro #Q_SPY is defined) and is **inactive** otherwise. This means that you don't need to comment-out or remove the instrumentation in the Debug or Release build configurations, but rather you can **leave** the instrumentation in your code for its future development, testing, profiling and maintenance.
+
+
+@section qs_tstamp Target Time-Stamps
+Most QS trace records produced by QS are **time-stamped** with a high-resolution counter (the resolution depends on the availability of a hardware timer-counter in the Target, but typically provides sub-microsecond granularity). QS provides an efficient API for obtaining platform-specific timestamp information. Given the right timer-counter resource in your Target system, you can provide QS with as precise timestamp information as required. The size of the timestamp is configurable to be 1, 2, or 4 bytes (see #QS_TIME_SIZE).
+
+@note
+The QS **timestamps** are used differently in @ref qutest "QUTest&trade;" unit testing. In that case the timestamps are used to count the QS records produced.
+
+
+
+@section qs_pre Predefined QS Trace Records
+The <a href="https://www.state-machine.com/qpc">QP/C</a> and <a href="https://www.state-machine.com/qpcpp">QP/C++</a> frameworks contain the QS instrumentation for tracing the interesting occurrences within the frameworks, such as state machine activity (dispatching events, entering/exiting a state, executing transitions, etc.), active object activity (allocating events, posting/publishing events, time events, etc.), and more. All this instrumentation reserves 100 **predefined** QS trace records, which are enumerated in ::QSpyRecords. These QS records have predefined (hard-coded) structure both in the QS target-resident component and in the @ref qspy "QSPY" host-based application. See also the documentation of the @ref qspy_pre "human-readable output" generated from the predefined QS records.
+
+
+
+@section qs_app Application-Specific QS Trace Records
+In addition to the predefined QS records, you can add your own, flexible, **application-specific** trace records, which are not known in advance to the @ref qspy "QSPY" host-resident component. You can think of the application-specific records as an equivalent to `printf()` but with much less overhead. The following code snippet shows an example of an application-specific QS record from your embedded code:
+
+@code
+enum MyAppRecords {
+    PHILO_STAT = QS_USER, /* offset for User QS Records */
+    COMMAND_STAT,
+    ~ ~ ~
+};
+~ ~ ~
+QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->prio) /* application-specific record begin */
+    QS_U8(1, n);  /* application-specific data element (Philo number) */
+    QS_STR(stat); /* application-specific data element (Philo status) */
+QS_END()          /* application-specific record end */
+@endcode
+
+As you can see from the example above, an application-specific trace record always begins with QS_BEGIN_ID(), followed by a number of @ref qs_app_el "application-specific data elements", followed by QS_END().
+
+@attention
+The application-specific records use the 25 @ref qpspy_proto "Record-Types" in the range #QS_USER .. 124 (see also User-All group in @ref qs_global "Global Filter"). Therefore, you need to **offset** your application-specific trace records by the #QS_USER constant to avoid overlap with the @ref qs_pre "predefined QS records" already instrumented into the QP components.
+
+@note
+As with all QS trace records, the application-specific records are produced in a critical section of code (with interrupts disabled). Therefore, you should keep the number of @ref qs_app_el "application-specific data elements" of the record reasonably short.
+
+
+@subsection qs_app_rep Application-Specific Record Representation
+The biggest challenge in supporting flexible "application-specific" trace records is to provide the data type information with the data itself, so that @ref qspy "QSPY" "knows" how to parse such records and move on to the next data element within the record. The figure below shows the encoding of the application-specific trace record from the previous listing.
+
+@image html qspy_app.gif "Structure of an Application-Specific trace record"
+
+The application-specific trace record, like all @ref qpspy_proto "QS records", starts with the Sequence Number and the
+Record-Type. Every application-specific trace record also contains the @ref qs_tstamp "timestamp" immediately following the Record Type. The number of bytes used by the timestamp is configurable by the macro #QS_TIME_SIZE. After the timestamp, you see the data elements, such as a byte (QS_U8()) and a string (QS_STR()). Each of these data elements starts with a fmt (format) byte, which actually contains both the data-type information (in the lower nibble) and the format width for displaying that element (in the upper nibble). For example, the data element QS_U8(1, n) will cause the value 'n' to be encoded as u`int8_t` with the format width of 1 decimal digit.
+
+@remark
+The maximum allowed format width is 15 decimal digits, while a format width of 0 means that a numeric value should be formatted in the minimum number of digits.
+
+
+As shown in the listing above, typically the application-specific records are enclosed with the QS_BEGIN_ID() / QS_END() pair of macros. This pair of macros disables interrupts at the beginning and enables them again at the end of each record. Occasionally you might want to generate trace data from within already-established critical sections or ISRs. In such rare occasions, you would use the macros QS_BEGIN_NOCRIT() / QS_END_NOCRIT() to avoid nesting of critical sections.
+
+The record-begin macro QS_BEGIN_ID() takes two arguments. The first argument (e.g., `PHILO_STAT`) is the enumerated @ref qpspy_proto "Record-Type", which is used in the @ref qs_global "global filter" and is part of each record header.
+
+The second argument (e.g., `AO_Philo[n]->prio` in the example above) is used for the @ref qs_local "local filter", which allows you to selectively log only specific objects. The code snippet shows an example of an application-specific trace record, including use of the second parameter of the QS_BEGIN_ID() macro.
+
+
+@subsection qs_app_exa Application-Specific Record Examples
+The following examples show the QS application-specific trace records as C code on the left, and the output generated by the @ref qspy "QSPY" host application from these records on the right. The examples assume that the @ref qs_dict "QS dictionaries" have been produced for the Record-Types and function/object pointers used.
+
+<table align="center" valign="middle">
+  <tr>
+    <th><b>Trace Record</b></th>
+    <th><b>QSPY output</b></th>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->prio)
+    QS_U8(1, n);
+    QS_STR(stat);
+QS_END()
+@endcode
+    </td>
+    <td>
+`1018004718 PHILO_STAT 1 thinking`<br>
+NOTE: produced only when `AO_Philo[n]` is enabled in the @ref qs_local "QS Local Filter"
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN_ID(IO_CALL, 0U)
+    QS_FUN(&IO_Read);
+    QS_I16(0, ret);
+    QS_U32(0, offset);
+QS_END()
+@endcode
+    </td>
+    <td>
+`1055004424 IO_CALL IO_Read -129 0`
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN_ID(DATA_RX, 0U)
+    QS_OBJ(me);
+    QS_U16(data_len);
+    QS_MEM(data_buf, 16);
+QS_END()
+@endcode
+    </td>
+    <td>
+`0207024814 DATA_RX l_uart2 10  17 84 BB 40 FD 15 00 00 99 0B 00 00 90 0D 00 20`
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+@code
+QS_BEGIN_ID(FP_DATA, QS_AP_ID + 1U)
+    QS_F32(6, 3141.5F);
+    QS_F64(10, -2.718281828e5);
+QS_END()
+@endcode
+    </td>
+    <td>
+`0991501750 FP_DATA  3.141500e+003 -2.7182818280e+005`<br>
+NOTE: produced only when QS-ID `QS_AP_ID + 1` is enabled in the @ref qs_local "QS Local Filter"
+    </td>
+  </tr>
+</table>
+
+
+@subsection qs_app_el Application-Specific Data Elements
+The following table summarizes the supported data elements that can be used inside the Application-Specific trace records:
+
+<center>
+Data Element    | Example         | Comments
+----------------|-----------------|---------
+QS_U8()         | `QS_U8(0, n);`  | Outputs a `uint8_t` integer with format `"%u"`
+QS_I8()         | `QS_I8(3, m);`  | Outputs a `int8_t` integer with format `"%3d"`
+QS_U16()        | `QS_U16(5, n);` | Outputs a `uint16_t` integer with format `"%5u"`
+QS_I16()        | `QS_I16(0, m);` | Outputs a `int16_t` integer with format `"%d"`
+QS_U32()        | `QS_U32(QS_HEX_FMT, n);` | Outputs a `uint32_t` integer with format `"%8X"`
+QS_I32()        | `QS_I32(0, m);` | Outputs a `int32_t` integer with format `"%d"`
+QS_U64()        | `QS_U32(0, n);` | Outputs a `uint32_t` integer with format `"%2"PRIi64`
+QS_F32()        | `QS_F32(0, 3.1415F);` | Outputs a 32-bit `float` with format `"%7.0e"`<br> (zero digits after the comma)
+QS_F64()        | `QS_F64(4, sqrt(2.0));` | Outputs a 64-bit `double` with format `"%12.4e"` <br> (4 digits after the comma)
+QS_STR()        | `QS_STR("Hello")`  | Outputs a zero-terminated string with format `"%s"`
+QS_MEM()        | `QS_MEM(&my_struct, 16)` | Outputs 16 bytes of memory starting from `&my_struct`.<br> The bytes are output using the hex format `"%02X"`
+QS_OBJ()        | `QS_OBJ(&my_obj);` | Outputs an object pointer.<br> If an object dictionary for the object exists,<br> @ref qspy "QSPY" will display the symbolic name of the object
+QS_FUN()        | `QS_OBJ(&foo);` | Outputs a function pointer.<br> If a function dictionary for the function exists,<br> @ref qspy "QSPY" will display the symbolic name of the function
+QS_SIG()        | `QS_SIG(TIMEOUT_SIG, (void*)0);` | Outputs a signal.<br> If signal dictionary for the signal exists,<br> @ref qspy "QSPY" will display the symbolic name of the signal
+</center>
+
+
+@section qs_filters QS Filters
+Obviously, QS cannot completely eliminate the overhead of software tracing. But with the fine-granularity __filters__ available in QS, you can make this impact as small as necessary. For greatest flexibility, QS uses two complementary levels of filters: @ref qs_global "Global Filter" and @ref qs_local "Local Filter" described below. The combination of such two complementary filtering criteria results in very selective tracing capabilities.
+
+@note
+The Global and Local filters are initialized in the QS_INIT() macro. Subsequently, the QP application can change the filters __at runtime__ by means of the QS_GLB_FILTER() and QS_LOC_FILTER() macros. Also, if the QS receive channel is enabled (@ref qs_rx "QS-RX"), the filters can be changed from the @ref qutest "QUTest" or @ref qview "QView" front-ends.
+
+
+@subsection qs_global Global Filter
+The Global Filter is based on trace @ref qpspy_proto "Record-Types" associated with each QS record (see ::QSpyRecords). This filter allows you to disable or enable each individual Record-Type or a whole group of QS records. For example, you might enable or disable #QS_QEP_STATE_ENTRY (entry to a state), #QS_QEP_STATE_EXIT (exit from a state), #QS_QEP_INIT_TRAN (state transition), #QS_QF_ACTIVE_POST (event posting), #QS_QF_PUBLISH (event publishing), and all other pre-defined and application-specific event types. This level works globally for all state machines, active objects, and time event objects in the entire system.
+
+QS provides a simple interface, QS_GLB_FILTER(), for setting and clearing individual Record-Types as well as groups of Record-Types in the Target code. The following table summarizes the Record-Types and groups of Record-Types that you can use as arguments to QS_GLB_FILTER().
+
+<br>
+<center>
+Record-Type<br>/Group | Example | Applies to QS Records
+----------------|---------|----------------------
+All Record-Types  | QS_GLB_FILTER(QS_ALL_RECORDS);<br> QS_GLB_FILTER(-QS_ALL_RECORDS); | all Record-Types
+State<br>Machine<br>Group | QS_GLB_FILTER(QS_SM_RECORDS);<br> QS_GLB_FILTER(-QS_SM_RECORDS); | #QS_QEP_STATE_ENTRY,<br> #QS_QEP_STATE_EXIT,<br> #QS_QEP_STATE_INIT,<br> #QS_QEP_INIT_TRAN,<br> #QS_QEP_INTERN_TRAN,<br> #QS_QEP_TRAN,<br> #QS_QEP_IGNORED,<br> #QS_QEP_TRAN_HIST,<br> #QS_QEP_TRAN_EP,<br> #QS_QEP_TRAN_XP
+Active<br>Object<br>Group | QS_GLB_FILTER(QS_AO_RECORDS);<br> QS_GLB_FILTER(-QS_AO_RECORDS); | #QS_QF_ACTIVE_SUBSCRIBE,<br> #QS_QF_ACTIVE_UNSUBSCRIBE,<br> #QS_QF_ACTIVE_POST, <br> #QS_QF_ACTIVE_POST_LIFO,<br> #QS_QF_ACTIVE_GET, <br> #QS_QF_ACTIVE_GET_LAST
+Event<br>Queue<br>Group | QS_GLB_FILTER(QS_EQ_RECORDS);<br> QS_GLB_FILTER(-QS_EQ_RECORDS); | #QS_QF_EQUEUE_POST,<br> #QS_QF_EQUEUE_POST_LIFO,<br> #QS_QF_EQUEUE_GET,<br> #QS_QF_EQUEUE_GET_LAST
+Memory<br>Pool<br>Group | QS_GLB_FILTER(QS_MP_RECORDS);<br> QS_GLB_FILTER(-QS_MP_RECORDS); | #QS_QF_MPOOL_GET,<br> #QS_QF_MPOOL_PUT
+Time<br>Event <br> Group | QS_GLB_FILTER(QS_TE_RECORDS);<br> QS_GLB_FILTER(-QS_TE_RECORDS); | #QS_QF_TICK,<br> #QS_QF_TIMEEVT_ARM,<br> #QS_QF_TIMEEVT_AUTO_DISARM,<br> #QS_QF_TIMEEVT_DISARM_ATTEMPT,<br> #QS_QF_TIMEEVT_DISARM,<br> #QS_QF_TIMEEVT_REARM,<br> #QS_QF_TIMEEVT_POST
+QF Group<br>Event<br>Management| QS_GLB_FILTER(QS_QF_RECORDS);<br> QS_GLB_FILTER(-QS_QF_RECORDS); | #QS_QF_NEW,<br> #QS_QF_NEW_ATTEMPT,<br> #QS_QF_GC_ATTEMPT,<br> #QS_QF_GC,<br> #QS_QF_TIMEEVT_DISARM_ATTEMPT,<br> #QS_QF_TICK,<br>
+Scheduler<br>Group | QS_GLB_FILTER(QS_SC_RECORDS);<br> QS_GLB_FILTER(-QS_SC_RECORDS); | #QS_SCHED_LOCK,<br> #QS_SCHED_UNLOCK,<br> #QS_SCHED_NEXT,<br> #QS_SCHED_IDLE,<br> #QS_SCHED_RESUME,<br> #QS_QF_TIMEEVT_DISARM_ATTEMPT,<br> #QS_QF_TICK,<br>
+User Group-0    | QS_GLB_FILTER(QS_U0_RECORDS);<br> QS_GLB_FILTER(-QS_U0_RECORDS); | #QS_USER+0  .. #QS_USER+4
+User Group-1    | QS_GLB_FILTER(QS_U1_RECORDS);<br> QS_GLB_FILTER(-QS_U1_RECORDS); | #QS_USER+5  .. #QS_USER+9
+User Group-2    | QS_GLB_FILTER(QS_U2_RECORDS);<br> QS_GLB_FILTER(-QS_U2_RECORDS); | #QS_USER+10 .. #QS_USER+14
+User Group-3    | QS_GLB_FILTER(QS_U3_RECORDS);<br> QS_GLB_FILTER(-QS_U3_RECORDS); | #QS_USER+15 .. #QS_USER+19
+User Group-4    | QS_GLB_FILTER(QS_U4_RECORDS);<br> QS_GLB_FILTER(-QS_U4_RECORDS); | #QS_USER+20 .. #QS_USER+24
+User-All Group  | QS_GLB_FILTER(QS_UA_RECORDS);<br> QS_GLB_FILTER(-QS_UA_RECORDS); | #QS_USER+0  .. #QS_USER+24
+<b>Non-Maskable</b> | | #QS_SIG_DICT,<br> #QS_OBJ_DICT,<br> #QS_FUN_DICT,<br> #QS_USR_DICT,<br> #QS_TARGET_INFO,<br> #QS_TARGET_DONE,<br> #QS_EMPTY,<br> #QS_TEST_PAUSED,<br> #QS_TEST_PROBE_GET,<br> #QS_RX_STATUS,<br> #QS_QUERY_DATA,<br> #QS_PEEK_DATA,<br> #QS_ASSERT_FAIL,<br> #QS_QF_RUN
+</center>
+<br>
+
+@attention
+The QS Global Filter is initialized in the QS_INIT() macro to __all OFF__.
+
+
+Here are some examples of setting and clearing the QS Global Filter with QS_GLB_FILTER():
+
+@code{c}
+void BSP_init(int argc, char *argv[]) {
+    ~ ~ ~
+    if (!QS_INIT(argv)) {         /* Initialize QS target component */
+        Q_ERROR();                /* unable to initialize QSpy */
+    }
+    ~ ~ ~
+    /* apply the QS Global Filter... */
+    QS_GLB_FILTER(QS_QF_RECORDS); /* turn QF-group ON */
+    QS_GLB_FILTER(-QS_QF_TICK);   /* turn #QS_QF_TICK OFF */
+    ~ ~ ~
+}
+@endcode
+
+
+@subsection qs_local Local Filter
+The Local Filter is based on __QS-IDs__ associated with various objects in the Target memory. The __QS-IDs__ are small integer numbers, such as the unique __priorities__ assigned to QP Active Objects, but there are more such QS-IDs which _you_ can assign to various objects. Then, you can set up the QS Local Filter to trace only a specific groups of such QS-IDs.
+
+The main use case for QS Local Filter is an application where certain active objects are very "noisy", and would overwhelm your trace. The QS Local Filter allows you to silence the "noisy" active objects and let the others through.
+
+Please note that the @ref qs_global "QS Global Filter" will not do the trick, because you don't want to suppress all QS records of a given Record-Type. Instead, you want to suppress only __specific objects__.
+
+QS provides a simple interface, QS_LOC_FILTER(), for setting and clearing individual QS-IDs as well as groups of QS-IDs in the Target code. The following table summarizes the QS-IDs and groups of QS_IDs that you can use as arguments to QS_LOC_FILTER().
+
+
+<center>
+QS-ID<br>/Group| Range   | Example            | Comments
+---------------|---------|--------------------|-------------
+0              | 0       |                    | always enabled
+#QS_AO_IDS     | 1..64   | QS_LOC_FILTER(QS_AO_IDS);<br> QS_LOC_FILTER(-QS_AO_IDS);<br> QS_LOC_FILTER(6);<br> QS_LOC_FILTER(-6);<br> QS_LOC_FILTER(AO_Table->prio)| Active Object priorities
+#QS_EP_IDS     | 65..80  | QS_LOC_FILTER(QS_EP_ID + 1U); | enable Event-Pool #1
+#QS_EQ_IDS     | 81..96  | QS_LOC_FILTER(QS_EQ_ID + 1U); | enable Event-Queue #1
+#QS_AP_IDS     | 97..127 | QS_LOC_FILTER(QS_AP_ID + 1U); | enable Application Specific QS_ID
+</center>
+
+@attention
+The QS Local Filter is initialized in the QS_INIT() macro to __all ON__.
+
+
+Here are some examples of setting and clearing QS Local Filter with QS_LOC_FILTER():
+
+@code{c}
+void BSP_init(int argc, char *argv[]) {
+    ~ ~ ~
+    if (!QS_INIT(argv)) {         /* Initialize QS target component */
+        Q_ERROR();                /* unable to initialize QSpy */
+    }
+    ~ ~ ~
+    /* apply the QS Local Filter... */
+    QS_LOC_FILTER(-QS_EP_IDS);    /* turn EP (Event-Pool) group  OFF */
+    QS_LOC_FILTER(3);             /* turn AO with prioity 3 ON */
+    QS_LOC_FILTER(AO_Table->prio); /* turn AO_Table ON */
+    ~ ~ ~
+}
+@endcode
+
+
+@section qs_curr Current Objects
+QS maintains a set of **Current Objects** to which it applies commands received through the @ref qs_rx "QS-RX channel". For example, the event-post operation is applied to the current Active Object, while the peek/poke/fill operations are applied to the current Application Object. QS maintains the following Current Objects:
+- ::SM_OBJ &mdash; State Machine object
+- ::AO_OBJ &mdash; Active Object object
+- ::MP_OBJ &mdash; Memory Pool object
+- ::EQ_OBJ &mdash; Event Queue object
+- ::TE_OBJ &mdash; Time Event object
+
+@note
+Current Objects can be set only by sending commands to the @ref qs_rx "QS-RX receive channel".
+
+
+@section qs_dict QS Dictionaries
+By the time you compile and load your application image to the Target, the symbolic names of various objects, function names, and event signal names are stripped from the code. Therefore, if you want to have the symbolic information available to the @ref qspy "QSPY" host-resident component, you need to supply it somehow to the software tracing system.
+
+The QS Target-resident component provides special **dictionary trace records** designed expressly for providing the symbolic information about the target code in the trace itself. These "dictionary records" are very much like the symbolic information embedded in the object files for the traditional single-step debugger. QS can supply four types of dictionary trace records:
+
+- object dictionary ( QS_OBJ_DICTIONARY() )
+- function dictionary  ( QS_FUN_DICTIONARY() )
+- signal dictionary  ( QS_SIG_DICTIONARY() )
+- user dictionary  ( QS_USR_DICTIONARY() )
+
+The dictionary trace records are typically generated during the system initialization and this is the only time they are sent to the @ref qspy "QSPY" host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
+
+
+@code{c}
+void BSP_init(int argc, char *argv[]) {
+    ~ ~ ~
+    if (!QS_INIT(argv)) {   /* Initialize QS target component */
+        Q_ERROR();          /* unable to initialize QSpy */
+    }
+
+    /* dictionaries... */
+    QS_OBJ_DICTIONARY(&myObject);
+    QS_OBJ_DICTIONARY(AO_Table);  /* opaque pointer */
+    QS_FUN_DICTIONARY(&myFun);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, (void*)0);
+
+    QS_USR_DICTIONARY(ON_TEST_SETUP);
+    QS_USR_DICTIONARY(ON_TEST_TEARDOWN);
+    QS_USR_DICTIONARY(COMMAND_X);
+    ~ ~ ~
+}
+@endcode
+<br>
+
+@remarks
+The dictionary trace records are not absolutely required to generate the human-readable output, in the same way that the symbolic information in the object files is not absolutely required to debug your code. However, in both cases, the availability of the symbolic information greatly improves productivity in working with the software trace or the debugger.
+
+
+@section qs_rx QS-RX Receive-Channel
+The QS target component contains the receive-channel (QS-RX), which can receive data from the @ref qspy "QSPY" host application. The QS-RX channel provides the following services:
+- Remotely reset the Target
+- Request target information (version, all sizes of objects, build time-stamp)
+- Execute a user-defined command inside the Target with arguments supplied from @ref qspy "QSPY"
+- Inject an arbitrary event to the Target (dispatch, post or publish)
+- Set @ref qs_global "QS Global Filter" inside the Target
+- Set @ref qs_local "QS Local Filter" inside the Target
+- Set @ref qs_curr "current QS object" inside the Target
+- Peek data inside the Target and send to @ref qspy "QSPY"
+- Poke data (supplied from @ref qspy "QSPY") into the Target
+- Fill a specified memory area in the Target with a bit pattern supplied from @ref qspy "QSPY"
+- Execute clock tick inside the Target
+- Execute test setup inside the Target
+- Execute test teardown inside the Target
+- Store a @ref qutest_fixture-probe "Test Probe" supplied from @ref qspy "QSPY" inside the Target
+
+@note
+The QS-RX channel is the backbone for interacting with the target system and implementing such features as @ref qutest "Unit Testing" and @ref qview "Visualization/Monitoring" of the target system.
+
+@nav{qpspy_proto,qspy}
+*/
