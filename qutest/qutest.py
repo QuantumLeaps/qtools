@@ -158,6 +158,8 @@ class QUTest:
             "GRP_TE": QSpy._GRP_TE,
             "GRP_QF": QSpy._GRP_QF,
             "GRP_SC": QSpy._GRP_SC,
+            "GRP_SEM": QSpy._GRP_SEM,
+            "GRP_MTX": QSpy._GRP_MTX,
             "GRP_U0": QSpy._GRP_U0,
             "GRP_U1": QSpy._GRP_U1,
             "GRP_U2": QSpy._GRP_U2,

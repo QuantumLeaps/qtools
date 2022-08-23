@@ -23,15 +23,15 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-01-27
-# @version Last updated for version: 7.0.0
+# @date Last updated on: 2022-08-22
+# @version Last updated for version: 7.1.0
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
 # @ingroup qutest
 
 ## @brief current version of the Python QUTest interface
-VERSION = 700
+VERSION = 710
 
 ## @brief include python code in a test script
 # @description
@@ -188,6 +188,8 @@ def ensure(bool_expr):
 # GRP_TE # Time Events Record-Types
 # GRP_QF # Framework Record-Types (e.g., post/publish/..)
 # GRP_SC # Scheduler Record-Types (e.g., scheduler lock/unlock)
+# GRP_SEM # Semaphore Record-Types (e.g., Semaphore take/signal)
+# GRP_MTX # Mutex Record-Types (e.g., Mutex lock/unlock)
 # GRP_U0 # User group 0 (Record-Types 100-104)
 # GRP_U1 # User group 1 (Record-Types 105-109)
 # GRP_U2 # User group 2 (Record-Types 110-114)

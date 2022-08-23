@@ -1,7 +1,7 @@
 ![QTools Collection](https://www.state-machine.com/img/qtools_banner.jpg)
 
 # What's New?
-View QTools Revision History at: 
+View QTools Revision History at:
 https://www.state-machine.com/qtools/history.html
 
 
@@ -90,7 +90,7 @@ Alternatively, you can download QTools **separately** as described below:
 On Windows, installation of QTools consists of unzipping the
 `qtools-windows_<ver>.zip` archive into a directory of your choice,
 although the recommended default is `C:\qp`.
- 
+
 After unzipping the archive, you need to add the following directories
 to the PATH:
 

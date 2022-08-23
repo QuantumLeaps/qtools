@@ -8,5 +8,5 @@ Adjusting the CPU Clock Speed
 =============================
 The current setting is to run at 20MHz from the PLL, but the CPU
 clock speed can be modified by editing the "Clock Configuration"
-section in the file system_LM3S811.c. 
+section in the file system_LM3S811.c.
 

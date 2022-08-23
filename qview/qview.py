@@ -1544,12 +1544,14 @@ GRP_EQ = 0xF4
 GRP_TE = 0xF5
 GRP_QF = 0xF6
 GRP_SC = 0xF7
-GRP_U0 = 0xF8
-GRP_U1 = 0xF9
-GRP_U2 = 0xFA
-GRP_U3 = 0xFB
-GRP_U4 = 0xFC
-GRP_UA = 0xFD
+GRP_SEM= 0xF8
+GRP_MTX= 0xF9
+GRP_U0 = 0xFA
+GRP_U1 = 0xFB
+GRP_U2 = 0xFC
+GRP_U3 = 0xFD
+GRP_U4 = 0xFE
+GRP_UA = 0xFF
 GRP_ON = GRP_ALL
 GRP_OFF= -GRP_ALL
 
@@ -1635,14 +1637,20 @@ def glb_filter(*args):
             _apply(QSpy._GLB_FLT_MASK_SM, is_neg)
         elif arg == GRP_AO:
             _apply(QSpy._GLB_FLT_MASK_AO, is_neg)
-        elif arg == GRP_QF:
-            _apply(QSpy._GLB_FLT_MASK_QF, is_neg)
-        elif arg == GRP_TE:
-            _apply(QSpy._GLB_FLT_MASK_TE, is_neg)
-        elif arg == GRP_EQ:
-            _apply(QSpy._GLB_FLT_MASK_EQ, is_neg)
         elif arg == GRP_MP:
             _apply(QSpy._GLB_FLT_MASK_MP, is_neg)
+        elif arg == GRP_EQ:
+            _apply(QSpy._GLB_FLT_MASK_EQ, is_neg)
+        elif arg == GRP_TE:
+            _apply(QSpy._GLB_FLT_MASK_TE, is_neg)
+        elif arg == GRP_QF:
+            _apply(QSpy._GLB_FLT_MASK_QF, is_neg)
+        elif arg == GRP_SC:
+            _apply(QSpy._GLB_FLT_MASK_SC, is_neg)
+        elif arg == GRP_SEM:
+            _apply(QSpy._GLB_FLT_MASK_SEM, is_neg)
+        elif arg == GRP_MTX:
+            _apply(QSpy._GLB_FLT_MASK_MTX, is_neg)
         elif arg == GRP_U0:
             _apply(QSpy._GLB_FLT_MASK_U0, is_neg)
         elif arg == GRP_U1:

@@ -1,8 +1,53 @@
 /**
 @page history Revision History
 
-@section qtools_7_0_0 Version 7.0.0, 2022-01-31
+@section qtools_7_1_0 Version 7.1.0, 2022-08-22
 
+__Changes in QSpy__
+- QSpy 7.1.0 has been updated for QP version 7.1.0. Specifically new predefined QS trace records have been added:
+@code{.c}
+/* [71] Semaphore (SEM) records */
+QS_SEM_TAKE,          /*!< a semaphore was taken by a thread */
+QS_SEM_BLOCK,         /*!< a semaphore blocked a thread */
+QS_SEM_SIGNAL,        /*!< a semaphore was signaled*/
+QS_SEM_BLOCK_ATTEMPT, /*!< a semaphore blocked was attempted */
+
+/* [75] Mutex (MTX) records */
+QS_MTX_LOCK,          /*!< a mutex was locked */
+QS_MTX_BLOCK,         /*!< a mutex blocked a thread */
+QS_MTX_UNLOCK,        /*!< a mutex was unlocked */
+QS_MTX_LOCK_ATTEMPT,  /*!< a mutex lock was attempted */
+QS_MTX_BLOCK_ATTEMPT, /*!< a mutex blocking was attempted */
+QS_MTX_UNLOCK_ATTEMPT,/*!< a mutex unlock was attempted */
+@endcode
+the following QS trace records are now deprecated:
+@code{.c}
+/* [48] old Mutex records, deprecated in QP 7.1.0 */
+QS_MUTEX_LOCK,        /*!< @deprecated */
+QS_MUTEX_UNLOCK,      /*!< @deprecated */
+@endcode
+Also, the following new groups for QS global filter have been added:
+@code{.c}
+    QS_SEM_RECORDS,       /*!< Semaphore QS records */
+    QS_MTX_RECORDS,       /*!< Mutex QS records */
+@endcode
+
+__Changes in QUTest__
+- `qutest.py` has been updated to include new QS trace records and global filters for them. The following QS record groups have been added to the "QUTest DSL":
+@code{.c}
+GRP_SEM - Semaphore QS records
+GRP_MTX - Mutex QS records
+@endcode
+
+__Changes in QUView__
+- `qview.py` has been updated to include new QS trace records and global filters for them. The following QS record groups have been added to QView:
+@code{.c}
+GRP_SEM - Semaphore QS records
+GRP_MTX - Mutex QS records
+@endcode
+
+
+@section qtools_7_0_0 Version 7.0.0, 2022-01-31
 __Changes in QSpy__
 - The QSpy 7.0.0 implementation has been re-factored to modularize it in order to better support building host-based applications for executing embedded code on the host. Specifically, the new QSpy design better separates the "QSpy parser" of the QS records from the rendering engine and from other functionality of the QSpy host application.
 - Also, this release introduces semantic coloring of the @ref qspy "QSPY output", which improves its readability. This feature is now controlled by the added @ref qspy_command "command-line option" `-r<c0|c1|c2>`.

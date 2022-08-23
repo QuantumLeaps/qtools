@@ -1,20 +1,20 @@
-License Agreement  
+License Agreement
 
-Important - This is a legally binding agreement. Read it carefully. After you read the following terms, you will be asked whether you are authorized to commit your company to abide by the following terms. THIS AGREEMENT IS DISPLAYED FOR YOU TO READ PRIOR TO DOWNLOADING OR USING THE "LICENSED MATERIALS". 
+Important - This is a legally binding agreement. Read it carefully. After you read the following terms, you will be asked whether you are authorized to commit your company to abide by the following terms. THIS AGREEMENT IS DISPLAYED FOR YOU TO READ PRIOR TO DOWNLOADING OR USING THE "LICENSED MATERIALS".
 
-DO NOT DOWNLOAD OR INSTALL the software programs unless you agree on behalf of yourself and your company to be bound by the terms of this License Agreement. 
+DO NOT DOWNLOAD OR INSTALL the software programs unless you agree on behalf of yourself and your company to be bound by the terms of this License Agreement.
 
-DO NOT CLICK "I AGREE" UNLESS : 
+DO NOT CLICK "I AGREE" UNLESS :
 
-1. YOU ARE AUTHORIZED TO AGREE TO THE TERMS OF THIS LICENSE ON BEHALF OF YOURSELF AND YOUR COMPANY; AND 
+1. YOU ARE AUTHORIZED TO AGREE TO THE TERMS OF THIS LICENSE ON BEHALF OF YOURSELF AND YOUR COMPANY; AND
 
-2. YOU INTEND TO ENTER THIS LEGALLY BINDING AGREEMENT ON BEHALF OF YOURSELF AND YOUR COMPANY. 
+2. YOU INTEND TO ENTER THIS LEGALLY BINDING AGREEMENT ON BEHALF OF YOURSELF AND YOUR COMPANY.
 
 Important - Read carefully: This software license agreement ("Agreement") is a legal agreement between you (either an individual or entity) and Texas Instruments Incorporated ("TI"). The "Licensed Materials" subject to this Agreement include the software programs TI has granted you access to download and any "on-line" or electronic documentation associated with these programs, or any portion thereof, and may also include hardware, reference designs and associated documentation. The Licensed Materials are specifically designed and licensed for use solely and exclusively with microprocessor/microcontroller devices manufactured by or for TI ("TI Devices"). By installing, copying or otherwise using the Licensed Materials you agree to abide by the provisions set forth herein. This Agreement is displayed for you to read prior to using the Licensed Materials. If you choose not to accept or agree with these provisions,do not download or install the Licensed Materials .
 
 1. Delivery. TI may deliver the Licensed Materials, or portions thereof, to you electronically.
 
-2. License Grant and Use Restrictions. 
+2. License Grant and Use Restrictions.
 
 a. Limited Source Code License. Subject to the terms of this Agreement, and commencing as of the Effective Date and continuing for the term of this Agreement, TI hereby grants to you a limited, free, non-transferable, non-exclusive, non-assignable, non-sub-licensable license to make copies, prepare derivative works, display internally and use internally the Licensed Materials provided to you in source code for the sole purposes of designing and developing object and executable versions of such Licensed Materials or any derivative thereof, that execute solely and exclusively on TI Devices used in Customer Product(s), and maintaining and supporting such Licensed Materials, or any derivative thereof, and Customer Product(s). "Customer Product" means a final product distributed by or for you that consists of both hardware, including one or more TI Devices, and software components, including only executable versions of the Licensed Materials that execute solely and exclusively on or with such TI Devices and not on devices manufactured by or for an entity other than TI.
 
@@ -40,7 +40,7 @@ h. Termination. This Agreement is effective until terminated. You may terminate 
 
 3. Licensed Materials Ownership. The Licensed Materials are licensed, not sold to you, and can only be used in accordance with the terms of this Agreement. Subject to the licenses granted to you pursuant to this Agreement, TI and TI's licensors own and shall continue to own all right, title, and interest in and to the Licensed Materials, including all copies thereof. The parties agree that all fixes, modifications and improvements to the Licensed Materials conceived of or made by TI that are based, either in whole or in part, on your feedback, suggestions or recommendations are the exclusive property of TI and all right, title and interest in and to such fixes, modifications or improvements to the Licensed Materials will vest solely in TI. Moreover, you acknowledge and agree that when your independently developed software or hardware components are combined, in whole or in part, with the Licensed Materials, your right to use the Licensed Materials embodied in such resulting combined work shall remain subject to the terms and conditions of this Agreement.
 
-4. Intellectual Property Rights. 
+4. Intellectual Property Rights.
 
 a. The Licensed Materials contain copyrighted material, trade secrets and other proprietary information of TI and TI's licensors and are protected by copyright laws, international copyright treaties, and trade secret laws, as well as other intellectual property laws. To protect TI's and TI's licensors' rights in the Licensed Materials, you agree, except as specifically permitted by statute by a provision that cannot be waived by contract, not to "unlock", decompile, reverse engineer, disassemble or otherwise translate any portions of the Licensed Materials to a human-perceivable form nor to permit any person or entity to do so. You shall not remove, alter, cover, or obscure any confidentiality, trade secret, proprietary, or copyright notices, trade-marks, proprietary, patent, or other identifying marks or designs from any component of the Licensed Materials and you shall reproduce and include in all copies of the Licensed Materials the copyright notice(s) and proprietary legend(s) of TI and TI's licensors as they appear in the Licensed Materials. TI reserves all rights not specifically granted under this Agreement.
 
@@ -74,7 +74,7 @@ a. Registration Requirements. You shall be solely responsible for performing all
 
 b. Governing Language. This Agreement is written and executed in the English language. If a translation of this Agreement is required for any purpose, including but not limited to registration of the Agreement pursuant to any governmental laws, regulations or rules, you shall be solely responsible for creating such translation. Any translation of this Agreement into a language other than English is intended solely in order to comply with such laws or for reference purposes, and the English language version shall be authoritative and controlling.
 
-c. Export Control. 
+c. Export Control.
 
 (i). Diversions of Technology. You hereby agree that unless prior authorization is obtained from the U.S. Department of Commerce, neither you nor your subsidiaries or affiliates shall knowingly export, re-export, or release, directly or indirectly, any technology, software, or software source code (as defined in Part 772 of the Export Administration Regulations of the U.S. Department of Commerce ("EAR")), received from TI or any of its affiliated companies, or export, directly or indirectly, any direct product of such technology, software, or software source code (as defined in Part 734 of the EAR), to any destination or country to which the export, re-export, or release of the technology, software, software source code, or direct product is prohibited by the EAR.
 
