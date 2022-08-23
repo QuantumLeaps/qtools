@@ -961,12 +961,15 @@ class QSpy:
     _GRP_TE = 0xF5
     _GRP_QF = 0xF6
     _GRP_SC = 0xF7
-    _GRP_U0 = 0xF8
-    _GRP_U1 = 0xF9
-    _GRP_U2 = 0xFA
-    _GRP_U3 = 0xFB
-    _GRP_U4 = 0xFC
-    _GRP_UA = 0xFD
+    _GRP_SEM= 0xF8
+    _GRP_MTX= 0xF9
+    _GRP_U0 = 0xFA
+    _GRP_U1 = 0xFB
+    _GRP_U2 = 0xFC
+    _GRP_U3 = 0xFD
+    _GRP_U4 = 0xFE
+    _GRP_UA = 0xFF
+
     _QS_USER = 100
 
     # local filter groups...
