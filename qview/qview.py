@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-03-09
-# @version Last updated for version: 7.0.0
+# @date Last updated on: 2022-08-22
+# @version Last updated for version: 7.1.0
 #
 # @file
 # @brief QView Monitoring for QP/Spy
@@ -49,7 +49,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 700
+    VERSION = 710
 
     # public static variables...
     ## menu to be customized
@@ -119,6 +119,10 @@ class QView:
              command=QView._onGlbFilter_EQ)
         m.add_command(label="SC Group...", accelerator="[NONE]",
              command=QView._onGlbFilter_SC)
+        m.add_command(label="SEM Group...", accelerator="[NONE]",
+             command=QView._onGlbFilter_SEM)
+        m.add_command(label="MTX Group...", accelerator="[NONE]",
+             command=QView._onGlbFilter_MTX)
         m.add_separator()
         m.add_command(label="U0 Group...", accelerator="[NONE]",
              command=QView._onGlbFilter_U0)
@@ -382,6 +386,8 @@ class QView:
         _update_glb_filter_menu("MP Group...", QSpy._GLB_FLT_MASK_MP)
         _update_glb_filter_menu("EQ Group...", QSpy._GLB_FLT_MASK_EQ)
         _update_glb_filter_menu("SC Group...", QSpy._GLB_FLT_MASK_SC)
+        _update_glb_filter_menu("SEM Group...", QSpy._GLB_FLT_MASK_SEM)
+        _update_glb_filter_menu("MTX Group...", QSpy._GLB_FLT_MASK_MTX)
         _update_glb_filter_menu("U0 Group...", QSpy._GLB_FLT_MASK_U0)
         _update_glb_filter_menu("U1 Group...", QSpy._GLB_FLT_MASK_U1)
         _update_glb_filter_menu("U2 Group...", QSpy._GLB_FLT_MASK_U2)
@@ -471,6 +477,14 @@ class QView:
     @staticmethod
     def _onGlbFilter_SC(*args):
         QView._GlbFilterDialog("SC Group", QSpy._GLB_FLT_MASK_SC)
+
+    @staticmethod
+    def _onGlbFilter_SEM(*args):
+        QView._GlbFilterDialog("SEM Group", QSpy._GLB_FLT_MASK_SEM)
+
+    @staticmethod
+    def _onGlbFilter_MTX(*args):
+        QView._GlbFilterDialog("MTX Group", QSpy._GLB_FLT_MASK_MTX)
 
     @staticmethod
     def _onGlbFilter_U0(*args):
@@ -1121,8 +1135,10 @@ class QSpy:
         # [47] Additional Memory Pool (MP) records
         "QS_QF_MPOOL_GET_ATTEMPT",
 
-        # [48] Scheduler (SC) records
+        # [48] old Mutex records (deprecated in QP 7.1.0)
         "QS_MUTEX_LOCK",          "QS_MUTEX_UNLOCK",
+
+        # [50] Scheduler (SC) records
         "QS_SCHED_LOCK",          "QS_SCHED_UNLOCK",
         "QS_SCHED_NEXT",          "QS_SCHED_IDLE",
         "QS_SCHED_RESUME",
@@ -1140,13 +1156,17 @@ class QSpy:
         "QS_PEEK_DATA",           "QS_ASSERT_FAIL",
         "QS_QF_RUN",
 
-        # [71] Reserved QS records
-        "QS_RESERVED_71",
-        "QS_RESERVED_72",         "QS_RESERVED_73",
-        "QS_RESERVED_74",         "QS_RESERVED_75",
-        "QS_RESERVED_76",         "QS_RESERVED_77",
-        "QS_RESERVED_78",         "QS_RESERVED_79",
-        "QS_RESERVED_80",         "QS_RESERVED_81",
+        # [71] Semaphore (SEM) records
+        "QS_SEM_TAKE",            "QS_SEM_BLOCK",
+        "QS_SEM_SIGNAL",          "QS_SEM_BLOCK_ATTEMPT",
+
+        # [75] Mutex (MTX) records
+        "QS_MTX_LOCK",            "QS_MTX_BLOCK",
+        "QS_MTX_UNLOCK",          "QS_MTX_LOCK_ATTEMPT",
+        "QS_MTX_BLOCK_ATTEMPT",   "QS_MTX_UNLOCK_ATTEMPT",
+
+        # [81] Reserved QS records
+        "QS_RESERVED_81",
         "QS_RESERVED_82",         "QS_RESERVED_83",
         "QS_RESERVED_84",         "QS_RESERVED_85",
         "QS_RESERVED_86",         "QS_RESERVED_87",
@@ -1180,7 +1200,9 @@ class QSpy:
     _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
     _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
-    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000007C000000000000
+    _GLB_FLT_MASK_SEM= 0x00000000000007800000000000000000
+    _GLB_FLT_MASK_MTX= 0x000000000001F8000000000000000000
     _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000
     _GLB_FLT_MASK_U1 = 0x00003E00000000000000000000000000
     _GLB_FLT_MASK_U2 = 0x0007C000000000000000000000000000

@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-05-08
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-08-22
+* @version Last updated for version: 7.1.0
 *
 * @file
 * @brief main for QSPY host utility
@@ -98,7 +98,7 @@ static char const l_helpStr[] =
     "-h                        help (show this message)\n"
     "-q [num]          (key-q) quiet mode (no QS data output)\n"
     "-u [UDP_port|0]   7701    UDP socket with optional port, 0-no UDP\n"
-    "-v <QS_version>   6.6     compatibility with QS version\n"
+    "-v <QS_version>   7.0     compatibility with QS version\n"
     "-r <c0|c1|c2>     c1      rendering (c0=no-color, c1-color1, )\n"
     "-k                        suppress keyboard input\n"
     "-o                (key-o) save screen output to a file\n"
@@ -293,7 +293,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
 
     /* default configuration options... */
     QSpyConfig config = {
-        .version      = 660U,
+        .version      = 700U,
         .endianness   = 0U,
         .objPtrSize   = 4U,
         .funPtrSize   = 4U,
@@ -988,7 +988,9 @@ static void colorPrintLn(void) {
         case GRP_MP:
         case GRP_TE:
         case GRP_QF:
-        case GRP_SC: {
+        case GRP_SC:
+        case GRP_SEM:
+        case GRP_MTX: {
             /* description section */
             ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';

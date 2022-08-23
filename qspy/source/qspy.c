@@ -23,11 +23,11 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-03-12
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-08-22
+* @version Last updated for version: 7.1.0
 *
 * @file
-* @brief QSPY host uility: main parser
+* @brief QSPY host utility: main parser
 * @ingroup qpspy
 */
 #include <stdint.h>
@@ -36,9 +36,9 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"     /* QSPY data parser */
-#include "pal.h"      /* Platform Abstraction Layer */
+#include "safe_std.h"   /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"       /* QSPY data parser */
+#include "pal.h"        /* Platform Abstraction Layer */
 
 #define Q_SPY   1       /* this is QP implementation */
 #define QP_IMPL 1       /* this is QP implementation */
@@ -145,9 +145,11 @@ QSpyRecRender const QSPY_rec[QS_USER] = {
     /* [47] Additional Memory Pool (MP) records */
     { "QS_QF_MPOOL_GET_ATTEMPT",          GRP_MP },
 
-    /* [48] Scheduler (SC) records */
-    { "QS_MUTEX_LOCK",                    GRP_SC },
-    { "QS_MUTEX_UNLOCK",                  GRP_SC },
+    /* [48] old Mutex records (deprecated) */
+    { "QS_MUTEX_LOCK",                    GRP_MTX },
+    { "QS_MUTEX_UNLOCK",                  GRP_MTX },
+
+    /* [50] Scheduler (SC) records */
     { "QS_SCHED_LOCK",                    GRP_SC },
     { "QS_SCHED_UNLOCK",                  GRP_SC },
     { "QS_SCHED_NEXT",                    GRP_SC },
@@ -174,17 +176,21 @@ QSpyRecRender const QSPY_rec[QS_USER] = {
     { "QS_ASSERT_FAIL",                   GRP_ERR },
     { "QS_QF_RUN",                        GRP_INF },
 
-    /* [71] Miscellaneous QS records (not maskable) */
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
+    /* [71] Semaphore (SEM) records */
+    { "QS_SEM_TAKE",                      GRP_SEM },
+    { "QS_SEM_BLOCK",                     GRP_SEM },
+    { "QS_SEM_SIGNAL",                    GRP_SEM },
+    { "QS_SEM_BLOCK_ATTEMPT",             GRP_SEM },
+
+    /* [75] Mutex (MTX) records */
+    { "QS_MTX_LOCK",                      GRP_MTX },
+    { "QS_MTX_BLOCK",                     GRP_MTX },
+    { "QS_MTX_UNLOCK",                    GRP_MTX },
+    { "QS_MTX_LOCK_ATTEMPT",              GRP_MTX },
+    { "QS_MTX_BLOCK_ATTEMPT",             GRP_MTX },
+    { "QS_MTX_UNLOCK_ATTEMPT",            GRP_MTX },
+
+    /* [81] reserved and unused */
     { "QS_RESERVED",                      GRP_ERR },
     { "QS_RESERVED",                      GRP_ERR },
     { "QS_RESERVED",                      GRP_ERR },
@@ -737,7 +743,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 }
 
 /*==========================================================================*/
-/* pre-defined QS records... */
+/* predefined QS records... */
 static void QSpyRecord_process(QSpyRecord * const me) {
     uint32_t t, a, b, c, d, e;
     uint64_t p, q, r;
@@ -1662,6 +1668,10 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
+        /* old Mutex records, deprecated in QP 7.1.0
+        * see QS_MTX_LOCK, etc.
+        */
         case QS_MUTEX_LOCK:
             if (s == 0) s = "Mtx-Lock";
             /* fall through */
@@ -1682,7 +1692,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        /* Miscallaneous built-in QS records ...............................*/
+        /* Miscellaneous built-in QS records ...............................*/
         case QS_TEST_PAUSED: {
             if (QSpyRecord_OK(me)) {
                 SNPRINTF_LINE("           %s", "TstPause");
@@ -1731,7 +1741,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
             s = QSpyRecord_getStr(me);
 
-            /* for backward compatibilty replace the '['/']' with '<'/'>' */
+            /* for backward compatibility replace the '['/']' with '<'/'>' */
             if (QSPY_conf.version < 690U) {
                 char *ps;
                 for (ps = (char *)s; *ps != '\0'; ++ps) {
@@ -2097,6 +2107,86 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             }
             break;
         }
+
+        /* Semaphore records ...............................................*/
+        case QS_SEM_TAKE:
+            if (s == 0) s = "Sem-Take";
+            /* fall through */
+        case QS_SEM_BLOCK:
+            if (s == 0) s = "Sem-Blk ";
+            /* fall through */
+        case QS_SEM_SIGNAL:
+            if (s == 0) s = "Sem-Sgnl";
+            /* fall through */
+        case QS_SEM_BLOCK_ATTEMPT: {
+            if (s == 0) s = "Sem-BlkA";
+            t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
+            p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+            a = QSpyRecord_getUint32(me, 1);
+            b = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u %s %s,Thr=%u,Cnt=%u",
+                       t,
+                       s,
+                       Dictionary_get(&QSPY_objDict, p, (char *)0),
+                       a, b);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
+                               (int)me->rec, (unsigned)t, p, a, b);
+            }
+            break;
+        }
+
+        /* Mutex records ...............................................*/
+        case QS_MTX_LOCK:
+            if (s == 0) s = "Mtx-Lock";
+            /* fall through */
+        case QS_MTX_UNLOCK:
+            if (s == 0) s = "Mtx-Unlk";
+            /* fall through */
+        case QS_MTX_LOCK_ATTEMPT:
+            if (s == 0) s = "Mtx-LckA";
+            /* fall through */
+        case QS_MTX_UNLOCK_ATTEMPT: {
+            if (s == 0) s = "Mtx-UlkA";
+            t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
+            p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+            a = QSpyRecord_getUint32(me, 1);
+            b = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u %s %s,Hldr=%u,Nest=%u",
+                       t,
+                       s,
+                       Dictionary_get(&QSPY_objDict, p, (char *)0),
+                       a, b);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
+                               (int)me->rec, (unsigned)t, p, a, b);
+            }
+            break;
+        }
+        case QS_MTX_BLOCK:
+            if (s == 0) s = "Mtx-Blk ";
+            /* fall through */
+        case QS_MTX_BLOCK_ATTEMPT: {
+            if (s == 0) s = "Mtx-BlkA";
+            t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
+            p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+            a = QSpyRecord_getUint32(me, 1);
+            b = QSpyRecord_getUint32(me, 1);
+            if (QSpyRecord_OK(me)) {
+                SNPRINTF_LINE("%010u %s %s,Hldr=%u,Thr=%u",
+                       t,
+                       s,
+                       Dictionary_get(&QSPY_objDict, p, (char *)0),
+                       a, b);
+                QSPY_onPrintLn();
+                FPRINF_MATFILE("%d %u %"PRId64" %u %u\n",
+                               (int)me->rec, (unsigned)t, p, a, b);
+            }
+            break;
+        }
+
 
         /* Unknown records .................................................*/
         /* NOTE: the Application-Specific records have been already

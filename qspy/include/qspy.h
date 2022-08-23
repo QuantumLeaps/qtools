@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-03-12
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-08-22
+* @version Last updated for version: 7.1.0
 *
 * @file
 * @brief Host API
@@ -33,7 +33,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "7.0.0"
+#define QSPY_VER "7.1.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -161,6 +161,8 @@ enum QSRreRecGroup {
     GRP_TE,
     GRP_QF,
     GRP_SC,
+    GRP_SEM,
+    GRP_MTX,
     GRP_USR
 };
 
