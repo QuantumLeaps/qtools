@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-08-22
-* @version Last updated for version: 7.1.0
+* @date Last updated on: 2022-08-29
+* @version Last updated for version: 7.1.1
 *
 * @file
 * @brief QSPY host utility: main parser
@@ -280,6 +280,10 @@ void QSPY_config(QSpyConfig const *config,
 
     QSPY_conf.tstamp[5] = 0U; /* invalidate the year-part of the timestamp */
     l_userRec = ((QSPY_conf.version < 660U) ? OLD_QS_USER : QS_USER);
+}
+/*..........................................................................*/
+void QSPY_cleanup(void) {
+    QSPY_configMatFile((void*)0);
 }
 /*..........................................................................*/
 void QSPY_configTxReset(QSPY_resetFun txResetFun) {

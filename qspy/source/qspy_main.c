@@ -77,9 +77,9 @@ static char  l_seqList[QS_SEQ_LIST_LEN_MAX];
 
 static int   l_bePort   = 7701;   /* default UDP port  */
 static int   l_tcpPort  = 6601;   /* default TCP port */
-static int   l_baudRate = 115200; /* default serial baudrate */
+static int   l_baudRate = 115200; /* default serial baud rate */
 
-/* color rendeing */
+/* color rendering */
 extern char const * const l_darkPalette[];
 extern char const * const l_lightPalette[];
 static char const * const *l_colorPalette = l_darkPalette;
@@ -144,6 +144,7 @@ static char const l_kbdHelpStr[] =
 
 /*..........................................................................*/
 static QSpyStatus configure(int argc, char *argv[]);
+static void cleanup(void);
 static void colorPrintLn(void);
 static uint8_t l_buf[8*1024]; /* process input in 8K chunks */
 
@@ -203,12 +204,14 @@ int main(int argc, char *argv[]) {
     }
 
     /* cleanup .............................................................*/
-    QSPY_cleanup();
+    cleanup();
     return status;
 }
 
 /*..........................................................................*/
-void QSPY_cleanup(void) {
+static void cleanup(void) {
+    QSPY_cleanup();
+
     PAL_closeKbd();  /* close the keyboard input (if open) */
 
     if (l_savFile != (FILE *)0) {
@@ -218,11 +221,10 @@ void QSPY_cleanup(void) {
         fclose(l_outFile);
     }
 
-    QSPY_configMatFile((void*)0);
     QSEQ_configFile((void*)0);
 
     if (l_bePort != 0) {
-        PAL_closeBE();          /* close the Back-End connection */
+        PAL_closeBE();  /* close the Back-End connection */
     }
 
     if (PAL_vtbl.cleanup != 0) {
@@ -236,7 +238,7 @@ void QSPY_cleanup(void) {
 void Q_onAssert(char const * const module, int loc) {
     PRINTF_S("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
            module, loc);
-    QSPY_cleanup();
+    cleanup();
     exit(-1);
 }
 

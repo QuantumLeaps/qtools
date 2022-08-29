@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-08-22
-* @version Last updated for version: 7.1.0
+* @date Last updated on: 2022-08-29
+* @version Last updated for version: 7.1.1
 *
 * @file
 * @brief Host API
@@ -33,7 +33,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "7.1.0"
+#define QSPY_VER "7.1.1"
 
 #ifdef __cplusplus
 extern "C" {

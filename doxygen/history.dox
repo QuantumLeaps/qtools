@@ -1,6 +1,10 @@
 /**
 @page history Revision History
 
+@section qtools_7_1_1 Version 7.1.0, 2022-08-30
+Slightly restructured QSPY source code to better integrate directly with QP applications. Specifically, moved QSPY_cleanup() to qspy.c, so it is available to the applications.
+
+
 @section qtools_7_1_0 Version 7.1.0, 2022-08-22
 
 __Changes in QSpy__
