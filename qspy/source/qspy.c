@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-08-29
+* @date Last updated on: 2022-09-03
 * @version Last updated for version: 7.1.1
 *
 * @file
@@ -145,11 +145,9 @@ QSpyRecRender const QSPY_rec[QS_USER] = {
     /* [47] Additional Memory Pool (MP) records */
     { "QS_QF_MPOOL_GET_ATTEMPT",          GRP_MP },
 
-    /* [48] old Mutex records (deprecated) */
-    { "QS_MUTEX_LOCK",                    GRP_MTX },
-    { "QS_MUTEX_UNLOCK",                  GRP_MTX },
-
-    /* [50] Scheduler (SC) records */
+    /* [48] Scheduler (SC) records */
+    { "QS_SCHED_PREEMPT",                 GRP_SC },
+    { "QS_SCHED_RESTORE",                 GRP_SC },
     { "QS_SCHED_LOCK",                    GRP_SC },
     { "QS_SCHED_UNLOCK",                  GRP_SC },
     { "QS_SCHED_NEXT",                    GRP_SC },
@@ -1673,25 +1671,37 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             break;
         }
 
-        /* old Mutex records, deprecated in QP 7.1.0
-        * see QS_MTX_LOCK, etc.
-        */
-        case QS_MUTEX_LOCK:
-            if (s == 0) s = "Mtx-Lock";
+        case QS_SCHED_PREEMPT:
+            if (QSPY_conf.version < 710U) {
+                /* old QS_MUTEX_LOCK */
+                if (s == 0) s = "Mtx-Lock";
+            }
+            else {
+                if (s == 0) s = "Sch-Pre ";
+            }
             /* fall through */
-        case QS_MUTEX_UNLOCK: {
-            if (s == 0) s = "Mtx-Unlk";
+        case QS_SCHED_RESTORE: {
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u %s Pro=%u,Ceil=%u",
-                       t,
-                       s,
-                       a, b);
-                QSPY_onPrintLn();
-                FPRINF_MATFILE("%d %u %u %u\n",
-                               (int)me->rec, t, a, b);
+                if (QSPY_conf.version < 710U) {
+                    /* old QS_MUTEX_UNLOCK */
+                    if (s == 0) s = "Mtx-Unlk";
+                    SNPRINTF_LINE("%010u %s Pro=%u,Ceil=%u",
+                           t, s, a, b);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %u %u\n",
+                                   (int)me->rec, t, a, b);
+                }
+                else {
+                    if (s == 0) s = "Sch-Rest";
+                    SNPRINTF_LINE("%010u %s Pri=%u->%u",
+                           t, s, b, a);
+                    QSPY_onPrintLn();
+                    FPRINF_MATFILE("%d %u %u %u\n",
+                                   (int)me->rec, t, b, a);
+                }
             }
             break;
         }

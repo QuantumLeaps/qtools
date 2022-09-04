@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-08-22
-# @version Last updated for version: 7.1.0
+# @date Last updated on: 2022-09-03
+# @version Last updated for version: 7.1.1
 #
 # @file
 # @brief QView Monitoring for QP/Spy
@@ -49,7 +49,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 710
+    VERSION = 711
 
     # public static variables...
     ## menu to be customized
@@ -1135,10 +1135,8 @@ class QSpy:
         # [47] Additional Memory Pool (MP) records
         "QS_QF_MPOOL_GET_ATTEMPT",
 
-        # [48] old Mutex records (deprecated in QP 7.1.0)
-        "QS_MUTEX_LOCK",          "QS_MUTEX_UNLOCK",
-
-        # [50] Scheduler (SC) records
+        # [48] Scheduler (SC) records
+        "QS_SCHED_PREEMPT",       "QS_SCHED_RESTORE",
         "QS_SCHED_LOCK",          "QS_SCHED_UNLOCK",
         "QS_SCHED_NEXT",          "QS_SCHED_IDLE",
         "QS_SCHED_RESUME",
@@ -1200,7 +1198,7 @@ class QSpy:
     _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
     _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
-    _GLB_FLT_MASK_SC = 0x0000000000000000007C000000000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
     _GLB_FLT_MASK_SEM= 0x00000000000007800000000000000000
     _GLB_FLT_MASK_MTX= 0x000000000001F8000000000000000000
     _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000

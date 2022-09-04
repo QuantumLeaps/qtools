@@ -200,16 +200,16 @@ enum QSpyPre {
     /* [47] Additional Memory Pool (MP) records */
     QS_QF_MPOOL_GET_ATTEMPT,  /*!< attempt to get a memory block failed */
 
-    /* [48] reserved */
-    QS_MUTEX_LOCK,        /*!< @deprecated */
-    QS_MUTEX_UNLOCK,      /*!< @deprecated */
+    /* [48] old Mutex records, reclaimed for scheduler in QP 7.1.1 */
+    QS_SCHED_PREEMPT,     /*!< scheduler asynchronously preempted a task */
+    QS_SCHED_RESTORE,     /*!< scheduler restored preempted task */
 
     /* [50] Scheduler (SC) records */
     QS_SCHED_LOCK,        /*!< scheduler was locked */
     QS_SCHED_UNLOCK,      /*!< scheduler was unlocked */
-    QS_SCHED_NEXT,        /*!< scheduler found next task to execute */
-    QS_SCHED_IDLE,        /*!< scheduler became idle */
-    QS_SCHED_RESUME,      /*!< scheduler resumed previous task (not idle) */
+    QS_SCHED_NEXT,        /*!< scheduler started new task */
+    QS_SCHED_IDLE,        /*!< scheduler restored the idle task */
+    QS_SCHED_RESUME,      /*!< scheduler resumed a task */
 
     /* [55] Additional QEP records */
     QS_QEP_TRAN_HIST,     /*!< a tran to history was taken */
@@ -234,7 +234,7 @@ enum QSpyPre {
     /* [71] Semaphore (SEM) records */
     QS_SEM_TAKE,          /*!< a semaphore was taken by a thread */
     QS_SEM_BLOCK,         /*!< a semaphore blocked a thread */
-    QS_SEM_SIGNAL,        /*!< a semaphore was signaled*/
+    QS_SEM_SIGNAL,        /*!< a semaphore was signaled */
     QS_SEM_BLOCK_ATTEMPT, /*!< a semaphore blocked was attempted */
 
     /* [75] Mutex (MTX) records */
@@ -260,6 +260,8 @@ enum QSpyGroups {
     QS_TE_RECORDS,        /*!< Time Events QS records */
     QS_QF_RECORDS,        /*!< QF QS records */
     QS_SC_RECORDS,        /*!< Scheduler QS records */
+    QS_SEM_RECORDS,       /*!< Semaphore QS records */
+    QS_MTX_RECORDS,       /*!< Mutex QS records */
     QS_U0_RECORDS,        /*!< User Group 100-104 records */
     QS_U1_RECORDS,        /*!< User Group 105-109 records */
     QS_U2_RECORDS,        /*!< User Group 110-114 records */
@@ -1575,7 +1577,7 @@ void QActiveDummy_dispatch_(
 */
 void QActiveDummy_start_(
     QActive * const me,
-    QPrioSpec const prio,
+    QPrioSpec const prioSpec,
     QEvt const * * const qSto,
     uint_fast16_t const qLen,
     void * const stkSto,
