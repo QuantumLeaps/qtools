@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-08-22
-* @version Last updated for version: 7.1.0
+* @date Last updated on: 2022-09-05
+* @version Last updated for version: 7.1.1
 *
 * @file
 * @brief main for QSPY host utility
@@ -36,11 +36,11 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
-#include "qspy.h"     /* QSPY data parser */
-#include "be.h"       /* Back-End interface */
-#include "pal.h"      /* Platform Abstraction Layer */
-#include "getopt.h"   /* command-line option processor */
+#include "safe_std.h"   /* "safe" <stdio.h> and <string.h> facilities */
+#include "qspy.h"       /* QSPY data parser */
+#include "be.h"         /* Back-End interface */
+#include "pal.h"        /* Platform Abstraction Layer */
+#include "getopt.h"     /* command-line option processor */
 
 #define Q_SPY   1       /* this is QP implementation */
 #define QP_IMPL 1       /* this is QP implementation */
@@ -122,7 +122,7 @@ static char const l_helpStr[] =
     "-Q <counter_size> 1       queue counter size    (bytes)\n"
     "-P <counter_size> 2       pool counter size     (bytes)\n"
     "-B <block_size>   2       pool block-size size  (bytes)\n"
-    "-C <counter_size> 2       QTimeEvt counter size (bytes)\n";
+    "-C <counter_size> 4       QTimeEvt counter size (bytes)\n";
 
 static char const l_kbdHelpStr[] =
     "Keyboard shortcuts (valid when -k option is absent):\n"
@@ -305,7 +305,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
         .queueCtrSize = 1U,
         .poolCtrSize  = 2U,
         .poolBlkSize  = 2U,
-        .tevtCtrSize  = 2U,
+        .tevtCtrSize  = 4U,
     };
     int  optChar;
 

@@ -1,8 +1,19 @@
 /**
 @page history Revision History
 
-@section qtools_7_1_1 Version 7.1.1, 2022-08-30
+@section qtools_7_1_1 Version 7.1.1, 2022-09-03
 Slightly restructured QSPY source code to better integrate directly with QP applications. Specifically, moved QSPY_cleanup() to qspy.c, so it is available to the applications.
+
+__QSPY host application:__
+- Added pre-defined "Scheduler" records:
+  + `QS_SCHED_PREEMPT` replaces deprecated `QS_MUTEX_LOCK`
+  + `QS_SCHED_RESTORE` replaces deprecated `QS_MUTEX_UNLOCK`
+- Increased the default version for backwards compatibility from 6.6 to 7.0
+(@ref qspy_command "command-line option -v", now defaults to 7.0)
+- Increased the default for QTimeEvt counter size from 2 to 4
+(@ref qspy_command "command-line option -C", now defaults to 4).
+This corresponds to the change of the default value
+of `QF_TIMEEVT_CTR_SIZE` to 4 in QP/C and QP/C.
 
 
 @section qtools_7_1_0 Version 7.1.0, 2022-08-22
@@ -32,8 +43,8 @@ QS_MUTEX_UNLOCK,      /*!< @deprecated */
 @endcode
 Also, the following new groups for QS global filter have been added:
 @code{.c}
-    QS_SEM_RECORDS,       /*!< Semaphore QS records */
-    QS_MTX_RECORDS,       /*!< Mutex QS records */
+    QS_SEM_RECORDS,   /*!< Semaphore QS records */
+    QS_MTX_RECORDS,   /*!< Mutex QS records */
 @endcode
 
 __Changes in QUTest__

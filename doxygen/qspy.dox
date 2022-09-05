@@ -37,7 +37,7 @@ Usage: qspy [options]     <arg> = required, [arg] = optional
 <tr><td>-h                    <td>-h           <td>(key-h) <td> <td>Help. Prints the summary of options
 <tr><td>-q [num]              <td>-q 99        <td>(key-q) <td> <td>Quiet mode (reduced stdout output)
 <tr><td>-u [UDP_port|0]       <td>-u           <td>7701    <td> <td>UDP socket for "Front-Ends".<br>`-u0` suppresses opening the UDP socket
-<tr><td>-v &lt;QS_version&gt; <td>-v 6.2       <td>6.6     <td> <td>Enforce backwards-compatibility with the specific QS version
+<tr><td>-v &lt;QS_version&gt; <td>-v 6.2       <td>7.0     <td> <td>Enforce backwards-compatibility with the specific QS version
 <tr><td>-r &lt;c0|c1|c2&gt;   <td>-r c2        <td>c1      <td> <td>Rendering options (c0=no-color|c1-color1|c2-color2)
 <tr><td>-k                    <td>-k           <td>        <td> <td>suppress keyboard input
 <tr><td>-o                    <td>-o           <td>(key-o) <td> <td>Produce output to the specified file
@@ -62,7 +62,7 @@ The Target can **report** its configuration to QSPY, which means that you don't 
 <tr><td>-P &lt;size&gt;       <td>-P 4         <td>2       <td>`QF_MPOOL_CTR_SIZE`  <td>Pool counter size in bytes. Valid values: 1, 2, 4
 <tr><td>-B &lt;size&gt;       <td>-B 1         <td>2       <td>`QF_MPOOL_SIZ_SIZE`  <td>Block size size in bytes. (i.e., the size of variables that hold
         memory block size). Valid values 1, 2, 4
-<tr><td>-C &lt;size&gt;       <td>-C 4         <td>2       <td>`QF_TIMEEVT_CTR_SIZE` <td>Time event counter size. Valid values: 1, 2, 4
+<tr><td>-C &lt;size&gt;       <td>-C 2         <td>4       <td>`QF_TIMEEVT_CTR_SIZE` <td>Time event counter size. Valid values: 1, 2, 4
 </table>
 
 
