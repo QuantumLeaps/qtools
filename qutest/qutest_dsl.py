@@ -23,15 +23,15 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-08-22
-# @version Last updated for version: 7.1.0
+# @date Last updated on: 2022-09-28
+# @version Last updated for version: 7.1.2
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
 # @ingroup qutest
 
 ## @brief current version of the Python QUTest interface
-VERSION = 710
+VERSION = 712
 
 ## @brief include python code in a test script
 # @description

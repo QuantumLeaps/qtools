@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-09-03
-# @version Last updated for version: 7.1.1
+# @date Last updated on: 2022-09-28
+# @version Last updated for version: 7.1.2
 #
 # @file
 # @brief QView Monitoring for QP/Spy
@@ -49,7 +49,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 711
+    VERSION = 712
 
     # public static variables...
     ## menu to be customized

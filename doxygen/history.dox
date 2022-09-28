@@ -1,9 +1,7 @@
 /**
 @page history Revision History
 
-@section qtools_7_1_1 Version 7.1.1, 2022-09-03
-Slightly restructured QSPY source code to better integrate directly with QP applications. Specifically, moved QSPY_cleanup() to qspy.c, so it is available to the applications.
-
+@section qtools_7_1_2 Version 7.1.2, 2022-09-28
 __QSPY host application:__
 - Added pre-defined "Scheduler" records:
   + `QS_SCHED_PREEMPT` replaces deprecated `QS_MUTEX_LOCK`
@@ -16,8 +14,11 @@ This corresponds to the change of the default value
 of `QF_TIMEEVT_CTR_SIZE` to 4 in QP/C and QP/C.
 
 
-@section qtools_7_1_0 Version 7.1.0, 2022-08-22
+@section qtools_7_1_1 Version 7.1.1, 2022-09-03
+Slightly restructured QSPY source code to better integrate directly with QP applications. Specifically, moved QSPY_cleanup() to qspy.c, so it is available to the applications.
 
+
+@section qtools_7_1_0 Version 7.1.0, 2022-08-22
 __Changes in QSpy__
 - QSpy 7.1.0 has been updated for QP version 7.1.0. Specifically new predefined QS trace records have been added:
 @code{.c}

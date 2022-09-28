@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-09-03
-# @version Last updated for version: 7.1.1
+# @date Last updated on: 2022-09-28
+# @version Last updated for version: 7.1.2
 #
 # @file
 # @brief QUTest Python scripting support (implementation)
@@ -52,7 +52,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 711
+    VERSION = 712
 
     # class variables
     _host_exe = ""

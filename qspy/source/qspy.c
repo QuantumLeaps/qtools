@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-09-03
-* @version Last updated for version: 7.1.1
+* @date Last updated on: 2022-09-26
+* @version Last updated for version: 7.1.2
 *
 * @file
 * @brief QSPY host utility: main parser
@@ -1662,7 +1662,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             a = QSpyRecord_getUint32(me, 1);
             b = QSpyRecord_getUint32(me, 1);
             if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u Sch-Rsme Prio=%u->%u",
+                SNPRINTF_LINE("%010u Sch-Rsme Pri=%u->%u",
                        t, b, a);
                 QSPY_onPrintLn();
                 FPRINF_MATFILE("%d %u %u %u\n",
