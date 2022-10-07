@@ -3,3 +3,4 @@ test("...")
 command(0, 78) # <===
 expect("...")
 ...
+expect("@timestamp Trg-Done QS_RX_COMMAND")

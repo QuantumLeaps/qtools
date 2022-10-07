@@ -138,7 +138,6 @@ python3 $(QTOOLS)/qspy/py/qutest.py *.py DEBUG localhost:7701 6605
 @endverbatim
 
 
-
 @section qutest_dsl QUTest&trade; Testing DSL
 The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defines a small Domain Specific Language (DSL) for writing test scripts in Python. The structure of this DSL is very simple. Each test script consists of two sections:
 
@@ -146,10 +145,10 @@ The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defi
 @subsection qutest_dsl-preamble Preamble
 The "preamble" section of a test script file specifies include scripts and defines callback functions common to all tests in this file. It can contain the following functions:
 
-- include()
-- on_reset()
-- on_setup()
-- on_teardown().
+- @ref qutest_dsl::include()     "include()"
+- @ref qutest_dsl::on_reset()    "on_reset()"
+- @ref qutest_dsl::on_setup()    "on_setup()"
+- @ref qutest_dsl::on_teardown() "on_teardown()"
 
 The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "test commands".
 
@@ -157,35 +156,35 @@ The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "
 @subsection qutest_dsl-tests Tests
 The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
 
-- test()
-- skip().
+- @ref qutest_dsl::test() "test()"
+- @ref qutest_dsl::skip() "skip()"
 
 
 @subsection qutest_dsl-commands Commands
 The commands that you can place in the tests (as well as inside the callback functions) are:
 
-- expect()
-- glb_filter()
-- loc_filter()
-- ao_filter()
-- current_obj()
-- query_curr()
-- tick()
-- expect_pause()
-- continue_test()
-- command()
-- init()
-- dispatch()
-- post()
-- publish()
-- probe()
-- peek()
-- poke()
-- fill()
-- pack()
-- test_file()
-- test_dir()
-- last_rec().
+- @ref qutest_dsl::command()      "command()"
+- @ref qutest_dsl::expect()       "expect()"
+- @ref qutest_dsl::glb_filter()   "glb_filter()"
+- @ref qutest_dsl::loc_filter()   "loc_filter()"
+- @ref qutest_dsl::ao_filter()    "ao_filter()"
+- @ref qutest_dsl::current_obj()  "current_obj()"
+- @ref qutest_dsl::query_curr()   "query_curr()"
+- @ref qutest_dsl::tick()         "tick()"
+- @ref qutest_dsl::expect_pause() "expect_pause()"
+- @ref qutest_dsl::continue_test() "continue_test()"
+- @ref qutest_dsl::init()         "init()"
+- @ref qutest_dsl::dispatch()     "dispatch()"
+- @ref qutest_dsl::post()         "post()"
+- @ref qutest_dsl::publish()      "publish()"
+- @ref qutest_dsl::probe()        "probe()"
+- @ref qutest_dsl::peek()         "peek()"
+- @ref qutest_dsl::poke()         "poke()"
+- @ref qutest_dsl::fill()         "fill()"
+- @ref qutest_dsl::pack()         "pack()"
+- @ref qutest_dsl::test_file()    "test_file()"
+- @ref qutest_dsl::test_dir()     "test_dir()"
+- @ref qutest_dsl::last_rec()     "last_rec()"
 
 
 @section qutest_qspy Categories of QSPY Output

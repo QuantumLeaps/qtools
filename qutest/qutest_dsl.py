@@ -28,7 +28,6 @@
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
-# @ingroup qutest
 
 ## @brief current version of the Python QUTest interface
 VERSION = 712
@@ -49,11 +48,11 @@ VERSION = 712
 # include("../my_include/test_include.pyi") # relative directory
 # @endcode
 #
-# __Example__@n
-# file to be included:@n
+# __Example__<br>
+# file to be included:<br>
 # @include inc_file.py
 #
-# test script calling `include()`:@n
+# test script calling `include()`:<br>
 # @include inc_test.py
 #
 def include(fname):
@@ -177,7 +176,7 @@ def ensure(bool_expr):
 # A given filter-group or an individual filter is set when it is positive, and
 # cleared with it is preceded with the minus (`-`) sign.
 #
-# @n
+# <br>
 # The filter list can contain the following:
 # @code{py}
 # GRP_ALL # all Record-Types
@@ -215,8 +214,8 @@ def glb_filter(*args):
 #
 # @param[in] args  list of QS-ID groups or individual QS-IDs to set or clear.
 # A given filter-group or an individual filter is set when it is positive, and
-# cleared with it is preceded with the minus (`-`) sign.
-# @n
+# cleared with it is preceded with the minus (`-`) sign.<br>
+#
 # This parameter can take one of the following values:
 # @code{py}
 # IDS_ALL # all QS-IDs
@@ -241,8 +240,8 @@ def loc_filter(*args):
 # Unlike loc_filter(), this facility changes **only** the QS-ID (AO's priority) of the given AO in the Target.
 # All other Local Filters will be left unchanged.
 #
-# @param[in] obj_id  active object to set/clear the local filter for in the Target
-# @n
+# @param[in] obj_id  active object to set/clear the local filter for in the Target<br>
+#
 # This parameter can be either a string (name of the AO) or the AO's priority.
 # Also, it can be either positive (to set) or negative (to clear) the QS local filter.
 #
@@ -259,8 +258,8 @@ def ao_filter(obj_id):
 # @description
 # This command sets the "current object" in the Target.
 #
-# @param[in] obj_kind  Kind of object to set
-# @n
+# @param[in] obj_kind  Kind of object to set<br>
+#
 # This parameter can take one of the following values:
 # @code{py}
 # OBJ_SM # State Machine object
@@ -290,13 +289,13 @@ def current_obj(obj_kind, obj_id):
 # This command queries the current object in the Target.
 #
 # @param[in] obj_kind  Kind of object to query
-# @n
+#
 # This parameter can take one of the following values:
 # @code{py}
-# OBJ_SM # State Machine object@n
-# OBJ_AO # Active Object object@n
-# OBJ_MP # Memory Pool object@n
-# OBJ_EQ # Event Queue object@n
+# OBJ_SM # State Machine object
+# OBJ_AO # Active Object object
+# OBJ_MP # Memory Pool object
+# OBJ_EQ # Event Queue object
 # OBJ_TE # Time Event object
 # @endcode
 #
@@ -324,11 +323,11 @@ def query_curr(obj_kind):
 ## @brief trigger system clock tick in the Target
 #
 # @description
-# This command triggers the following actions in the Target:@n
+# This command triggers the following actions in the Target:<br>
 # 1. If the @ref current_obj() "current TE object" is defined and
 #    the TE is armed, the TE is disarmed (if one-shot) and then
-#     posted to the recipient AO.@n
-# 2. The linked-list of all armed Time Events is updated.@n
+#     posted to the recipient AO.
+# 2. The linked-list of all armed Time Events is updated.
 #
 # @param[in] tick_rate  the tick rate (0..QF_MAX_TICK_RATE)
 #
@@ -394,7 +393,7 @@ def continue_test():
 # This command causes execution of the callback QS_onCommand() inside the
 # the Target system.
 #
-# @param[in] cmdId  the command-id first argument to QS_onCommand()@n
+# @param[in] cmdId  the command-id first argument to QS_onCommand()<br>
 #            NOTE: this could be either the raw number or a name
 #            that is delivered by QS_USR_DICTIONARY() from the Target
 # @param[in] param1 the "param1" argument to QS_onCommand() (optional)
