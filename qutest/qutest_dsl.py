@@ -23,7 +23,7 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-09-28
+# @date Last updated on: 2022-10-07
 # @version Last updated for version: 7.1.2
 #
 # @file
@@ -34,9 +34,9 @@ VERSION = 712
 
 ## @brief include python code in a test script
 # @description
-# This command includes python code in a specified file into the test script.
-# The included file can contain any code that you would put into test scripts,
-# such as
+# This @ref qutest_dsl-preamble "preamble command" includes python code
+# in a specified file into the test script. The included file can contain
+# any code that you would put into test scripts (see Example below).
 #
 # @param[in] fname  name of the file to include. May contain a path
 #                   **relative** to the test script.
@@ -70,8 +70,8 @@ def test_file():
 
 ## @brief get the test directory (relative to the current directory)
 # @description
-# This command returns a string containing the directory name of the currently
-# executed test script ("test group").
+# This @ref qutest_complex "complex command" returns a string containing
+# the directory name of the currently executed test script ("test group").
 #
 # @usage
 # @code{py}
@@ -81,7 +81,8 @@ def test_dir():
 
 ## @brief start a new test
 # @description
-# This command starts a new test and gives it a name.
+# This @ref qutest_complex "complex command" starts a new test
+# and gives it a name.
 #
 # @param[in] title  title of the test
 # @param[in] opt    options  {0=default, NORESET}
@@ -100,7 +101,6 @@ def test(title, opt = 0):
 
 ## @brief skip the tests following this command.
 #
-# @description
 # @param[in] nTests number of tests to skip (default-all remaining tests)
 #            e.g., skip(1) will skip one test following this command.
 # @note
@@ -169,12 +169,13 @@ def ensure(bool_expr):
 ## @brief Send the QS Global Filter to the Target
 #
 # @description
-# This command sends the complete @ref qs_global "QS Global Filter" to the Target.
+# This @ref qutest_simple "simple command" sends the complete
+# @ref qs_global "QS Global Filter" to the Target.
 # Any existing Global Filter setting inside the Target will be overwritten.
 #
-# @param[in] args  list of Record-Type groups or individual Record-Types to set or clear.
-# A given filter-group or an individual filter is set when it is positive, and
-# cleared with it is preceded with the minus (`-`) sign.
+# @param[in] args  list of Record-Type groups or individual Record-Types
+# to set or clear. A given filter-group or an individual filter is set when
+# it is positive, and cleared with it is preceded with the minus (`-`) sign.
 #
 # <br>
 # The filter list can contain the following:
@@ -209,7 +210,8 @@ def glb_filter(*args):
 ## @brief Send the Local Filter to the Target
 #
 # @description
-# This command sends the complete @ref qs_local "QS Local Filter" to the Target.
+# This @ref qutest_simple "simple command" sends the complete
+# @ref qs_local "QS Local Filter" to the Target.
 # Any existing Local Filter setting inside the Target will be overwritten.
 #
 # @param[in] args  list of QS-ID groups or individual QS-IDs to set or clear.
@@ -236,14 +238,18 @@ def loc_filter(*args):
 ## @brief Updates the Local Filter for a given AO in the Target
 #
 # @description
-# This command sets or clears the @ref qs_local "QS Local Filter" corresponding to the given AO in the Target.
-# Unlike loc_filter(), this facility changes **only** the QS-ID (AO's priority) of the given AO in the Target.
+# This @ref qutest_simple "simple command" sets or clears the
+# @ref qs_local "QS Local Filter" corresponding to the given AO in the Target.
+# Unlike loc_filter(), this facility changes **only** the QS-ID
+# (AO's priority) of the given AO in the Target.
 # All other Local Filters will be left unchanged.
 #
-# @param[in] obj_id  active object to set/clear the local filter for in the Target<br>
+# @param[in] obj_id  active object to set/clear the local filter
+#                    for in the Target<br>
 #
 # This parameter can be either a string (name of the AO) or the AO's priority.
-# Also, it can be either positive (to set) or negative (to clear) the QS local filter.
+# Also, it can be either positive (to set) or negative (to clear) the QS
+# local filter.
 #
 # @usage
 # @include ao_filter.py
@@ -256,7 +262,8 @@ def ao_filter(obj_id):
 ## @brief Set the Current-Object in the Target
 #
 # @description
-# This command sets the "current object" in the Target.
+# This @ref qutest_simple "simple command" sets the "current object"
+# in the Target.
 #
 # @param[in] obj_kind  Kind of object to set<br>
 #
@@ -286,7 +293,8 @@ def current_obj(obj_kind, obj_id):
 ## @brief query the @ref current_obj() "current object" in the Target
 #
 # @description
-# This command queries the current object in the Target.
+# This @ref qutest_complex "complex command" queries the current object
+# in the Target.
 #
 # @param[in] obj_kind  Kind of object to query
 #
@@ -323,7 +331,8 @@ def query_curr(obj_kind):
 ## @brief trigger system clock tick in the Target
 #
 # @description
-# This command triggers the following actions in the Target:<br>
+# This @ref qutest_complex "complex command" triggers the following actions
+# in the Target:<br>
 # 1. If the @ref current_obj() "current TE object" is defined and
 #    the TE is armed, the TE is disarmed (if one-shot) and then
 #     posted to the recipient AO.
@@ -390,8 +399,8 @@ def continue_test():
 
 ## @brief executes a given command in the Target
 # @description
-# This command causes execution of the callback QS_onCommand() inside the
-# the Target system.
+# This @ref qutest_complex "complex command" causes execution of the
+# callback QS_onCommand() inside the the Target system.
 #
 # @param[in] cmdId  the command-id first argument to QS_onCommand()<br>
 #            NOTE: this could be either the raw number or a name
@@ -427,7 +436,7 @@ def init(signal = 0, params = None):
 ## @brief dispatch a given event in the current SM object in the Target
 #
 # @description
-# This command dispatches a given event in the
+# This @ref qutest_complex "complex command" dispatches a given event in the
 # @ref current_obj() "current SM object" in the Target.
 #
 # @param[in] signal  the event signal of the event to be dispatched
@@ -461,7 +470,8 @@ def post(signal, params = None):
 ## @brief publish a given event to subscribers in the Target
 #
 # @description
-# This command publishes a given event in the Target.
+# This @ref qutest_complex "complex command" publishes a given event
+# in the Target.
 #
 # @param[in] signal  the event signal of the event to be posted
 # @param[in] params  the parameters of the event to be posted
@@ -476,10 +486,11 @@ def publish(signal, params = None):
 
 ## @brief sends a Test-Probe to the Target
 # @description
-# This command sends the Test Probe data to the Target. The Target
-# collects these Test Probes preserving the order in which they were sent.
-# Subsequently, whenever a given API is called inside the Target, it can
-# obtain the Test-Probe by means of the QS_TEST_PROBE_DEF() macro.
+# This @ref qutest_simple "simple command" sends the Test Probe data
+# to the Target. The Target collects these Test Probes preserving the
+# order in which they were sent. Subsequently, whenever a given API is
+# called inside the Target, it can obtain the Test-Probe by means of the
+# QS_TEST_PROBE_DEF() macro.
 # The QS_TEST_PROBE_DEF() macro returns the Test-Probes in the same
 # order as they were received to the Target. If there are no more Test-
 # Probes for a given API, the Test-Probe is initialized to zero.
@@ -502,8 +513,8 @@ def probe(func, data):
 ## @brief peeks data in the Target
 #
 # @description
-# This command peeks data at the given offset from the start address
-# of the current_obj() inside the Target.
+# This @ref qutest_complex "complex command" peeks data at the given offset
+# from the start address of the current_obj() inside the Target.
 #
 # @param[in] offset offset [in bytes] from the start of the current_obj()
 # @param[in] size   size of the data items (1, 2, or 4)
@@ -520,8 +531,9 @@ def peek(offset, size, num):
 
 ## @brief pokes data into the Target.
 # @description
-# This command pokes provided data at the given offset from the start
-# address of the @ref current_obj() "current AP object" inside the Target.
+# This @ref qutest_simple "simple command" pokes provided data at the
+# given offset from the start address of the
+# @ref current_obj() "current AP object" inside the Target.
 #
 # @param[in] offset offset [in bytes] from the start of the current_obj()
 # @param[in] size   size of the data items (1, 2, or 4)
@@ -538,8 +550,8 @@ def poke(offset, size, data):
 
 ## @brief fills data into the Target.
 # @description
-# This command fills provided data at the given offset from the
-# start address of the current_obj() inside the Target.
+# This @ref qutest_simple "simple command" fills provided data at the
+# given offset from the start address of the current_obj() inside the Target.
 #
 # @param[in] offset offset [in bytes] from the start of the current_obj()
 # @param[in] size   size of the data item (1, 2, or 4)
