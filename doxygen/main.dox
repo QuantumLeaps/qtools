@@ -13,10 +13,11 @@ QTools&trade; is a collection of open source tools for embedded software develop
 - @ref qpspy "QP/Spy software tracing and testing for embedded systems", which includes:
   + @ref qs       "QS&trade; Target-Resident Component"
   + @ref qspy     "QSPY&trade; Host Application"
-+ @ref qutest "QUTest&trade; Unit Testing Harness"
-+ @ref qview  "QView&trade; Visualization &amp; Monitoring"
+- @ref qutest "QUTest&trade; Unit Testing Harness"
+- @ref qview  "QView&trade; Visualization &amp; Monitoring"
 - @ref qwin   "QWin GUI toolkit for prototyping embedded systems on Windows in C or C++"
 - @ref qclean "QClean utility for cleaning the white space in the source code"
+- @ref qcalc  "QCalc programmer's calculator with C syntax"
 - @ref qfsgen "QFSGen utility for building ROM-based file systems"
 
 
@@ -25,7 +26,7 @@ The QTools Collection for Windows additionally contains the following open-sourc
 
 - GNU-make for Windows (version 4.2.1)
 - GNU C/C++ toolchain for Windows (MinGW version 9.2.0)
-- GNU C/C++ toolchain for ARM Cortex-M/R (GNU Arm Embedded Toolchain)
+- GNU C/C++ toolchain for ARM Cortex-M (GNU Arm Embedded Toolchain)
 - Python for Windows (version 3.9 with tkinter)
 
 
