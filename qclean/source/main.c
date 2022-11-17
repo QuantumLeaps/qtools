@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-02-22
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-10-28
+* @version Last updated for version: 7.1.3
 *
 * @file
 * @brief main for QClean host utility
@@ -52,8 +52,8 @@ enum Constants {
     TAB        = 0x09,
     LF         = 0x0A,
     CR         = 0x0D,
-    TAB_SIZE   = 4,            /* default TAB size */
-    LINE_LIMIT = 80            /* default line limit */
+    TAB_SIZE   = 4,           /* default TAB size */
+    LINE_LIMIT = 80           /* default line limit */
 };
 
 enum TodoFlags {
@@ -65,7 +65,7 @@ enum TodoFlags {
 };
 
 typedef struct {
-    char ending[14];
+    char pattern[32];
     uint8_t len;
     uint8_t flags;
 } FileType;
@@ -74,31 +74,59 @@ typedef struct {
 * NOTE: For greater flexibility, this array could be read from an external
 * config file in the future.
 */
-static FileType l_fileTypes[] = {
+static FileType const l_fileTypes[] = {
     { ".c",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".h",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".cpp",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".hpp",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".s",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".S",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".asm",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* Lint */
     { ".txt",     4, CR_FLG | TAB_FLG                 },
+    { ".xml",     4, CR_FLG | TAB_FLG                 },
+    { ".dox",     4, CR_FLG | TAB_FLG                 }, /* Doxygen */
     { ".md",      3, CR_FLG | TAB_FLG                 }, /* markdown */
-    { ".bat",     4, /*CRLF*/ TAB_FLG                 },
-    { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU ld */
-    { ".tcl",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".bat",     4, CR_FLG | TAB_FLG                 },
+    { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU linker */
     { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".java",    5, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+
     { "Makefile", 8, CR_FLG           | LONG_LINE_FLG },
+    { "mak_",     4, CR_FLG           | LONG_LINE_FLG },
     { ".mak",     4, CR_FLG           | LONG_LINE_FLG },
+    { ".make",    5, CR_FLG           | LONG_LINE_FLG },
+
     { ".html",    5, CR_FLG | TAB_FLG                 },
     { ".htm",     4, CR_FLG | TAB_FLG                 },
-    { ".php",     4, CR_FLG | TAB_FLG                 },
-    { ".dox",     4, CR_FLG | TAB_FLG                 }, /* Doxygen */
+    { ".css",     4, CR_FLG | TAB_FLG                 },
+
+    { ".eww",     4, CR_FLG                           }, /* IAR workspace */
+    { ".ewp",     4, CR_FLG                           }, /* IAR project */
+    { ".ewd",     4, CR_FLG                           }, /* IAR debug config */
+    { ".icf",     4, CR_FLG | TAB_FLG                 }, /* IAR linker */
+
+    { ".uvprojx", 8, CR_FLG                           }, /* uVision project */
+    { ".uvoptx",  7, CR_FLG                           }, /* uVision option */
+
+    { ".sln",     4, CR_FLG                           }, /* VS solution */
+    { ".vcxproj", 8, CR_FLG                           }, /* VS project */
+    { ".filters", 8, CR_FLG                           }, /* VS sub-folders */
+    { ".vcxproj.filters",16, CR_FLG                   }, /* VS sub-folders */
+
+    { ".project", 8, CR_FLG                           }, /* Eclipse project */
+    { ".cproject",9, CR_FLG                           }, /* Eclipse CDT project */
+
+    { ".pro",     4, CR_FLG | TAB_FLG                 }, /* Qt project */
+
     { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB*/
+
+    { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* PC-Lint */
+    { ".cfg",     4, CR_FLG | TAB_FLG                 }, /* RSM config */
+
+    { ".properties",11, CR_FLG                        }, /* MPLABX properties */
 };
-static int l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
+static int const l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
 
 /*..........................................................................*/
 /* This function looks for a match between the fname and any of the file
@@ -107,19 +135,18 @@ static int l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
 * the function returns 0.
 */
 unsigned isMatching(char const *fname) {
-    int len = strlen(fname);
-    FileType const *ft = &l_fileTypes[0];
+    int const flen = strlen(fname);
 
-    int n;
-    for (n = l_fileNum; n > 0; --n, ++ft) { /* go over all file types... */
-        char const *s = &ft->ending[0];
-        if (((*s == '.') && (len > ft->len))
-            || (len == ft->len))
+    FileType const *ft = &l_fileTypes[0];
+    for (int n = l_fileNum; n > 0; --n, ++ft) { /* go over all file types.. */
+        char const *s = &ft->pattern[0];
+        if (((*s == '.') && (flen > ft->len)) /* extension */
+            || (flen >= ft->len))             /* beginning of file name */
         {
-            char const *t = &fname[len - ft->len];
+            char const *t = &fname[flen - ft->len];
             int i;
-            for (i = ft->len; i > 0; --i, ++s, ++t) { /* compare the names */
-                if (*s != *t) { /* missmatch? */
+            for (i = ft->len; i > 0; --i, ++s, ++t) { /* compare to pattern */
+                if (*s != *t) { /* mismatch? */
                     break;
                 }
             }
@@ -132,7 +159,7 @@ unsigned isMatching(char const *fname) {
             }
         }
     }
-    return 0;
+    return 0U;
 }
 /*..........................................................................*/
 void onMatchFound(char const *fname, unsigned flags, int ro_info) {

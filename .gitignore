@@ -24,6 +24,7 @@
 version-*
 
 html/
+latex/
 test_priv/
 bin/*.exe
 bin/*.dll

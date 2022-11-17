@@ -1,6 +1,14 @@
 /**
 @page history Revision History
 
+@section qtools_7_1_3 Version 7.1.3, 2022-11-18
+@ref qclean "QCLEAN host application":
+- Added new file types and changing some cleaning rules for white-space cleaning.
+
+__Documentation__
+- Modified the `doxygen/` folder for generation of QM Manual in LaTeX (enables generation of PDF)
+
+
 @section qtools_7_1_2 Version 7.1.2, 2022-09-28
 __QSPY host application:__
 - Added pre-defined "Scheduler" records:

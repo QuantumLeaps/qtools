@@ -72,30 +72,45 @@ QClean can optionally check the code for **long lines of code** that exceed a sp
 QClean applies the following rules for cleaning the whitespace depending on the file types:
 
 <center>
-FILE TYPE      | END-OF-LINE | TRAILING WS | TABS    | LONG-LINES
-:--------------|:------------|:-----------:|:--------:|:------------:
-`.c`           | Unix (LF)   | remove  | replace | check
-`.h`           | Unix (LF)   | remove  | replace | check
-`.cpp`         | Unix (LF)   | remove  | replace | check
-`.hpp`         | Unix (LF)   | remove  | replace | check
-`.s`           | Unix (LF)   | remove  | replace | check
-`.asm`         | Unix (LF)   | remove  | replace | check
-`.lnt`         | Unix (LF)   | remove  | replace | check
-`.txt`         | Unix (LF)   | remove  | replace | don't check
-`.md`          | Unix (LF)   | remove  | replace | don't check
-`.bat`         | DOS (CR,LF) | remove  | replace | don't check
-`.ld`          | Unix (LF)   | remove  | replace | check
-`.py`          | Unix (LF)   | remove  | replace | check
-`.pyw`         | Unix (LF)   | remove  | replace | check
-`.tcl`         | Unix (LF)   | remove  | replace | check
-`.java`        | Unix (LF)   | remove  | replace | check
-`Makefile`     | Unix (LF)   | remove  | leave   | check
-`.mak`         | Unix (LF)   | remove  | leave   | check
-`.html`        | Unix (LF)   | remove  | replace | don't check
-`.htm`         | Unix (LF)   | remove  | replace | don't check
-`.php`         | Unix (LF)   | remove  | replace | don't check
-`.dox`         | Unix (LF)   | remove  | replace | don't check
-`.m`           | Unix (LF)   | remove  | replace | check
+FILE TYPE       | END-OF-LINE | TRAILING WS | TABS    | LONG-LINES
+:---------------|:------------|:-----------:|:--------:|:------------:
+`.c`            | Unix (LF)   | remove  | replace | check
+`.h`            | Unix (LF)   | remove  | replace | check
+`.cpp`          | Unix (LF)   | remove  | replace | check
+`.hpp`          | Unix (LF)   | remove  | replace | check
+`.s/.S`         | Unix (LF)   | remove  | replace | check
+`.asm`          | Unix (LF)   | remove  | replace | check
+`.txt`          | Unix (LF)   | remove  | replace | don't check
+`.xml`          | Unix (LF)   | remove  | replace | don't check
+`.dox`          | Unix (LF)   | remove  | replace | don't check
+`.md`           | Unix (LF)   | remove  | replace | don't check
+`.bat`          | Unix (LF)   | remove  | replace | don't check
+`.ld`           | Unix (LF)   | remove  | replace | check
+`.py`           | Unix (LF)   | remove  | replace | check
+`.pyw`          | Unix (LF)   | remove  | replace | check
+`.java`         | Unix (LF)   | remove  | replace | check
+`Makefile`      | Unix (LF)   | remove  | leave   | check
+`mak_*`         | Unix (LF)   | remove  | leave   | check
+`.mak`          | Unix (LF)   | remove  | leave   | check
+`.make`         | Unix (LF)   | remove  | leave   | check
+`.html`         | Unix (LF)   | remove  | replace | don't check
+`.htm`          | Unix (LF)   | remove  | replace | don't check
+`.css`          | Unix (LF)   | remove  | replace | don't check
+`.eww`          | Unix (LF)   | remove  | replace | don't check
+`.ewp`          | Unix (LF)   | remove  | replace | don't check
+`.ewd`          | Unix (LF)   | remove  | replace | don't check
+`.icf`          | Unix (LF)   | remove  | replace | don't check
+`.sln`          | Unix (LF)   | remove  | replace | don't check
+`.vcxproj`      | Unix (LF)   | remove  | replace | don't check
+`.filters`      | Unix (LF)   | remove  | replace | don't check
+`.vcxproj.filters` | Unix (LF) | remove | replace | don't check
+`.project`      | Unix (LF)   | remove  | replace | don't check
+`.cproject`     | Unix (LF)   | remove  | replace | don't check
+`.pro`          | Unix (LF)   | remove  | replace | don't check
+`.m`            | Unix (LF)   | remove  | replace | check
+`.lnt`          | Unix (LF)   | remove  | replace | check
+`.cfg`          | Unix (LF)   | remove  | replace | don't check
+`.properties`   | Unix (LF)   | remove  | replace | don't check
 </center>
 
 <br>

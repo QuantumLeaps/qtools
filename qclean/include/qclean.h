@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-10-28
+* @version Last updated for version: 7.1.3
 *
 * @file
 * @brief QClean internal interface
@@ -33,7 +33,7 @@
 #ifndef qclean_h
 #define qclean_h
 
-#define VERSION "7.0.0"
+#define VERSION "7.1.3"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);
