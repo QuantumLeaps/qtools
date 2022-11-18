@@ -29,8 +29,10 @@ test_priv/
 bin/*.exe
 bin/*.dll
 bin/*.conf
+bin/qspy
+bin/qclean
+bin/qfsgen
 gnu_arm-eabi/
-/include/
 libexec/
 dbg/
 rel/
