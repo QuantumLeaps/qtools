@@ -2,6 +2,9 @@
 @page history Revision History
 
 @section qtools_7_1_3 Version 7.1.3, 2022-11-18
+@ref qspy "QSPY host application":
+- Implemented feature request [#199 "Extend state name character length in qspy sequence diagrams."](https://sourceforge.net/p/qpc/feature-requests/199).
+
 @ref qclean "QCLEAN host application":
 - Added new file types and changing some cleaning rules for white-space cleaning.
 

@@ -23,11 +23,11 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-11-28
+* @version Last updated for version: 7.1.3
 *
 * @file
-* @brief QSPY host uility: sequence diagram generation
+* @brief QSPY host utility: sequence diagram generation
 * @ingroup qpspy
 */
 #include <stdint.h>
@@ -471,7 +471,7 @@ void QSEQ_genTran(uint32_t tstamp, int obj, char const* state) {
     SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
     i += 10;
     for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
-        seq_line[i] = ((i - SEQ_LEFT_OFFSET)% SEQ_LANE_WIDTH) == 0
+        seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
                       ? '|'
                       : ' ';
     }
@@ -479,11 +479,35 @@ void QSEQ_genTran(uint32_t tstamp, int obj, char const* state) {
     seq_line[i] = '\n';
     seq_line_len = i + 1;
     i = SEQ_LEFT_OFFSET + obj* SEQ_LANE_WIDTH;
-    /* write the state */
-    int len = strlen(state);
+
+    /* write the state annotation... */
+    /* 1. scan the "state" string for special char and find its length */
+    i = 0;
+    j = 0;
+    for (char const *s = state; *s != '\0'; ++s, ++i) {
+        if (j == 0) { /* special sequence not found yet? */
+            if (*s == '_') { /* first underscore? */
+                j = i + 1; /* one beyond the first underscore */
+            }
+            else if (*s == ':') { /* first colon? */
+                if (*(s + 1) == ':') { /* second colon? */
+                    j = i + 2; /* two beyond the first colon */
+                }
+            }
+        }
+    }
+
+    /* 2. adjust "state" to one beyond special char, for example:
+    * from state == "MyStateMachine_active_123"  -> s == "active_123"
+    * from state == "MyStateMachine::active_123" -> s == "active_123"
+    */
+    state = &state[j]; /* adjusted beginning of the state-annotation */
+    int len = i - j; /* length of the adjusted "state" annotation */
     if (len > SEQ_LABEL_MAX) {
         len = SEQ_LABEL_MAX;
     }
+
+    /* 3. copy the adjusted state-annotation state to seq_line[] */
     i = SEQ_LEFT_OFFSET + obj* SEQ_LANE_WIDTH - (len + 1)/2;
     j = i + SEQ_LABEL_MAX;
     seq_line[i] = '<'; i += 1;
