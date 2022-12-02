@@ -1,6 +1,20 @@
 /**
 @page history Revision History
 
+@section qtools_7_1_4 Version 7.1.4, 2022-12-19
+@ref qspy "QSPY host application":
+- added "Enum Dictionaries" and parsing of the Enum data item
+- implemented [feature request #197](https://sourceforge.net/p/qpc/feature-requests/197) for displaying of "tag messages" from QUTest or QView in the QSPY output. This includes rendering special test tags now produced by QUTest 7.1.4.
+- implemented [feature request #199](https://sourceforge.net/p/qpc/feature-requests/199) for truncating state annotations in sequence diagrams.
+
+@ref qutest "QUTest testing framework":
+- added generation of "tag messages" from tests in the QSPY output to improve readability.
+- added new tag() command for generating tags from tests
+
+@ref qview "QView visualization and monitoring":
+- added generation of "tag messages" in the QSPY output from the Commands menu.
+
+
 @section qtools_7_1_3 Version 7.1.3, 2022-11-18
 @ref qspy "QSPY host application":
 - Implemented feature request [#199 "Extend state name character length in qspy sequence diagrams."](https://sourceforge.net/p/qpc/feature-requests/199).

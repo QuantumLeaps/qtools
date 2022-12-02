@@ -324,6 +324,17 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
     }
 }
 /*..........................................................................*/
+void QSPY_dispTag(QSpyRecord const * const qrec) {
+    char const *msg = (char const *)&qrec->start[3];
+    SNPRINTF_LINE("%s", msg);
+    switch (qrec->start[2]) {
+        case 0xFFU: QSPY_output.type = TST_OUT; break;
+        case 0xFEU: QSPY_output.type = ERR_OUT; break;
+        default:    QSPY_output.type = USR_OUT; break;
+    }
+    QSPY_onPrintLn();
+}
+/*..........................................................................*/
 void QSPY_txReset(void) {
     l_txTargetSeq = 0U;
     l_currSM = (ObjType)(~0U); /* invalidate */

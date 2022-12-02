@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-09-28
-# @version Last updated for version: 7.1.2
+# @date Last updated on: 2022-12-01
+# @version Last updated for version: 7.1.4
 #
 # @file
 # @brief QUTest Python scripting support (implementation)
@@ -52,7 +52,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 712
+    VERSION = 714
 
     # class variables
     _host_exe = ""
@@ -134,6 +134,7 @@ class QUTest:
             "peek": self.peek,
             "poke": self.poke,
             "fill": self.fill,
+            "tag": self.tag,
             "pack": struct.pack,
             "test_file": self.test_file,
             "test_dir": self.test_dir,
@@ -192,6 +193,12 @@ class QUTest:
         self._startTime = QUTest._time()
         QUTest._num_tests += 1
         print("%s: "%(name), end = "")
+
+        # display the test name in QSPY
+        label = ("  Test(R): ", " Test(NR): ")[opt & QUTest._OPT_NORESET != 0]
+        self.tag(
+            "---------- -----------------------------------------------\n"
+            + label + name, 0xFF)
 
         if self._to_skip > 0:
             self._to_skip -= 1
@@ -351,6 +358,7 @@ class QUTest:
             pass # ignore
         else:
             assert 0, "invalid state in glb_filter"
+        return filter
 
     # loc_filter DSL command .................................................
     def loc_filter(self, *args):
@@ -399,6 +407,7 @@ class QUTest:
             pass # ignore
         else:
             assert 0, "invalid state in loc_filter"
+        return filter
 
     # ao_filter DSL command ................................................
     def ao_filter(self, obj_id):
@@ -707,6 +716,14 @@ class QUTest:
     def test_dir(self):
         return self._test_dir
 
+    # last_rec DSL command ...................................................
+    def last_rec(self):
+        return QUTest._last_record
+
+    # tag DSL command ........................................................
+    def tag(self, message, kind = 0):
+        QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_DISP_TAG, kind), message)
+
     # dummy callbacks --------------------------------------------------------
     def _dummy_on_reset(self):
         #print("_dummy_on_reset")
@@ -721,20 +738,19 @@ class QUTest:
         #print("_dummy_on_teardown")
         pass
 
-    # last_rec DSL command ...................................................
-    def last_rec(self):
-        return QUTest._last_record
-
     # helper methods ---------------------------------------------------------
     @staticmethod
     def _run_script(fname):
         print("--------------------------------------------------")
-        print(QUTest._STR_GRP1 + "Group:" + fname + QUTest._STR_GRP2)
+        print(QUTest._STR_GRP1 + "Group: " + fname + QUTest._STR_GRP2)
         QUTest._num_groups += 1
 
         err = 0 # assume no errors
         with open(fname) as f:
             QUTest_inst = QUTest()
+            QUTest_inst.tag(
+                "========== ===============================================\n"
+                "    Group: " + fname, 0xFF)
             QUTest_inst._test_file = fname
             QUTest_inst._test_dir = os.path.dirname(fname)
             if not QUTest_inst._test_dir: # empty dir?
@@ -785,6 +801,8 @@ class QUTest:
             print("%s (%.3fs)"%(
                   QUTest._STR_TEST_PASS,
                   QUTest._time() - self._startTime))
+            # display the test success in QSPY
+            self.tag(" Test-End: PASS", 0xFF)
             return
         else:
             self._fail('got: "%s"'%(QUTest._last_record),
@@ -870,6 +888,10 @@ class QUTest:
             print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
         elif err != "":
             print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
+
+        # display the test failure in QSPY
+        self.tag(" Test-End: FAIL", 0xFE)
+
         QUTest._num_failed += 1
         QUTest._need_reset = True
         self._tran(QUTest._FAIL)
@@ -939,14 +961,17 @@ class QSpy:
     _TRGT_EVENT      = 16
 
     # packets to QSpy only...
-    _QSPY_ATTACH     = 128
-    _QSPY_DETACH     = 129
-    _QSPY_SAVE_DICT  = 130
-    _QSPY_SCREEN_OUT = 131
-    _QSPY_BIN_OUT    = 132
-    _QSPY_MATLAB_OUT = 133
-    _QSPY_MSCGEN_OUT = 134
-    _QSPY_SEND_EVENT = 135
+    _QSPY_ATTACH          = 128
+    _QSPY_DETACH          = 129
+    _QSPY_SAVE_DICT       = 130
+    _QSPY_TEXT_OUT        = 131
+    _QSPY_BIN_OUT         = 132
+    _QSPY_MATLAB_OUT      = 133
+    _QSPY_SEQUENCE_OUT    = 134
+    _QSPY_DISP_TAG        = 140
+
+    # packets to QSpy to be "massaged" and forwarded to the Target...
+    _QSPY_SEND_EVENT      = 135
     _QSPY_SEND_AO_FILTER  = 136
     _QSPY_SEND_CURR_OBJ   = 137
     _QSPY_SEND_COMMAND    = 138
@@ -995,7 +1020,7 @@ class QSpy:
     _EVT_DISPATCH  = 255
 
     # tuple of QS records from the Target.
-    # !!! NOTE: Must match qs_copy.h !!!
+    # !!! NOTE: Must match qpc/include/qs.h !!!
     _QS = ("QS_EMPTY",
         # [1] SM records
         "QS_QEP_STATE_ENTRY",     "QS_QEP_STATE_EXIT",
@@ -1050,7 +1075,9 @@ class QSpy:
         "QS_SCHED_PREEMPT",       "QS_SCHED_RESTORE",
         "QS_SCHED_LOCK",          "QS_SCHED_UNLOCK",
         "QS_SCHED_NEXT",          "QS_SCHED_IDLE",
-        "QS_SCHED_RESUME",
+
+        # [54] Miscellaneous QS records (not maskable)
+        "QS_ENUM_DICT",
 
         # [55] Additional QEP records
         "QS_QEP_TRAN_HIST",       "QS_QEP_TRAN_EP",
@@ -1109,7 +1136,7 @@ class QSpy:
     _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
     _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
-    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000003F000000000000
     _GLB_FLT_MASK_SEM= 0x00000000000007800000000000000000
     _GLB_FLT_MASK_MTX= 0x000000000001F8000000000000000000
     _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000

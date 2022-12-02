@@ -9,3 +9,5 @@ glb_filter(GRP_ALL, -GRP_SC)  # sets all global filters, but clears the SC-group
 glb_filter(GRP_QF, "-QS_QF_TICK")  # sets the QF-group, but clears the QS_QF_TICK filter
 
 glb_filter(GRP_AO, 78)` # sets the AO-group and the QS record 78
+
+filters = glb_filter(GRP_AO, 78) # store the 128-bit bitmask returned

@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-09-28
-# @version Last updated for version: 7.1.2
+# @date Last updated on: 2022-12-01
+# @version Last updated for version: 7.1.4
 #
 # @file
 # @brief QView Monitoring for QP/Spy
@@ -49,7 +49,7 @@ from struct import pack
 #
 class QView:
     ## current version of QView
-    VERSION = 712
+    VERSION = 714
 
     # public static variables...
     ## menu to be customized
@@ -179,6 +179,7 @@ class QView:
         m.add_command(label="Tick[0]", command=QView._onTick0)
         m.add_command(label="Tick[1]", command=QView._onTick1)
         m.add_command(label="Command...", command=QView._CommandDialog)
+        m.add_command(label="Tag Message...", command=QView._TagDialog)
         m.add_separator()
         m.add_command(label="Peek...", command=QView._PeekDialog)
         m.add_command(label="Poke...", command=QView._PokeDialog)
@@ -259,6 +260,8 @@ class QView:
         QView._command_p1 = StringVar()
         QView._command_p2 = StringVar()
         QView._command_p3 = StringVar()
+        QView._tag        = StringVar()
+        QView._tag_kind   = StringVar(value=0)
         QView._peek_offs  = StringVar()
         QView._peek_dtype = StringVar(value=QView._dtypes[2])
         QView._peek_len   = StringVar()
@@ -359,9 +362,9 @@ class QView:
                 accelerator=QView._currObj[OBJ_SM].get())
         QView._menu_events.entryconfig(3,
                 accelerator=QView._currObj[OBJ_SM].get())
-        QView._menu_commands.entryconfig(6,
-                accelerator=QView._currObj[OBJ_AP].get())
         QView._menu_commands.entryconfig(7,
+                accelerator=QView._currObj[OBJ_AP].get())
+        QView._menu_commands.entryconfig(8,
                 accelerator=QView._currObj[OBJ_AP].get())
         state_SM = "normal"
         state_AO = "normal"
@@ -376,8 +379,8 @@ class QView:
         QView._menu_events.entryconfig(1, state=state_AO)
         QView._menu_events.entryconfig(2, state=state_SM)
         QView._menu_events.entryconfig(3, state=state_SM)
-        QView._menu_commands.entryconfig(6, state=state_AP)
         QView._menu_commands.entryconfig(7, state=state_AP)
+        QView._menu_commands.entryconfig(8, state=state_AP)
 
         _update_glb_filter_menu("SM Group...", QSpy._GLB_FLT_MASK_SM)
         _update_glb_filter_menu("AO Group...", QSpy._GLB_FLT_MASK_AO)
@@ -421,7 +424,7 @@ class QView:
 
     @staticmethod
     def _onSaveText(*args):
-        QSpy._sendTo(pack("<B", QSpy._QSPY_SCREEN_OUT))
+        QSpy._sendTo(pack("<B", QSpy._QSPY_TEXT_OUT))
 
     @staticmethod
     def _onSaveBin(*args):
@@ -898,6 +901,25 @@ class QView:
             command(self._cmdId, self._param1, self._param2, self._param3)
 
     #.........................................................................
+    class _TagDialog(Dialog):
+        def __init__(self):
+            super().__init__(QView._gui, "Tag Message")
+        def body(self, master):
+            Label(master, text="message").grid(row=0,column=0,sticky=E,padx=2)
+            Entry(master, relief=SUNKEN, width=65,
+                  textvariable=QView._tag).grid(row=0,column=1,sticky=W,pady=2)
+            Label(master, text="kind").grid(row=1,column=0,sticky=E,padx=2)
+            Entry(master, relief=SUNKEN, width=5,
+                  textvariable=QView._tag_kind).grid(row=1,column=1,sticky=W,padx=2)
+        def validate(self):
+            self._tag = QView._tag.get()
+            self._tag_kind = QView._strVar_value(QView._tag_kind)
+            return 1
+        def apply(self):
+            QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_DISP_TAG, self._tag_kind),
+                self._tag)
+
+    #.........................................................................
     class _PeekDialog(Dialog):
         def __init__(self):
             super().__init__(QView._gui, "Peek")
@@ -1084,7 +1106,7 @@ class QSpy:
     _POLLI = 10
 
     # tuple of QS records from the Target.
-    # !!! NOTE: Must match qs_copy.h !!!
+    # !!! NOTE: Must match qpc/include/qs.h !!!
     _QS = ("QS_EMPTY",
         # [1] SM records
         "QS_QEP_STATE_ENTRY",     "QS_QEP_STATE_EXIT",
@@ -1139,7 +1161,9 @@ class QSpy:
         "QS_SCHED_PREEMPT",       "QS_SCHED_RESTORE",
         "QS_SCHED_LOCK",          "QS_SCHED_UNLOCK",
         "QS_SCHED_NEXT",          "QS_SCHED_IDLE",
-        "QS_SCHED_RESUME",
+
+        # [54] Miscellaneous QS records (not maskable)
+        "QS_ENUM_DICT",
 
         # [55] Additional QEP records
         "QS_QEP_TRAN_HIST",       "QS_QEP_TRAN_EP",
@@ -1198,7 +1222,7 @@ class QSpy:
     _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
     _GLB_FLT_MASK_MP = 0x00000000000000000000800003000000
-    _GLB_FLT_MASK_SC = 0x0000000000000000007F000000000000
+    _GLB_FLT_MASK_SC = 0x0000000000000000003F000000000000
     _GLB_FLT_MASK_SEM= 0x00000000000007800000000000000000
     _GLB_FLT_MASK_MTX= 0x000000000001F8000000000000000000
     _GLB_FLT_MASK_U0 = 0x000001F0000000000000000000000000
@@ -1245,13 +1269,14 @@ class QSpy:
     _TRGT_EVENT      = 16
 
     # packets to QSpy only...
-    _QSPY_ATTACH       = 128
-    _QSPY_DETACH       = 129
-    _QSPY_SAVE_DICT    = 130
-    _QSPY_SCREEN_OUT   = 131
-    _QSPY_BIN_OUT      = 132
-    _QSPY_MATLAB_OUT   = 133
-    _QSPY_SEQUENCE_OUT = 134
+    _QSPY_ATTACH          = 128
+    _QSPY_DETACH          = 129
+    _QSPY_SAVE_DICT       = 130
+    _QSPY_TEXT_OUT        = 131
+    _QSPY_BIN_OUT         = 132
+    _QSPY_MATLAB_OUT      = 133
+    _QSPY_SEQUENCE_OUT    = 134
+    _QSPY_DISP_TAG        = 140
 
     # packets to QSpy to be "massaged" and forwarded to the Target...
     _QSPY_SEND_EVENT      = 135

@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-09-05
-* @version Last updated for version: 7.1.1
+* @date Last updated on: 2022-12-01
+* @version Last updated for version: 7.1.4
 *
 * @file
 * @brief main for QSPY host utility
@@ -250,7 +250,7 @@ void QSPY_onPrintLn(void) {
         fputc('\n', l_outFile);
     }
 
-    if (QSPY_output.type != INF_OUT) { /* just an internal info? */
+    if (QSPY_output.type < BE_OUT) { /* message to be forwarded to BE? */
         BE_sendLine(); /* forward to the back-end */
     }
 
@@ -865,6 +865,8 @@ char const* QSPY_tstampStr(void) {
 enum {
     PALETTE_ERR_OUT,
     PALETTE_INF_OUT,
+    PALETTE_TST_OUT,
+    PALETTE_USR_OUT,
     PALETTE_TSTAMP,
     PALETTE_DSC_SM,
     PALETTE_DSC_QP,
@@ -881,6 +883,8 @@ enum {
 char const * const l_darkPalette[] = {
 /* PALETTE_ERR_OUT */            B_RED     F_BYELLOW,
 /* PALETTE_INF_OUT */    B_DFLT  B_GREEN   F_BLACK,
+/* PALETTE_TST_OUT */            B_BLACK   F_BYELLOW,
+/* PALETTE_USR_OUT */            B_BLACK   F_WHITE,
 /* PALETTE_TSTAMP  */            B_BLACK   F_CYAN,
 /* PALETTE_DSC_SM  */            B_BLUE    F_WHITE,
 /* PALETTE_DSC_QP  */    B_DFLT  B_MAGENTA F_WHITE,
@@ -897,6 +901,8 @@ char const * const l_darkPalette[] = {
 char const * const l_lightPalette[] = {
 /* PALETTE_ERR_OUT */            B_RED     F_BYELLOW,
 /* PALETTE_INF_OUT */    B_DFLT  B_GREEN   F_BLACK,
+/* PALETTE_TST_OUT */            B_BLACK   F_BYELLOW,
+/* PALETTE_USR_OUT */            B_BLACK   F_WHITE,
 /* PALETTE_TSTAMP  */            B_WHITE   F_GRAY,
 /* PALETTE_DSC_SM  */            B_BLUE    F_WHITE,
 /* PALETTE_DSC_QP  */    B_DFLT  B_MAGENTA F_WHITE,
@@ -917,13 +923,6 @@ enum {
 
 static void colorPrintLn(void) {
     if (QSPY_output.type == REG_OUT) {
-        /* output a visible marker before the start of each test */
-        if ( QSPY_output.rx_status == QS_RX_TEST_SETUP) {
-            fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
-            fputs("----------------------------------------------------------"
-                  B_DFLT_EOL "\n", stdout);
-        }
-
         int group = QSPY_output.rec < QS_USER
                    ? QSPY_rec[QSPY_output.rec].group
                    : GRP_USR;
@@ -1019,10 +1018,19 @@ static void colorPrintLn(void) {
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
         fputs(B_DFLT_EOL "\n", stdout);
     }
-    else { /* ERR_OUT */
+    else if (QSPY_output.type == ERR_OUT) {
         fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
         fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
         fputs(B_DFLT_EOL "\n", stdout);
     }
+    else if (QSPY_output.type == TST_OUT) {
+        fputs(l_colorPalette[PALETTE_TST_OUT], stdout);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        fputs(B_DFLT_EOL "\n", stdout);
+    }
+    else { /* USR_OUT */
+        fputs(l_colorPalette[PALETTE_USR_OUT], stdout);
+        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        fputs(B_DFLT_EOL "\n", stdout);
+    }
 }
-

@@ -270,7 +270,15 @@ The Curr-Obj menu reflects the selected current objects, which are listed to the
 @section qview_commands Commands Menu
 The Commands menu allows you to execute simple commands (without parameters) in the Target, such as Reset the Target, Query the Target, and clock Tick at rate 0 and rate 1. Also, this menu allows you to execute commands with parameters, which are briefly discussed below.
 
-@image html qview_cmd.gif "Commands Menu"
+@image html  qview_cmd.png
+@image latex qview_cmd.png with=5.0in
+@caption{Commands Menu}
+
+
+@subsection qview_tag Displaying Tag Messages in QSPY
+The "Tag Message..." menu allows you to display a tag message in the QSPY output.
+
+@image html qview_tag_dlg.png "Tag Message Dialog and QSPY output"
 
 
 @subsection qview_user Executing User Command

@@ -23,14 +23,14 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-10-07
-# @version Last updated for version: 7.1.2
+# @date Last updated on: 2022-12-01
+# @version Last updated for version: 7.1.4
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
 
 ## @brief current version of the Python QUTest interface
-VERSION = 712
+VERSION = 714
 
 ## @brief include python code in a test script
 # @description
@@ -42,7 +42,7 @@ VERSION = 712
 #                   **relative** to the test script.
 #
 # @usage
-# @code{py}
+# @code{.py}
 # include("test_include.pyi") # file in the same directory as the script
 # ~ ~ ~
 # include("../my_include/test_include.pyi") # relative directory
@@ -63,7 +63,7 @@ def include(fname):
 # executed test script ("test group").
 #
 # @usage
-# @code{py}
+# @code{.py}
 # file_name = test_file()
 # @endcode
 def test_file():
@@ -74,7 +74,7 @@ def test_file():
 # the directory name of the currently executed test script ("test group").
 #
 # @usage
-# @code{py}
+# @code{.py}
 # dir_name = test_dir()
 # @endcode
 def test_dir():
@@ -88,7 +88,7 @@ def test_dir():
 # @param[in] opt    options  {0=default, NORESET}
 #
 # @usage
-# @code{py}
+# @code{.py}
 # test("my first test") # test with title and with full target reset
 # ~ ~ ~
 # test("my second test", NORESET) # test without target reset
@@ -108,7 +108,7 @@ def test(title, opt = 0):
 # errors, such as commands and parameters coded in the skipped tests.
 #
 # @usage
-# @code{py}
+# @code{.py}
 # test("my first test")
 # ~ ~ ~
 # skip(1) # skip one subsequent test
@@ -176,10 +176,9 @@ def ensure(bool_expr):
 # @param[in] args  list of Record-Type groups or individual Record-Types
 # to set or clear. A given filter-group or an individual filter is set when
 # it is positive, and cleared with it is preceded with the minus (`-`) sign.
-#
 # <br>
 # The filter list can contain the following:
-# @code{py}
+# @code{.py}
 # GRP_ALL # all Record-Types
 # GRP_SM # State Machine Record-Types
 # GRP_AO # Active Object Record-Types
@@ -198,6 +197,11 @@ def ensure(bool_expr):
 # GRP_UA # All user records (Record-Types 100-124)
 # <num>  # Specific QS trace Record-Type in the range 0..127
 # @endcode
+#
+# @retruns
+# The 128-bit filter bitmask sent to the target. For each enabled filter
+# with the QS record-ID `recID` the bitmask has a '1' in the position
+# (`1 << recID`).
 #
 # @usage
 # @include glb_filter.py
@@ -219,13 +223,18 @@ def glb_filter(*args):
 # cleared with it is preceded with the minus (`-`) sign.<br>
 #
 # This parameter can take one of the following values:
-# @code{py}
+# @code{.py}
 # IDS_ALL # all QS-IDs
 # IDS_AO # Active Object QS-IDs (1..64)
 # IDS_EP # Event Pool QS-IDs (65-80)
 # IDS_EQ # Event Queue QS-IDs (81-96)
 # IDS_AP # Application-Specific QS-IDs (97-127)
 # @endcode
+#
+# @retruns
+# The 128-bit filter bitmask sent to the target. For each enabled filter
+# with the QS-ID `qsID` the bitmask has a '1' in the position
+# (`1 << qsID`).
 #
 # @usage
 # @include loc_filter.py
@@ -268,7 +277,7 @@ def ao_filter(obj_id):
 # @param[in] obj_kind  Kind of object to set<br>
 #
 # This parameter can take one of the following values:
-# @code{py}
+# @code{.py}
 # OBJ_SM # State Machine object
 # OBJ_AO # Active Object object
 # OBJ_MP # Memory Pool object
@@ -299,7 +308,7 @@ def current_obj(obj_kind, obj_id):
 # @param[in] obj_kind  Kind of object to query
 #
 # This parameter can take one of the following values:
-# @code{py}
+# @code{.py}
 # OBJ_SM # State Machine object
 # OBJ_AO # Active Object object
 # OBJ_MP # Memory Pool object
@@ -310,7 +319,7 @@ def current_obj(obj_kind, obj_id):
 # @usage
 # The queries for various objects generate the following QS trace records
 # from the Target
-# @code{py}
+# @code{.py}
 # query_curr(OBJ_SM)
 # "@timestamp Query-SM Obj=<obj-name>,State=<state-name>"
 # query_curr(OBJ_AO)
@@ -425,7 +434,7 @@ def command(cmdId, param1 = 0, param2 = 0, param3 = 0):
 # @param[in] params  the parameters of the "initialization event"
 #
 # @usage
-# @code{py}
+# @code{.py}
 # init()
 # init("MY_SIG")
 # init("MY_SIG", pack("<B", 2))
@@ -443,7 +452,7 @@ def init(signal = 0, params = None):
 # @param[in] params  the parameters of the event to be dispatched
 #
 # @usage
-# @code{py}
+# @code{.py}
 # dispatch("MY_SIG")
 # dispatch("MY_SIG", pack("<B", 2))
 # @endcode
@@ -460,7 +469,7 @@ def dispatch(signal, params = None):
 # @param[in] params  the parameters of the event to be posted
 #
 # @usage
-# @code{py}
+# @code{.py}
 # `post("MY_SIG")
 # `post("MY_SIG", pack("<B", 2))
 # @endcode
@@ -477,7 +486,7 @@ def post(signal, params = None):
 # @param[in] params  the parameters of the event to be posted
 #
 # @usage
-# @code{py}
+# @code{.py}
 # publish("MY_SIG")
 # publish("MY_SIG", pack("<B", 2))
 # @endcode
@@ -504,7 +513,7 @@ def publish(signal, params = None):
 # (NORESET tests).
 #
 # @usage
-# @code{py}
+# @code{.py}
 # probe("myFunction", 123)
 # @endcode
 #
@@ -521,7 +530,7 @@ def probe(func, data):
 # @param[in] num    number of data items to peek
 #
 # @usage
-# @code{py}
+# @code{.py}
 # peek(0, 1, 10)
 # peek(8, 2, 4)
 # peek(4, 4, 2)
@@ -540,7 +549,7 @@ def peek(offset, size, num):
 # @param[in] data   binary data to send
 #
 # @usage
-# @code{py}
+# @code{.py}
 # poke(4,4,pack("<II",0xB4C4D4E4,0xB5C5D5E5))
 # poke(0, 1, bytearray("dec=%d\0", "ascii"))
 # poke(0, 1, bytes("Hello World!\0","ascii"))
@@ -559,13 +568,22 @@ def poke(offset, size, data):
 # @param[in] item   data item to fill with
 #
 # @usage
-# @code{py}
+# @code{.py}
 # fill(0, 1, 100, 0x1A)
 # fill(0, 2, 50, 0x2A2B)
 # fill(0, 4, 25, 0x4A4B4C4D)
 # @endcode
 #
 def fill(offset, size, num, item = 0):
+
+## @brief send a tag message to QSPY.
+# @description
+# This @ref qutest_simple "simple command" adds a given tag message
+# to the QSPY output.
+#
+# @param[in] message text message to display
+# @param[in] kind   kind of the message (for special rendering)
+def tag(message, kind = 0):
 
 ## @brief packs data into binary string to be sent to QSPY.
 # @description
@@ -583,7 +601,7 @@ def fill(offset, size, num, item = 0):
 # @param[in] v2 one or more data elements requried by format
 #
 # @usage
-# @code{py}
+# @code{.py}
 # dispatch("MY_SIG", pack("<B", 2))
 # poke(2, 2, pack("<HH", 0xB2C2, 0xD2E2))
 # @endcode
@@ -593,7 +611,7 @@ def pack(format, v1, v2, ...):
 ## @brief returns last record received from the target as string.
 #
 # @usage
-# @code{py}
+# @code{.py}
 # command("COMMAND_B", 123, 23456, 3456789) # generate record (if needed)
 # expect("@timestamp COMMAND_B *") # expect the record from the target
 # last = last_rec().split() # <-- obtain the last record and split it

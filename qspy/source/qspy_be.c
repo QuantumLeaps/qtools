@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-11-30
+* @version Last updated for version: 7.1.4
 *
 * @file
 * @brief Back-End connection point for the external Front-Ends
@@ -180,7 +180,7 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             QSPY_command('d');
             break;
         }
-        case QSPY_SCREEN_OUT: {
+        case QSPY_TEXT_OUT: {
             QSPY_command('o');
             break;
         }
@@ -212,6 +212,10 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
         }
         case QSPY_SEND_TEST_PROBE: {
             QSPY_sendTP(qrec);
+            break;
+        }
+        case QSPY_DISP_TAG: {
+            QSPY_dispTag(qrec);
             break;
         }
 
@@ -261,10 +265,11 @@ void BE_sendLine(void) {
          * QS_OBJ_DICT,
          * QS_FUN_DICT,
          * QS_USR_DICT,
+         * QS_ENUM_DICT,
          * QS_TARGET_INFO
          */
         static uint8_t const dont_forward[32] = {
-            0x01U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0xF0U,
+            0x01U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x40U, 0xF0U,
             0x01U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
             0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U,
             0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U, 0x00U

@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name="qview",
-    version="7.1.2",
+    version="7.1.4",
     author="Quantum Leaps",
     author_email="info@state-machine.com",
     description="QView visualization and monitoring",

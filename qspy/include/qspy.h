@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-11-28
-* @version Last updated for version: 7.1.3
+* @date Last updated on: 2022-11-30
+* @version Last updated for version: 7.1.4
 *
 * @file
 * @brief Host API
@@ -33,7 +33,7 @@
 #ifndef QSPY_H
 #define QSPY_H
 
-#define QSPY_VER "7.1.3"
+#define QSPY_VER "7.1.4"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +114,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec);
 void QSPY_sendObj(QSpyRecord const * const qrec);
 void QSPY_sendCmd(QSpyRecord const * const qrec);
 void QSPY_sendTP (QSpyRecord const * const qrec);
+void QSPY_dispTag(QSpyRecord const * const qrec);
 
 uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
                    uint8_t const *srcBuf, uint32_t srcBytes);
@@ -125,6 +126,7 @@ SigType QSPY_findSig(char const *name, ObjType obj);
 KeyType QSPY_findObj(char const *name);
 KeyType QSPY_findFun(char const *name);
 KeyType QSPY_findUsr(char const *name);
+KeyType QSPY_findEnum(char const *name, uint8_t group);
 
 void QSPY_cleanup(void); /* cleanup after the run */
 
@@ -140,7 +142,18 @@ void QSPY_printError(void);
 
 /* last human-readable line of output from QSPY ............................*/
 #define QS_LINE_OFFSET  8
-enum QSPY_LastOutputType { REG_OUT, INF_OUT, ERR_OUT };
+enum QSPY_LastOutputType {
+    /* output forwarded to the back-end... */
+    REG_OUT, /* regular output from the Target */
+    ERR_OUT, /* error output from QSPY */
+    /* ... */
+    BE_OUT,  /* last message forwarded to the back-end */
+
+    /* output NOT forwarded to the back-end... */
+    INF_OUT, /* internal info from QSPY */
+    TST_OUT, /* test message from BE */
+    USR_OUT, /* generic user message from BE */
+};
 typedef struct {
     char buf[QS_LINE_OFFSET + QS_LINE_LEN_MAX];
     int  len;  /* the length of the composed string */
@@ -267,12 +280,12 @@ void QSPY_resetAllDictionaries(void);
 /* facilities used by the QSPY host app only (but not for QSPY parser) */
 #ifdef QSPY_APP
 
-/*! commands to QSPY; @sa "packet IDs" in qspy.tcl script */
+/*! commands to QSPY; @sa "packet IDs" in qutest.py or qview.py scripts */
 typedef enum {
     QSPY_ATTACH = 128,    /*!< attach to the QSPY Back-End */
     QSPY_DETACH,          /*!< detach from the QSPY Back-End */
     QSPY_SAVE_DICT,       /*!< save dictionaries to a file in QSPY */
-    QSPY_SCREEN_OUT,      /*!< toggle screen output to a file in QSPY */
+    QSPY_TEXT_OUT,        /*!< toggle text output to a file in QSPY */
     QSPY_BIN_OUT,         /*!< toggle binary output to a file in QSPY */
     QSPY_MATLAB_OUT,      /*!< toggle Matlab output to a file in QSPY */
     QSPY_SEQUENCE_OUT,    /*!< toggle Sequence output to a file in QSPY */
@@ -280,7 +293,8 @@ typedef enum {
     QSPY_SEND_AO_FILTER,  /*!< send Local Filter (QSPY supplying addr) */
     QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
     QSPY_SEND_COMMAND,    /*!< send command (QSPY supplying cmdId) */
-    QSPY_SEND_TEST_PROBE  /*!< send Test-Probe (QSPY supplying apiId) */
+    QSPY_SEND_TEST_PROBE, /*!< send Test-Probe (QSPY supplying apiId) */
+    QSPY_DISP_TAG,        /*!< display a tag message in QSPY */
     /* ... */
 } QSpyCommands;
 
@@ -289,6 +303,7 @@ extern Dictionary    QSPY_funDict;
 extern Dictionary    QSPY_objDict;
 extern Dictionary    QSPY_usrDict;
 extern SigDictionary QSPY_sigDict;
+extern Dictionary    QSPY_enumDict[8];
 
 void QSPY_setExternDict(char const* dictName);
 QSpyStatus QSPY_readDict(void);

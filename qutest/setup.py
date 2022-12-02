@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name="qutest",
-    version="7.1.2",
+    version="7.1.4",
     author="Quantum Leaps",
     author_email="info@state-machine.com",
     description="QUTest Python scripting support",

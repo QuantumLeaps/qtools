@@ -208,7 +208,9 @@ enum QSpyPre {
     QS_SCHED_UNLOCK,      /*!< scheduler was unlocked */
     QS_SCHED_NEXT,        /*!< scheduler started new task */
     QS_SCHED_IDLE,        /*!< scheduler restored the idle task */
-    QS_SCHED_RESUME,      /*!< scheduler resumed a (blocked) task */
+
+    /* [54] Miscellaneous QS records (not maskable) */
+    QS_ENUM_DICT,         /*!< enumeration dictionary entry */
 
     /* [55] Additional QEP records */
     QS_QEP_TRAN_HIST,     /*!< a tran to history was taken */
@@ -370,29 +372,29 @@ typedef struct {
 } QS_tx;
 
 /*${QS::QS-tx::preType} ....................................................*/
-/*! Enumerates data formats recognized by QS
-*
-* @details
-* QS uses this enumeration is used only internally for the formatted
-* user data elements.
-*/
+/*! Enumerates data elements for app-specific trace records */
 enum QS_preType {
-    QS_I8_T,              /*!< signed 8-bit integer format */
-    QS_U8_T,              /*!< unsigned 8-bit integer format */
-    QS_I16_T,             /*!< signed 16-bit integer format */
-    QS_U16_T,             /*!< unsigned 16-bit integer format */
-    QS_I32_T,             /*!< signed 32-bit integer format */
-    QS_U32_T,             /*!< unsigned 32-bit integer format */
-    QS_F32_T,             /*!< 32-bit floating point format */
-    QS_F64_T,             /*!< 64-bit floating point format */
-    QS_STR_T,             /*!< zero-terminated ASCII string format */
-    QS_MEM_T,             /*!< up to 255-bytes memory block format */
-    QS_SIG_T,             /*!< event signal format */
-    QS_OBJ_T,             /*!< object pointer format */
-    QS_FUN_T,             /*!< function pointer format */
-    QS_I64_T,             /*!< signed 64-bit integer format */
-    QS_U64_T,             /*!< unsigned 64-bit integer format */
-    QS_HEX_FMT            /*!< HEX format for the "width" filed */
+    QS_I8_ENUM_T, /*!< signed 8-bit integer or enum format */
+    QS_U8_T,      /*!< unsigned 8-bit integer format */
+    QS_I16_T,     /*!< signed 16-bit integer format */
+    QS_U16_T,     /*!< unsigned 16-bit integer format */
+    QS_I32_T,     /*!< signed 32-bit integer format */
+    QS_U32_T,     /*!< unsigned 32-bit integer format */
+    QS_F32_T,     /*!< 32-bit floating point format */
+    QS_F64_T,     /*!< 64-bit floating point format */
+    QS_STR_T,     /*!< zero-terminated ASCII string format */
+    QS_MEM_T,     /*!< up to 255-bytes memory block format */
+    QS_SIG_T,     /*!< event signal format */
+    QS_OBJ_T,     /*!< object pointer format */
+    QS_FUN_T,     /*!< function pointer format */
+    QS_I64_T,     /*!< signed 64-bit integer format */
+    QS_U64_T,     /*!< unsigned 64-bit integer format */
+};
+
+/*${QS::QS-tx::preFmt} .....................................................*/
+/*! Enumerates data formats for app-specific trace records */
+enum QS_preFmt {
+    QS_HEX_FMT = 0x0F, /*!< HEX format for the "width" filed */
 };
 
 /*${QS::QS-tx::priv_} ......................................................*/
@@ -704,6 +706,17 @@ void QS_fun_dict_pre_(
 */
 void QS_usr_dict_pre_(
     enum_t const rec,
+    char const * const name);
+
+/*${QS::QS-tx::enum_dict_pre_} .............................................*/
+/*! Output predefined enum-dictionary record
+* @static @private @memberof QS_tx
+*
+* @note This function is only to be used through macro QS_ENUM_DICTIONARY()
+*/
+void QS_enum_dict_pre_(
+    enum_t const value,
+    uint8_t const group,
     char const * const name);
 
 /*${QS::QS-tx::ASSERTION} ..................................................*/
@@ -1104,7 +1117,8 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
 /*${QS-macros::QS_I8} ......................................................*/
 /*! Output formatted int8_t to the QS record */
 #define QS_I8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I8_T, (data_)))
+    (QS_u8_fmt_((uint8_t)(((width_) << 4U) & 0x7U) | (uint8_t)QS_I8_ENUM_T, \
+                (data_)))
 
 /*${QS-macros::QS_U8} ......................................................*/
 /*! Output formatted uint8_t to the QS record */
@@ -1158,6 +1172,12 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
 /*${QS-macros::QS_MEM} .....................................................*/
 /*! Output formatted memory block of up to 255 bytes to the QS record */
 #define QS_MEM(mem_, size_) (QS_mem_fmt_((mem_), (size_)))
+
+/*${QS-macros::QS_ENUM} ....................................................*/
+/*! Output formatted enumeration to the QS record */
+#define QS_ENUM(group_, value_) \
+    (QS_u8_fmt_((uint8_t)(0x80U | ((group_) << 4U)) | (uint8_t)QS_I8_ENUM_T,\
+                (uint8_t)(value_)))
 
 /*${QS-macros::QS_TIME_PRE_} ...............................................*/
 #if (QS_TIME_SIZE == 4U)
@@ -1350,6 +1370,16 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qs_id_)) { \
 */
 #define QS_USR_DICTIONARY(rec_) \
     (QS_usr_dict_pre_((rec_), #rec_))
+
+/*${QS-macros::QS_ENUM_DICTIONARY} .........................................*/
+/*! Output enumeration dictionary record
+*
+* @details
+* An enum QS record dictionary record associates the numerical value of
+* an enumeration with the human-readable identifier.
+*/
+#define QS_ENUM_DICTIONARY(value_, group_) \
+    (QS_enum_dict_pre_((value_), (group_), #value_))
 
 /*${QS-macros::QF_QS_CRIT_ENTRY} ...........................................*/
 /*! Output the critical section entry record */
