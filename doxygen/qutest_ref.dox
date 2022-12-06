@@ -1,6 +1,6 @@
 F/*###########################################################################*/
 /*! @page qutest_fixture QUTest&trade; Fixture Reference
-@nav{qutest_rtc,qutest_script}
+@nav{qutest_conc,qutest_script}
 
 <p>A QUTest *test fixture* is a regular C or C++ program that contains the @c %main() function as well as a few @ref qs "QS" callback functions (to implement test commands as well as test startup and teardown). The main job of a *test fixture* is to exercise the CUT (Code Under Test).
 </p>
@@ -62,7 +62,7 @@ A C or C++ function calls the macro QS_TEST_PROBE_DEF(), which defines the test-
 Once the test-probe variable is defined and initialized, it can be tested with the QS_TEST_PROBE() and QS_TEST_PROBE_ID() macros. The QS_TEST_PROBE() macro executes the code snippet specified as the parameter to the macro when the test probe is not zero. The QS_TEST_PROBE_ID() executes the specified code snippet only when the test-probe has a given ID value.
 
 
-@nav{qutest_rtc,qutest_script}
+@nav{qutest_conc,qutest_script}
 */
 
 /*###########################################################################*/
@@ -74,8 +74,67 @@ Once the test-probe variable is defined and initialized, it can be tested with t
 
 The QUTest *test scripts* are executed in the host by the "QUTest front-end" that communicates with the @ref qspy "QSPY" host application via the @ref qspy_udp "UDP interface". The "QUTest front-end" is itself implemented in [<b>Python</b>](https://www.python.org/) (Python 3.3+).
 
-![](logo_python3.gif)
+@image html  img/logo_python3.png
+@image latex img/logo_python3.png width=1.5in
 
+@section qutest_dsl QUTest&trade; Testing DSL
+The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defines a small Domain Specific Language (DSL) for writing test scripts in Python. The structure of this DSL is very simple. Each test script consists of two sections:
+
+
+@subsection qutest_dsl-preamble Preamble
+The "preamble" section of a test script file specifies include scripts and defines callback functions common to all tests in this file. It can contain the following functions:
+
+- @ref qutest_dsl::include()     "include()"
+- @ref qutest_dsl::on_reset()    "on_reset()"
+- @ref qutest_dsl::on_setup()    "on_setup()"
+- @ref qutest_dsl::on_teardown() "on_teardown()"
+
+The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "test commands".
+
+
+@subsection qutest_dsl-tests Tests
+The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
+
+- @ref qutest_dsl::test() "test()"
+- @ref qutest_dsl::skip() "skip()"
+
+
+@subsection qutest_dsl-commands Commands
+The commands that you can place in the tests (as well as inside the callback functions) are:
+
+@ref qutest_simple "Simple Commands":
+
+- @ref qutest_dsl::glb_filter()   "glb_filter()"
+- @ref qutest_dsl::loc_filter()   "loc_filter()"
+- @ref qutest_dsl::ao_filter()    "ao_filter()"
+- @ref qutest_dsl::current_obj()  "current_obj()"
+- @ref qutest_dsl::poke()         "poke()"
+- @ref qutest_dsl::fill()         "fill()"
+- @ref qutest_dsl::continue_test() "continue_test()"
+
+
+@ref qutest_complex "Complex Commands":
+
+- @ref qutest_dsl::command()      "command()"
+- @ref qutest_dsl::query_curr()   "query_curr()"
+- @ref qutest_dsl::init()         "init()"
+- @ref qutest_dsl::dispatch()     "dispatch()"
+- @ref qutest_dsl::post()         "post()"
+- @ref qutest_dsl::publish()      "publish()"
+- @ref qutest_dsl::probe()        "probe()"
+- @ref qutest_dsl::tick()         "tick()"
+- @ref qutest_dsl::peek()         "peek()"
+
+
+Commands that don't communicate with the Target:
+
+- @ref qutest_dsl::expect()       "expect()"
+- @ref qutest_dsl::expect_pause() "expect_pause()"
+- @ref qutest_dsl::test_file()    "test_file()"
+- @ref qutest_dsl::test_dir()     "test_dir()"
+- @ref qutest_dsl::last_rec()     "last_rec()"
+- @ref qutest_dsl::pack()         "pack()"
+- @ref qutest_dsl::tag()          "tag()"
 
 @section qutest_script-run Running the Test Scripts
 
@@ -117,8 +176,8 @@ Usage examples (for Windows):
 @verbatim
 python3 %QTOOLS%\qspy\py\qutest.py
 python3 %QTOOLS%\qspy\py\qutest.py *.py
-python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp.exe
-python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp.exe 192.168.1.100:7705
+python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp
+python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp 192.168.1.100:7705
 python3 %QTOOLS%\qspy\py\qutest.py *.py "" localhost:7701 6605
 python3 %QTOOLS%\qspy\py\qutest.py *.py DEBUG
 python3 %QTOOLS%\qspy\py\qutest.py *.py DEBUG localhost:7701 6605
@@ -136,73 +195,6 @@ python3 $(QTOOLS)/qspy/py/qutest.py *.py "" localhost:7701 6605
 python3 $(QTOOLS)/qspy/py/qutest.py *.py DEBUG
 python3 $(QTOOLS)/qspy/py/qutest.py *.py DEBUG localhost:7701 6605
 @endverbatim
-
-
-@section qutest_dsl QUTest&trade; Testing DSL
-The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defines a small Domain Specific Language (DSL) for writing test scripts in Python. The structure of this DSL is very simple. Each test script consists of two sections:
-
-
-@subsection qutest_dsl-preamble Preamble
-The "preamble" section of a test script file specifies include scripts and defines callback functions common to all tests in this file. It can contain the following functions:
-
-- @ref qutest_dsl::include()     "include()"
-- @ref qutest_dsl::on_reset()    "on_reset()"
-- @ref qutest_dsl::on_setup()    "on_setup()"
-- @ref qutest_dsl::on_teardown() "on_teardown()"
-
-The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "test commands".
-
-
-@subsection qutest_dsl-tests Tests
-The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
-
-- @ref qutest_dsl::test() "test()"
-- @ref qutest_dsl::skip() "skip()"
-
-
-@subsection qutest_dsl-commands Commands
-The commands that you can place in the tests (as well as inside the callback functions) are:
-
-- @ref qutest_dsl::command()      "command()"
-- @ref qutest_dsl::expect()       "expect()"
-- @ref qutest_dsl::glb_filter()   "glb_filter()"
-- @ref qutest_dsl::loc_filter()   "loc_filter()"
-- @ref qutest_dsl::ao_filter()    "ao_filter()"
-- @ref qutest_dsl::current_obj()  "current_obj()"
-- @ref qutest_dsl::query_curr()   "query_curr()"
-- @ref qutest_dsl::tick()         "tick()"
-- @ref qutest_dsl::expect_pause() "expect_pause()"
-- @ref qutest_dsl::continue_test() "continue_test()"
-- @ref qutest_dsl::init()         "init()"
-- @ref qutest_dsl::dispatch()     "dispatch()"
-- @ref qutest_dsl::post()         "post()"
-- @ref qutest_dsl::publish()      "publish()"
-- @ref qutest_dsl::probe()        "probe()"
-- @ref qutest_dsl::peek()         "peek()"
-- @ref qutest_dsl::poke()         "poke()"
-- @ref qutest_dsl::fill()         "fill()"
-- @ref qutest_dsl::pack()         "pack()"
-- @ref qutest_dsl::test_file()    "test_file()"
-- @ref qutest_dsl::test_dir()     "test_dir()"
-- @ref qutest_dsl::last_rec()     "last_rec()"
-
-
-@section qutest_qspy Categories of QSPY Output
-To write effective *test scripts* you need to understand the main categories of QSPY output, which are illustrated in the picture below:
-
-![Categories of QSPY output](qspy_cat.png)
-
-<dl class="tag">
-  <dt>0</dt><dd> Information output generated internally by QSPY. This output is *not* sent to *test scripts*.
-  </dd>
-  <dt>1</dt><dd> Dictionary trace records generated by the Target. This output is *not* forwarded to *test scripts*.
-  </dd>
-  <dt>2</dt><dd> Acknowledgement trace records generated by the Target. This output *is* forwarded to *test scripts*, but is checked automatically and implicitly by the *test commands*.
-  </dd>
-  <dt>3</dt><dd> Trace records generated by the Target. This output *is* forwarded to *test scripts* and must be checked **explicitly** by test expectations.
-  </dd>
-</dl>
-<div style="clear:both;"></div>
 
 @nav{qutest_fixture,qview}
 */

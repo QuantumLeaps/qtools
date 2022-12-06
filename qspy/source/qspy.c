@@ -28,7 +28,6 @@
 *
 * @file
 * @brief QSPY host utility: main parser
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stdbool.h>
@@ -2504,8 +2503,8 @@ void Dictionary_put(Dictionary * const me,
 /*..........................................................................*/
 char const *Dictionary_get(Dictionary * const me, KeyType key, char *buf) {
     int idx;
-    if (key == 0) {
-        return me->keySize <= 1 ? "000" : "NULL";
+    if ((key == 0) && (me->keySize >= 4U)) {
+        return "NULL";
     }
     idx = Dictionary_find(me, key);
     if (idx >= 0) { /* key found? */

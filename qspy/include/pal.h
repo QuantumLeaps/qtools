@@ -28,10 +28,9 @@
 *
 * @file
 * @brief Platform Abstraction Layer (PAL)
-* @ingroup qpspy
 */
-#ifndef pal_h
-#define pal_h
+#ifndef PAL_H_
+#define PAL_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -97,4 +96,4 @@ void PAL_updateReadySet(int targetConn);
 void Q_onAssert(char const* const module, int location);
 #endif
 
-#endif /* pal_h */
+#endif /* PAL_H_ */

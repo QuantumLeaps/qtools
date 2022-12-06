@@ -28,7 +28,6 @@
 *
 * @file
 * @brief main for QSPY host utility
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stddef.h>

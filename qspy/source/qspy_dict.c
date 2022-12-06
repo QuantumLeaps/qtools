@@ -28,7 +28,6 @@
 *
 * @file
 * @brief QSPY host uility: dictionary file reading/writing
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stdbool.h>

@@ -38,8 +38,8 @@
 ******************************************************************************
 * @endcond
 */
-#ifndef QWIN_GUI_H
-#define QWIN_GUI_H
+#ifndef QWIN_GUI_H_
+#define QWIN_GUI_H_
 
 #ifndef QWIN_GUI
     #error The pre-processor macro QWIN_GUI must be defined
@@ -147,4 +147,4 @@ void DrawBitmap(HDC hdc, HBITMAP hBitmap, int xStart, int yStart);
 }
 #endif
 
-#endif /* QWIN_GUI_H */
+#endif /* QWIN_GUI_H_ */

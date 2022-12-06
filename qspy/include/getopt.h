@@ -28,8 +28,8 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
-#ifndef INCLUDED_GETOPT_PORT_H
-#define INCLUDED_GETOPT_PORT_H
+#ifndef GETOPT_H_
+#define GETOPT_H_
 
 #if defined(__cplusplus)
 extern "C" {
@@ -46,4 +46,4 @@ int getopt(int argc, char *argv[], char const *optstr);
 }
 #endif
 
-#endif /* INCLUDED_GETOPT_PORT_H */
+#endif /* GETOPT_H_ */

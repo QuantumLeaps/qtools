@@ -28,7 +28,6 @@
 *
 * @file
 * @brief QSPY host utility: sequence diagram generation
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stdbool.h>

@@ -28,7 +28,6 @@
 *
 * @file
 * @brief Back-End connection point for the external Front-Ends
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stdbool.h>

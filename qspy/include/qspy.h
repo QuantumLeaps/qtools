@@ -28,10 +28,9 @@
 *
 * @file
 * @brief Host API
-* @ingroup qpspy
 */
-#ifndef QSPY_H
-#define QSPY_H
+#ifndef QSPY_H_
+#define QSPY_H_
 
 #define QSPY_VER "7.1.4"
 
@@ -339,4 +338,4 @@ void QSEQ_dictionaryReset(void);
 }
 #endif
 
-#endif /* QSPY_H */
+#endif /* QSPY_H_ */

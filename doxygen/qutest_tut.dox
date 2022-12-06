@@ -1236,7 +1236,7 @@ This will build the @ref qutest_fixture "test fixture" as a host executable and 
 
 /*###########################################################################*/
 /*! @page qutest_dpp DPP Example
-@nav{qutest_blinky,qutest_rtc}
+@nav{qutest_blinky,qutest_conc}
 
 <p>The DPP (Dining Philosophers Problem) example shows how to use QUTest in various stages of application development, including not only unit testing, but **integration testing** as well.
 </p>
@@ -1271,5 +1271,5 @@ This will build the @ref qutest_fixture "test fixture" as a host executable and 
 ![DPP test build and run with QUTest (right) and QSPY output (left).](test_dpp.jpg)
 
 <br>
-@nav{qutest_blinky,qutest_rtc}
+@nav{qutest_blinky,qutest_conc}
 */

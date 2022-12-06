@@ -28,7 +28,6 @@
 *
 * @file
 * @brief QSPY transmit facilities
-* @ingroup qpspy
 */
 #include <stdint.h>
 #include <stdbool.h>

@@ -28,10 +28,9 @@
 *
 * @file
 * @brief Back-End connection point for the external Front-Ends
-* @ingroup qpspy
 */
-#ifndef be_h
-#define be_h
+#ifndef BE_H_
+#define BE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +48,4 @@ void BE_sendLine(void);     /* send the QSPY parsed line to the Front-End */
 }
 #endif
 
-#endif /* be_h */
+#endif /* BE_H_ */

@@ -28,7 +28,6 @@
 *
 * @file
 * @brief main for QClean host utility
-* @ingroup qclean
 */
 #include <stdlib.h>
 #include <stdint.h>

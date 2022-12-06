@@ -28,7 +28,6 @@
 *
 * @file
 * @brief QSPY PAL implementation for Win32
-* @ingroup qpspy
 */
 #include <stdlib.h>   /* for system() */
 #include <stdint.h>

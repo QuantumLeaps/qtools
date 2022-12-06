@@ -28,10 +28,9 @@
 *
 * @file
 * @brief QClean internal interface
-* @ingroup qclean
 */
-#ifndef qclean_h
-#define qclean_h
+#ifndef QCLEAN_H_
+#define QCLEAN_H_
 
 #define VERSION "7.1.3"
 
@@ -41,4 +40,4 @@ void     filesearch  (char const *dirname);
 
 extern char const dir_separator; /* platform-dependent directory separator */
 
-#endif /* qclean_h */
+#endif /* QCLEAN_H_ */
