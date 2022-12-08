@@ -4,6 +4,7 @@
 @section qtools_7_1_4 Version 7.1.4, 2022-12-19
 @ref qspy "QSPY host application":
 - added "Enum Dictionaries" and parsing of the Enum data item
+- changed dictionaries for QUTest command() from "User" dictionaries to "Enum Dictionaries" for enum-group 7 (#QS_CMD_ENUM). This change affects only QP 7.1.4 and newer. For backwards compatibility, older versions of QP still use the "User" dictionaries for commands.
 - implemented [feature request #197](https://sourceforge.net/p/qpc/feature-requests/197) for displaying of "tag messages" from QUTest or QView in the QSPY output. This includes rendering special test tags now produced by QUTest 7.1.4.
 - implemented [feature request #199](https://sourceforge.net/p/qpc/feature-requests/199) for truncating state annotations in sequence diagrams.
 

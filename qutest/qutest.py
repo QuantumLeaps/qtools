@@ -23,7 +23,7 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-01
+# @date Last updated on: 2022-12-07
 # @version Last updated for version: 7.1.4
 #
 # @file
@@ -204,6 +204,7 @@ class QUTest:
             self._to_skip -= 1
             QUTest._num_skipped += 1
             print("SKIPPED")
+            self.tag(" Test-End: SKIPPED", 0xFF)
             self._tran(QUTest._SKIP)
             return
 

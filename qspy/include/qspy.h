@@ -127,6 +127,9 @@ KeyType QSPY_findFun(char const *name);
 KeyType QSPY_findUsr(char const *name);
 KeyType QSPY_findEnum(char const *name, uint8_t group);
 
+#define SIG_NOT_FOUND ((SigType)-1)
+#define KEY_NOT_FOUND ((KeyType)-1)
+
 void QSPY_cleanup(void); /* cleanup after the run */
 
 char const* QSPY_tstampStr(void);

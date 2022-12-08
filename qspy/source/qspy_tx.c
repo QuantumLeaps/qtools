@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2021-12-23
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2022-12-07
+* @version Last updated for version: 7.1.4
 *
 * @file
 * @brief QSPY transmit facilities
@@ -130,7 +130,7 @@ void QSPY_sendEvt(QSpyRecord const * const qrec) {
     else {
         char const *name = (char const *)&qrec->start[n];
         SigType sig = QSPY_findSig(name, l_currSM);
-        if (sig == (SigType)0) {
+        if (sig == SIG_NOT_FOUND) {
             SNPRINTF_LINE("   <F-END> ERROR    "
                           "Signal Dictionary not found for Sig=%s", name);
             QSPY_printError();
@@ -177,7 +177,7 @@ void QSPY_sendObj(QSpyRecord const * const qrec) {
 
     KeyType key = QSPY_findObj(name);
 
-    if (key == (KeyType)0) {
+    if (key == KEY_NOT_FOUND) {
         SNPRINTF_LINE("   <F-END> ERROR    Object Dictionary not found for "
                       "Name=%s", name);
         QSPY_printError();
@@ -248,31 +248,37 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
     unsigned n = 2U + 1U + 3U*4U;
     char const *name = (char const *)&qrec->start[n];
 
-    KeyType key = QSPY_findUsr(name);
-
-    if (key == (KeyType)0) {
-        SNPRINTF_LINE("   <F-END> ERROR    User Dictionary not found for "
-                      "Name=%s", name);
-        QSPY_printError();
+    KeyType key;
+    if (QSPY_conf.version < 714U) {
+        key = QSPY_findUsr(name);
     }
     else {
-        uint32_t nBytes;
-        uint8_t *cmdPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
+        key = QSPY_findEnum(name, QS_CMD_ENUM);
+    }
 
-        cmdPkt[0] = 0U;
-        cmdPkt[1] = (uint8_t)QS_RX_COMMAND;
-        cmdPkt[2] = (uint8_t)key;
+    if (key == KEY_NOT_FOUND) {
+        SNPRINTF_LINE("   <F-END> ERROR    Command Dictionary not found for "
+                      "Name=%s", name);
+        QSPY_printError();
+        return;
+    }
 
-        nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), cmdPkt, n);
-        if (nBytes == 0) {
-            SNPRINTF_LINE("   <COMMS> ERROR    %s",
-                          "Encoding QS_RX_COMMAND");
-            QSPY_onPrintLn();
-        }
-        else {
-             (void)(*PAL_vtbl.send2Target)(l_dstBuf, nBytes);
-             /* send2Target() reports error by itself */
-        }
+    uint32_t nBytes;
+    uint8_t *cmdPkt = (uint8_t *)&qrec->start[0]; /* cast const away */
+
+    cmdPkt[0] = 0U;
+    cmdPkt[1] = (uint8_t)QS_RX_COMMAND;
+    cmdPkt[2] = (uint8_t)key;
+
+    nBytes = QSPY_encode(l_dstBuf, sizeof(l_dstBuf), cmdPkt, n);
+    if (nBytes == 0) {
+        SNPRINTF_LINE("   <COMMS> ERROR    %s",
+                      "Encoding QS_RX_COMMAND");
+        QSPY_onPrintLn();
+    }
+    else {
+         (void)(*PAL_vtbl.send2Target)(l_dstBuf, nBytes);
+         /* send2Target() reports error by itself */
     }
 }
 /*..........................................................................*/
@@ -283,7 +289,7 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
 
     KeyType key = QSPY_findFun(name);
 
-    if (key == (KeyType)0) {
+    if (key == KEY_NOT_FOUND) {
         SNPRINTF_LINE("   <F-END> ERROR    Function Dictionary not found for "
                       "Name=%s", name);
         QSPY_printError();

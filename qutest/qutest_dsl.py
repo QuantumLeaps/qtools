@@ -413,7 +413,7 @@ def continue_test():
 #
 # @param[in] cmdId  the command-id first argument to QS_onCommand()<br>
 #            NOTE: this could be either the raw number or a name
-#            that is delivered by QS_USR_DICTIONARY() from the Target
+#            that is delivered by QS_ENUM_DICTIONARY(..., QS_CMD_ENUM)
 # @param[in] param1 the "param1" argument to QS_onCommand() (optional)
 # @param[in] param2 the "param2" argument to QS_onCommand() (optional)
 # @param[in] param3 the "param3" argument to QS_onCommand() (optional)
@@ -612,8 +612,8 @@ def pack(format, v1, v2, ...):
 #
 # @usage
 # @code{.py}
-# command("COMMAND_B", 123, 23456, 3456789) # generate record (if needed)
-# expect("@timestamp COMMAND_B *") # expect the record from the target
+# command("CMD_B", 123, 23456, 3456789) # generate record (if needed)
+# expect("@timestamp USER+000 CMD_B *") # expect the record from the target
 # last = last_rec().split() # <-- obtain the last record and split it
 # p1 = int(last[2])         # extract the expected parameter p1 (int)
 # s1 = last[3]              # extract the expected string s1

@@ -391,10 +391,11 @@ enum QS_preType {
     QS_U64_T,     /*!< unsigned 64-bit integer format */
 };
 
-/*${QS::QS-tx::preFmt} .....................................................*/
+/*${QS::QS-tx::usrFmt} .....................................................*/
 /*! Enumerates data formats for app-specific trace records */
-enum QS_preFmt {
-    QS_HEX_FMT = 0x0F, /*!< HEX format for the "width" filed */
+enum QS_usrFmt {
+    QS_HEX_FMT    = 0x0F, /*!< HEX format for the "width" filed */
+    QS_CMD_ENUM   = 7,    /*!< User command enumeration group */
 };
 
 /*${QS::QS-tx::priv_} ......................................................*/

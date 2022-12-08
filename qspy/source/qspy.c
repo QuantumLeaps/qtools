@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-11-30
+* @date Last updated on: 2022-12-07
 * @version Last updated for version: 7.1.4
 *
 * @file
@@ -333,11 +333,11 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
             SNPRINTF_APPEND("%d bytes needed in ", (-me->len));
         }
 
-        /* is this a standard QS record? */
+        /* is this a pre-defined QS record? */
         if (me->rec < l_userRec) {
             SNPRINTF_APPEND("Rec=%s", QSPY_rec[me->rec].name);
         }
-        else { /* USER-specific record */
+        else { /* application-specific (user) record */
             SNPRINTF_APPEND("Rec=USER+%3d", (int)(me->rec - l_userRec));
         }
         QSPY_onPrintLn();
@@ -2531,12 +2531,11 @@ char const *Dictionary_get(Dictionary * const me, KeyType key, char *buf) {
 /*..........................................................................*/
 int Dictionary_find(Dictionary * const me, KeyType key) {
     /* binary search algorithm... */
-    int mid;
     int first = 0;
     int last = me->entries;
     if (last > 0) { /* not empty? */
         while (first <= last) {
-            mid = (first + last) / 2;
+            int mid = (first + last) / 2;
             if (me->sto[mid].key == key) {
                 return mid;
             }
@@ -2553,18 +2552,16 @@ int Dictionary_find(Dictionary * const me, KeyType key) {
 /*..........................................................................*/
 KeyType Dictionary_findKey(Dictionary * const me, char const *name) {
     /* brute-force search algorithm... */
-    int i;
-    for (i = 0; i < me->entries; ++i) {
+    for (int i = 0; i < me->entries; ++i) {
         if (strncmp(me->sto[i].name, name, sizeof(me->sto[i].name)) == 0) {
             return me->sto[i].key;
         }
     }
-    return (KeyType)0; /* not found */
+    return KEY_NOT_FOUND;
 }
 /*..........................................................................*/
 void Dictionary_reset(Dictionary * const me) {
-    int i;
-    for (i = 0; i < me->capacity; ++i) {
+    for (int i = 0; i < me->capacity; ++i) {
         me->sto[i].key = (KeyType)0;
     }
     me->entries = 0;
