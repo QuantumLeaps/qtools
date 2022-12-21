@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-11-30
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2022-12-19
+* @version Last updated for version: 7.2.0
 *
 * @file
 * @brief Host API
@@ -32,7 +32,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "7.1.4"
+#define QSPY_VER "7.2.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,12 +108,19 @@ void QSPY_reset(void);
 void QSPY_parse(uint8_t const *buf, uint32_t nBytes);
 void QSPY_txReset(void);
 
-bool QSPY_command(uint8_t cmdId); /* execute an internal QSPY command */
+/* command options */
+enum {
+    CMD_OPT_OFF,
+    CMD_OPT_ON,
+    CMD_OPT_TOGGLE,
+};
+bool QSPY_command(uint8_t cmdId, uint8_t opt);
+
 void QSPY_sendEvt(QSpyRecord const * const qrec);
 void QSPY_sendObj(QSpyRecord const * const qrec);
 void QSPY_sendCmd(QSpyRecord const * const qrec);
 void QSPY_sendTP (QSpyRecord const * const qrec);
-void QSPY_dispTag(QSpyRecord const * const qrec);
+void QSPY_showNote(QSpyRecord const * const qrec);
 
 uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
                    uint8_t const *srcBuf, uint32_t srcBytes);
@@ -153,8 +160,8 @@ enum QSPY_LastOutputType {
 
     /* output NOT forwarded to the back-end... */
     INF_OUT, /* internal info from QSPY */
-    TST_OUT, /* test message from BE */
     USR_OUT, /* generic user message from BE */
+    TST_OUT, /* test message from BE */
 };
 typedef struct {
     char buf[QS_LINE_OFFSET + QS_LINE_LEN_MAX];
@@ -189,7 +196,7 @@ typedef struct {
 /* last output generated */
 extern QSPY_LastOutput QSPY_output;
 
-/* begining of QSPY line to print */
+/* beginning of QSPY line to print */
 extern char const * const QSPY_line;
 
 /* rendering information for QSPY records */
@@ -250,13 +257,13 @@ int Dictionary_find(Dictionary* const me, KeyType key);
 KeyType Dictionary_findKey(Dictionary* const me, char const* name);
 void Dictionary_reset(Dictionary* const me);
 
-typedef struct SigDictEntryTag {
+typedef struct {
     SigType sig;
     ObjType obj;
     char    name[QS_DNAME_LEN_MAX];
 } SigDictEntry;
 
-typedef struct SigDictionaryTag {
+typedef struct {
     SigDictEntry  notFound;
     SigDictEntry* sto;
     int           capacity;
@@ -296,7 +303,8 @@ typedef enum {
     QSPY_SEND_CURR_OBJ,   /*!< send current Object (QSPY supplying addr) */
     QSPY_SEND_COMMAND,    /*!< send command (QSPY supplying cmdId) */
     QSPY_SEND_TEST_PROBE, /*!< send Test-Probe (QSPY supplying apiId) */
-    QSPY_DISP_TAG,        /*!< display a tag message in QSPY */
+    QSPY_CLEAR_SCREEN,    /*!< clear the QSPY screen */
+    QSPY_SHOW_NOTE,       /*!< show a note in QSPY output */
     /* ... */
 } QSpyCommands;
 

@@ -23,14 +23,14 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-01
-# @version Last updated for version: 7.1.4
+# @date Last updated on: 2022-12-19
+# @version Last updated for version: 7.2.0
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
 
 ## @brief current version of the Python QUTest interface
-VERSION = 714
+VERSION = 720
 
 ## @brief include python code in a test script
 # @description
@@ -97,7 +97,14 @@ def test_dir():
 #
 # @sa skip()
 #
-def test(title, opt = 0):
+def test(title, opt=0):
+
+## @brief start a new scenario
+# @description
+# This is an alias for the test() command for the BDD-style
+# testing.
+#
+def scenario(title, opt=0):
 
 ## @brief skip the tests following this command.
 #
@@ -122,7 +129,7 @@ def test(title, opt = 0):
 # @sa
 # test()
 #
-def skip(nTests = 9999):
+def skip(nTests=9999):
 
 ## @brief defines an expectation for the current test
 #
@@ -355,7 +362,7 @@ def query_curr(obj_kind):
 # @sa
 # current_obj()
 #
-def tick(tick_rate = 0):
+def tick(tick_rate=0):
 
 ## @brief defines expectation for a Test Pause
 #
@@ -413,7 +420,7 @@ def continue_test():
 #
 # @param[in] cmdId  the command-id first argument to QS_onCommand()<br>
 #            NOTE: this could be either the raw number or a name
-#            that is delivered by QS_ENUM_DICTIONARY(..., QS_CMD_ENUM)
+#            that is delivered by QS_USR_DICTIONARY() from the Target
 # @param[in] param1 the "param1" argument to QS_onCommand() (optional)
 # @param[in] param2 the "param2" argument to QS_onCommand() (optional)
 # @param[in] param3 the "param3" argument to QS_onCommand() (optional)
@@ -421,7 +428,7 @@ def continue_test():
 # @usage
 # @include command.py
 #
-def command(cmdId, param1 = 0, param2 = 0, param3 = 0):
+def command(cmdId, param1=0, param2=0, param3=0):
 
 ## @brief take the top-most initial transition in the
 # current SM object in the Target
@@ -440,7 +447,7 @@ def command(cmdId, param1 = 0, param2 = 0, param3 = 0):
 # init("MY_SIG", pack("<B", 2))
 # @endcode
 #
-def init(signal = 0, params = None):
+def init(signal=0, params=None):
 
 ## @brief dispatch a given event in the current SM object in the Target
 #
@@ -457,7 +464,7 @@ def init(signal = 0, params = None):
 # dispatch("MY_SIG", pack("<B", 2))
 # @endcode
 #
-def dispatch(signal, params = None):
+def dispatch(signal, params=None):
 
 ## @brief post a given event to the current AO object in the Target
 #
@@ -474,7 +481,7 @@ def dispatch(signal, params = None):
 # `post("MY_SIG", pack("<B", 2))
 # @endcode
 #
-def post(signal, params = None):
+def post(signal, params=None):
 
 ## @brief publish a given event to subscribers in the Target
 #
@@ -491,7 +498,7 @@ def post(signal, params = None):
 # publish("MY_SIG", pack("<B", 2))
 # @endcode
 #
-def publish(signal, params = None):
+def publish(signal, params=None):
 
 ## @brief sends a Test-Probe to the Target
 # @description
@@ -574,16 +581,35 @@ def poke(offset, size, data):
 # fill(0, 4, 25, 0x4A4B4C4D)
 # @endcode
 #
-def fill(offset, size, num, item = 0):
+def fill(offset, size, num, item=0):
 
-## @brief send a tag message to QSPY.
+## @brief display a note in the QUTest output and in QSPY output.
 # @description
-# This @ref qutest_simple "simple command" adds a given tag message
-# to the QSPY output.
+# This command allows the test script to output a note (text) both
+# to the QUTest output (text/log) and the QSPY output (text/log).
+# This command can be also used for commenting the test scripts.
 #
-# @param[in] message text message to display
-# @param[in] kind   kind of the message (for special rendering)
-def tag(message, kind = 0):
+# @param[in] msg    text message
+# @param[in] dest   destination (SCREEN, TRACE), default both
+# @usage
+# @code{.py}
+# note("This is a short note")
+#
+# note('''
+# This test group checks the MPU (Memory Protection Unit)
+# by reading/writing from/to various memory addresses
+# in the target
+# ''', SCREEN)
+# @endcode
+#
+def note(msg, dest=(SCREEN | TRACE)):
+
+## @brief display a tag in the QUTest output and in QSPY output.
+# @description
+# This is an alias for the note() command for the BDD-style
+# testing.
+#
+def tag(msg, dest=(SCREEN | TRACE)):
 
 ## @brief packs data into binary string to be sent to QSPY.
 # @description
@@ -612,8 +638,8 @@ def pack(format, v1, v2, ...):
 #
 # @usage
 # @code{.py}
-# command("CMD_B", 123, 23456, 3456789) # generate record (if needed)
-# expect("@timestamp USER+000 CMD_B *") # expect the record from the target
+# command("COMMAND_B", 123, 23456, 3456789) # generate record (if needed)
+# expect("@timestamp COMMAND_B *") # expect the record from the target
 # last = last_rec().split() # <-- obtain the last record and split it
 # p1 = int(last[2])         # extract the expected parameter p1 (int)
 # s1 = last[3]              # extract the expected string s1
@@ -636,4 +662,3 @@ def on_setup():
 ## @brief
 # callback function invoked at the end of each test
 def on_teardown():
-

@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-01
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2022-12-13
+* @version Last updated for version: 7.2.0
 *
 * @file
 * @brief main for QSPY host utility
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
                     break;
 
                 case QSPY_KEYBOARD_EVT: /* the User pressed a key... */
-                    isRunning = QSPY_command(l_buf[0]);
+                    isRunning = QSPY_command(l_buf[0], CMD_OPT_TOGGLE);
                     break;
 
                 case QSPY_DONE_EVT:     /* done (e.g., file processed) */
@@ -630,7 +630,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     return QSPY_SUCCESS;
 }
 /*..........................................................................*/
-bool QSPY_command(uint8_t cmdId) {
+bool QSPY_command(uint8_t cmdId, uint8_t opt) {
     uint32_t nBytes;
     bool isRunning = true;
     QSpyStatus stat;
@@ -703,13 +703,16 @@ bool QSPY_command(uint8_t cmdId) {
             }
             break;
 
-        case 'o':  /* output file open/close toggle */
+        case 'o':  /* text output file open/close/toggle */
             if (l_outFile != (FILE *)0) {
                 fclose(l_outFile);
                 l_outFile = (FILE *)0;
                 STRNCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
+                if (opt == CMD_OPT_TOGGLE) {
+                    opt = CMD_OPT_OFF;
+                }
             }
-            else {
+            if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
                 STRNCPY_S(l_tstampStr, sizeof(l_tstampStr), QSPY_tstampStr());
                 SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
                            "qspy%s.txt", l_tstampStr);
@@ -728,13 +731,16 @@ bool QSPY_command(uint8_t cmdId) {
             break;
 
         case 'b':
-        case 's':  /* save binary file open/close toggle*/
+        case 's':  /* binary output file open/close/toggle */
             if (l_savFile != (FILE *)0) {
                 fclose(l_savFile);
                 l_savFile = (FILE *)0;
                 STRNCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
+                if (opt == CMD_OPT_TOGGLE) {
+                    opt = CMD_OPT_OFF;
+                }
             }
-            else {
+            if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
                 SNPRINTF_S(l_savFileName, sizeof(l_savFileName),
                            "qspy%s.bin", QSPY_tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
@@ -748,13 +754,16 @@ bool QSPY_command(uint8_t cmdId) {
                    l_savFileName);
             break;
 
-        case 'm':  /* save Matlab file open/close toggle */
+        case 'm':  /* Matlab output file open/close/toggle */
             if (l_matFile != (FILE *)0) {
                 QSPY_configMatFile((void *)0); /* close the Matlab file */
                 l_matFile = (FILE *)0;
                 STRNCPY_S(l_matFileName, sizeof(l_matFileName), "OFF");
+                if (opt == CMD_OPT_TOGGLE) {
+                    opt = CMD_OPT_OFF;
+                }
             }
-            else {
+            if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
                 SNPRINTF_S(l_matFileName, sizeof(l_matFileName),
                            "qspy%s.mat", QSPY_tstampStr());
                 FOPEN_S(l_matFile, l_matFileName, "w");
@@ -771,18 +780,22 @@ bool QSPY_command(uint8_t cmdId) {
                    l_matFileName);
             break;
 
-        case 'g':  /* save Sequence file open/close toggle */
+        case 'g':  /* Sequence output file open/close/toggle */
             if (l_seqList[0] == '\0') {
                 SNPRINTF_LINE("   <QSPY-> Sequence list NOT provided %s ",
                               "(no -g option)");
                 QSPY_printError();
+                break;
             }
-            else if (l_seqFile != (FILE *)0) {
+            if (l_seqFile != (FILE *)0) {
                 QSEQ_configFile((void *)0); /* close the Sequence file */
                 l_seqFile = (FILE *)0;
                 STRNCPY_S(l_seqFileName, sizeof(l_seqFileName), "OFF");
+                if (opt == CMD_OPT_TOGGLE) {
+                    opt = CMD_OPT_OFF;
+                }
             }
-            else {
+            if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
                 SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName),
                            "qspy%s.seq", QSPY_tstampStr());
                 FOPEN_S(l_seqFile, l_seqFileName, "w");

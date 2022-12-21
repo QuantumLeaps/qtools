@@ -1,6 +1,6 @@
 /*! @page qutest_tut QUTest&trade; Tutorial
 
-@nav{qutest,qutest_unity}
+@nav{qutest_conc,qutest_unity}
 
 <p>This Tutorial describes how to use the QUTest&trade; unit test harness in a series of progressively advancing examples. The first examples pertain to generic C code completely unrelated to the QP frameworks. These examples are adaptations of tests shipping with the <a href="http://www.throwtheswitch.org/unity" target="_blank" class="extern"><b>Unity test framework</b></a>. Later examples in this Tutorial show how to test <a href="https://www.state-machine.com/doc/concepts#HSM" target="_blank" class="extern"><b>hierarchical state machines</b></a> and <a href="https://www.state-machine.com/doc/concepts#Active" target="_blank" class="extern"><b>active objects</b></a>. It is highly recommended to study the simpler examples before the more advanced ones, as the basic information won't be repeated in the later tests.
 </p>
@@ -20,7 +20,7 @@ This Tutorial consists of the following lessons:
 - @subpage qutest_dpp
 
 <br>
-@nav{qutest,qutest_unity}
+@nav{qutest_conc,qutest_unity}
 */
 
 /*###########################################################################*/
@@ -1236,7 +1236,7 @@ This will build the @ref qutest_fixture "test fixture" as a host executable and 
 
 /*###########################################################################*/
 /*! @page qutest_dpp DPP Example
-@nav{qutest_blinky,qutest_conc}
+@nav{qutest_blinky,qutest_fixture}
 
 <p>The DPP (Dining Philosophers Problem) example shows how to use QUTest in various stages of application development, including not only unit testing, but **integration testing** as well.
 </p>
@@ -1271,5 +1271,5 @@ This will build the @ref qutest_fixture "test fixture" as a host executable and 
 ![DPP test build and run with QUTest (right) and QSPY output (left).](test_dpp.jpg)
 
 <br>
-@nav{qutest_blinky,qutest_conc}
+@nav{qutest_blinky,qutest_fixture}
 */

@@ -69,13 +69,9 @@ Once the test-probe variable is defined and initialized, it can be tested with t
 /*! @page qutest_script QUTest&trade; Script Reference
 @nav{qutest_fixture,qview}
 
-<p>A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qutest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the <a href="https://www.state-machine.com/glossary#test_expectation" class="extern"><b>expectations</b></a> of the tests.
-</p>
+A QUTest *test script* contains a group of related tests (a *test group*). The basic job of these tests is to send commands to the @ref qutest_fixture "test fixture" running in the Target and to compare the @ref qspy_text "QSPY textual output" produced by the Target with the *test expectations*.
 
-The QUTest *test scripts* are executed in the host by the "QUTest front-end" that communicates with the @ref qspy "QSPY" host application via the @ref qspy_udp "UDP interface". The "QUTest front-end" is itself implemented in [<b>Python</b>](https://www.python.org/) (Python 3.3+).
-
-@image html  img/logo_python3.png
-@image latex img/logo_python3.png width=1.5in
+The QUTest **test scripts** are executed in the host by the @ref qutest_use "QUTest script runner" that communicates with the @ref qspy "QSPY host application" via the @ref qspy_udp "UDP interface". The QUTest script runner is itself implemented in a Python module @ref qutest_use "qutest.py".
 
 @section qutest_dsl QUTest&trade; Testing DSL
 The Python module <span class="img file_py">qtools/qspy/py/qutest.py</span> defines a small Domain Specific Language (DSL) for writing test scripts in Python. The structure of this DSL is very simple. Each test script consists of two sections:
@@ -95,8 +91,9 @@ The `on_...()` callback functions can call any of the @ref qutest_dsl-commands "
 @subsection qutest_dsl-tests Tests
 The "tests" section of a test script file contains the actual tests. Each test starts with the test() command and can contain any number of the @ref qutest_dsl-commands "test commands". The test continues until another test() command, or the skip() command.
 
-- @ref qutest_dsl::test() "test()"
-- @ref qutest_dsl::skip() "skip()"
+- @ref qutest_dsl::test()     "test()"
+- @ref qutest_dsl::scenario() "scenario()"
+- @ref qutest_dsl::skip()     "skip()"
 
 
 @subsection qutest_dsl-commands Commands
@@ -134,67 +131,8 @@ Commands that don't communicate with the Target:
 - @ref qutest_dsl::test_dir()     "test_dir()"
 - @ref qutest_dsl::last_rec()     "last_rec()"
 - @ref qutest_dsl::pack()         "pack()"
+- @ref qutest_dsl::note()         "note()"
 - @ref qutest_dsl::tag()          "tag()"
-
-@section qutest_script-run Running the Test Scripts
-
-@note
-To run any test script(s), you first need to make sure that the @ref qspy "QSPY" console application (version 6.x or higher) is running. Once QSPY is running, you can "attach" to the UDP socket and start communicating with the QSPY back-end or to the Target (through QSPY).
-
-
-The Python test scripts are executed by the Python module <span class="img file_py">qtools/qspy/py/qutest.py</span>, with the following usage:
-
-@verbatim
-python3 <qutest-dir>qutest.py [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
-@endverbatim
-
-where:<br>
-`<qutest-dir>` is the directory with the `qutest.py` script@n
-
-@param [test_scripts] optional specification of the Python test scripts to run.
-                 If not specified, qutest will try to run all *.py files
-                 in the current directory as test scripts.
-
-@param [host_exe]  optional specification of the host executable to
-                 launch for testing embedded code on the host computer.
-                 If `host_exe` is **not** specified, or is specified as a
-                 placeholder `""`, an embedded target is assumed.
-                 The special value `DEBUG` means that `qutest.py` will start
-                 in the **debug mode**, in which it will NOT launch the
-                 host executables and it will wait for the Target reset
-                 and other responses from the Target.
-
-@param [qspy_host[:udp_port]] optional host-name/IP-address:port for the host
-                 running the QSpy utility. If not specified, the default
-                 is localhost:7701.
-
-@param [tcp_port] optional QSpy TCP port number for connecting
-                 host executables.
-
-Usage examples (for Windows):
-
-@verbatim
-python3 %QTOOLS%\qspy\py\qutest.py
-python3 %QTOOLS%\qspy\py\qutest.py *.py
-python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp
-python3 %QTOOLS%\qspy\py\qutest.py *.py build\dpp 192.168.1.100:7705
-python3 %QTOOLS%\qspy\py\qutest.py *.py "" localhost:7701 6605
-python3 %QTOOLS%\qspy\py\qutest.py *.py DEBUG
-python3 %QTOOLS%\qspy\py\qutest.py *.py DEBUG localhost:7701 6605
-@endverbatim
-
-
-Usage examples (for Linux/MacOS):
-
-@verbatim
-python3 $(QTOOLS)/qspy/py/qutest.py
-python3 $(QTOOLS)/qspy/py/qutest.py *.py
-python3 $(QTOOLS)/qspy/py/qutest.py *.py build/dpp
-python3 $(QTOOLS)/qspy/py/qutest.py *.py build/dpp 192.168.1.100:7705
-python3 $(QTOOLS)/qspy/py/qutest.py *.py "" localhost:7701 6605
-python3 $(QTOOLS)/qspy/py/qutest.py *.py DEBUG
-python3 $(QTOOLS)/qspy/py/qutest.py *.py DEBUG localhost:7701 6605
-@endverbatim
 
 @nav{qutest_fixture,qview}
 */

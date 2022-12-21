@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-11-30
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2022-12-15
+* @version Last updated for version: 7.2.0
 *
 * @file
 * @brief Back-End connection point for the external Front-Ends
@@ -145,6 +145,7 @@ void BE_parse(unsigned char *buf, uint32_t nBytes) {
 
 /*..........................................................................*/
 void BE_parseRecFromFE(QSpyRecord * const qrec) {
+    uint8_t action;
     switch (qrec->rec) {
         case QSPY_ATTACH: {   /* attach to the Front-End */
             if (l_channels == 0U) { /* no Front-End attached yet? */
@@ -176,23 +177,39 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             break;
         }
         case QSPY_SAVE_DICT: { /* save dictionaries collected so far */
-            QSPY_command('d');
+            QSPY_command('d', CMD_OPT_TOGGLE);
             break;
         }
         case QSPY_TEXT_OUT: {
-            QSPY_command('o');
+            action = CMD_OPT_TOGGLE;
+            if (qrec->tot_len > 2U) { /* payload contains action? */
+                action = qrec->start[2];
+            }
+            QSPY_command('o', action);
             break;
         }
         case QSPY_BIN_OUT: {
-            QSPY_command('s');
+            action = CMD_OPT_TOGGLE;
+            if (qrec->tot_len > 2U) { /* payload contains action? */
+                action = qrec->start[2];
+            }
+            QSPY_command('s', action);
             break;
         }
         case QSPY_MATLAB_OUT: {
-            QSPY_command('m');
+            action = CMD_OPT_TOGGLE;
+            if (qrec->tot_len > 2U) { /* payload contains action? */
+                action = qrec->start[2];
+            }
+            QSPY_command('m', action);
             break;
         }
         case QSPY_SEQUENCE_OUT: {
-            QSPY_command('g');
+            action = CMD_OPT_TOGGLE;
+            if (qrec->tot_len > 2U) { /* payload contains action? */
+                action = qrec->start[2];
+            }
+            QSPY_command('g', action);
             break;
         }
 
@@ -213,8 +230,12 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
             QSPY_sendTP(qrec);
             break;
         }
-        case QSPY_DISP_TAG: {
-            QSPY_dispTag(qrec);
+        case QSPY_SHOW_NOTE: {
+            QSPY_showNote(qrec);
+            break;
+        }
+        case QSPY_CLEAR_SCREEN: {
+            QSPY_command('c', CMD_OPT_OFF);
             break;
         }
 

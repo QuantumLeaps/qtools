@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-07
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2022-12-13
+* @version Last updated for version: 7.2.0
 *
 * @file
 * @brief QSPY transmit facilities
@@ -329,12 +329,11 @@ void QSPY_sendTP(QSpyRecord const * const qrec) {
     }
 }
 /*..........................................................................*/
-void QSPY_dispTag(QSpyRecord const * const qrec) {
-    char const *msg = (char const *)&qrec->start[3];
-    SNPRINTF_LINE("%s", msg);
+void QSPY_showNote(QSpyRecord const * const qrec) {
+    char const *note = (char const *)&qrec->start[3];
+    SNPRINTF_LINE("%s", note);
     switch (qrec->start[2]) {
         case 0xFFU: QSPY_output.type = TST_OUT; break;
-        case 0xFEU: QSPY_output.type = ERR_OUT; break;
         default:    QSPY_output.type = USR_OUT; break;
     }
     QSPY_onPrintLn();

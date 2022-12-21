@@ -1,9 +1,11 @@
 /*! @page qutest QUTest&trade; Unit Testing Harness
 
-@image html qutest_banner.jpg
+@image html  qutest_banner.jpg
+@image latex qutest_banner.jpg width=6.5in
 
-@subpage qutest_tut "&nbsp;"
+@subpage qutest_use "&nbsp;"
 @subpage qutest_conc "&nbsp;"
+@subpage qutest_tut "&nbsp;"
 @subpage qutest_fixture "&nbsp;"
 @subpage qutest_script "&nbsp;"
 
@@ -75,8 +77,23 @@ QUTest&trade; supports *test scripts* written in [Python](https://www.python.org
 Even though QUTest&trade; is particularly suitable for running tests on deeply embedded targets, it also fully supports running *the same* tests on your **host computer** (Windows, Linux, and MacOS are supported). In fact, running the tests as much as possible on the host and thus avoiding the target-hardware bottleneck is the highly recommended best-practice of embedded TDD.  QUTest&trade; supports **fully-automated** unit testing, both on the embedded target and on the host computer.
 
 
-@section qutest_use Installation &amp; Use
-The <span class="img file_py">qutest.py</span> script can be used standalone, without any installation in your Python system (see  @ref qutest_run below).
+@nav_next{qutest_use}
+*/
+
+/*###########################################################################*/
+/*! @page qutest_use Installation &amp; Use
+@nav{qutest,qutest_conc}
+
+In order to run tests in the QUTest test system, you need the following three components:
+
+1. The @ref qutest_fixture "test fixture" running on a remote target (or the host computer)
+2. The @ref qspy "QSPY host application" running and connected to the target
+3. The @ref qutest_script "qutest.py script runner" and some test scripts
+
+This section describes how to install and use the "qutest.py script runner" component.
+
+@section qutest_inst Installation
+The "qutest.py script runner" can be used standalone, without installation in your Python system (see  @ref qutest_exa below).
 
 @note
 The <span class="img file_py">qutest.py</span> script is included in the @ref qtools_about "QTools&trade; collection". Also, the @ref qtools_win "QTools&trade; collection for Windows" already includes Python (3.8), so you don't need to install anything extra.
@@ -88,126 +105,228 @@ Alternatively, you can use **your own Python** installation, into which you can 
 pip install qutest
 @endverbatim
 
-
 If you are using QUTest&trade; as a standalone Python script, you invoke it as follows:
 
 @verbatim
-python3 <path-to-qutest-script>/qutest.py [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
+python3 <path-to-qutest-script>/qutest.py <command-line-options>
 @endverbatim
 
 Alternatively, if you've installed QView&trade; with `pip`, you invoke it as follows:
 
 @verbatim
-qutest [-x] [test-scripts] [host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]
+qutest <command-line-options>
 @endverbatim
 
 
-@subsection qutest_command Command-line Options
+@section qutest_command Command-line Options
+The Python test scripts are executed by the QUTest test script runner `qutest.py` (located in `qtools/qutest/` folder), with the following usage:
 
-- `-x` &mdash; optional flag that causes qutest to exit on first test failure.
+@attention
+The `qutest.py` script runner command-line options have been expanded and changed at @ref qtools_7_2_0 "version 7.2.0". Unfortunately, it was not possible to preserve the backwards compatibility with the earlier versions.
 
-- `test_scripts` &mdash; optional specification of the Python test scripts to run. If not specified, qutest will try to run all *.py files in the current directory as test scripts.
+@verbatim
+usage: python qutest.py [-h] [-v] [-e [EXE]] [-q [QSPY]] [-l [LOG]] [-o [OPT]] [scripts ...]
 
-- `host_exe | "" | DEBUG` &mdash; optional specification of the test-fixture compiled for the host (host executable) for testing on the host computer. The placeholder value `""` (empty string) can be used for running test fixtures on an embedded Target. The special value DEBUG means that qutest will run in "debug mode", in which it will NOT launch the host executables and it will wait for the Target reset and other responses from the Target. If host_exe is not specified, an embedded target is assumed (which is already loaded with the test fixture).
+QUTest test script runner
 
-- `qspy_host[:udp_port]` &mdash; optional host-name/IP-address:port for the host running the QSPY host utility. If not specified, the default is 'localhost:7701'.
+positional arguments:
+  scripts               List (comma-separated) of test scripts to run
 
-- `tcp_port` &mdash; optional QSpy TCP port number for connecting host executables. If not specified, the default is `6601`.
+options:
+  -h, --help            show this help message and exit
+  -v, --version         Display QUTest version
+  -e [EXE], --exe [EXE]
+                        Optional host executable or debug/DEBUG
+  -q [QSPY], --qspy [QSPY]
+                        optional qspy host, [:ud_port][:tcp_port]
+  -l [LOG], --log [LOG]
+                        Optional log directory (might not exist yet)
+  -o [OPT], --opt [OPT]
+                        xcob: x:exit-on-fail, c:qspy-clear, o:qspy-save-txt, b:qspy-save-bin
+
+More info: https://www.state-machine.com/qtools/qutest.html
+@endverbatim
+
+where:<br>
+
+@param [scripts] optional specification of the Python test scripts to run.
+                 If not specified, `qutest.py` will try to run all *.py files
+                 in the current directory as test scripts.
+
+@param -e[exe]   optional specification of the host executable to
+                 launch for testing embedded code on the host computer.
+                 If `exe` is **not** specified a remote (embedded) target is assumed.
+                 The special value `debug` or `DEBUG` means that `qutest.py`
+                 will start in the **debug mode**, in which it will NOT launch
+                 the host executable and it will wait for the Target reset
+                 and other responses from the Target.
+
+@param -q[host][:ud_port][:tcp_port] optional host-name/IP-address:udp_port:tcp_port
+                 for the machine running the QSpy utility. If not specified,
+                 the default is `localhost:7701:6601`.
+
+@param -l[log]   Optional directory for output of the log file
+                 (directory will be created if it does not exist yet).
+
+@param -o[opt]   options for the QUTest script runner to perform the
+                 following actions:<br>
+                 x : exit on first failed test<br>
+                 c : clear the QSPY screen just after attaching<br>
+                 o : save the QSPY text output to a file (in the QSPY launch directory)<br>
+                 b : save the QSPY binary output to a file (in the QSPY launch directory)
 
 @note
-The command-line options for `qutest.py` are **positional**, meaning that an option must be at the specific position in the command-line to be parsed correctly. For example, if you wish to run QUTest on an embedded target at the specified `[qspy_host]` host-name, you still need to provide a placeholder for the host executable `[host_exe]` ("") option, to get to the right position for the `[qspy_host]` option.
+For reliable operation it is recommended to apply the short options *without* a space between the option and the parameter (e.g., `-q192.168.1.100`, `-ocx`).
 
 
-@subsection qutest_exa Examples
+@section qutest_exa Examples
 <img style="float:left; clear:left; margin-right:10px" src="img/logo_win48.png">
-@subsubsection qutest_exa_win Windows Hosts
+@subsection qutest_exa_win Windows Hosts
 <div style="clear:both"></div>
 
 @verbatim
 python3 %QTOOLS%\qutest\qutest.py
 @endverbatim
 
-runs all the test scripts (`*.py`) in the current directory.
-
 @verbatim
-python3 %QTOOLS%\qutest\qutest.py *.py
+[1] python3 %QTOOLS%\qutest\qutest.py
+[2] python3 %QTOOLS%\qutest\qutest.py -- test_mpu.py
+[3] python3 %QTOOLS%\qutest\qutest.py -ebuild/test_dpp.exe
+[4] python3 %QTOOLS%\qutest\qutest.py -ebuild/test_dpp.exe -q192.168.1.100 -l../log -oco
+[5] qutest -qlocalhost:7702 -oxc --  test_qk.py,test_mpu.py
+[6] python3 %QTOOLS%\qutest\qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-runs the test scripts (`*.py`) in the current directory.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
 
-@verbatim
-python3 %QTOOLS%\qutest\qutest.py *.py build\dpp.exe
-@endverbatim
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
 
-runs the test scripts (`*.py`) in the current directory and uses the host executable `build\dpp.exe`.
+`[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp.exe` (test fixture).
 
-@verbatim
-python3 %QTOOLS%\qutest\qutest.py *.py "" 192.168.1.100:7705
-@endverbatim
+`[4]` runs all test scripts (`*.py`) in the current directory, uses the host executable `build/test_dpp.exe` (test fixture), and connects to QSPY running on a machine with IP address `192.168.1.100`. Also produces QUTest log (-l) in the directory `../log`. Also clears the QUTest screen before the run (-oc) and causes QSPY to save the text output to a file (-oo)
 
-runs the test scripts (`*.py`) in the current directory, without a host executable (`""`), and connects to QSPY at `192.168.1.100:7705`.
+`[5]` runs "qutest" (**installed with pip**) to execute the test scripts `test_qk.py,test_mpu.py` in the current directory, and connects to QSPY at UDP-host:port `localhost:7701`.
 
-@verbatim
-qutest *.py build\dpp.exe 192.168.1.100:7705
-@endverbatim
-
-runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable `build\dpp.exe`, and connects to QSPY at `192.168.1.100:7705`.
-
-@verbatim
-qutest *.py build\dpp.exe localhost:7701 6605
-@endverbatim
-
-runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable `build\dpp.exe`, and connects to QSPY at `localhost:7701`, using the local UDP port `6605`.
+`[6]` runs "qutest" in the DEBUG mode to execute the test script `test_mpu.py` in the current directory.
 
 <br>
 <img style="float:left; clear:left; margin-right:10px" src="img/logo_linux48.png">
 <img style="float:left; margin-right:10px" src="img/logo_macos48.png">
-@subsubsection qutest_exa_posiz Linux/macOS Hosts
+@subsection qutest_exa_posiz Linux/macOS Hosts
 <div style="clear:both"></div>
 
 @verbatim
-python3 $(QTOOLS)/qutest/qutest.py
+[1] python3 $(QTOOLS)/qutest/qutest.py
+[2] python3 $(QTOOLS)/qutest/qutest.py -- test_mpu.py
+[3] python3 $(QTOOLS)/qutest/qutest.py -ebuild/test_dpp
+[4] python3 $(QTOOLS)/qutest/qutest.py -ebuild/test_dpp -q192.168.1.100 -l../log -oco
+[5] qutest -qlocalhost:7702 -oxc --  test_qk.py,test_mpu.py
+[6] python3 $(QTOOLS)/qutest/qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-runs all the test scripts (`*.py`) in the current directory.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
+
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
+
+`[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp` (test fixture).
+
+`[4]` runs all test scripts (`*.py`) in the current directory, uses the host executable `build/test_dpp` (test fixture), and connects to QSPY running on a machine with IP address `192.168.1.100`. Also produces QUTest log (-l) in the directory `../log`. Also clears the QUTest screen before the run (-oc) and causes QSPY to save the text output to a file (-oo)
+
+`[5]` runs "qutest" (**installed with pip**) to execute the test scripts `test_qk.py,test_mpu.py` in the current directory, and connects to QSPY at UDP-host:port `localhost:7701`.
+
+`[6]` runs "qutest" in the DEBUG mode to execute the test script `test_mpu.py` in the current directory.
+
+
+@section qutest_log Generating Test Logs
+As required for safety certification, the `qutest.py` test runner can generate permanent records of the runs by producing **log files**. This feature is enabled by the `-l<log-dir>` command-line option.
+
+@remark
+The various make-files supplied in QP/C and QP/C++ allow you to supply the command-line options for saving QUTest logs (by defining the `LOG=` symbol while invoking `make`), for example:
+@verbatim
+[1] make LOG=.
+[2] make LOG=../log
+[3] make LOG=c:/cert/logs
+@endverbatim
+`[1]` generates QUTest log file in the current directory (`.`)<br>
+`[2]` generates QUTest log file in the parent directory, `log` subdirectory (relative)<br>
+`[3]` generates QUTest log file in the absolute directory `c:/cert/logs`
+
+The following screen shot shows the qutest.py screen output in which a log file has been produced (with the `-l.` command-line option):
+
+@image html  qutest-out.png
+@image latex qutest-out.png with=4.0in
+
+And the following listing shows the generated log file:
 
 @verbatim
-python3 $(QTOOLS)/qutest/utest.py *.py
+Run ID    : 221221_161550
+Target    : build/test_qutest.exe
+
+===================================[group]====================================
+test_assert.py
+
+This test group contains tests that intenionally FAIL,
+to exercise failure modes of the QUTest system.
+
+[ 1]--------------------------------------------------------------------------
+Expected assertion
+                                                             [ PASS (  0.1s) ]
+[ 2]--------------------------------------------------------------------------
+Unexpected assertion (should FAIL!)
+  @test_assert.py:22
+exp: "0000000002 COMMAND CMD_A 0"
+got: "0000000002 =ASSERT= Mod=test_qutest,Loc=100"
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ![ FAIL (  0.2s) ]
+[ 3]--------------------------------------------------------------------------
+Simple passing test
+                                                             [ PASS (  0.1s) ]
+[ 4]--------------------------------------------------------------------------
+Wrong assertion expectation (should FAIL!)
+  @test_assert.py:32
+exp: "0000000002 =ASSERT= Mod=test_qutest,Loc=200"
+got: "0000000002 =ASSERT= Mod=test_qutest,Loc=100"
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ![ FAIL (  1.1s) ]
+[ 5]--------------------------------------------------------------------------
+Simple passing test
+                                                             [ PASS (  0.1s) ]
+
+=================================[ SUMMARY ]==================================
+
+Target ID : 221221_161031 (QP-Ver=720)
+Log file  : ./qutest221221_161550.txt
+Groups    : 1
+Tests     : 5
+Skipped   : 0
+FAILED    : 2 [ 2 4 ]
+
+==============================[ FAIL (  2.7s) ]===============================
 @endverbatim
 
-runs the test scripts (`*.py`) in the current directory.
 
+@section qutest_qspy_log Generating QSPY Logs
+Additionally, it is also possible to generate logs files from the QSPY output. This feature is enabled by the `-oo` and `-ob` command-line options.
+
+- the option `-oo` saves the QSPY text output generated during the qutest.py run. QSPY saves the output in the directory from which it was launched.
+
+- the option `-ob` saves the QSPY raw binary output received from the test fixture during the qutest.py run. QSPY saves the output in the directory from which it was launched.
+
+@remark
+The various make-files supplied in QP/C and QP/C++ allow you to supply the command-line options for saving QSPY logs (by defining the `OPT=` symbol while invoking `make`), for example:
 @verbatim
-python3 $(QTOOLS)/qutest/qutest.py *.py build/dpp
+[1] make OPT=o
+[2] make OPT=b
+[3] make OPT=ob
 @endverbatim
+`[1]` generates QSPY text output (in the QSPY launch directory)<br>
+`[2]` generates QSPY binary output (in the QSPY launch directory)<br>
+`[3]` generates both QSPY text and binary outputs (in the QSPY launch directory)
 
-runs the test scripts (`*.py`) in the current directory and uses the host executable `build/dpp`.
-
-@verbatim
-python3 $(QTOOLS)/qutest/utest.py *.py "" 192.168.1.100:7705
-@endverbatim
-
-runs the test scripts (`*.py`) in the current directory, without a host executable (`""`), and connects to QSPY at `192.168.1.100:7705`.
-
-@verbatim
-qutest *.py build/dpp 192.168.1.100:7705
-@endverbatim
-
-runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable `build/dpp`, and connects to QSPY at `192.168.1.100:7705`.
-
-@verbatim
-qutest *.py build/dpp localhost:7701 6605
-@endverbatim
-
-runs "qutest" (**installed with pip**) to execute the test scripts (`*.py`) in the current directory, uses the host executable `build/dpp`, and connects to QSPY at `localhost:7701`, using the local UDP port `6605`.
-
-
-@nav{qspy_matlab,qutest_tut}
+@nav{qutest,qutest_conc}
 */
 
 /*###########################################################################*/
 /*! @page qutest_conc QUTest Concepts
-@nav{qutest_dpp,qutest_fixture}
+@nav{qutest_use,qutest_tut}
 
 @section qutest_rtc Run-to-Completion Processing
 The central concept applied in QUTest is **Run-to-Completion (RTC)** processing, both in the @ref qutest_fixture "test fixture" (Target) and in the @ref qutest_script "test script" (Host). RTC processing means that the code progresses in discrete, uninterruptible steps and that new inputs (commands) are recognized only *after* the current RTC step completes.
@@ -488,5 +607,5 @@ Complex @ref qutest_script "test script" commands might produce some output from
 `[9]` The @ref qutest_script "test script" must consume the "Trg-Done <COMPLEX-COMMAND>" record by an explicit expect() command.
   </dd>
 
-@nav{qutest_dpp,qutest_fixture}
+@nav{qutest_use,qutest_tut}
 */

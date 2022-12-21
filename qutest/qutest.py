@@ -23,13 +23,14 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-07
-# @version Last updated for version: 7.1.4
+# @date Last updated on: 2022-12-21
+# @version Last updated for version: 7.2.0
 #
 # @file
 # @brief QUTest Python scripting support (implementation)
 # @ingroup qutest
 
+import argparse
 import socket
 import struct
 import time
@@ -44,6 +45,7 @@ else:
 from fnmatch import fnmatchcase
 from glob import glob
 from platform import python_version
+from datetime import datetime
 from subprocess import Popen
 from inspect import getframeinfo, stack
 
@@ -52,20 +54,27 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 714
+    VERSION = 720
 
     # class variables
-    _host_exe = ""
-    _is_debug = False
-    _exit_on_fail = False
     _have_target = False
     _have_info   = False
+    _have_assert = False
     _need_reset  = True
-    _last_record = ""
+    _is_debug    = False
+    _last_record = ''
     _num_groups  = 0
     _num_tests   = 0
     _num_failed  = 0
     _num_skipped = 0
+    _str_failed  = ''
+    _str_skipped = ''
+    _host_exe    = None
+    _log_file    = None
+    _exit_on_fail = False
+    _clear_qspy   = False
+    _save_qspy_txt = False
+    _save_qspy_bin = False
 
     # states of the internal QUTest state machine
     _INIT = 0
@@ -77,27 +86,33 @@ class QUTest:
     _TOUT = 1.000
 
     # options for implemented commands
-    _OPT_NORESET = 0x01
+    _OPT_NORESET  = 0x01  # for test() command (NORESET tests)
+    _OPT_SCREEN   = 0x01  # for note() command (SCREEN destination)
+    _OPT_TRACE    = 0x02  # for note() command (TRACE  destination)
 
-    # output strings with decorations (colors/backgrounds)
-    _STR_TEST_PASS  = "\x1b[32mPASS\x1b[0m" # GREEN on DEFAULT
-    _STR_TEST_FAIL  = "\x1b[31;1mFAIL\x1b[0m" # B-RED on DEFAULT
-    _STR_ERR1       = "\x1b[41m\x1b[37m" # WHITE on RED
-    _STR_ERR2       = "\x1b[0m"    # expectation end DEFAULT
-    _STR_EXP1       = "\x1b[44m\x1b[37m" # WHITE on BLUE
-    _STR_EXP2       = "\x1b[0m"    # expectation end DEFAULT
-    _STR_EXC1       = "\x1b[31m"   # exception text begin RED
-    _STR_EXC2       = "\x1b[0m"    # exception text end   DEFAULT
-    _STR_GRP1       = "\x1b[32;1m" # test-group text begin B-YELLOW
-    _STR_GRP2       = "\x1b[0m"    # test-group test end   DEFAULT
-    _STR_FINAL_OK   = "\x1b[42m\x1b[30m     OK     \x1b[0m"
-    _STR_FINAL_FAIL = "\x1b[41m\x1b[1;37m    FAIL    \x1b[0m"
-    _STR_QSPY_FAIL  = "\x1b[1;91mFAIL\x1b[0m"
+    # colors/backgrounds for screen output...
+    _COL_PASS1 = "\x1b[32m"           # GREEN on DEFAULT
+    _COL_PASS2 = "\x1b[0m"
+    _COL_FAIL1 = "\x1b[31;1m"         # B-RED on DEFAULT
+    _COL_FAIL2 = "\x1b[0m"
+    _COL_ERR1  = "\x1b[41m\x1b[37m"   # WHITE on RED
+    _COL_ERR2  = "\x1b[0m"            # expectation end DEFAULT
+    _COL_EXP1  = "\x1b[44m\x1b[37m"   # WHITE on BLUE
+    _COL_EXP2  = "\x1b[0m"            # expectation end DEFAULT
+    _COL_EXC1  = "\x1b[31m"           # exception text begin RED
+    _COL_EXC2  = "\x1b[0m"            # exception text end   DEFAULT
+    _COL_GRP1  = "\x1b[32;1m"         # test-group text begin B-YELLOW
+    _COL_GRP2  = "\x1b[0m"            # test-group test end   DEFAULT
+    _COL_OK1   = "\x1b[42m\x1b[30m"   # BLACK on GREEN
+    _COL_OK2   = "\x1b[0m"
+    _COL_NOK1  = "\x1b[41m\x1b[32;1m" # B-YELLOW on RED
+    _COL_NOK2  = "\x1b[0m"
 
     def __init__(self):
         QUTest._have_target = False
         QUTest._have_info   = False
         QUTest._need_reset  = True
+        # don't clear 'QUTest._have_assert'
 
         self._state     = QUTest._INIT
         self._timestamp = 0
@@ -113,6 +128,7 @@ class QUTest:
         self._DSL_dict  = {
             "include": self.include,
             "test": self.test,
+            "scenario": self.test, # alias for 'test' for BDD
             "skip": self.skip,
             "expect": self.expect,
             "glb_filter": self.glb_filter,
@@ -122,8 +138,8 @@ class QUTest:
             "query_curr": self.query_curr,
             "tick": self.tick,
             "expect_pause": self.expect_pause,
-            "continue_test": self.continue_test,
             "expect_run": self.expect_run,
+            "continue_test": self.continue_test,
             "ensure": self.ensure,
             "command": self.command,
             "init": self.init,
@@ -134,7 +150,8 @@ class QUTest:
             "peek": self.peek,
             "poke": self.poke,
             "fill": self.fill,
-            "tag": self.tag,
+            "note": self.note,
+            "tag": self.note,  # alias for 'note' for BDD
             "pack": struct.pack,
             "test_file": self.test_file,
             "test_dir": self.test_dir,
@@ -144,6 +161,8 @@ class QUTest:
             "last_rec": self.last_rec,
             "VERSION": QUTest.VERSION,
             "NORESET": QUTest._OPT_NORESET,
+            "SCREEN": QUTest._OPT_SCREEN,
+            "TRACE":  QUTest._OPT_TRACE,
             "OBJ_SM": QSpy._OBJ_SM,
             "OBJ_AO": QSpy._OBJ_AO,
             "OBJ_MP": QSpy._OBJ_MP,
@@ -185,26 +204,38 @@ class QUTest:
     # QUTest Domain Specific Language (DSL) commands
 
     # test DSL command .......................................................
-    def test(self, name, opt = 0):
+    def test(self, title, opt=0):
         # end the previous test
         self._test_end()
 
         # start the new test...
         self._startTime = QUTest._time()
         QUTest._num_tests += 1
-        print("%s: "%(name), end = "")
 
-        # display the test name in QSPY
-        label = ("  Test(R): ", " Test(NR): ")[opt & QUTest._OPT_NORESET != 0]
-        self.tag(
-            "---------- -----------------------------------------------\n"
-            + label + name, 0xFF)
-
-        if self._to_skip > 0:
+        if self._to_skip == 0:
+            marker = "[%2d]%s--------------------------------------"\
+                "-----------------------------------\n%s"%(
+                    QUTest._num_tests,
+                    ('-', "^")[opt & QUTest._OPT_NORESET != 0], # '^' NORESET
+                    title)
+            QUTest._display(marker)
+            QSpy._qspy_show(marker)
+        else:
             self._to_skip -= 1
             QUTest._num_skipped += 1
-            print("SKIPPED")
-            self.tag(" Test-End: SKIPPED", 0xFF)
+            QUTest._str_skipped += " %d"%(QUTest._num_tests)
+
+            marker = "[%2d]%s - - - - - - - - - - - - - - - - - - -"\
+                "- - - - - - - - - - - - - - - - - -\n%s"%(
+                    QUTest._num_tests,
+                    ('-', "^")[opt & QUTest._OPT_NORESET != 0], # '^' NORESET
+                    title)
+            QUTest._display(marker)
+            QSpy._qspy_show(marker)
+            QUTest._display("                                             "
+                "                      [ SKIPPED ]")
+            QSpy._qspy_show("                                             "
+                "                      [ SKIPPED ]")
             self._tran(QUTest._SKIP)
             return
 
@@ -289,6 +320,7 @@ class QUTest:
             else:
                 return filter | mask
 
+        filter = 0
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
@@ -420,7 +452,7 @@ class QUTest:
             # NOTE: positive obj_id argument means 'add' (allow),
             # negative obj_id argument means 'remove' (disallow)
             remove = 0
-            fmt = "<BB" + QSpy.fmt_objPtr
+            fmt = "<BB" + QSpy.trg_objPtr
             if isinstance(obj_id, str):
                 if obj_id == '-': # is it remvoe request?
                     obj_id = obj_id[1:]
@@ -449,7 +481,7 @@ class QUTest:
         elif self._state == QUTest._INIT:
             self._before_test("current_obj")
         elif self._state == QUTest._TEST:
-            fmt = "<BB" + QSpy.fmt_objPtr
+            fmt = "<BB" + QSpy.trg_objPtr
             # Build packet according to obj_id type
             if isinstance(obj_id, int):
                 QSpy._sendTo(struct.pack(
@@ -603,7 +635,7 @@ class QUTest:
         elif self._state == QUTest._INIT:
             self._before_test("probe")
         elif self._state == QUTest._TEST:
-            fmt = "<BI" + QSpy.fmt_funPtr
+            fmt = "<BI" + QSpy.trg_funPtr
             if isinstance(func, int):
                 # Send directly to target
                 QSpy._sendTo(struct.pack(
@@ -721,9 +753,14 @@ class QUTest:
     def last_rec(self):
         return QUTest._last_record
 
-    # tag DSL command ........................................................
-    def tag(self, message, kind = 0):
-        QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_DISP_TAG, kind), message)
+    # note DSL command .....................................................
+    def note(self, msg, dest=0x3):
+        if self._to_skip > 0:
+            return
+        if not (dest & QUTest._OPT_SCREEN) == 0:
+            QUTest._display(msg)
+        if not (dest & QUTest._OPT_TRACE) == 0:
+            QSpy._qspy_show(msg, kind=0x0)
 
     # dummy callbacks --------------------------------------------------------
     def _dummy_on_reset(self):
@@ -742,31 +779,47 @@ class QUTest:
     # helper methods ---------------------------------------------------------
     @staticmethod
     def _run_script(fname):
-        print("--------------------------------------------------")
-        print(QUTest._STR_GRP1 + "Group: " + fname + QUTest._STR_GRP2)
         QUTest._num_groups += 1
 
         err = 0 # assume no errors
         with open(fname) as f:
             QUTest_inst = QUTest()
-            QUTest_inst.tag(
-                "========== ===============================================\n"
-                "    Group: " + fname, 0xFF)
             QUTest_inst._test_file = fname
             QUTest_inst._test_dir = os.path.dirname(fname)
+
+            QUTest._display("\n==================================="
+                "[group]====================================")
+            QUTest._display(fname, QUTest._COL_GRP1, QUTest._COL_GRP2)
+            QSpy._qspy_show("\n==================================="
+                "[group]====================================\n%s"%(fname))
+
             if not QUTest_inst._test_dir: # empty dir?
                 QUTest_inst._test_dir = "."
             try:
                 code = compile(f.read(), fname, "exec")
+
+                # the last test ended with assertion?
+                if QUTest._have_assert:
+                    QUTest._have_assert = False
+                    if not QUTest._host_exe:
+                        # ignore all input until timeout
+                        while QSpy._receive():
+                            pass
+
                 # execute the script code in a separate instance of QUTest
                 exec(code, QUTest_inst._DSL_dict)
+
+            except ExitOnFailException:
+                err = QUTest._num_failed
+
             except (AssertionError,
                     RuntimeError,
                     OSError) as e:
                 QUTest_inst._fail()
-                #print(QUTest._STR_EXC1 + repr(e) + QUTest._STR_EXC2)
+                #print(QUTest._COL_EXC1 + repr(e) + QUTest._COL_EXC2)
                 traceback.print_exc()
                 err = -2
+
             except: # most likely an error in a test script
                 QUTest_inst._fail()
                 QUTest._quit_host_exe()
@@ -790,6 +843,15 @@ class QUTest:
         if not QUTest._have_info:
             return
 
+        elapsed = QUTest._time() - self._startTime
+        if QUTest._have_assert:
+            QUTest._display("                                                "
+                "             [ PASS (%5.1fs) ]"%(elapsed),
+                            QUTest._COL_PASS1, QUTest._COL_PASS2)
+            QSpy._qspy_show("[%2d]-------------------------------------------"
+               "--------------[ PASS (%5.1fs) ]"%(QUTest._num_tests, elapsed))
+            return
+
         QSpy._sendTo(struct.pack("<B", QSpy._TRGT_TEST_TEARDOWN))
         if not QSpy._receive(): # timeout?
             self._fail('got: "" (timeout)',
@@ -798,12 +860,14 @@ class QUTest:
 
         exp = "           Trg-Ack  QS_RX_TEST_TEARDOWN"
         if QUTest._last_record == exp:
-            self._DSL_dict["on_teardown"]()
-            print("%s (%.3fs)"%(
-                  QUTest._STR_TEST_PASS,
-                  QUTest._time() - self._startTime))
-            # display the test success in QSPY
-            self.tag(" Test-End: PASS", 0xFF)
+
+            self._DSL_dict["on_teardown"]() # on_teardown() callback
+
+            QUTest._display("                                                "
+                "             [ PASS (%5.1fs) ]"%(elapsed),
+                            QUTest._COL_PASS1, QUTest._COL_PASS2)
+            QSpy._qspy_show("[%2d]-------------------------------------------"
+               "--------------[ PASS (%5.1fs) ]"%(QUTest._num_tests, elapsed))
             return
         else:
             self._fail('got: "%s"'%(QUTest._last_record),
@@ -813,19 +877,20 @@ class QUTest:
                 pass
 
     def _reset_target(self):
-        if QUTest._host_exe != "": # running a host executable?
-            QUTest._quit_host_exe()
+        if QUTest._host_exe:
+            if not QUTest._have_assert:
+                #print("quitting exe")
+                QUTest._quit_host_exe()
 
             # lauch a new instance of the host executable
             QUTest._have_target = True
             QUTest._have_info = False
-            Popen([QUTest._host_exe,
-                   QSpy._host_addr[0] + ":" + str(QSpy._tcp_port)])
+            Popen(QUTest._host_exe)
 
-        else: # running an embedded target
+        else: # running remote target
             QUTest._have_target = True
             QUTest._have_info = False
-            if not QUTest._is_debug:
+            if not (QUTest._is_debug or QUTest._have_assert):
                 QSpy._sendTo(struct.pack("<B", QSpy._TRGT_RESET))
 
         # ignore all input until have-target-info or timeout
@@ -834,7 +899,8 @@ class QUTest:
                 break
 
         if QUTest._have_info:
-            QUTest._need_reset = False;
+            QUTest._have_assert = False;
+            QUTest._need_reset  = False;
         else:
             QUTest._quit_host_exe()
             raise RuntimeError("Target reset failed")
@@ -863,43 +929,47 @@ class QUTest:
         raise SyntaxError(msg)
 
     def _fail(self, err = "", exp = ""):
-        print("%s (%.3fs):"%(
-            QUTest._STR_TEST_FAIL,
-            QUTest._time() - self._startTime))
         stk = stack()
         max = len(stk) - 3
         lvl = 2
         while lvl < max:
             fun = getframeinfo(stk[lvl][0]).function
             if fun == "<module>":
-                print("  @%s:%d"%(
+                QUTest._display("  @%s:%d"%(
                       getframeinfo(stk[lvl][0]).filename,
                       getframeinfo(stk[lvl][0]).lineno))
             else:
-                print("  @%s/%s:%d"%(
+                QUTest._display("  @%s/%s:%d"%(
                       getframeinfo(stk[lvl][0]).filename,
                       getframeinfo(stk[lvl][0]).function,
                       getframeinfo(stk[lvl][0]).lineno))
             lvl += 1
         if exp != "":
-            print(QUTest._STR_EXP1 + exp + QUTest._STR_EXP2)
+            QUTest._display(exp, QUTest._COL_EXP1, QUTest._COL_EXP2)
         if err == "ensure":
             if 2 < max:
                 err = ''.join(getframeinfo(stk[2][0]).code_context).strip()
-            print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
+            QUTest._display(err, QUTest._COL_ERR1, QUTest._COL_ERR2)
         elif err != "":
-            print(QUTest._STR_ERR1 + err + QUTest._STR_ERR2)
+            QUTest._display(err, QUTest._COL_ERR1, QUTest._COL_ERR2)
 
-        # display the test failure in QSPY
-        self.tag(" Test-End: FAIL", 0xFE)
-
+        elapsed = QUTest._time() - self._startTime
+        QUTest._display("! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! "
+            "! ! ! ! ! ! ! ! ![ FAIL (%5.1fs) ]"%(elapsed),
+            QUTest._COL_FAIL1, QUTest._COL_FAIL2)
+        QSpy._qspy_show("[%2d]! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! "
+            "! ! ! ! ! ! ! ! ![ FAIL (%5.1fs) ]"%(
+                QUTest._num_tests, elapsed))
         QUTest._num_failed += 1
+        QUTest._str_failed += " %d"%(QUTest._num_tests)
         QUTest._need_reset = True
         self._tran(QUTest._FAIL)
+        if QUTest._exit_on_fail:
+            raise ExitOnFailException
 
     @staticmethod
     def _quit_host_exe():
-        if QUTest._host_exe != "" and QUTest._have_target:
+        if QUTest._host_exe and QUTest._have_target:
             QUTest._have_target = False
             QSpy._sendTo(struct.pack("<B", QSpy._TRGT_RESET))
             time.sleep(QUTest._TOUT) # wait until host-exe quits
@@ -911,6 +981,24 @@ class QUTest:
         else: # Python 3+
             return time.perf_counter()
 
+    @staticmethod
+    def _display(msg, c1='', c2='', eol=True):
+        if QUTest._log_file:
+            QUTest._log_file.write(msg)
+            if eol:
+                QUTest._log_file.write('\n')
+        if not c1 == '':
+            msg = c1 + msg
+        if not c2 == '':
+            msg = msg + c2
+        if eol:
+            print(msg)
+        else:
+            print(msg, end='')
+
+class ExitOnFailException(Exception):
+    pass
+
 #=============================================================================
 # Helper class for communication with the QSpy front-end
 #
@@ -919,21 +1007,21 @@ class QSpy:
     _sock = None
     _is_attached = False
     _tx_seq = 0
-    _host_addr = ["localhost", 7701] # list, to be converted to a tuple
+    _host_udp = ["localhost", 7701] # list, to be converted to a tuple
     _local_port = 0 # let the OS decide the best local port
-    _tcp_port = 6601
 
     # formats of various packet elements from the Target
-    fmt_objPtr   = "L"
-    fmt_funPtr   = "L"
-    fmt_tstamp   = "L"
-    fmt_sig      = "H"
-    fmt_evtSize  = "H"
-    fmt_queueCtr = "B"
-    fmt_poolCtr  = "H"
-    fmt_poolBlk  = "H"
-    fmt_tevtCtr  = "H"
-    fmt_targetTstamp = "UNKNOWN"
+    trg_QPver    = 0
+    trg_objPtr   = "L"
+    trg_funPtr   = "L"
+    trg_tsize    = "L"
+    trg_sig      = "H"
+    trg_evtSize  = "H"
+    trg_queueCtr = "B"
+    trg_poolCtr  = "H"
+    trg_poolBlk  = "H"
+    trg_tevtCtr  = "H"
+    trg_tstamp   = "UNKNOWN"
 
     # packets from QSPY...
     _PKT_TEXT_ECHO   = 0
@@ -969,7 +1057,8 @@ class QSpy:
     _QSPY_BIN_OUT         = 132
     _QSPY_MATLAB_OUT      = 133
     _QSPY_SEQUENCE_OUT    = 134
-    _QSPY_DISP_TAG        = 140
+    _QSPY_CLEAR_SCREEN    = 140
+    _QSPY_SHOW_NOTE       = 141
 
     # packets to QSpy to be "massaged" and forwarded to the Target...
     _QSPY_SEND_EVENT      = 135
@@ -1175,7 +1264,7 @@ class QSpy:
     def _attach(channels = 0x2):
         # channels: 1-binary, 2-text, 3-both
         print("Attaching to QSpy (%s:%d) ... "%(
-              QSpy._host_addr[0], QSpy._host_addr[1]), end = "")
+              QSpy._host_udp[0], QSpy._host_udp[1]), end='')
         QSpy._is_attached = False
         QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_ATTACH, channels))
         try:
@@ -1184,10 +1273,10 @@ class QSpy:
             pass
 
         if QSpy._is_attached:
-            print("OK")
+            print("OK\n")
             return True
         else:
-            print(QUTest._STR_QSPY_FAIL)
+            print("FAILED\n")
             return False
 
     @staticmethod
@@ -1201,7 +1290,6 @@ class QSpy:
         QSpy._sock = None
 
     ## returns True if packet received, False if timed out
-    #
     @staticmethod
     def _receive():
         if not QUTest._is_debug:
@@ -1242,28 +1330,34 @@ class QSpy:
             QUTest._last_record = packet[3:].decode("utf-8")
             # QS_ASSERTION?
             if dlen > 3 and packet[2] == QSpy._PKT_ASSERTION:
-                QUTest._need_reset = True
+                QUTest._have_assert = True
+                QUTest._have_target = False
+                QUTest._need_reset  = True
+                if QSpy.trg_QPver < 720: # before QP 7.2.0?
+                    QSpy._sendTo(struct.pack("<B", QSpy._TRGT_RESET))
 
         elif recID == QSpy._PKT_TARGET_INFO: # target info?
             QUTest._last_record = ""
             if dlen != 18:
                 raise RuntimeError("Incorrect Target info")
 
+            QSpy.trg_QPver = packet[3] + (packet[4] << 8)
+
             fmt = "xBHxLxxxQ"
-            tstamp = packet[5:18]
-            QSpy.fmt_objPtr  = fmt[tstamp[3] & 0x0F]
-            QSpy.fmt_funPtr  = fmt[tstamp[3] >> 4]
-            QSpy.fmt_tstamp  = fmt[tstamp[4] & 0x0F]
-            QSpy.fmt_sig     = fmt[tstamp[0] & 0x0F]
-            QSpy.fmt_evtSize = fmt[tstamp[0] >> 4]
-            QSpy.fmt_queueCtr= fmt[tstamp[1] & 0x0F]
-            QSpy.fmt_poolCtr = fmt[tstamp[2] >> 4]
-            QSpy.fmt_poolBlk = fmt[tstamp[2] & 0x0F]
-            QSpy.fmt_tevtCtr = fmt[tstamp[1] >> 4]
-            QSpy.fmt_targetTstamp = "%02d%02d%02d_%02d%02d%02d"%(
-                   tstamp[12], tstamp[11], tstamp[10],
-                   tstamp[9], tstamp[8], tstamp[7])
-            #print("Target:", QSpy.fmt_targetTstamp)
+            trg_info = packet[5:18]
+            QSpy.trg_objPtr  = fmt[trg_info[3] & 0x0F]
+            QSpy.trg_funPtr  = fmt[trg_info[3] >> 4]
+            QSpy.trg_tsize   = fmt[trg_info[4] & 0x0F]
+            QSpy.trg_sig     = fmt[trg_info[0] & 0x0F]
+            QSpy.trg_evtSize = fmt[trg_info[0] >> 4]
+            QSpy.trg_queueCtr= fmt[trg_info[1] & 0x0F]
+            QSpy.trg_poolCtr = fmt[trg_info[2] >> 4]
+            QSpy.trg_poolBlk = fmt[trg_info[2] & 0x0F]
+            QSpy.trg_tevtCtr = fmt[trg_info[1] >> 4]
+            QSpy.trg_tstamp = "%02d%02d%02d_%02d%02d%02d"%(
+                   trg_info[12], trg_info[11], trg_info[10],
+                   trg_info[9], trg_info[8], trg_info[7])
+            #print("Target:", QSpy.trg_tstamp)
             QUTest._have_info = True
 
         elif recID == QSpy._PKT_ATTACH_CONF:
@@ -1289,13 +1383,13 @@ class QSpy:
         if str is not None:
             tx_packet.extend(bytes(str, "utf-8"))
             tx_packet.extend(b"\0") # zero-terminate
-        QSpy._sock.sendto(tx_packet, QSpy._host_addr)
+        QSpy._sock.sendto(tx_packet, QSpy._host_udp)
         QSpy._tx_seq = (QSpy._tx_seq + 1) & 0xFF
         #print("sendTo", QSpy._tx_seq)
 
     @staticmethod
     def _sendEvt(ao_prio, signal, parameters = None):
-        fmt = "<BB" + QSpy.fmt_sig + "H"
+        fmt = "<BB" + QSpy.trg_sig + "H"
         if parameters is not None:
             length = len(parameters)
         else:
@@ -1314,80 +1408,163 @@ class QSpy:
                 packet.extend(parameters)
             QSpy._sendTo(packet, signal)
 
+    @staticmethod
+    def _qspy_show(note, kind=0xFF):
+        QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_SHOW_NOTE, kind), note)
 
 #=============================================================================
 # main entry point to QUTest
-def main(*args):
-    # process command-line arguments...
-    argv = sys.argv
-    argc = len(argv)
-    arg  = 1 # skip the "qutest" argument
-
-    if "-h" in argv or "--help" in argv or "?" in argv:
-        print("\nusage: python qutest.py [-x] [test-scripts] "
-              "[host_exe] [qspy_host[:udp_port]] [qspy_tcp_port]\n\n"
-              "help at: https://www.state-machine.com/qtools/qutest.html")
-        return sys.exit(0)
-
-    print("QUTest unit testing front-end %d.%d.%d running on Python %s"%(
-            QUTest.VERSION//100,
-            (QUTest.VERSION//10) % 10,
-             QUTest.VERSION % 10, python_version()))
-    print("Copyright (c) 2005-2022 Quantum Leaps, www.state-machine.com")
-
-    if "--version" in argv:
-        return sys.exit(0)
-
+def main():
     startTime = QUTest._time()
+    tstamp = datetime.now().strftime("%y%m%d_%H%M%S")
 
     # on Windows enable color escape characters in the console...
     if os.name == "nt":
         os.system("color")
 
-    # list of scripts to exectute...
+    # parse command-line arguments...
+    parser = argparse.ArgumentParser(
+        prog="python qutest.py",
+        description="QUTest test script runner",
+        epilog="More info: https://www.state-machine.com/qtools/qutest.html")
+    parser.add_argument('-v', '--version',
+        action='version',
+        version="QUTest script runner %d.%d.%d on Python %s"%(
+                    QUTest.VERSION//100, (QUTest.VERSION//10) % 10,
+                    QUTest.VERSION % 10,
+            python_version()),
+        help='Display QUTest version')
+
+    parser.add_argument('-e', '--exe', nargs='?', default='', const='',
+        help="Optional host executable or debug/DEBUG")
+    parser.add_argument('-q', '--qspy', nargs='?', default='', const='',
+        help="optional qspy host, [:ud_port][:tcp_port]")
+    parser.add_argument('-l', '--log', nargs='?', default='', const='',
+        help="Optional log directory (might not exist yet)")
+    parser.add_argument('-o', '--opt', nargs='?', default='', const='',
+        help="xcob: x:exit-on-fail, "
+             "c:qspy-clear, o:qspy-save-txt, b:qspy-save-bin")
+    parser.add_argument('scripts', nargs='*',
+                        help="List (comma-separated) of test scripts to run")
+    args = parser.parse_args()
+    #print(args)
+
+    print("\nQUTest unit testing front-end %d.%d.%d running on Python %s"%(
+            QUTest.VERSION//100,
+            (QUTest.VERSION//10) % 10,
+             QUTest.VERSION % 10, python_version()))
+    print("Copyright (c) 2005-2022 Quantum Leaps, www.state-machine.com")
+
+    # process command-line argumens...
+    if not args.scripts: # scripts not provided?
+        #print("applying default *.py")
+        args.scripts = ['*.py'] # apply the default "*.py"
     scripts = []
+    for s in args.scripts:
+        if s.endswith('.exe'):
+            print("\nIncorrect test script(s). Old QUTEST command-line?\n")
+            parser.print_help()
+            return sys.exit(-1)
+        scripts.extend(glob(s))
+    if not scripts: # still no scripts?
+        print("\nFound no test scripts to run")
+        return sys.exit(0)
 
-    if arg < argc and argv[arg] == "-x":
-        QUTest._exit_on_fail = True
-        arg += 1
-
-    # scan argv for test scripts...
-    while arg < argc:
-        # if test file input uses wildcard, find matches
-        if argv[arg].endswith(".py"):
-            scripts.extend(glob(argv[arg]))
-            arg += 1
-        else:
-            break
-    if not scripts: # no specfic scripts found?
-        scripts.extend(glob("*.py")) # take all scripts in the current dir
-
-    if arg < argc:
-        QUTest._host_exe = argv[arg]
-        arg += 1
-        if QUTest._host_exe == "DEBUG":
-            QUTest._host_exe = ""
+    if args.exe != '':
+        if args.exe == 'debug' or args.exe == 'DEBUG':
             QUTest._is_debug = True
-    if arg < argc:
-        host_port = argv[arg].split(":")
-        arg += 1
-        if len(host_port) > 0:
-            QSpy._host_addr[0] = host_port[0]
-        if len(host_port) > 1:
-            QSpy._host_addr[1] = int(host_port[1])
-    if arg < argc:
-        QSpy._tcp_port = argv[arg]
+        else:
+            host_exe = glob(args.exe)
+            if host_exe:
+                QUTest._host_exe = [host_exe[0], "localhost:6601"]
+            else:
+                print("\nProvided test executable '%s' does not exist\n"%(
+                      args.exe))
+                return sys.exit(-1)
 
-    QSpy._host_addr = tuple(QSpy._host_addr) # convert to immutable tuple
+    if args.qspy != '':
+        qspy_conf = args.qspy.split(":")
+        if len(qspy_conf) > 0 and not qspy_conf[0] == '':
+            QSpy._host_udp[0] = qspy_conf[0]
+        if len(qspy_conf) > 1 and not qspy_conf[1] == '':
+            QSpy._host_udp[1] = int(qspy_conf[1])
+        if len(qspy_conf) > 2 and not qspy_conf[2] == '':
+            if QUTest._host_exe:
+                QUTest._host_exe[1] = (QSpy._host_udp[0] + ":" + qspy_conf[2])
+            else:
+                print("\nTCP port specified without host executable\n")
+                return sys.exit(-1)
+
+    log = args.log
+    if log != '':
+        if not (log.endswith('/') or log.endswith('\\')):
+            log += '/'
+        try:
+            os.makedirs(os.path.dirname(log), exist_ok=True)
+        except:
+            pass
+        if os.path.isdir(log): # is arg.log a directory
+            log += "qutest" + tstamp + ".txt"
+        else: # not a directory
+            log = ''
+            print("\nWrong directory for log output\n")
+            return sys.exit(-1)
+
+    # convert to immutable tuples
+    QSpy._host_udp = tuple(QSpy._host_udp)
+    if QUTest._host_exe:
+        QUTest._host_exe = tuple(QUTest._host_exe)
+
+    QUTest._exit_on_fail  = 'x' in args.opt
+    QUTest._clear_qspy    = 'c' in args.opt
+    QUTest._save_qspy_txt = 'o' in args.opt
+    QUTest._save_qspy_bin = 'b' in args.opt
+
+    #print("scripts:", scripts)
+    #print("host_exe:", QUTest._host_exe)
+    #print("debug:", QUTest._is_debug)
+    #print("_log_file:", log)
+    #print("host_udp:", QSpy._host_udp)
+    #print("opt: x", QUTest._exit_on_fail)
+    #print("opt: c", QUTest._clear_qspy)
+    #print("opt: o", QUTest._save_qspy_txt)
+    #print("opt: o", QUTest._save_qspy_bin)
+    #return 0
 
     # init QSpy socket
     err = QSpy._init()
     if err:
         return sys.exit(err)
 
-    # attach the the QSPY Back-End
+    # attach the the QSPY Back-End...
     if not QSpy._attach():
         return sys.exit(-1)
+
+    if QUTest._clear_qspy:
+        QSpy._sendTo(struct.pack("<B", QSpy._QSPY_CLEAR_SCREEN))
+
+    # open the log file only after potential initialization errors
+    if log != '': # log file provided?
+        try:
+            QUTest._log_file = open(log, 'w')
+        except:
+            print("Requested log file cannot be opened")
+            return sys.exit(-1)
+
+    if QUTest._save_qspy_txt:
+         QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_TEXT_OUT, 1))
+    if QUTest._save_qspy_bin:
+         QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_BIN_OUT, 1))
+
+    msg = "Run ID    : %s"%(tstamp)
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+    if QUTest._host_exe:
+        msg = "Target    : %s"%(QUTest._host_exe[0])
+    else:
+       msg = "Target    : remote"
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
 
     # run all the test scripts...
     err = 0
@@ -1396,28 +1573,75 @@ def main(*args):
         err = QUTest._run_script(scr)
 
         # error encountered and shall we quit on failure?
-        if err != 0 and QUTest._exit_on_fail:
+        if err != 0:
             break
 
-    if QUTest._num_failed == 0:
-        # print "OK" in GREEN
-        status = QUTest._STR_FINAL_OK
-    else:
-        # print "FAIL!" in RED
-        status = QUTest._STR_FINAL_FAIL
+    # print the SUMMARY of the run...
+    elapsed = QUTest._time() - startTime
+    msg = "\n=================================[ SUMMARY ]"\
+          "==================================\n"
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
 
     if QUTest._have_info:
-        print("============= Target:",
-               QSpy.fmt_targetTstamp, "==============")
+        msg = "Target ID : %s (QP-Ver=%3d)"%(QSpy.trg_tstamp, QSpy.trg_QPver)
     else:
-        print("================= (no target ) ===================")
+        msg = "Target ID : N/A"
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
 
-    print("%d Groups, %d Tests, %d Failures, %d Skipped (%.3fs)\n"
-          "%s"%(
-            QUTest._num_groups, QUTest._num_tests,
-            QUTest._num_failed, QUTest._num_skipped,
-            (QUTest._time() - startTime),
-            status))
+    if QUTest._log_file:
+        msg = "Log file  : %s"%(log)
+    else:
+        msg = "Log file  :"
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+
+    msg = "Groups    : %d"%(QUTest._num_groups)
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+
+    msg = "Tests     : %d"%(QUTest._num_tests)
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+
+    if QUTest._num_skipped == 0:
+        msg = "Skipped   : 0"
+    else:
+        msg = "Skipped   : %d [%s ]"%(QUTest._num_skipped,QUTest._str_skipped)
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+
+    if QUTest._num_failed == 0:
+        msg = "Failed    : 0"
+    else:
+        msg = "FAILED    : %d [%s ]"%(QUTest._num_failed, QUTest._str_failed)
+    QUTest._display(msg)
+    QSpy._qspy_show(msg)
+
+    if QUTest._num_failed == 0:
+        msg = "\n==============================[  OK  (%5.1fs) ]"\
+                "==============================="%(elapsed)
+        QUTest._display(msg, QUTest._COL_OK1, QUTest._COL_OK2)
+        QSpy._qspy_show(msg)
+    else:
+        msg = "\n==============================[ FAIL (%5.1fs) ]"\
+                "==============================="%(elapsed)
+        QUTest._display(msg, QUTest._COL_NOK1, QUTest._COL_NOK2)
+        QSpy._qspy_show(msg)
+
+    if err != 0 and QUTest._exit_on_fail:
+        msg = "Exiting after first failure (-x)"
+        QUTest._display(msg);
+        QSpy._qspy_show(msg)
+
+    if QUTest._log_file:
+        QUTest._log_file.close()
+
+    if QUTest._save_qspy_txt:
+         QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_TEXT_OUT, 0))
+    if QUTest._save_qspy_bin:
+         QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_BIN_OUT, 0))
 
     QUTest._quit_host_exe()
     QSpy._detach()
