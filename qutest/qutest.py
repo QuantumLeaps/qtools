@@ -23,7 +23,7 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-21
+# @date Last updated on: 2022-12-23
 # @version Last updated for version: 7.2.0
 #
 # @file
@@ -781,21 +781,22 @@ class QUTest:
     def _run_script(fname):
         QUTest._num_groups += 1
 
-        err = 0 # assume no errors
         with open(fname) as f:
             QUTest_inst = QUTest()
             QUTest_inst._test_file = fname
             QUTest_inst._test_dir = os.path.dirname(fname)
 
-            QUTest._display("\n==================================="
-                "[group]====================================")
+            QUTest._display("\n==================================[Group %2d]"
+                "=================================="%(QUTest._num_groups))
             QUTest._display(fname, QUTest._COL_GRP1, QUTest._COL_GRP2)
-            QSpy._qspy_show("\n==================================="
-                "[group]====================================\n%s"%(fname))
+            QSpy._qspy_show("\n==================================[Group %2d]"
+                "==================================\n%s"%(
+                QUTest._num_groups, fname))
 
             if not QUTest_inst._test_dir: # empty dir?
                 QUTest_inst._test_dir = "."
             try:
+                QUTest_inst._startTime = QUTest._time()
                 code = compile(f.read(), fname, "exec")
 
                 # the last test ended with assertion?
@@ -810,27 +811,23 @@ class QUTest:
                 exec(code, QUTest_inst._DSL_dict)
 
             except ExitOnFailException:
-                err = QUTest._num_failed
+                # QUTest_inst._fail() already done
+                pass
 
-            except (AssertionError,
-                    RuntimeError,
-                    OSError) as e:
+            except SyntaxError:
+                QUTest._display(traceback.format_exc(limit=0),
+                    QUTest._COL_ERR1, QUTest._COL_ERR2)
+                QSpy._qspy_show(traceback.format_exc(limit=0))
+                QUTest._num_failed += 1
+                QUTest._str_failed += " G%d"%(QUTest._num_groups)
+ 
+            except Exception as e:
+                QUTest._display(traceback.format_exc(),
+                    QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QUTest_inst._fail()
-                #print(QUTest._COL_EXC1 + repr(e) + QUTest._COL_EXC2)
-                traceback.print_exc()
-                err = -2
-
-            except: # most likely an error in a test script
-                QUTest_inst._fail()
-                QUTest._quit_host_exe()
-                traceback.print_exc()
-                err = -3
-
+            # properly end the last test in the group
             QUTest_inst._test_end()
             QUTest._quit_host_exe()
-            err = QUTest._num_failed
-
-        return err;
 
     def _tran(self, state):
         #print("tran(%d->%d)"%(self._state, state))
@@ -997,6 +994,7 @@ class QUTest:
             print(msg, end='')
 
 class ExitOnFailException(Exception):
+    # test failed and exit-on-fail (-x) is set
     pass
 
 #=============================================================================
@@ -1567,19 +1565,16 @@ def main():
     QSpy._qspy_show(msg)
 
     # run all the test scripts...
-    err = 0
     for scr in scripts:
-        # run the script...
-        err = QUTest._run_script(scr)
-
-        # error encountered and shall we quit on failure?
-        if err != 0:
+        QUTest._run_script(scr)
+        # errors encountered? and shall we exit on failure?
+        if (QUTest._num_failed != 0) and QUTest._exit_on_fail:
             break
 
     # print the SUMMARY of the run...
     elapsed = QUTest._time() - startTime
-    msg = "\n=================================[ SUMMARY ]"\
-          "==================================\n"
+    msg = "\n==================================[ SUMMARY ]"\
+          "=================================\n"
     QUTest._display(msg)
     QSpy._qspy_show(msg)
 
@@ -1630,11 +1625,12 @@ def main():
         QUTest._display(msg, QUTest._COL_NOK1, QUTest._COL_NOK2)
         QSpy._qspy_show(msg)
 
-    if err != 0 and QUTest._exit_on_fail:
-        msg = "Exiting after first failure (-x)"
-        QUTest._display(msg);
-        QSpy._qspy_show(msg)
+        if QUTest._exit_on_fail:
+            msg = "Exiting after first failure (-x)"
+            QUTest._display(msg);
+            QSpy._qspy_show(msg)
 
+    # cleanup...
     if QUTest._log_file:
         QUTest._log_file.close()
 
@@ -1646,7 +1642,7 @@ def main():
     QUTest._quit_host_exe()
     QSpy._detach()
 
-    return sys.exit(err)
+    return sys.exit(QUTest._num_failed) # report to the caller (e.g., make)
 
 #=============================================================================
 if __name__ == "__main__":
