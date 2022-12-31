@@ -243,9 +243,13 @@ The various make-files supplied in QP/C and QP/C++ allow you to supply the comma
 [2] make LOG=../log
 [3] make LOG=c:/cert/logs
 @endverbatim
-`[1]` generates QUTest log file in the current directory (`.`)<br>
-`[2]` generates QUTest log file in the parent directory, `log` subdirectory (relative)<br>
+`[1]` generates QUTest log file in the current directory (`.`)
+
+`[2]` generates QUTest log file in the `../log` directory (relative to the current directory)
+
 `[3]` generates QUTest log file in the absolute directory `c:/cert/logs`
+
+The following following listing shows the generated log file:
 
 The following screen shot shows the qutest.py screen output in which a log file has been produced (with the `-l.` command-line option):
 
