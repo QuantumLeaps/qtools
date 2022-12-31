@@ -111,7 +111,7 @@ If you are using QUTest&trade; as a standalone Python script, you invoke it as f
 python3 <path-to-qutest-script>/qutest.py <command-line-options>
 @endverbatim
 
-Alternatively, if you've installed QView&trade; with `pip`, you invoke it as follows:
+Alternatively, if you've installed `qutest.py` with `pip`, you invoke it as follows:
 
 @verbatim
 qutest <command-line-options>
@@ -183,10 +183,6 @@ For reliable operation it is recommended to apply the short options *without* a 
 <img style="float:left; clear:left; margin-right:10px" src="img/logo_win48.png">
 @subsection qutest_exa_win Windows Hosts
 <div style="clear:both"></div>
-
-@verbatim
-python3 %QTOOLS%\qutest\qutest.py
-@endverbatim
 
 @verbatim
 [1] python3 %QTOOLS%\qutest\qutest.py
