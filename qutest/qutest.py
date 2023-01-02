@@ -23,7 +23,7 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-23
+# @date Last updated on: 2022-12-31
 # @version Last updated for version: 7.2.0
 #
 # @file
@@ -814,17 +814,23 @@ class QUTest:
                 # QUTest_inst._fail() already done
                 pass
 
+            except RuntimeError as e:
+                QUTest._display(str(e), QUTest._COL_ERR1, QUTest._COL_ERR2)
+                QSpy._qspy_show(str(e))
+                QUTest_inst._fail()
+
             except SyntaxError:
                 QUTest._display(traceback.format_exc(limit=0),
                     QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QSpy._qspy_show(traceback.format_exc(limit=0))
                 QUTest._num_failed += 1
                 QUTest._str_failed += " G%d"%(QUTest._num_groups)
- 
-            except Exception as e:
+
+            except Exception:
                 QUTest._display(traceback.format_exc(),
                     QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QUTest_inst._fail()
+
             # properly end the last test in the group
             QUTest_inst._test_end()
             QUTest._quit_host_exe()
