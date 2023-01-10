@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-07
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2023-01-07
+* @version Last updated for version: 7.2.0
 *
 * @file
 * @brief QSPY host utility: main parser
@@ -2503,7 +2503,7 @@ void Dictionary_put(Dictionary * const me,
 /*..........................................................................*/
 char const *Dictionary_get(Dictionary * const me, KeyType key, char *buf) {
     int idx;
-    if ((key == 0) && (me->keySize >= 4U)) {
+    if ((key == 0U) && (me->keySize >= 4)) {
         return "NULL";
     }
     idx = Dictionary_find(me, key);
