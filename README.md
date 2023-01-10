@@ -1,6 +1,8 @@
 ![QTools Collection](https://www.state-machine.com/img/qtools_banner.jpg)
 
 # What's New?
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qtools)](https://github.com/QuantumLeaps/qtools/releases/latest)
+
 View QTools Revision History at:
 https://www.state-machine.com/qtools/history.html
 

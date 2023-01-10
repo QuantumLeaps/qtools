@@ -539,7 +539,7 @@ The main <span class="img file_py"><b>qview.py</b></span> script calls the on_re
 
 
 @subsection qview_cust_run The on_run() Callback
-The main <span class="img file_py"><b>qview.py</b></span> script calls the on_run() callback function in your customization script when it receives the @ref #QS_QF_RUN trace record from the Target. This record typically marks the end of the Target initialization and, specifically, the completion of the @qs_dict. This gives you an opportunity to set the @ref qs_filters, @ref qs_curr, using their **symbolic names**.
+The main <span class="img file_py"><b>qview.py</b></span> script calls the on_run() callback function in your customization script when it receives the @ref #QS_QF_RUN trace record from the Target. This record typically marks the end of the Target initialization and, specifically, the completion of the @ref qs_dict. This gives you an opportunity to set the @ref qs_filters, @ref qs_curr, using their **symbolic names**.
 
 @note
 The **symbolic names** inside the Target are known to QSPY only *after* the Target produces the @ref qs_dict.

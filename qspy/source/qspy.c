@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-07
-* @version Last updated for version: 7.1.4
+* @date Last updated on: 2023-01-19
+* @version Last updated for version: 7.2.1
 *
 * @file
 * @brief QSPY host utility: main parser
@@ -246,9 +246,9 @@ static char const *  l_qs_rx_rec[] = {
 /* facilities for QSPY host application only (but not for QSPY parser) */
 #ifdef QSPY_APP
 
-#define FPRINF_MATFILE(format_, ...)                  \
-    if (l_matFile != (FILE *)0) {                     \
-        FPRINTF_S(l_matFile, format_, ##__VA_ARGS__); \
+#define FPRINF_MATFILE(format_, ...)                \
+    if (l_matFile != (FILE *)0) {                   \
+        FPRINTF_S(l_matFile, format_, __VA_ARGS__); \
     } else (void)0
 
 #else
@@ -2503,7 +2503,7 @@ void Dictionary_put(Dictionary * const me,
 /*..........................................................................*/
 char const *Dictionary_get(Dictionary * const me, KeyType key, char *buf) {
     int idx;
-    if ((key == 0) && (me->keySize >= 4U)) {
+    if ((key == 0U) && (me->keySize >= 4)) {
         return "NULL";
     }
     idx = Dictionary_find(me, key);

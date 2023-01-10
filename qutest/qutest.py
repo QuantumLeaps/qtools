@@ -23,8 +23,8 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-31
-# @version Last updated for version: 7.2.0
+# @date Last updated on: 2023-01-11
+# @version Last updated for version: 7.2.1
 #
 # @file
 # @brief QUTest Python scripting support (implementation)
@@ -54,7 +54,7 @@ from inspect import getframeinfo, stack
 # https://www.state-machine.com/qtools/qutest_script.html
 #
 class QUTest:
-    VERSION = 720
+    VERSION = 721
 
     # class variables
     _have_target = False
@@ -71,10 +71,12 @@ class QUTest:
     _str_skipped = ''
     _host_exe    = None
     _log_file    = None
-    _exit_on_fail = False
-    _clear_qspy   = False
-    _save_qspy_txt = False
-    _save_qspy_bin = False
+    # command-line options
+    _opt_exit_on_fail  = False
+    _opt_interactive   = False
+    _opt_clear_qspy    = False
+    _opt_save_qspy_txt = False
+    _opt_save_qspy_bin = False
 
     # states of the internal QUTest state machine
     _INIT = 0
@@ -114,12 +116,14 @@ class QUTest:
         QUTest._need_reset  = True
         # don't clear 'QUTest._have_assert'
 
+        # instance variables...
         self._state     = QUTest._INIT
         self._timestamp = 0
         self._startTime = 0
         self._to_skip   = 0
         self._test_file = ""
-        self._test_dir = ""
+        self._test_dir  = ""
+        self._is_inter  = False
 
         # The following _DSL_dict dictionary defines the QUTest testing
         # DSL (Domain Specific Language), which is documented separately
@@ -212,6 +216,10 @@ class QUTest:
         self._startTime = QUTest._time()
         QUTest._num_tests += 1
 
+        if self._is_inter:
+            QUTest._num_skipped += 1
+            QUTest._str_skipped += " %d"%(QUTest._num_tests)
+
         if self._to_skip == 0:
             marker = "[%2d]%s--------------------------------------"\
                 "-----------------------------------\n%s"%(
@@ -257,7 +265,7 @@ class QUTest:
             return
 
     # expect DSL command .....................................................
-    def expect(self, exp):
+    def expect(self, exp, ignore=False):
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
@@ -291,11 +299,21 @@ class QUTest:
             names = names.replace("]", "\3")
 
             if fnmatchcase(names, pattern):
-                return True
+                pass
             else:
                 self._fail('got: "%s"'%(QUTest._last_record),
                            'exp: "%s"'%(exp))
                 return False
+
+            # is interactive?
+            if self._is_inter and ignore:
+                # consume & ignore all output produced
+                while QSpy._receive():
+                    print(QUTest._last_record)
+                    pass
+
+            return True
+
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -506,6 +524,8 @@ class QUTest:
         elif self._state == QUTest._TEST:
             QSpy._sendTo(struct.pack("<BB", QSpy._TRGT_QUERY_CURR, obj_kind))
             # test-specific expect
+            if self._is_inter:
+                self.expect("@timestamp *")
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -566,7 +586,7 @@ class QUTest:
                 QSpy._sendTo(struct.pack(
                     fmt, QSpy._QSPY_SEND_COMMAND, 0, param1, param2, param3),
                     cmdId) # add string command ID to end
-            self.expect("           Trg-Ack  QS_RX_COMMAND")
+            self.expect("           Trg-Ack  QS_RX_COMMAND", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -580,7 +600,7 @@ class QUTest:
             self._before_test("init")
         elif self._state == QUTest._TEST:
             QSpy._sendEvt(QSpy._EVT_INIT, signal, params)
-            self.expect("           Trg-Ack  QS_RX_EVENT")
+            self.expect("           Trg-Ack  QS_RX_EVENT", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -594,7 +614,7 @@ class QUTest:
             self._before_test("dispatch")
         elif self._state == QUTest._TEST:
             QSpy._sendEvt(QSpy._EVT_DISPATCH, signal, params)
-            self.expect("           Trg-Ack  QS_RX_EVENT")
+            self.expect("           Trg-Ack  QS_RX_EVENT", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -608,7 +628,7 @@ class QUTest:
             self._before_test("post")
         elif self._state == QUTest._TEST:
             QSpy._sendEvt(QSpy._EVT_POST, signal, params)
-            self.expect("           Trg-Ack  QS_RX_EVENT")
+            self.expect("           Trg-Ack  QS_RX_EVENT", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -622,7 +642,7 @@ class QUTest:
             self._before_test("publish")
         elif self._state == QUTest._TEST:
             QSpy._sendEvt(QSpy._EVT_PUBLISH, signal, params)
-            self.expect("           Trg-Ack  QS_RX_EVENT")
+            self.expect("           Trg-Ack  QS_RX_EVENT", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -659,7 +679,7 @@ class QUTest:
             self._before_test("tick")
         elif self._state == QUTest._TEST:
             QSpy._sendTo(struct.pack("<BB", QSpy._TRGT_TICK, tick_rate))
-            self.expect("           Trg-Ack  QS_RX_TICK")
+            self.expect("           Trg-Ack  QS_RX_TICK", True)
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -677,6 +697,8 @@ class QUTest:
             QSpy._sendTo(struct.pack("<BHBB", QSpy._TRGT_PEEK,
                 offset, size, num))
             # explicit expectation of peek output
+            if self._is_inter:
+                self.expect("@timestamp *")
         elif self._state == QUTest._FAIL or self._state == QUTest._SKIP:
             pass # ignore
         else:
@@ -831,9 +853,37 @@ class QUTest:
                     QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QUTest_inst._fail()
 
+            if QUTest._opt_interactive:
+                QUTest_inst._interact()
+
             # properly end the last test in the group
             QUTest_inst._test_end()
             QUTest._quit_host_exe()
+
+    def _interact(self):
+        self._is_inter  = True
+        self._test_file = ''
+        self._test_dir  = os.path.dirname('.')
+
+        if self._state == QUTest._TEST:
+            QUTest._num_skipped += 1
+            QUTest._str_skipped += " %d"%(QUTest._num_tests)
+
+        # consume & ignore all output produced so far
+        while QSpy._receive():
+            print(QUTest._last_record)
+            pass
+
+        # enter "interactive mode": commands entered as user input
+        while True:
+            code = input('>>> ')
+            if code:
+                try:
+                    exec(code, self._DSL_dict)
+                except:
+                    traceback.print_exc(2)
+            else:
+                break
 
     def _tran(self, state):
         #print("tran(%d->%d)"%(self._state, state))
@@ -844,6 +894,13 @@ class QUTest:
             return
 
         if not QUTest._have_info:
+            return
+
+        if self._is_inter:
+            QUTest._display("                                             "
+                "                      [ SKIPPED ]")
+            QSpy._qspy_show("                                             "
+                "                      [ SKIPPED ]")
             return
 
         elapsed = QUTest._time() - self._startTime
@@ -956,6 +1013,9 @@ class QUTest:
         elif err != "":
             QUTest._display(err, QUTest._COL_ERR1, QUTest._COL_ERR2)
 
+        if self._is_inter:
+            return
+
         elapsed = QUTest._time() - self._startTime
         QUTest._display("! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! "
             "! ! ! ! ! ! ! ! ![ FAIL (%5.1fs) ]"%(elapsed),
@@ -967,7 +1027,7 @@ class QUTest:
         QUTest._str_failed += " %d"%(QUTest._num_tests)
         QUTest._need_reset = True
         self._tran(QUTest._FAIL)
-        if QUTest._exit_on_fail:
+        if QUTest._opt_exit_on_fail:
             raise ExitOnFailException
 
     @staticmethod
@@ -1446,8 +1506,8 @@ def main():
     parser.add_argument('-l', '--log', nargs='?', default='', const='',
         help="Optional log directory (might not exist yet)")
     parser.add_argument('-o', '--opt', nargs='?', default='', const='',
-        help="xcob: x:exit-on-fail, "
-             "c:qspy-clear, o:qspy-save-txt, b:qspy-save-bin")
+        help="xciob: x:exit-on-fail,i:inter,"
+             "c:qspy-clear,o:qspy-save-txt,b:qspy-save-bin")
     parser.add_argument('scripts', nargs='*',
                         help="List (comma-separated) of test scripts to run")
     args = parser.parse_args()
@@ -1457,23 +1517,9 @@ def main():
             QUTest.VERSION//100,
             (QUTest.VERSION//10) % 10,
              QUTest.VERSION % 10, python_version()))
-    print("Copyright (c) 2005-2022 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
 
     # process command-line argumens...
-    if not args.scripts: # scripts not provided?
-        #print("applying default *.py")
-        args.scripts = ['*.py'] # apply the default "*.py"
-    scripts = []
-    for s in args.scripts:
-        if s.endswith('.exe'):
-            print("\nIncorrect test script(s). Old QUTEST command-line?\n")
-            parser.print_help()
-            return sys.exit(-1)
-        scripts.extend(glob(s))
-    if not scripts: # still no scripts?
-        print("\nFound no test scripts to run")
-        return sys.exit(0)
-
     if args.exe != '':
         if args.exe == 'debug' or args.exe == 'DEBUG':
             QUTest._is_debug = True
@@ -1482,7 +1528,7 @@ def main():
             if host_exe:
                 QUTest._host_exe = [host_exe[0], "localhost:6601"]
             else:
-                print("\nProvided test executable '%s' does not exist\n"%(
+                print("\nProvided test executable '%s' not found\n"%(
                       args.exe))
                 return sys.exit(-1)
 
@@ -1519,20 +1565,37 @@ def main():
     if QUTest._host_exe:
         QUTest._host_exe = tuple(QUTest._host_exe)
 
-    QUTest._exit_on_fail  = 'x' in args.opt
-    QUTest._clear_qspy    = 'c' in args.opt
-    QUTest._save_qspy_txt = 'o' in args.opt
-    QUTest._save_qspy_bin = 'b' in args.opt
+    QUTest._opt_exit_on_fail  = 'x' in args.opt
+    QUTest._opt_interactive   = 'i' in args.opt
+    QUTest._opt_clear_qspy    = 'c' in args.opt
+    QUTest._opt_save_qspy_txt = 'o' in args.opt
+    QUTest._opt_save_qspy_bin = 'b' in args.opt
+
+    if not args.scripts: # scripts not provided?
+        #print("applying default *.py")
+        args.scripts = ['*.py'] # apply the default "*.py"
+    scripts = []
+    for s in args.scripts:
+        if s.endswith('.exe'):
+            print("\nIncorrect test script(s). Old QUTEST command-line?\n")
+            parser.print_help()
+            return sys.exit(-1)
+        scripts.extend(glob(s))
+    # still no scripts?
+    if (not scripts) and (not QUTest._opt_interactive):
+        print("\nFound no test scripts to run")
+        return sys.exit(0)
 
     #print("scripts:", scripts)
     #print("host_exe:", QUTest._host_exe)
     #print("debug:", QUTest._is_debug)
     #print("_log_file:", log)
     #print("host_udp:", QSpy._host_udp)
-    #print("opt: x", QUTest._exit_on_fail)
-    #print("opt: c", QUTest._clear_qspy)
-    #print("opt: o", QUTest._save_qspy_txt)
-    #print("opt: o", QUTest._save_qspy_bin)
+    #print("opt: x", QUTest._opt_exit_on_fail)
+    #print("opt: i", QUTest._opt_interactive)
+    #print("opt: c", QUTest._opt_clear_qspy)
+    #print("opt: o", QUTest._opt_save_qspy_txt)
+    #print("opt: o", QUTest._opt_save_qspy_bin)
     #return 0
 
     # init QSpy socket
@@ -1544,7 +1607,7 @@ def main():
     if not QSpy._attach():
         return sys.exit(-1)
 
-    if QUTest._clear_qspy:
+    if QUTest._opt_clear_qspy:
         QSpy._sendTo(struct.pack("<B", QSpy._QSPY_CLEAR_SCREEN))
 
     # open the log file only after potential initialization errors
@@ -1555,9 +1618,9 @@ def main():
             print("Requested log file cannot be opened")
             return sys.exit(-1)
 
-    if QUTest._save_qspy_txt:
+    if QUTest._opt_save_qspy_txt:
          QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_TEXT_OUT, 1))
-    if QUTest._save_qspy_bin:
+    if QUTest._opt_save_qspy_bin:
          QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_BIN_OUT, 1))
 
     msg = "Run ID    : %s"%(tstamp)
@@ -1571,11 +1634,15 @@ def main():
     QSpy._qspy_show(msg)
 
     # run all the test scripts...
-    for scr in scripts:
-        QUTest._run_script(scr)
-        # errors encountered? and shall we exit on failure?
-        if (QUTest._num_failed != 0) and QUTest._exit_on_fail:
-            break
+    if scripts:
+        for scr in scripts:
+            QUTest._run_script(scr)
+            # errors encountered? and shall we exit on failure?
+            if (QUTest._num_failed != 0) and QUTest._opt_exit_on_fail:
+                break
+    elif QUTest._opt_interactive:
+        QUTest_inst = QUTest()
+        QUTest_inst._interact()
 
     # print the SUMMARY of the run...
     elapsed = QUTest._time() - startTime
@@ -1631,7 +1698,7 @@ def main():
         QUTest._display(msg, QUTest._COL_NOK1, QUTest._COL_NOK2)
         QSpy._qspy_show(msg)
 
-        if QUTest._exit_on_fail:
+        if QUTest._opt_exit_on_fail:
             msg = "Exiting after first failure (-x)"
             QUTest._display(msg);
             QSpy._qspy_show(msg)
@@ -1640,9 +1707,9 @@ def main():
     if QUTest._log_file:
         QUTest._log_file.close()
 
-    if QUTest._save_qspy_txt:
+    if QUTest._opt_save_qspy_txt:
          QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_TEXT_OUT, 0))
-    if QUTest._save_qspy_bin:
+    if QUTest._opt_save_qspy_bin:
          QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_BIN_OUT, 0))
 
     QUTest._quit_host_exe()

@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-13
-* @version Last updated for version: 7.2.0
+* @date Last updated on: 2023-01-11
+* @version Last updated for version: 7.2.1
 *
 * @file
 * @brief QSPY transmit facilities
@@ -253,7 +253,7 @@ void QSPY_sendCmd(QSpyRecord const * const qrec) {
         key = QSPY_findUsr(name);
     }
     else {
-        key = QSPY_findEnum(name, QS_CMD_ENUM);
+        key = QSPY_findEnum(name, QS_CMD);
     }
 
     if (key == KEY_NOT_FOUND) {

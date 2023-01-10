@@ -37,8 +37,8 @@ Several examples of *test scripts* are explained in the @ref qutest_tut "QUTest 
 @remark
 The separation between CUT execution and checking the test results has many benefits. One of the most important ones is that CUT execution (@ref qutest_fixture "test fixture") and checking the results (@ref qutest_script "test script") can be done in *different programming languages*. To this end QUTest&trade; provides support for writing the @ref qutest_script "test scripts in Python".
 <br>
-@image html  img/logo_python3.png
-@image latex img/logo_python3.png width=5.0in
+@image html  logo_python3.png
+@image latex logo_python3.png width=5.0in
 
 
 The general QUTest&trade; structure just described corresponds to running tests on an embedded Target. But QUTest&trade; can also execute tests on the **host computer**. In that case (shown in the figure below), the *@ref qutest_fixture "test fixture"* is a host executable that communicates with the @ref qspy_command "QSPY host application" via a TCP/IP socket. In this case all QUTest&trade; components execute on the host computer.
@@ -142,7 +142,7 @@ options:
   -l [LOG], --log [LOG]
                         Optional log directory (might not exist yet)
   -o [OPT], --opt [OPT]
-                        xcob: x:exit-on-fail, c:qspy-clear, o:qspy-save-txt, b:qspy-save-bin
+                        xciob: x:exit-on-fail,i:inter,c:qspy-clear,o:qspy-save-txt,b:qspy-save-bin
 
 More info: https://www.state-machine.com/qtools/qutest.html
 @endverbatim
@@ -171,12 +171,13 @@ where:<br>
 @param -o[opt]   options for the QUTest script runner to perform the
                  following actions:<br>
                  x : exit on first failed test<br>
+                 i : interactive mode<br>
                  c : clear the QSPY screen just after attaching<br>
                  o : save the QSPY text output to a file (in the QSPY launch directory)<br>
                  b : save the QSPY binary output to a file (in the QSPY launch directory)
 
 @note
-For reliable operation it is recommended to apply the short options *without* a space between the option and the parameter (e.g., `-q192.168.1.100`, `-ocx`).
+For reliable operation it is recommended to apply the short options *without* a space between the option and the parameter (e.g., `-q192.168.1.100`, `-oci`).
 
 
 @section qutest_exa Examples
@@ -193,9 +194,9 @@ For reliable operation it is recommended to apply the short options *without* a 
 [6] python3 %QTOOLS%\qutest\qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPY host utility.
 
-`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPY host utility.
 
 `[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp.exe` (test fixture).
 
@@ -220,9 +221,9 @@ For reliable operation it is recommended to apply the short options *without* a 
 [6] python3 $(QTOOLS)/qutest/qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPY host utility.
 
-`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPY host utility.
 
 `[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp` (test fixture).
 
@@ -231,6 +232,80 @@ For reliable operation it is recommended to apply the short options *without* a 
 `[5]` runs "qutest" (**installed with pip**) to execute the test scripts `test_qk.py,test_mpu.py` in the current directory, and connects to QSPY at UDP-host:port `localhost:7701`.
 
 `[6]` runs "qutest" in the DEBUG mode to execute the test script `test_mpu.py` in the current directory.
+
+
+@section qutest_inter Interactive Mode
+Similar to the Python interpreter itself, the `qutest.py` test runner has two basic modes: script (default) and interactive. In the default script mode, `qutest.py` runs the provided @ref qutest_script "test scripts" and exits. In the **interactive mode** the reads and executes commands *interactively* @ref from the terminal input. The interactive mode is activated by providing the `-oi` @ref qutest_command "command-line option". Interactive mode is a good way to play around and try the system's response to various commands. Also, interactive mode can be used to provide stimuli for debugging the @ref qutest_fixture "test fixture".
+
+Once activated, the interactive mode works as follows:
+
+- If any test scripts are provided, after each test group (test script) the test runner enters an interactive session, where the user can manually enter any supported test commands. These commands are executed in the context of the *last test in the group*. Tt is also possible to start a new test interactively (by providing the @ref qutest_dsl::test() "test()" command). In that case, the interactively entered commands will be executed in the context of the new test.
+
+- If no test scripts are provided, the test runner enters an interactive session immediately. In that case, the user must provide the @ref qutest_dsl::test() "test()" command manually (perhaps after defining the @ref qutest_dsl-preamble "test callbacks").
+
+In either case, the interactive mode is shown by the presence of the `>>> ` command prompt. During an interactive session the output produced by the text fixture is displayed on the screen and **not** checked against any expectations. In fact, the @ref qutest_dsl::expect() "expect()" command itself makes no sense in the interactive mode. Also, all tests that are interactive are considered "SIKPPED" and are not evaluated as "PASS" or "FAIL".
+
+@note
+You can use the up- and down-arrow keys to navigate through the list of previous commands. You end the interactive session by providing an "empty" command, that is by pressing the `<Enter>` key right at the `>>> ` command prompt
+
+Here is an example of an interactive session with test scripts provided. (Note the annotations added after the `//` comments).
+
+@verbatim
+C:\qp\qpc\examples\qutest\qhsmtst\test>make OPT=i   // <--- NOTE OPT=i
+
+python3 C:\qp\qtools/qutest/qutest.py -ebuild/test_qhsmtst.exe -q -l -oci --
+
+QUTest unit testing front-end 7.2.1 running on Python 3.10.1
+Copyright (c) 2005-2022 Quantum Leaps, www.state-machine.com
+Attaching to QSpy (localhost:7701) ... OK
+
+Run ID    : 230111_174610
+Target    : build/test_qhsmtst.exe
+
+==================================[Group  1]==================================
+test_qhsm-funct.py
+[ 1]--------------------------------------------------------------------------
+QHsmTst_init
+                                                             [ PASS (  0.1s) ]
+[ 2]^-------------------------------------------------------------------------
+QHsmTst dispatch
+>>> dispatch('A_SIG')      // <--- interactive command
+0000000127 BSP_DISPLAY s1-A;
+0000000128 BSP_DISPLAY s11-EXIT;
+0000000129 BSP_DISPLAY s1-EXIT;
+0000000130 BSP_DISPLAY s1-ENTRY;
+0000000131 BSP_DISPLAY s1-INIT;
+0000000132 BSP_DISPLAY s11-ENTRY;
+0000000133 Trg-Done QS_RX_EVENT
+>>> dispatch('B_SIG')      // <--- interactive command
+0000000134 BSP_DISPLAY s1-B;
+0000000135 BSP_DISPLAY s11-EXIT;
+0000000136 BSP_DISPLAY s11-ENTRY;
+0000000137 Trg-Done QS_RX_EVENT
+>>>                        // <--- end of interactive session
+                          interactive test shows as "skipped" ---> [ SKIPPED ]
+
+==================================[Group  2]==================================
+test_qhsm-struct.py
+[ 3]--------------------------------------------------------------------------
+QHsmTst init
+                                                             [ PASS (  0.1s) ]
+[ 4]^-------------------------------------------------------------------------
+QHsmTst dispatch
+>>>                        // <--- end of interactive session
+                                                                   [ SKIPPED ]
+
+==================================[ SUMMARY ]=================================
+
+Target ID : 230111_170758 (QP-Ver=721)
+Log file  :
+Groups    : 2
+Tests     : 4
+Skipped   : 2 [ 2 4 ]
+Failed    : 0
+
+==============================[  OK  ( 20.1s) ]===============================
+@endverbatim
 
 
 @section qutest_log Generating Test Logs

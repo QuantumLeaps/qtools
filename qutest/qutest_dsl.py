@@ -23,14 +23,14 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-12-19
-# @version Last updated for version: 7.2.0
+# @date Last updated on: 2023-01-24
+# @version Last updated for version: 7.2.1
 #
 # @file
 # @brief QUTest Python scripting support (documentation)
 
 ## @brief current version of the Python QUTest interface
-VERSION = 720
+VERSION = 721
 
 ## @brief include python code in a test script
 # @description
@@ -205,7 +205,7 @@ def ensure(bool_expr):
 # <num>  # Specific QS trace Record-Type in the range 0..127
 # @endcode
 #
-# @retruns
+# @returns
 # The 128-bit filter bitmask sent to the target. For each enabled filter
 # with the QS record-ID `recID` the bitmask has a '1' in the position
 # (`1 << recID`).
@@ -238,7 +238,7 @@ def glb_filter(*args):
 # IDS_AP # Application-Specific QS-IDs (97-127)
 # @endcode
 #
-# @retruns
+# @returns
 # The 128-bit filter bitmask sent to the target. For each enabled filter
 # with the QS-ID `qsID` the bitmask has a '1' in the position
 # (`1 << qsID`).
@@ -416,14 +416,19 @@ def continue_test():
 ## @brief executes a given command in the Target
 # @description
 # This @ref qutest_complex "complex command" causes execution of the
-# callback QS_onCommand() inside the the Target system.
+# @ref QS_rx::QS_onCommand() "QS_onCommand()" callback in the test fixture.
 #
-# @param[in] cmdId  the command-id first argument to QS_onCommand()<br>
-#            NOTE: this could be either the raw number or a name
-#            that is delivered by QS_USR_DICTIONARY() from the Target
-# @param[in] param1 the "param1" argument to QS_onCommand() (optional)
-# @param[in] param2 the "param2" argument to QS_onCommand() (optional)
-# @param[in] param3 the "param3" argument to QS_onCommand() (optional)
+# @param[in] cmdId  the first `cmdId` argument for the
+#                   @ref QS_rx::QS_onCommand() "QS_onCommand()" callback
+#                   function in the test fixture.
+# @note
+# The `cmdId` parameter could be either the raw number or a name
+# that is delivered by QS_ENUM_DICTIONARY(enum, group), where the
+# second `group` argument is ::QS_CMD (numerical value 7).
+#
+# @param[in] param1 the "param1" argument to `QS_onCommand()` (optional)
+# @param[in] param2 the "param2" argument to `QS_onCommand()` (optional)
+# @param[in] param3 the "param3" argument to `QS_onCommand()` (optional)
 #
 # @usage
 # @include command.py

@@ -1,6 +1,10 @@
 /**
 @page history Revision History
 
+@section qtools_7_2_1 Version 7.2.1, 2023-01-11
+Introduced the @ref qutest_inter "QUTest interactive mode".
+
+
 @section qtools_7_2_0 Version 7.2.0, 2022-12-22
 @ref qutest "QUTest testing framework":<br>
 This release represents a significant overhaul of the @ref qutest_use "qutest.py test runner". 

@@ -284,6 +284,7 @@ The QS Target-resident component provides special **dictionary trace records** d
 - function dictionary  ( QS_FUN_DICTIONARY() )
 - signal dictionary  ( QS_SIG_DICTIONARY() )
 - user dictionary  ( QS_USR_DICTIONARY() )
+- enumeration dictionary  ( QS_ENUM_DICTIONARY() )
 
 The dictionary trace records are typically generated during the system initialization and this is the only time they are sent to the @ref qspy "QSPY" host component. It is **your** responsibility to code them in (by means of the `QS_???_DICTIONARY()` macros). The following code snippet provides some examples of generating QS dictionaries:
 
@@ -303,7 +304,8 @@ void BSP_init(int argc, char *argv[]) {
 
     QS_USR_DICTIONARY(ON_TEST_SETUP);
     QS_USR_DICTIONARY(ON_TEST_TEARDOWN);
-    QS_USR_DICTIONARY(COMMAND_X);
+
+    QS_ENUM_DICTIONARY(COMMAND_X, QS_CMD); /* for command */
     ~ ~ ~
 }
 @endcode

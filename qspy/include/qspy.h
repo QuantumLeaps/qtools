@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-19
-* @version Last updated for version: 7.2.0
+* @date Last updated on: 2023-01-19
+* @version Last updated for version: 7.2.1
 *
 * @file
 * @brief Host API
@@ -32,7 +32,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "7.2.0"
+#define QSPY_VER "7.2.1"
 
 #ifdef __cplusplus
 extern "C" {
@@ -205,7 +205,7 @@ extern QSpyRecRender const QSPY_rec[];
 #define SNPRINTF_LINE(format_, ...) do {                       \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \
                 (QS_LINE_LEN_MAX - QS_LINE_OFFSET),            \
-                format_,  ##__VA_ARGS__);                      \
+                format_,  __VA_ARGS__);                        \
     if ((0 < n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) { \
         QSPY_output.len = n_;                                  \
     }                                                          \
@@ -217,7 +217,7 @@ extern QSpyRecRender const QSPY_rec[];
 #define SNPRINTF_APPEND(format_, ...) do {                                 \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
                 (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len),      \
-                format_, ##__VA_ARGS__);                                   \
+                format_, __VA_ARGS__);                                     \
     if ((0 < n_)                                                           \
         && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len)) {    \
         QSPY_output.len += n_;                                             \
