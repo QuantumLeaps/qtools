@@ -23,7 +23,7 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2023-01-10
+# @date Last updated on: 2023-01-11
 # @version Last updated for version: 7.2.1
 #
 # @file
@@ -854,8 +854,6 @@ class QUTest:
                 QUTest_inst._fail()
 
             if QUTest._opt_interactive:
-                QUTest._num_skipped += 1
-                QUTest._str_skipped += " %d"%(QUTest._num_tests)
                 QUTest_inst._interact()
 
             # properly end the last test in the group
@@ -878,7 +876,7 @@ class QUTest:
 
         # enter "interactive mode": commands entered as user input
         while True:
-            code = input('> ')
+            code = input('>>> ')
             if code:
                 try:
                     exec(code, self._DSL_dict)
@@ -886,7 +884,6 @@ class QUTest:
                     traceback.print_exc(2)
             else:
                 break
-
 
     def _tran(self, state):
         #print("tran(%d->%d)"%(self._state, state))
@@ -897,6 +894,13 @@ class QUTest:
             return
 
         if not QUTest._have_info:
+            return
+
+        if self._is_inter:
+            QUTest._display("                                             "
+                "                      [ SKIPPED ]")
+            QSpy._qspy_show("                                             "
+                "                      [ SKIPPED ]")
             return
 
         elapsed = QUTest._time() - self._startTime
