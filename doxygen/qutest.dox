@@ -194,9 +194,9 @@ For reliable operation it is recommended to apply the short options *without* a 
 [6] python3 %QTOOLS%\qutest\qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPY host utility.
 
-`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPY host utility.
 
 `[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp.exe` (test fixture).
 
@@ -221,9 +221,9 @@ For reliable operation it is recommended to apply the short options *without* a 
 [6] python3 $(QTOOLS)/qutest/qutest.py -eDEBUG -- test_mpu.py
 @endverbatim
 
-`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPU host utility.
+`[1]` runs all test scripts (`*.py`) in the current directory on a remote target connected to QSPY host utility.
 
-`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPU host utility.
+`[2]` runs the test script `test_mpu.py` in the current directory on a remote target connected to QSPY host utility.
 
 `[3]` runs all test scripts (`*.py`) in the current directory and uses the host executable `build/test_dpp` (test fixture).
 

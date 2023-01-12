@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-13
+* @date Last updated on: 2023-01-11
 * @version Last updated for version: 7.2.0
 *
 * @file
@@ -84,7 +84,7 @@ extern char const * const l_lightPalette[];
 static char const * const *l_colorPalette = l_darkPalette;
 
 static char const l_introStr[] = \
-    "QSPY %s Copyright (c) 2005-2022 Quantum Leaps\n" \
+    "QSPY %s Copyright (c) 2005-2023 Quantum Leaps\n" \
     "Documentation: https://www.state-machine.com/qtools/qspy.html\n" \
     "Current timestamp: %s\n";
 

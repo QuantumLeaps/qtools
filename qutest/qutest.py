@@ -1517,7 +1517,7 @@ def main():
             QUTest.VERSION//100,
             (QUTest.VERSION//10) % 10,
              QUTest.VERSION % 10, python_version()))
-    print("Copyright (c) 2005-2022 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
 
     # process command-line argumens...
     if args.exe != '':
