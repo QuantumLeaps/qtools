@@ -359,7 +359,7 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
 <tr><td>28 <td>#QS_QF_NEW                 <td>`<timestamp> QF-New`    <td>new event creation
 <tr><td>29 <td>#QS_QF_GC_ATTEMPT          <td>`<timestamp> QF-gcA`    <td>garbage collection attempt
 <tr><td>30 <td>#QS_QF_GC                  <td>`<timestamp> QF-gc`     <td>garbage collection performed
-<tr><td>31 <td>#QS_QF_TICK                <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tick`<td>QF system clock tick processing was called
+<tr><td>31 <td>#QS_QF_TICK                <td>`Tick`<td>QF system clock tick processing was called
 <tr><td>39 <td>#QS_QF_CRIT_ENTRY          <td>`<timestamp> QF-CritE`  <td>critical section was entered
 <tr><td>40 <td>#QS_QF_CRIT_EXIT           <td>`<timestamp> QF-CritX`  <td>critical section was exited
 <tr><td>41 <td>#QS_QF_ISR_ENTRY           <td>`<timestamp> QF-IsrE`   <td>an ISR was entered
@@ -379,23 +379,23 @@ To better adapt QSPY to support @ref qutest "QUTest Unit Testing", the QSPY huma
 <tr><td>51 <td>#QS_SCHED_UNLOCK           <td>`<timestamp> Sch-Unlk`  <td>scheduler was unlocked
 <tr><td>52 <td>#QS_SCHED_NEXT             <td>`<timestamp> Sch-Next`  <td>scheduler found next task to execute
 <tr><td>53 <td>#QS_SCHED_IDLE             <td>`<timestamp> Sch-Idle`  <td>scheduler became idle
-<tr><td>54 <td>#QS_SCHED_RESUME           <td>`<timestamp> Sch-Rsme`  <td>scheduler resumed previous task (not idle)
+<tr><td>54 <td>#QS_ENUM_DICT              <td>`Enum-Dict` <td>Enumeration record dictionary entry
 <tr><td colspan="4"><strong>Miscellaneous Trace Records<br>NOT MASKABLE WITH THE @ref qs_global "QS GLOBAL FILTER"!</strong>
 <tr><th>Rec.<br> Num <th>Rec.<br> Enum <th>Start of record <th>Comment
-<tr><td>58 <td>#QS_TEST_PAUSED    <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TstPause` <td>test has been paused
+<tr><td>58 <td>#QS_TEST_PAUSED    <td>`TstPause` <td>test has been paused
 <tr><td>59 <td>#QS_TEST_PROBE_GET <td>`<timestamp> TstProbe` <td>reports that Test-Probe has been used
-<tr><td>60 <td>#QS_SIG_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sig-Dict` <td>signal dictionary entry
-<tr><td>61 <td>#QS_OBJ_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Obj-Dict` <td>object dictionary entry
-<tr><td>62 <td>#QS_FUN_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fun-Dict` <td>function dictionary entry
-<tr><td>63 <td>#QS_USR_DICTIONARY <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Usr-Dict` <td>User record dictionary entry
+<tr><td>60 <td>#QS_SIG_DICTIONARY <td>`Sig-Dict` <td>signal dictionary entry
+<tr><td>61 <td>#QS_OBJ_DICTIONARY <td>`Obj-Dict` <td>object dictionary entry
+<tr><td>62 <td>#QS_FUN_DICTIONARY <td>`Fun-Dict` <td>function dictionary entry
+<tr><td>63 <td>#QS_USR_DICTIONARY <td>`Usr-Dict` <td>User record dictionary entry
 <tr><td>64 <td>#QS_TARGET_INFO    <td>`########## Trg-Info`   <td>reports the Target information
 <tr><td>65 <td>#QS_TARGET_DONE    <td>`<timestamp> Trg-Done`  <td>reports completion of a user callback
-<tr><td>66 <td>#QS_RX_STATUS      <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Ack`  <td>reports QS data receive status
+<tr><td>66 <td>#QS_RX_STATUS      <td>`Trg-Ack`  <td>reports QS data receive status
 <tr><td>67 <td>#QS_QUERY_DATA     <td>`<timestamp> Query-xxx` <td>reports the data from "current object" query
-<tr><td>68 <td>#QS_PEEK_DATA      <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trg-Peek` <td>reports the data from the PEEK query
+<tr><td>68 <td>#QS_PEEK_DATA      <td>`Trg-Peek` <td>reports the data from the PEEK query
 <tr><td>69 <td>#QS_ASSERT_FAIL    <td>`<timestamp> =ASSERT=`   <td>Assertion failed in the target
-<tr><td>70 <td>#QS_QF_RUN         <td>`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QF RUN`   <td>`QF_run()` called
-<tr><td colspan="4"><strong>User (Application Specific) Records</strong>
+<tr><td>70 <td>#QS_QF_RUN         <td>`QF RUN`   <td>`QF_run()` called
+<tr><td colspan="4"><strong>User Records (@ref qs_app "Application Specific")</strong>
 <tr><td>100 <td>#QS_USER + xxx    <td>`<timestamp> USER+xxx` <td>@ref qs_app "application-specific" (user) QS records (100..124)
 </table>
 

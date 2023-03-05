@@ -235,18 +235,18 @@ For reliable operation it is recommended to apply the short options *without* a 
 
 
 @section qutest_inter Interactive Mode
-Similar to the Python interpreter itself, the `qutest.py` test runner has two basic modes: script (default) and interactive. In the default script mode, `qutest.py` runs the provided @ref qutest_script "test scripts" and exits. In the **interactive mode** the reads and executes commands *interactively* @ref from the terminal input. The interactive mode is activated by providing the `-oi` @ref qutest_command "command-line option". Interactive mode is a good way to play around and try the system's response to various commands. Also, interactive mode can be used to provide stimuli for debugging the @ref qutest_fixture "test fixture".
+Similar to the Python interpreter itself, the `qutest.py` test runner has two basic modes: script (default) and interactive. In the default script mode, the test runner executes the test scripts as fast as possible and exits. In the interactive mode, the test runner pauses and executes commands *interactively* @ref from the terminal input. The interactive mode is activated by providing the `-oi` @ref qutest_command "command-line option". Interactive mode is a good way to play around and try the system's response to various commands. Also, interactive mode can be used to provide stimuli for debugging the @ref qutest_fixture "test fixture".
 
 Once activated, the interactive mode works as follows:
 
-- If any test scripts are provided, after each test group (test script) the test runner enters an interactive session, where the user can manually enter any supported test commands. These commands are executed in the context of the *last test in the group*. Tt is also possible to start a new test interactively (by providing the @ref qutest_dsl::test() "test()" command). In that case, the interactively entered commands will be executed in the context of the new test.
+- If any test scripts are provided, after each test group (test script) the test runner enters an interactive session, where the user can manually enter any supported test commands. These commands are executed in the context of the *last test in the group*. It is also possible to start a new test interactively (by providing the @ref qutest_dsl::test() "test()" command). In that case, the interactively entered commands will be executed in the context of the new test.
 
 - If no test scripts are provided, the test runner enters an interactive session immediately. In that case, the user must provide the @ref qutest_dsl::test() "test()" command manually (perhaps after defining the @ref qutest_dsl-preamble "test callbacks").
 
-In either case, the interactive mode is shown by the presence of the `>>> ` command prompt. During an interactive session the output produced by the text fixture is displayed on the screen and **not** checked against any expectations. In fact, the @ref qutest_dsl::expect() "expect()" command itself makes no sense in the interactive mode. Also, all tests that are interactive are considered "SIKPPED" and are not evaluated as "PASS" or "FAIL".
+In either case, the interactive mode is shown by the presence of the `>>> ` command prompt. During an interactive session the output produced by the text fixture is displayed after each interactive command entered. The output is **not** checked against any expectations. In fact, the @ref qutest_dsl::expect() "expect()" command itself makes no sense in the interactive mode. Also, all tests that are interactive are considered "SIKPPED" and are not evaluated as "PASS" or "FAIL".
 
 @note
-You can use the up- and down-arrow keys to navigate through the list of previous commands. You end the interactive session by providing an "empty" command, that is by pressing the `<Enter>` key right at the `>>> ` command prompt
+You can use the `Up-arrow` and `Down-arrow` keys on your keyboard to navigate through the list of previous commands. You end the interactive session by providing an "empty" command, that is by pressing the `<Enter>` key right at the `>>> ` command prompt
 
 Here is an example of an interactive session with test scripts provided. (Note the annotations added after the `//` comments).
 
@@ -460,7 +460,7 @@ The main purpose of the @ref qutest_dsl::on_reset() "on_reset()"` procedure is t
 
 `[13]` The acknowledgment for the ::QS_RX_TEST_SETUP is sent back to the @ref qutest_script "test script".
 
-`[14]` Upon reception of "Trg-Ack QS_RX_TEST_SETUP", the @ref qutest_script "test script" attempts to execute the @ref qutest_dsl::on_setup() "on_setup()" procedure. If @ref qutest_dsl::on_setup() "on_setup()" is defined in the script, it runs at this time.
+`[14]` Upon reception of `Trg-Ack QS_RX_TEST_SETUP`, the @ref qutest_script "test script" attempts to execute the @ref qutest_dsl::on_setup() "on_setup()" procedure. If @ref qutest_dsl::on_setup() "on_setup()" is defined in the script, it runs at this time.
 <br>
 The main purpose of the @ref qutest_dsl::on_setup() "on_setup()" procedure is to consume any output generated from the QS_onTestSetup() callback in the @ref qutest_fixture "test fixture" invoked in the next step [15]. Note also the QS_onTestSetup() runs in all tests, including @ref qutest_noreset "NORESET tests".
 
@@ -644,7 +644,7 @@ To write effective *test scripts* you need to understand the main categories of 
 
 
 @section qutest_simple Simple Commands
-Simple @ref qutest_script "test script" commands do not produce any output from the Target, except for the "Trg-Ack" (acknowledgement). Examples of `<SIMPLE-COMMAND>` include @ref qutest_dsl::glb_filter() "glb_filter()", @ref qutest_dsl::loc_filter() "loc_filter()" and @ref qutest_dsl::current_obj() "current_obj()".
+Simple @ref qutest_script "test script" commands do not produce any output from the Target, except for the `Trg-Ack` (acknowledgement). Examples of `<SIMPLE-COMMAND>` include @ref qutest_dsl::glb_filter() "glb_filter()", @ref qutest_dsl::loc_filter() "loc_filter()" and @ref qutest_dsl::current_obj() "current_obj()".
 
 ![Simple command processing](qutest_simple.gif)
 
@@ -654,13 +654,13 @@ Simple @ref qutest_script "test script" commands do not produce any output from 
 `[2]` The @ref qutest_fixture "test fixture" receives the command and immediately starts processing it.
   </dd>
 
-`[3]` Processing of a command triggers an RTC step and produces only the "Trg-Ack  <SIMPLE-COMMAND>" (acknowledgement of the specific `<SIMPLE-COMMAND>`).
+`[3]` Processing of a command triggers an RTC step and produces only the `Trg-Ack  <SIMPLE-COMMAND>` (acknowledgement of the specific `<SIMPLE-COMMAND>`).
 
-`[4]` Immediately after sending the `<SIMPLE-COMMAND>`, the @ref qutest_script "test script" enters an implicit expect state, in which it waits for the "Trg-Ack <SIMPLE-COMMAND>" output from the Target. The processing of the `<SIMPLE-COMMAND>` ends when the next output received from the Target exactly matches the expected output.
+`[4]` Immediately after sending the `<SIMPLE-COMMAND>`, the @ref qutest_script "test script" enters an implicit expect state, in which it waits for the `Trg-Ack <SIMPLE-COMMAND>` output from the Target. The processing of the `<SIMPLE-COMMAND>` ends when the next output received from the Target exactly matches the expected output.
 
 
 @section qutest_complex Complex Commands
-Complex @ref qutest_script "test script" commands might produce some output from the Target, not just the "Trg-Ack" (acknowledgement). Examples of `<COMPLEX-COMMAND>` include @ref qutest_dsl::command() "command()", @ref qutest_dsl::dispatch() "dispatch()", @ref qutest_dsl::post() "post()" and @ref qutest_dsl::tick() "tick()".
+Complex @ref qutest_script "test script" commands might produce some output from the Target, not just the `Trg-Ack` (acknowledgement). Examples of `<COMPLEX-COMMAND>` include @ref qutest_dsl::command() "command()", @ref qutest_dsl::dispatch() "dispatch()", @ref qutest_dsl::post() "post()" and @ref qutest_dsl::tick() "tick()".
 
 ![Complex command processing](qutest_complex.gif)
 
@@ -669,18 +669,21 @@ Complex @ref qutest_script "test script" commands might produce some output from
 
 `[2]` The @ref qutest_fixture "test fixture" receives the command and immediately starts processing it.
 
-`[3]` Processing of a command triggers an RTC step and produces only the "Trg-Ack  <COMPLEX-COMMAND>" (acknowledgement of the specific `<COMPLEX-COMMAND>`).
+`[3]` Processing of a command triggers an RTC step and produces only the `Trg-Ack  <COMPLEX-COMMAND>` (acknowledgement of the specific `<COMPLEX-COMMAND>`).
 
-`[4]` The `<COMPLEX-COMMAND>` must be followed in the @ref qutest_script "test script" by the explicit expect() commands that consume any output produced by the command.
+`[4]` The `<COMPLEX-COMMAND>` must be followed in the @ref qutest_script "test script" by the explicit @ref qutest_dsl::expect() "expect()" commands that consume any output produced by the command.
 
 `[5-6]` The @ref qutest_fixture "test fixture" produces some output.
 
-`[7]` Each such ouput is consumed by the matching expect() command.
+`[7]` Each such ouput is consumed by the matching @ref qutest_dsl::expect() "expect()" command.
 
-`[8]` The @ref qutest_fixture "test fixture" sends the additional QS record "Trg-Done <COMPLEX-COMMAND>", which explicitly delimits the output from this particular command.
+`[8]` The @ref qutest_fixture "test fixture" sends the additional QS record `Trg-Done <COMPLEX-COMMAND>`, which explicitly delimits the output from this particular command.
 
-`[9]` The @ref qutest_script "test script" must consume the "Trg-Done <COMPLEX-COMMAND>" record by an explicit expect() command.
-  </dd>
+`[9]` The @ref qutest_script "test script" must consume the `Trg-Done <COMPLEX-COMMAND>` record by an explicit @ref qutest_dsl::expect() "expect()" command.
+
+
+@attention
+Any events posted inside the Target in the course of processing a command (Simple or Complex) are also handled in the **same** RTC step. This extends the RTC step until all event queues of all Active Objects inside the Target are empty.
 
 @nav{qutest_use,qutest_tut}
 */

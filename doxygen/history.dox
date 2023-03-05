@@ -7,7 +7,7 @@ Introduced the @ref qutest_inter "QUTest interactive mode".
 
 @section qtools_7_2_0 Version 7.2.0, 2022-12-22
 @ref qutest "QUTest testing framework":<br>
-This release represents a significant overhaul of the @ref qutest_use "qutest.py test runner". 
+This release represents a significant overhaul of the @ref qutest_use "qutest.py test runner".
 
 - re-designed the  @ref qutest_command "qutest.py command-line interface" (with the [Python argparse library](https://docs.python.org/3/library/argparse.html)) and added several new options.
 
