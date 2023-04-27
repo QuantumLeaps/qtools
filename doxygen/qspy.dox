@@ -867,8 +867,7 @@ par4: | I      | 0x11223344
 
 @section udp_QSPY Packets to the QSPY Back-End
 
-
-@subsection udp_ATTACH  Attach to the QSPY Back-End (ATTACH)
+@subsection udp_ATTACH  Attach to the QSPY Back-End (QSPY_ATTACH)
 This packet has Record-ID==ATTACH and Data Payload of the form:
 
 Data item  | binary format | description
@@ -876,33 +875,62 @@ Data item  | binary format | description
 channels   | B (byte)      | Binary bitmask of @ref udp_channel "QSPY channels" to attach to
 
 
-@subsection udp_DETACH Detach from the QSPY Back-End (DETACH)
+@subsection udp_DETACH Detach from the QSPY Back-End (QSPY_DETACH)
 This packet has Record-ID==DETACH and has no Data Payload.
 
 
-@subsection udp_SAVE_DIC  Save Dictionaries to a File in QSPY (SAVE_DIC)
+@subsection udp_SAVE_DIC  Save Dictionaries to a File in QSPY (QSPY_SAVE_DICT)
 This packet has Record-ID==SAVE_DIC and has no Data Payload.
 
 
-@subsection udp_SCREEN_OUT Toggle Screen Output to a File in QSPY (SCREEN_OUT)
-This packet has Record-ID==SCREEN_OUT and has no Data Payload.
+@subsection udp_TEXT_OUT Text Output to a File in QSPY (QSPY_TEXT_OUT)
+This packet has Record-ID==SCREEN_OUT and may have (optionally) one byte of Data Payload
+(Data-Byte==0 means turn text output off, Data-Byte!=0 means turn text output on).
+In case no Data Payload is provided, the command toggles the output from its current sate.  
 
 
-@subsection udp_BIN_OUT Toggle Binary Output to a File in QSPY (BIN_OUT)
-This packet has Record-ID==BIN_OUT and has no Data Payload.
+@subsection udp_BIN_OUT Binary Output to a File in QSPY (QSPY_BIN_OUT)
+This packet has Record-ID==BIN_OUT and may have (optionally) one byte of Data Payload
+(Data-Byte==0 means turn binary output off, Data-Byte!=0 means turn binary output on).
+In case no Data Payload is provided, the command toggles the output from its current sate.  
 
 
-@subsection udp_MATLAB_OUT Toggle MATLAB Output to a File in QSPY (MATLAB_OUT)
-This packet has Record-ID==MATLAB_OUT and has no Data Payload.
+@subsection udp_MATLAB_OUT MATLAB Output to a File in QSPY (QSPY_MATLAB_OUT)
+This packet has Record-ID==MATLAB_OUT and may have (optionally) one byte of Data Payload
+(Data-Byte==0 means turn Matlab output off, Data-Byte!=0 means turn Matlab output on).
+In case no Data Payload is provided, the command toggles the output from its current sate.
 
 
-@subsection udp_SEQUENCE_OUT Toggle Sequence Output to a File in QSPY (SEQUENCE_OUT)
-This packet has Record-ID==SEQUENCE_OUT and has no Data Payload.
+@subsection udp_SEQUENCE_OUT Sequence Output to a File in QSPY (QSPY_SEQUENCE_OUT)
+This packet has Record-ID==SEQUENCE_OUT and may have (optionally) one byte of Data Payload
+(Data-Byte==0 means turn sequence output off, Data-Byte!=0 means turn sequence output on).
+In case no Data Payload is provided, the command toggles the output from its current sate.
 
+
+@subsection udp_SEND_EVT Send Event to the Target (QSPY_SEND_EVENT)
+This packet has Record-ID==SEND_EVENT and contains the event as Data Payload.
+
+
+@subsection udp_SEND_CURR_OBJ Send Current Object to the Target (QSPY_SEND_CURR_OBJ)
+This packet has Record-ID==SEND_CURR_OBJ and contains the current object (address) as Data Payload.
+
+
+@subsection udp_SEND_COMMAND Send Command to the Target (QSPY_SEND_COMMAND)
+This packet has Record-ID==SEND_COMMAND and contains the command (including parameters) as Data Payload.
+
+
+@subsection udp_SEND_TEST_PROBE Send Test Probe to the Target (QSPY_SEND_TEST_PROBE)
+This packet has Record-ID==SEND_TEST_PROBE and contains the test-probe as Data Payload.
+
+
+@subsection udp_SHOW_NOTE Send and Show a Note to QSPY (QSPY_SHOW_NOTE)
+This packet has Record-ID==SHOW_NOTE and contains the note (text) as Data Payload.
+
+@subsection udp_CLEAR_SCREEN Clear QSPY Screen (QSPY_CLEAR_SCREEN)
+This packet has Record-ID==SAVE_DIC and has no Data Payload.
 
 
 @section udp_from Packets from the QSPY Back-End
-
 
 @subsection udp_from_ATTACH  Attach Response from the QSPY Back-End (ATTACH)
 This packet has Record-ID==ATTACH and has no Data Payload.
