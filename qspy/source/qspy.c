@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-01-19
-* @version Last updated for version: 7.2.1
+* @date Last updated on: 2023-08-20
+* @version Last updated for version: 7.3.0
 *
 * @file
 * @brief QSPY host utility: main parser

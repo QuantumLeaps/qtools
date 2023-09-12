@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-01-25
-* @version Last updated for version: 7.0.0
+* @date Last updated on: 2023-03-12
+* @version Last updated for version: 7.2.2
 *
 * @file
 * @brief QSPY PAL implementation for Win32
@@ -708,6 +708,12 @@ QSPYEvtType PAL_receiveBe(unsigned char *buf, uint32_t *pBytes) {
         }
     }
     else if (l_feAddrSize == 0) { /* not attached yet? */
+        if (feAddrSize > sizeof(l_feAddr)) {
+            SNPRINTF_LINE("   <F-END> ERROR    UDP address error size=%d",
+                          feAddrSize);
+            QSPY_printError();
+            return QSPY_ERROR_EVT;
+        }
         memcpy(&l_feAddr, &feAddr, feAddrSize);
         l_feAddrSize = feAddrSize; /* attach connection */
         *pBytes = (uint32_t)status;

@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-01-19
-* @version Last updated for version: 7.2.1
+* @date Last updated on: 2023-08-20
+* @version Last updated for version: 7.3.0
 *
 * @file
 * @brief Host API
@@ -32,7 +32,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "7.2.1"
+#define QSPY_VER "7.3.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +43,9 @@ typedef enum {
     QSPY_ERROR,
     QSPY_SUCCESS
 } QSpyStatus;
+
+/*! typedef for inclusion of qpc_qs.h */
+typedef uint16_t QSignal;
 
 /*! QSPY record being processed */
 typedef struct {

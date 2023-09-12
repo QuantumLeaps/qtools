@@ -2,11 +2,11 @@
 * Product: Front Panel example, BSP for EK-LM3S811 board
 * Last Update: 2016-05-03
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                   Q u a n t u m  L e a P s
+*                   ------------------------
+*                   Modern Embedded Software
 *
-* Copyright (C) Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the following MIT License (MIT).
@@ -46,6 +46,21 @@
 /* Local-scope objects -----------------------------------------------------*/
 static int volatile l_tickCtr;
 static int l_paused;
+
+/*..........................................................................*/
+void Q_onError(char const *module, int id); /* prototype */
+void Q_onError(char const *module, int id) {
+    /* NOTE: add here your application-specific error handling... */
+    (void)module;
+    (void)id;
+
+    NVIC_SystemReset(); /* reset the MCU */
+}
+//............................................................................
+void assert_failed(char const * const module, int const id); // prototype
+void assert_failed(char const * const module, int const id) {
+    Q_onError(module, id);
+}
 
 
 /* prototypes of ISRs defined in the BSP....................................*/
@@ -168,14 +183,3 @@ void BSP_drawCount(uint32_t n) {
 void BSP_drawNString(uint8_t x, uint8_t y, char const *str) {
     Display96x16x1StringDraw(str, x, y);
 }
-
-/*..........................................................................*/
-void Q_onAssert(char const *module, int loc); /* prototype */
-void Q_onAssert(char const *module, int loc) {
-    /* NOTE: add here your application-specific error handling... */
-    (void)module;
-    (void)loc;
-
-    NVIC_SystemReset(); /* reset the MCU */
-}
-
