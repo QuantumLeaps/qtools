@@ -119,6 +119,7 @@ __Vectors_Size  EQU   __Vectors_End - __Vectors
 ; Weak fault handlers...
 ;
         SECTION .text:CODE:REORDER:NOROOT(2)
+        EXTERN  assert_failed
 
 ;.............................................................................
         PUBWEAK Reset_Handler
@@ -250,26 +251,5 @@ FlashCtrl_IRQHandler
         MOV     r0,#0
         MOV     r1,#-1      ; 0xFFFFFFF
         B       assert_failed
-
-;******************************************************************************
-;
-; The function assert_failed defines the error/assertion handling policy
-; for the application. After making sure that the stack is OK, this function
-; calls Q_onAssert, which should NOT return (typically reset the CPU).
-;
-; NOTE: the function Q_onAssert should NOT return.
-;
-; The C proptotype of the assert_failed() and Q_onAssert() functions are:
-; void assert_failed(char const *file, int line);
-; void Q_onAssert   (char const *file, int line);
-;******************************************************************************
-        PUBLIC  assert_failed
-        EXTERN  Q_onAssert
-assert_failed
-        LDR    sp,=sfe(CSTACK)   ; re-set the SP in case of stack overflow
-        BL     Q_onAssert        ; call the application-specific handler
-
-        B      .                 ; should not be reached, but just in case...
-
 
         END                      ; end of module

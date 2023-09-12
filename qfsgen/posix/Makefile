@@ -95,7 +95,7 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -g -std=c11 -ffunction-sections -fdata-sections \
+CFLAGS = -c -g -std=gnu11 -ffunction-sections -fdata-sections \
 	-O -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
@@ -105,7 +105,7 @@ else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -std=c11 -ffunction-sections -fdata-sections \
+CFLAGS = -c -std=gnu11 -ffunction-sections -fdata-sections \
 	-O3 -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \

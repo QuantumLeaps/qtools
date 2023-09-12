@@ -2,57 +2,64 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{d16cf4ac-57da-4b98-8936-a9c610d90c3b}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{d7678db7-aac6-404e-a668-18f0837d9637}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="PAL">
-      <UniqueIdentifier>{814658d4-1447-4d90-9769-547a6758de80}</UniqueIdentifier>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\be.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\pal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\qs_copy.h">
+    <ClInclude Include="..\include\qpc_qs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\qpc_qs_pkg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\qspy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\be.h">
+    <ClInclude Include="..\include\safe_std.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\getopt.c">
+    <ClCompile Include="qspy_pal.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\qspy_tx.c">
+    <ClCompile Include="..\source\getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\qspy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\qspy_seq.c">
+    <ClCompile Include="..\source\qspy_be.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\qspy_be.c">
+    <ClCompile Include="..\source\qspy_dict.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\qspy_main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qspy_pal.c">
-      <Filter>PAL</Filter>
+    <ClCompile Include="..\source\qspy_seq.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\qspy_dict.c">
+    <ClCompile Include="..\source\qspy_tx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

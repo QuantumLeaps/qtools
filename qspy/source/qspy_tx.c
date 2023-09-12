@@ -93,7 +93,7 @@ uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
     QSPY_INSERT_ESC_BYTE(b)    /* insert the escaped checksum */
     QSPY_INSERT_BYTE(QS_FRAME) /* insert un-escaped frame */
 
-    return dst - &dstBuf[0];  /* number of bytes in the destination */
+    return (uint32_t)(dst - &dstBuf[0]); /* number of bytes in the destination */
 }
 /*..........................................................................*/
 uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize) {

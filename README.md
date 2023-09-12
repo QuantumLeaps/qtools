@@ -186,7 +186,7 @@ Has been taken from the GitHub at:
 # How to Help this Project?
 If you like this project, please give it a star (in the upper-right corner of your browser window):
 
-![GitHub star](doxygen/images/github-star.jpg)
+![GitHub star](https://www.state-machine.com/img/github-star.jpg)
 
 
 # Contact information:

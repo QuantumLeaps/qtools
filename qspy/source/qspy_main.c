@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-01-11
-* @version Last updated for version: 7.2.0
+* @date Last updated on: 2023-08-22
+* @version Last updated for version: 7.3.0
 *
 * @file
 * @brief main for QSPY host utility
@@ -234,9 +234,9 @@ static void cleanup(void) {
 }
 
 /*..........................................................................*/
-void Q_onAssert(char const * const module, int loc) {
+void Q_onError(char const * const module, int const id) {
     PRINTF_S("\n   <ERROR> QSPY ASSERTION failed in Module=%s:%d\n",
-           module, loc);
+           module, id);
     cleanup();
     exit(-1);
 }
@@ -340,6 +340,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
             case 'u': { /* UDP control port */
                 if (optarg != NULL) { /* is optional argument provided? */
                     l_bePort = (int)strtoul(optarg, NULL, 10);
+                    PRINTF_S("-u %d\n", l_bePort);
                 }
                 else { /* apply the default */
                     l_bePort = 7701;
@@ -550,7 +551,6 @@ static QSpyStatus configure(int argc, char *argv[]) {
     /* configure QSPY ......................................................*/
     /* open Back-End link. NOTE: must happen *before* opening Target link */
     if (l_bePort != 0) {
-        PRINTF_S("-u %d\n", l_bePort);
         if (PAL_openBE(l_bePort) == QSPY_ERROR) {
             return QSPY_ERROR;
         }
@@ -558,9 +558,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
 
     /* open Target link... */
     switch (l_link) {
-        case NO_LINK:
-            PRINTF_S("-t %d\n", l_tcpPort); /* -t is the default link */
-            /* fall through */
+        case NO_LINK:  /* fall through */
         case TCP_LINK: {    /* connect to the Target via TCP socket */
             if (PAL_openTargetTcp(l_tcpPort) != QSPY_SUCCESS) {
                 return QSPY_ERROR;

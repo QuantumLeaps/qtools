@@ -1,5 +1,10 @@
 /*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
+* QTools Collection
+*
+*                   Q u a n t u m  L e a P s
+*                   ------------------------
+*                   Modern Embedded Software
+*
 * Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
 * SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -24,7 +29,7 @@
 ============================================================================*/
 /*!
 * @date Last updated on: 2022-10-28
-* @version Last updated for version: 7.1.3
+* @version Last updated for version: 7.3.0
 *
 * @file
 * @brief main for QClean host utility
@@ -37,8 +42,6 @@
 #include "qclean.h"
 #include "getopt.h"
 
-static char l_src[10*1024*1024]; /* 10MB */
-static char l_dst[10*1024*1024]; /* 10MB */
 static int  l_nFiles     = 0;
 static int  l_nReadOnly  = 0;
 static int  l_nCleaned   = 0;
@@ -162,20 +165,13 @@ unsigned isMatching(char const *fname) {
 }
 /*..........................................................................*/
 void onMatchFound(char const *fname, unsigned flags, int ro_info) {
-    FILE *f;
-    int nBytes;
-    int lineCtr = 1;
-    int lineLen = 0;
     char prev = 0x00;
-    char *src = l_src;
-    char *dst = l_dst;
-    unsigned found = 0;
-    bool foundLLs = false;
     bool isReadOnly = false;
 
     ++l_nFiles;
     PRINTF_S("%c", '.');
 
+    FILE *f;
     if (ro_info >= 0) { /* read-only information available right away? */
         if (ro_info > 0) {
             isReadOnly = true;
@@ -202,12 +198,20 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         return;
     }
 
-    nBytes = FREAD_S(l_src, sizeof(l_src), 1U, sizeof(l_src), f);
+    static char src_buf[10*1024*1024]; /* 10MB buffer */
+    char *src = src_buf;
+    static char dst_buf[10*1024*1024]; /* 10MB buffer */
+    char *dst = dst_buf;
+    int nBytes = FREAD_S(src_buf, sizeof(src_buf), 1U, sizeof(src_buf), f);
     fclose(f);
-    if (nBytes == sizeof(l_src)) { /* full buffer? */
+    if (nBytes == sizeof(src_buf)) { /* full buffer? */
         PRINTF_S("\n%s(too big -- skipped)\n", fname);
         return;
     }
+    unsigned found = 0;
+    bool foundLLs = false;
+    int lineCtr = 1;
+    int lineLen = 0;
     for (; nBytes > 0; --nBytes, ++src) {
         switch (*src) {
             case TAB: {
@@ -234,7 +238,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 ++lineCtr;
 
                 /* always cleanup trailing blanks... */
-                for (; (*(dst - 1) == ' ') && (dst > l_dst); --dst) {
+                for (; (*(dst - 1) == ' ') && (dst > dst_buf); --dst) {
                     found |= TRAIL_WS_FLG; /* removed trailing blank */
                 }
 
@@ -265,7 +269,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
             }
         }
         prev = *src;
-        if (dst >= &l_dst[sizeof(l_dst)]) {
+        if (dst >= &dst_buf[sizeof(dst_buf)]) {
             PRINTF_S("\n%s\n", "Error: too big!");
             return;
         }
@@ -280,7 +284,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 PRINTF_S(" %s\n", "ERROR: cannot modify!");
                 return;
             }
-            fwrite(l_dst, 1, dst - l_dst, f);
+            fwrite(dst_buf, 1, dst - dst_buf, f);
             fclose(f);
             PRINTF_S(" %s", "CLEANED(");
         }

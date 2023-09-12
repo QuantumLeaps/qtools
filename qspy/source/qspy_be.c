@@ -272,7 +272,7 @@ void BE_sendShortPkt(int pktId) {
         ++l_txBeSeq;
         *pos++ = l_txBeSeq;
         *pos++ = (uint8_t)pktId;
-        PAL_send2FE(buf, (pos - &buf[0]));
+        PAL_send2FE(buf, (uint32_t)(pos - &buf[0]));
     }
 }
 /*..........................................................................*/

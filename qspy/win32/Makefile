@@ -1,5 +1,12 @@
 #=============================================================================
-# Makefile for QSPY console, Win32, MinGW
+# Makefile for qspy console, Win32, MinGW
+# Last updated for version 7.3.0
+# Last updated on  2023-09-26
+#
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
+#
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -105,21 +112,21 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -g -O -ffunction-sections -fdata-sections \
-	-std=c11 -pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
+CFLAGS = -c -g -std=c11 \
+	-O -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES)
 
-CPPFLAGS = -c -g -O -ffunction-sections -fdata-sections \
-	-pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c -g -std=c++11 -fno-rtti -fno-exceptions \
+	-O -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES)
 
 else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -O3 -ffunction-sections -fdata-sections  -DNDEBUG \
-	-std=c11 -pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
+CFLAGS = -c -std=c11 \
+	-Ofast -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES) -DNDEBUG
 
-CPPFLAGS = -c -O3 -ffunction-sections -fdata-sections  -DNDEBUG \
-	-pedantic -Wall -Wextra $(INCLUDES) $(DEFINES)
+CPPFLAGS = -c -std=c++11 -fno-rtti -fno-exceptions \
+	-Ofast -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES) -DNDEBUG
 
 endif  # .....................................................................
 

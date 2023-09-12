@@ -201,7 +201,7 @@ void QSEQ_genHeader(void) {
 
             /* write the name */
             char const *name = l_seqNames[n];
-            int len = strlen(name);
+            int len = (int)strlen(name);
             i = left_box_edge + 1;
             if (len < SEQ_BOX_WIDTH - 2) {
                 i += (SEQ_BOX_WIDTH - 2 - len)/2; /* center the name */
@@ -231,7 +231,7 @@ void QSEQ_genHeader(void) {
             seq_line[i] = '+'; i += 1;
         }
         seq_line[i] = '\n';
-        seq_header_len = &seq_line[i + 1] - &seq_header[0];
+        seq_header_len = (uint32_t)(&seq_line[i + 1] - &seq_header[0]);
     }
     if (l_seqLines == 0) {
         FPRINTF_S(l_seqFile, "-g %s\n\n", l_seqList);
@@ -310,7 +310,7 @@ void QSEQ_genPost(uint32_t tstamp, int src, int dst, char const* sig,
         seq_line[SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH] = '|';
 
         /* write the signal */
-        int len = strlen(sig);
+        int len = (int)strlen(sig);
         if (len > SEQ_LABEL_MAX) {
             len = SEQ_LABEL_MAX;
         }
@@ -427,7 +427,7 @@ void QSEQ_genPublish(uint32_t tstamp, int obj, char const* sig) {
     i = SEQ_LEFT_OFFSET + obj * SEQ_LANE_WIDTH;
 
     /* write the signal */
-    int len = strlen(sig);
+    int len = (int)strlen(sig);
     if (len > SEQ_LABEL_MAX) {
         len = SEQ_LABEL_MAX;
     }
@@ -551,7 +551,7 @@ void QSEQ_genAnnotation(uint32_t tstamp, int obj, char const* ann) {
     seq_line_len = i + 1;
     i = SEQ_LEFT_OFFSET + obj*SEQ_LANE_WIDTH;
     /* write the annotation */
-    int len = strlen(ann);
+    int len = (int)strlen(ann);
     if (len > SEQ_LABEL_MAX) {
         len = SEQ_LABEL_MAX;
     }
