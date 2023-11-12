@@ -1,0 +1,33 @@
+QTools Collection
+=================
+Most tools included in the QTools collection for Windows are distributed
+under the terms of the GNU General Public License (GPL) as published by
+the Free Software Foundation, either version 2 of the License, or (at
+your option) any later version. The text of GPL version 2 is included
+in the file qtools/LICENSES/GPL-2.0-or-later.txt.
+
+Some of the tools are distributed under the terms of the MIT open source
+license. The complete text of the MIT license is included in the file
+qtools/LICENSES/LICENSE-MIT.txt as well as in the source code comments.
+
+The Python package is distributed under the terms of the PYTHON LICENSE
+AGREEMENT, included in the file PYTHON_LICENSE.txt in the file
+qtools/LICENSES/LICENSE-Python.txt.
+
+The LMFlash utility for Windows is is distributed under the terms
+of the LMFlash license, included in the file:
+qtools/LICENSES/LICENSE-LMFlash.txt
+
+Specifically, the LMFlash utility is distributed according to Section 2a
+"Demonstration License".
+
+The freewaer Termite utility for Windows is is distributed under the terms
+of the zlib/libpng License included in the file:
+qtools/LICENSES/LICENS-Termite.txt
+
+
+Contact Information:
+=============
+- https://www.state-machine.com
+- mailto:info@state-machine.com
+

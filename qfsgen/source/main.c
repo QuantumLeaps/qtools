@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-03
-* @version Last updated for: @ref qtools_7_1_3
+* @date Last updated on: 2023-10-26
+* @version Last updated for: @ref qtools_7_3_0
 *
 * @file
 * @brief QFSgen ROM file system generator main function
@@ -93,9 +93,9 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     char const *s;
     char *d;
     char fvar[256];
-    int len;
-    int nBytes;
-    int i;
+    size_t len;
+    size_t nBytes;
+    size_t i;
 
     (void)flags;
     (void)ro_info;

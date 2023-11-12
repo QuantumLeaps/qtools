@@ -47,7 +47,7 @@ char const dir_separator = '\\'; /* platform-dependent directory separator */
 void filesearch(char const *dirname) {
     static char buffer[1024];
     struct _finddata_t fdata;
-    long hnd;
+    intptr_t hnd;
     unsigned flags;
 
     _chdir(dirname);
@@ -70,8 +70,8 @@ void filesearch(char const *dirname) {
         flags = isMatching(fdata.name);
         if (flags != 0) {
             _getcwd(buffer,  sizeof(buffer));
-            strcat(buffer, "\\");
-            strcat(buffer, fdata.name);
+            strcat_s(buffer, sizeof(buffer), "\\");
+            strcat_s(buffer, sizeof(buffer), fdata.name);
             onMatchFound(buffer, flags,
                          (fdata.attrib & _A_RDONLY) != 0 ? 1 : 0);
         }
@@ -90,8 +90,8 @@ void filesearch(char const *dirname) {
             flags = isMatching(fdata.name);
             if (flags != 0) {
                 _getcwd(buffer, sizeof(buffer));
-                strcat(buffer, "\\");
-                strcat(buffer, fdata.name);
+                strcat_s(buffer, sizeof(buffer), "\\");
+                strcat_s(buffer, sizeof(buffer), fdata.name);
                 onMatchFound(buffer, flags,
                              (fdata.attrib & _A_RDONLY) != 0 ? 1 : 0);
             }
