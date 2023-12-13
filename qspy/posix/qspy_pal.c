@@ -152,7 +152,11 @@ void PAL_closeKbd(void) {
         l_kbd_inp = false;
     }
 }
-
+/*..........................................................................*/
+void PAL_exit(void) {
+    QSPY_cleanup();
+    exit(0);
+}
 /*==========================================================================*/
 /* POSIX serial communication with the Target */
 QSpyStatus PAL_openTargetSer(char const *comName, int baudRate) {

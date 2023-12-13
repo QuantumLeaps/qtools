@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-03-12
-* @version Last updated for version: 7.2.2
+* @date Last updated on: 2023-12-12
+* @version Last updated for version: 7.3.1
 *
 * @file
 * @brief QSPY PAL implementation for Win32
@@ -98,7 +98,8 @@ static FILE *l_file = (FILE *)0;
 static BOOL WINAPI CtrlHandler(_In_ DWORD dwCtrlType) {
     (void)dwCtrlType; /* unused parameter */
     QSPY_cleanup();
-    exit(0);
+    //exit(-1);
+    return true; // signal handled
 }
 
 /* Keyboard input */
@@ -116,7 +117,13 @@ QSpyStatus PAL_openKbd(bool kbd_inp, bool color) {
 void PAL_closeKbd(void) {
     if (l_color) {
         fputs("\033[0m", stdout); /* switch default colors */
+        l_color = false;
     }
+}
+/*..........................................................................*/
+void PAL_exit(void) {
+    QSPY_cleanup();
+    exit(0);
 }
 
 /*==========================================================================*/
@@ -370,6 +377,7 @@ QSpyStatus PAL_openTargetTcp(int portNum) {
 static void tcp_cleanup(void) {
     if (l_serverSock != INVALID_SOCKET) {
         closesocket(l_serverSock);
+        l_serverSock = INVALID_SOCKET;
     }
     WSACleanup();
 }

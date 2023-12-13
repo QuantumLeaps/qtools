@@ -293,10 +293,6 @@ void QSPY_config(QSpyConfig const *config,
     l_userRec = ((QSPY_conf.version < 660U) ? OLD_QS_USER : QS_USER);
 }
 /*..........................................................................*/
-void QSPY_cleanup(void) {
-    QSPY_configMatFile((void*)0);
-}
-/*..........................................................................*/
 void QSPY_configTxReset(QSPY_resetFun txResetFun) {
     l_txResetFun = txResetFun;
 }

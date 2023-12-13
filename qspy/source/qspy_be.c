@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-12-15
-* @version Last updated for version: 7.2.0
+* @date Last updated on: 2023-12-13
+* @version Last updated for version: 7.3.1
 *
 * @file
 * @brief Back-End connection point for the external Front-Ends
@@ -170,10 +170,19 @@ void BE_parseRecFromFE(QSpyRecord * const qrec) {
         }
         case QSPY_DETACH: {   /* detach from the Front-End */
             PAL_detachFE();
-            l_channels = 0U; /* detached from a Front-End */
-            SNPRINTF_LINE("   <F-END> Detached %s",
-                          "######################################");
-            QSPY_printInfo();
+            l_channels = 0U; /* mark as detached from the Front-End */
+
+            if (qrec->tot_len > 2U) { /* payload contains exit request? */
+                SNPRINTF_LINE("   <F-END> Forced EXIT %s",
+                              "###################################");
+                QSPY_printInfo();
+                PAL_exit();
+            }
+            else { /* detach request without exit */
+                SNPRINTF_LINE("   <F-END> Detached %s",
+                              "######################################");
+                QSPY_printInfo();
+            }
             break;
         }
         case QSPY_SAVE_DICT: { /* save dictionaries collected so far */
