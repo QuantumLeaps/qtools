@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+
 #=============================================================================
-# QUTest Python scripting support
+# qspy_exit utility
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -22,31 +24,27 @@
 # <www.state-machine.com>
 # <info@state-machine.com>
 #=============================================================================
-##
-# @date Last updated on: 2023-12-13
-# @version Last updated for version: 7.3.1
-#
-# @file
-# @brief QUTest Python scripting support (implementation)
-# @ingroup qutest
+
+# pylint: disable=missing-module-docstring,
+# pylint: disable=missing-class-docstring,
+# pylint: disable=missing-function-docstring
+# pylint: disable=broad-except
+
+from platform import python_version
 
 import argparse
 import socket
 import struct
 import sys
-import os
-if os.name == "nt":
-    import msvcrt
-else:
-    import select
-
-from platform import python_version
 
 #=============================================================================
 # Helper class for communication with the QSpy front-end
 #
 class QSpy:
-    VERSION = 731
+
+    # public class constants
+    VERSION = 732
+    TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables...
     _sock = None
@@ -54,9 +52,6 @@ class QSpy:
     _tx_seq = 0
     _host_udp = ["localhost", 7701] # list, to be converted to a tuple
     _local_port = 0 # let the OS decide the best local port
-
-    # timeout value [seconds]
-    _TOUT = 1.000
 
     # packets to QSpy only...
     _QSPY_ATTACH          = 128
@@ -69,44 +64,38 @@ class QSpy:
     _QSPY_CLEAR_SCREEN    = 140
     _QSPY_SHOW_NOTE       = 141
 
-    # packets to QSpy to be "massaged" and forwarded to the Target...
-    _QSPY_SEND_EVENT      = 135
-    _QSPY_SEND_AO_FILTER  = 136
-    _QSPY_SEND_CURR_OBJ   = 137
-    _QSPY_SEND_COMMAND    = 138
-    _QSPY_SEND_TEST_PROBE = 139
-
     @staticmethod
     def _init():
         # Create socket
         QSpy._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        QSpy._sock.settimeout(QSpy._TOUT) # timeout for blocking socket
+        QSpy._sock.settimeout(QSpy.TIMEOUT) # timeout for blocking socket
         #bufsize = QSpy._sock.getsockopt(socket.SOL_UDP, socket.SO_RCVBUF)
         #print("SO_RCVBUF ", bufsize)
         try:
             QSpy._sock.bind(("0.0.0.0", QSpy._local_port))
             #print("bind: ", ("0.0.0.0", QSpy._local_port))
-        except:
-            messagebox.showerror("UDP Socket Error",
-               "Can't bind the UDP socket\nto the specified local_host")
-            QSpyView._gui.destroy()
-            return -1
+        except Exception:
+            print("UDP Socket Error"\
+                  "Can't bind the UDP socket\nto the specified local_host")
+            sys.exit(-1)
         return 0
 
     @staticmethod
-    def _sendTo(packet, str=None):
+    def send_to(packet, payload=None):
         tx_packet = bytearray([QSpy._tx_seq])
         tx_packet.extend(packet)
-        if str is not None:
-            tx_packet.extend(bytes(str, "utf-8"))
+        if payload is not None:
+            tx_packet.extend(bytes(payload, "utf-8"))
             tx_packet.extend(b"\0") # zero-terminate
         QSpy._sock.sendto(tx_packet, QSpy._host_udp)
         QSpy._tx_seq = (QSpy._tx_seq + 1) & 0xFF
         #print("sendTo", QSpy._tx_seq)
 
 #=============================================================================
-# main entry point to QUTest
+# main entry point to qspy_exit
 def main():
+    # pylint: disable=protected-access
+
     # parse command-line arguments...
     parser = argparse.ArgumentParser(
         prog="python qspy_exit.py",
@@ -114,22 +103,15 @@ def main():
         epilog="More info: https://www.state-machine.com/qspy.html#qspy_exit")
     parser.add_argument('-v', '--version',
         action='version',
-        version="QSPY-exit %d.%d.%d on Python %s"%(
-                    QSpy.VERSION//100, (QSpy.VERSION//10) % 10,
-                    QSpy.VERSION % 10,
-            python_version()),
+        version=f"QSPY-exit {QSpy.VERSION//100}."\
+                f"{(QSpy.VERSION//10) % 10}.{QSpy.VERSION % 10} "\
+                f"on Python {python_version()}",
         help='Display QSPY-exit version')
 
     parser.add_argument('-q', '--qspy', nargs='?', default='', const='',
         help="optional qspy host, [:ud_port]")
     args = parser.parse_args()
     #print(args)
-
-    print("\nQSPY-exit %d.%d.%d running on Python %s"%(
-            QSpy.VERSION//100,
-            (QSpy.VERSION//10) % 10,
-             QSpy.VERSION % 10, python_version()))
-    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
 
     # process command-line argumens...
     if args.qspy != '':
@@ -150,10 +132,18 @@ def main():
     if err:
         return sys.exit(err)
 
-    QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_DETACH, 1))
+    QSpy.send_to(struct.pack("<BB", QSpy._QSPY_DETACH, 1))
 
     return 0 # report to the caller (e.g., make)
 
 #=============================================================================
 if __name__ == "__main__":
-    main()
+    print(f"\nQSPY-exit "\
+        f"{QSpy.VERSION//100}.{(QSpy.VERSION//10) % 10}."\
+        f"{QSpy.VERSION % 10} running on Python {python_version()}")
+    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
+    if sys.version_info >= (3,6):
+        main()
+    else:
+        print("\nERROR: QSPY-exit requires Python 3.6 or newer")
+        sys.exit(-1)

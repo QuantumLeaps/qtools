@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #=============================================================================
 # QCalc programmer's Calculator
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
@@ -23,101 +25,113 @@
 # <info@state-machine.com>
 #=============================================================================
 ##
-# @date Last updated on: 2022-01-27
-# @version Last updated for version: 7.0.0
+# @date Last updated on: 2023-12-18
+# @version Last updated for version: 7.3.2
 #
 # @file
 # @brief QCalc programmer's Calculator
 # @ingroup qtools
 
+# pylint: disable=broad-except
+# pylint: disable=eval-used
+
+
+'''
+"qcalc" is a powerful, cross-platform calculator specifically designed for
+embedded systems programmers. The calculator accepts whole expressions in
+the **C-syntax** and displays results simultaneously in decimal, hexadecimal,
+and binary without the need to explicitly convert the result to these bases.
+
+'''
+
 import os
+import sys
 import traceback
 
-from math import *
 from platform import python_version
-from sys import argv
+
+# NOTE: the following wildcard import from math is needed
+# for user expressions.
+#
+# pylint: disable=wildcard-import
+# pylint: disable=unused-wildcard-import
+# pylint: disable=redefined-builtin
+from math import *
+
+# current version of QCalc
+VERSION = 732
 
 # the 'ans' global variable
-ans = 0
+ans = {}
 
-class QCalc:
-    ## current version of QCalc
-    VERSION = 700
+def display(result):
+    '''
+    Display result of computation in decimal, hexadecimal, and binary.
+    Also, handle the 32-bit and 64-bit cases.
+    '''
 
-    @staticmethod
-    def _print(result):
-        # the 'ans' global variable
-        global ans
-        ans = result
+    # pylint: disable=global-statement
+    global ans
+    ans = result
 
-        if isinstance(ans, int):
-            # outside the 64-bit range?
-            if ans < -0xFFFFFFFFFFFFFFFF or 0xFFFFFFFFFFFFFFFF < ans:
-                print("\x1b[41m\x1b[1;37m! out of range\x1b[0m")
-                return
+    if isinstance(ans, int):
+        # outside the 64-bit range?
+        if ans < -0xFFFFFFFFFFFFFFFF or 0xFFFFFFFFFFFFFFFF < ans:
+            print("\x1b[41m\x1b[1;37m! out of range\x1b[0m")
+            return
 
-            #inside the 32-bit range?
-            if -0xFFFFFFFF < ans and ans <= 0xFFFFFFFF:
-                # use 32-bit unsigned arithmetic...
-                u32 = ans & 0xFFFFFFFF
-                u16_0 = u32 & 0xFFFF
-                u16_1 = (u32 >> 16) & 0xFFFF
-                u8_0 = u32 & 0xFF
-                u8_1 = (u32 >> 8) & 0xFF
-                u8_2 = (u32 >> 16) & 0xFF
-                u8_3 = (u32 >> 24) & 0xFF
-                print("= {0:d} |".format(ans),
-                       "0x{0:04X}'{1:04X} |".format(u16_1, u16_0),
-                       "0b{0:08b}'{1:08b}'{2:08b}'{3:08b}".format(
-                           u8_3, u8_2, u8_1, u8_0))
-            else:
-                # use 64-bit unsigned arithmetic...
-                u64 = ans & 0xFFFFFFFFFFFFFFFF
-                u16_0 = u64 & 0xFFFF
-                u16_1 = (u64 >> 16) & 0xFFFF
-                u16_2 = (u64 >> 32) & 0xFFFF
-                u16_3 = (u64 >> 48) & 0xFFFF
-                u8_0 = u64 & 0xFF
-                u8_1 = (u64 >> 8) & 0xFF
-                u8_2 = (u64 >> 16) & 0xFF
-                u8_3 = (u64 >> 24) & 0xFF
-                u8_4 = (u64 >> 32) & 0xFF
-                u8_5 = (u64 >> 40) & 0xFF
-                u8_6 = (u64 >> 48) & 0xFF
-                u8_7 = (u64 >> 56) & 0xFF
-                print("= {0:d} |".format(ans),
-                      "0x{0:04X}'{1:04X}'{2:04X}'{3:04X}".format(
-                      u16_3, u16_2, u16_1, u16_0))
-                print("= 0b{0:08b}'{1:08b}'{2:08b}'{3:08b}"
-                         "'{4:08b}'{5:08b}'{6:08b}'{7:08b}".format(
-                           u8_7, u8_6, u8_5, u8_4, u8_3, u8_2, u8_1, u8_0))
+        #inside the 32-bit range?
+        if -0xFFFFFFFF < ans <= 0xFFFFFFFF:
+            # use 32-bit unsigned arithmetic...
+            u32 = ans & 0xFFFFFFFF
+            u16_0 = u32 & 0xFFFF
+            u16_1 = (u32 >> 16) & 0xFFFF
+            u8_0 = u32 & 0xFF
+            u8_1 = (u32 >> 8) & 0xFF
+            u8_2 = (u32 >> 16) & 0xFF
+            u8_3 = (u32 >> 24) & 0xFF
+            print(f"= {ans:d} |",
+                  f"0x{u16_1:04X}'{u16_0:04X} |",
+                  f"0b{u8_3:08b}'{u8_2:08b}'{u8_1:08b}'{u8_0:08b}", end="")
         else:
-            print("=", ans)
+            # use 64-bit unsigned arithmetic...
+            u64 = ans & 0xFFFFFFFFFFFFFFFF
+            u16_0 = u64 & 0xFFFF
+            u16_1 = (u64 >> 16) & 0xFFFF
+            u16_2 = (u64 >> 32) & 0xFFFF
+            u16_3 = (u64 >> 48) & 0xFFFF
+            u8_0 = u64 & 0xFF
+            u8_1 = (u64 >> 8) & 0xFF
+            u8_2 = (u64 >> 16) & 0xFF
+            u8_3 = (u64 >> 24) & 0xFF
+            u8_4 = (u64 >> 32) & 0xFF
+            u8_5 = (u64 >> 40) & 0xFF
+            u8_6 = (u64 >> 48) & 0xFF
+            u8_7 = (u64 >> 56) & 0xFF
+            print(f"= {ans:d} |",
+                  f"0x{u16_3:04X}'{u16_2:04X}'{u16_1:04X}'{u16_0:04X}")
+            print(f"= 0b{u8_7:08b}'{u8_6:08b}'{u8_5:08b}'{u8_4:08b}"\
+                  f"'{u8_3:08b}'{u8_2:08b}'{u8_1:08b}'{u8_0:08b}", end="")
+    else:
+        print("=", ans)
 
 #=============================================================================
 # main entry point to QCalc
 def main():
-    if os.name == "nt":
-        os.system("color")
-
-    print("QCalc Programmer's Calculator {0:d}.{1:d}.{2:d} " \
-          "running on Python {3}".format(
-              QCalc.VERSION//100,
-              (QCalc.VERSION//10) % 10,
-              QCalc.VERSION % 10,
-              python_version()))
-    print("(c) 2005-2022 Quantum Leaps, www.state-machine.com\n")
-
+    '''
+    Main entry point to QCalc. Process command-line parameters
+    and handle separately "batch" and "interactive" modes.
+    '''
     # "batch mode": expression provided in command-line arguments
-    if len(argv) > 1:
-        expr = "".join(argv[1:])
+    if len(sys.argv) > 1:
+        expr = "".join(sys.argv[1:])
         print(expr)
         try:
             result = eval(expr)
-        except:
+        except Exception:
             traceback.print_exc(2)
         else:
-            QCalc._print(result)
+            display(result)
         return
 
     # "interactive mode": expressions provided as user input
@@ -126,16 +140,27 @@ def main():
         if expr:
             try:
                 result = eval(expr)
-            except:
+            except Exception:
                 traceback.print_exc(2)
             else:
                 print("\x1b[47m\x1b[30m", end = "")
-                QCalc._print(result)
-                print("\x1b[0m", end = "")
+                display(result)
+                print("\x1b[0m")
         else:
             break
 
 
 #=============================================================================
 if __name__ == "__main__":
-    main()
+    if os.name == "nt":
+        os.system("color")
+
+    print(f"\nQCalc programmer's calculator "\
+        f"{VERSION//100}.{(VERSION//10) % 10}."\
+        f"{VERSION % 10} running on Python {python_version()}")
+    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
+    if sys.version_info >= (3,6):
+        main()
+    else:
+        print("\nERROR: QCalc requires Python 3.6 or newer")
+        sys.exit(-1)

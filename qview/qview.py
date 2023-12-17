@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #=============================================================================
 # QView Monitoring for QP/Spy
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
@@ -22,13 +24,16 @@
 # <www.state-machine.com>
 # <info@state-machine.com>
 #=============================================================================
-##
-# @date Last updated on: 2022-12-19
-# @version Last updated for version: 7.2.0
-#
-# @file
-# @brief QView Monitoring for QP/Spy
-# @ingroup qview
+
+# pylint: disable=missing-module-docstring,
+# pylint: disable=missing-class-docstring,
+# pylint: disable=missing-function-docstring
+# pylint: disable=broad-except
+
+from tkinter import *
+from tkinter.ttk import * # override the basic Tk widgets with Ttk widgets
+from tkinter.simpledialog import *
+from struct import pack
 
 import socket
 import time
@@ -37,11 +42,6 @@ import struct
 import os
 import traceback
 import webbrowser
-
-from tkinter import *
-from tkinter.ttk import * # override the basic Tk widgets with Ttk widgets
-from tkinter.simpledialog import *
-from struct import pack
 
 #=============================================================================
 # QView GUI
@@ -640,7 +640,7 @@ class QView:
         try:
             value = int(str, base=base)
             return value # integer
-        except:
+        except Exception:
             return str # string
 
 
@@ -1048,7 +1048,7 @@ class QView:
             for i in range(len(QView._evt_par)):
                 par = QView._strVar_value(QView._evt_par[i])
                 if par == "":
-                    break;
+                    break
                 if not isinstance(par, int):
                     QView._MessageDialog("Event Error: par%d"%(i),
                                          "data not integer")
@@ -1305,7 +1305,7 @@ class QSpy:
         try:
             QSpy._sock.bind(("0.0.0.0", QSpy._local_port))
             #print("bind: ", ("0.0.0.0", QSpy._local_port))
-        except:
+        except Exception:
             QView._showerror("UDP Socket Error",
                "Can't bind the UDP socket\n"
                "to the specified local_host.\n"
@@ -1366,7 +1366,7 @@ class QSpy:
         except OSError: # non-blocking socket...
             QSpy._after_id = QView._gui.after(QSpy._POLLI, QSpy._poll0)
             return # <======== most frequent return (no packet)
-        except:
+        except Exception:
             QView._showerror("UDP Socket Error",
                "Uknown UDP socket error")
             QView._quit(-1)
@@ -1420,7 +1420,7 @@ class QSpy:
             except OSError: # non-blocking socket...
                 QSpy._after_id = QView._gui.after(QSpy._POLLI, QSpy._poll)
                 return # <============= no packet at this time
-            except:
+            except Exception:
                 QView._showerror("UDP Socket Error",
                                  "Uknown UDP socket error")
                 QView._quit(-1)
@@ -1475,7 +1475,7 @@ class QSpy:
                     if handler is not None:
                         try:
                             handler() # call the packet handler
-                        except:
+                        except Exception:
                             QView._showerror("Runtime Error",
                                              traceback.format_exc(3))
                             QView._quit(-3)
@@ -1487,7 +1487,7 @@ class QSpy:
                 if handler is not None:
                     try:
                         handler() # call the packet handler
-                    except:
+                    except Exception:
                         QView._showerror("Runtime Error",
                                          traceback.format_exc(3))
                         QView._quit(-3)
@@ -1504,7 +1504,7 @@ class QSpy:
                 if handler is not None:
                     try:
                         handler(packet) # call the packet handler
-                    except:
+                    except Exception:
                         QView._showerror("Runtime Error",
                                          traceback.format_exc(3))
                         QView._quit(-3)
@@ -1522,7 +1522,7 @@ class QSpy:
             tx_packet.extend(b"\0") # zero-terminate
         try:
             QSpy._sock.sendto(tx_packet, QSpy._host_addr)
-        except:
+        except Exception:
             QView._showerror("UDP Socket Error",
                                  traceback.format_exc(3))
             QView._quit(-1)
@@ -1648,7 +1648,7 @@ def glb_filter(*args):
                 arg = arg[1:]
             try:
                 arg = QSpy._QS.index(arg)
-            except:
+            except Exception:
                 QView._MessageDialog("Error in glb_filter()",
                                      'arg="' + arg + '"\n' +
                                      traceback.format_exc(3))
@@ -1842,46 +1842,46 @@ def qunpack(fmt, bstr):
     data = []
     offset = 0
     while n < m:
-       fmt1 = fmt[n:(n+1)]
-       u = ()
-       if fmt1 in ("B", "b", "c", "x", "?"):
-           u = struct.unpack_from(bord + fmt1, bstr, offset)
-           offset += 1
-       elif fmt1 in ("H", "h"):
-           u = struct.unpack_from(bord + fmt1, bstr, offset)
-           offset += 2
-       elif fmt1 in ("I", "L", "i", "l", "f"):
-           u = struct.unpack_from(bord + fmt1, bstr, offset)
-           offset += 4
-       elif fmt1 in ("Q", "q", "d"):
-           u = struct.unpack_from(bord + fmt1, bstr, offset)
-           offset += 8
-       elif fmt1 == "T":
-           u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_tstamp],
+        fmt1 = fmt[n:(n+1)]
+        u = ()
+        if fmt1 in ("B", "b", "c", "x", "?"):
+            u = struct.unpack_from(bord + fmt1, bstr, offset)
+            offset += 1
+        elif fmt1 in ("H", "h"):
+            u = struct.unpack_from(bord + fmt1, bstr, offset)
+            offset += 2
+        elif fmt1 in ("I", "L", "i", "l", "f"):
+            u = struct.unpack_from(bord + fmt1, bstr, offset)
+            offset += 4
+        elif fmt1 in ("Q", "q", "d"):
+            u = struct.unpack_from(bord + fmt1, bstr, offset)
+            offset += 8
+        elif fmt1 == "T":
+            u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_tstamp],
+                                   bstr, offset)
+            offset += QSpy._size_tstamp
+        elif fmt1 == "O":
+            u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_objPtr],
+                                   bstr, offset)
+            offset += QSpy._size_objPtr
+        elif fmt1 == "F":
+            u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_funPtr],
+                                   bstr, offset)
+            offset += QSpy._size_funPtr
+        elif fmt1 == "S":
+            u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_sig],
                                   bstr, offset)
-           offset += QSpy._size_tstamp
-       elif fmt1 == "O":
-           u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_objPtr],
-                                  bstr, offset)
-           offset += QSpy._size_objPtr
-       elif fmt1 == "F":
-           u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_funPtr],
-                                  bstr, offset)
-           offset += QSpy._size_funPtr
-       elif fmt1 == "S":
-           u = struct.unpack_from(bord + QSpy._fmt[QSpy._size_sig],
-                                  bstr, offset)
-           offset += QSpy._size_sig
-       elif fmt1 == "Z": # zero-terminated C-string
-           end = offset
-           while bstr[end]: # not zero-terminator?
-               end += 1
-           u = (bstr[offset:end].decode(),)
-           offset = end + 1 # inclue the terminating zero
-       else:
-           assert 0, "qunpack(): unknown format"
-       data.extend(u)
-       n += 1
+            offset += QSpy._size_sig
+        elif fmt1 == "Z": # zero-terminated C-string
+            end = offset
+            while bstr[end]: # not zero-terminator?
+                end += 1
+            u = (bstr[offset:end].decode(),)
+            offset = end + 1 # inclue the terminating zero
+        else:
+            assert 0, "qunpack(): unknown format"
+        data.extend(u)
+        n += 1
     return tuple(data)
 
 #=============================================================================
@@ -1938,7 +1938,7 @@ def main():
                 code = compile(f.read(), script, "exec")
 
             exec(code) # execute the script
-        except: # error opening the file or error in the script
+        except Exception: # error opening the file or error in the script
             # NOTE: don't use QView._showError() because the
             # polling loop is not running yet.
             QView._MessageDialog("Error in " + script,
@@ -1959,4 +1959,3 @@ def main():
 #=============================================================================
 if __name__ == "__main__":
     main()
-
