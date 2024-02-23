@@ -57,7 +57,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 732
+    VERSION = 733
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -1708,7 +1708,7 @@ if __name__ == "__main__":
     print(f"\nQUTest unit testing front-end "\
         f"{QUTest.VERSION//100}.{(QUTest.VERSION//10) % 10}."\
         f"{QUTest.VERSION % 10} running on Python {python_version()}")
-    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2024 Quantum Leaps, www.state-machine.com")
     if sys.version_info >= (3,6):
         main()
     else:

@@ -1,34 +1,33 @@
-/*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
-* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-*
-* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-*
-* This software is dual-licensed under the terms of the open source GNU
-* General Public License version 3 (or any later version), or alternatively,
-* under the terms of one of the closed source Quantum Leaps commercial
-* licenses.
-*
-* The terms of the open source GNU General Public License version 3
-* can be found at: <www.gnu.org/licenses/gpl-3.0>
-*
-* The terms of the closed source Quantum Leaps commercial licenses
-* can be found at: <www.state-machine.com/licensing>
-*
-* Redistributions in source code must retain this top-level comment block.
-* Plagiarizing this software to sidestep the license obligations is illegal.
-*
-* Contact information:
-* <www.state-machine.com>
-* <info@state-machine.com>
-============================================================================*/
-/*!
-* @date Last updated on: 2022-11-28
-* @version Last updated for version: 7.1.3
-*
-* @file
-* @brief QSPY host utility: sequence diagram generation
-*/
+//============================================================================
+// QSPY software tracing host-side utility
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2024-02-23
+//! @version Last updated for version: 7.3.3
+//!
+//! @file
+//! @brief QSPY host utility: sequence diagram generation
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -167,7 +166,7 @@ void QSEQ_genHeader(void) {
         return;
     }
     static char seq_header[(SEQ_LEFT_OFFSET
-                            + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX + 4) * 3];
+                            + SEQ_LANE_WIDTH*SEQ_ITEMS_MAX + 4)*3 + 1];
     static uint32_t seq_header_len = 0;
     if (seq_header_len == 0) { /* not initialized yet? */
         int n;

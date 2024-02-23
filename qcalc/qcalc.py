@@ -26,7 +26,7 @@
 #=============================================================================
 ##
 # @date Last updated on: 2023-12-18
-# @version Last updated for version: 7.3.2
+# @version Last updated for version: 7.3.3
 #
 # @file
 # @brief QCalc programmer's Calculator
@@ -59,7 +59,7 @@ from platform import python_version
 from math import *
 
 # current version of QCalc
-VERSION = 732
+VERSION = 733
 
 # the 'ans' global variable
 ans = {}

@@ -28,8 +28,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-12-12
-* @version Last updated for version: 7.3.1
+* @date Last updated on: 2024-02-16
+* @version Last updated for version: 7.3.3
 *
 * @file
 * @brief Host API
@@ -37,7 +37,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "7.3.1"
+#define QSPY_VER "7.3.3"
 
 #ifdef __cplusplus
 extern "C" {
@@ -179,7 +179,7 @@ typedef struct {
     int  rx_status; /* the type of the RX status */
 } QSPY_LastOutput;
 
-enum QSRreRecGroup {
+typedef enum {
     GRP_ERR,
     GRP_INF,
     GRP_DIC,
@@ -194,21 +194,16 @@ enum QSRreRecGroup {
     GRP_SEM,
     GRP_MTX,
     GRP_USR
-};
+} QSRreRecGroup;
 
-typedef struct {
-    char const *name; /* name of the record, e.g. "QS_QF_PUBLISH" */
-    int  const group; /* group of the record (for rendering/coloring) */
-} QSpyRecRender;
+/* returns the "group" of a given QS record-ID */
+QSRreRecGroup QSPY_getGroup(int recId);
 
 /* last output generated */
 extern QSPY_LastOutput QSPY_output;
 
 /* beginning of QSPY line to print */
 extern char const * const QSPY_line;
-
-/* rendering information for QSPY records */
-extern QSpyRecRender const QSPY_rec[];
 
 #define SNPRINTF_LINE(format_, ...) do {                       \
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \

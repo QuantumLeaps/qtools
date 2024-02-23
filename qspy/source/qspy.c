@@ -1,34 +1,33 @@
-/*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
-* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-*
-* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-*
-* This software is dual-licensed under the terms of the open source GNU
-* General Public License version 3 (or any later version), or alternatively,
-* under the terms of one of the closed source Quantum Leaps commercial
-* licenses.
-*
-* The terms of the open source GNU General Public License version 3
-* can be found at: <www.gnu.org/licenses/gpl-3.0>
-*
-* The terms of the closed source Quantum Leaps commercial licenses
-* can be found at: <www.state-machine.com/licensing>
-*
-* Redistributions in source code must retain this top-level comment block.
-* Plagiarizing this software to sidestep the license obligations is illegal.
-*
-* Contact information:
-* <www.state-machine.com>
-* <info@state-machine.com>
-============================================================================*/
-/*!
-* @date Last updated on: 2023-08-20
-* @version Last updated for version: 7.3.0
-*
-* @file
-* @brief QSPY host utility: main parser
-*/
+//============================================================================
+// QSPY software tracing host-side utility
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2024-02-23
+//! @version Last updated for version: 7.3.3
+//!
+//! @file
+//! @brief QSPY host utility: main parser
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -39,10 +38,12 @@
 #include "qspy.h"       /* QSPY data parser */
 #include "pal.h"        /* Platform Abstraction Layer */
 
-#define Q_SPY   1       /* this is QP implementation */
-#define QP_IMPL 1       /* this is QP implementation */
-#include "qpc_qs.h"     /* QS target-resident interface */
-#include "qpc_qs_pkg.h" /* QS package-scope interface */
+#define Q_SPY   1       // this is QP implementation
+#define QP_IMPL 1       // this is QP implementation
+typedef uint32_t QSObj; // dummy definition for including "qpc_qs.h"
+typedef uint32_t QEvt;  // dummy definition for including "qpc_qs.h"
+#include "qpc_qs.h"     // QS target-resident interface
+#include "qpc_qs_pkg.h" // QS package-scope interface
 
 /* global objects ..........................................................*/
 QSPY_LastOutput QSPY_output;
@@ -73,8 +74,14 @@ static uint32_t      l_userRec;
 static QSPY_CustParseFun l_custParseFun;
 static QSPY_resetFun     l_txResetFun;
 
+typedef struct {
+    char const *name; /* name of the record, e.g. "QS_QF_PUBLISH" */
+    int  const group; /* group of the record (for rendering/coloring) */
+} QSpyRecRender;
+
+/* rendering information for QSPY records */
 /* QS record names... NOTE: keep in synch with qspy_qs.h */
-QSpyRecRender const QSPY_rec[QS_USER] = {
+QSpyRecRender const l_recRender[QS_USER] = {
     { "QS_EMPTY",                         GRP_INF },
 
     /* [1] QEP records */
@@ -331,7 +338,7 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
 
         /* is this a pre-defined QS record? */
         if (me->rec < l_userRec) {
-            SNPRINTF_APPEND("Rec=%s", QSPY_rec[me->rec].name);
+            SNPRINTF_APPEND("Rec=%s", l_recRender[me->rec].name);
         }
         else { /* application-specific (user) record */
             SNPRINTF_APPEND("Rec=USER+%3d", (int)(me->rec - l_userRec));
@@ -2279,7 +2286,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 /* is it a standard QS record? */
                 if (l_record[1] < l_userRec) {
                     SNPRINTF_APPEND("Rec=%s(?)",
-                                    QSPY_rec[l_record[1]].name);
+                                    l_recRender[l_record[1]].name);
                 }
                 else { /* this is a USER-specific record */
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
@@ -2301,7 +2308,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                                   "Bad checksum in ");
                     if (l_record[1] < l_userRec) {
                         SNPRINTF_APPEND("Rec=%s(?),",
-                            QSPY_rec[l_record[1]].name);
+                            l_recRender[l_record[1]].name);
                     }
                     else {
                         SNPRINTF_APPEND("Rec=USER+%u(?),",
@@ -2316,7 +2323,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                            "Seq=%u(?),",
                            (unsigned)l_seq);
                 if (l_record[1] < l_userRec) {
-                    SNPRINTF_APPEND("Rec=%s", QSPY_rec[l_record[1]].name);
+                    SNPRINTF_APPEND("Rec=%s", l_recRender[l_record[1]].name);
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%u(?)",
@@ -2382,7 +2389,7 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                            "Seq=%3u,",
                            (unsigned)l_seq);
                 if (l_record[1] < l_userRec) {
-                    SNPRINTF_APPEND("Rec=%s", QSPY_rec[l_record[1]].name);
+                    SNPRINTF_APPEND("Rec=%s", l_recRender[l_record[1]].name);
                 }
                 else {
                     SNPRINTF_APPEND("Rec=USER+%3u",
@@ -2433,6 +2440,12 @@ KeyType QSPY_findUsr(char const* name) {
 KeyType QSPY_findEnum(char const *name, uint8_t group) {
     Q_ASSERT(group < sizeof(QSPY_enumDict)/sizeof(QSPY_enumDict[0]));
     return Dictionary_findKey(&QSPY_enumDict[group], name);
+}
+/*..........................................................................*/
+QSRreRecGroup QSPY_getGroup(int recId) {
+    return recId < QS_USER
+        ? l_recRender[recId].group
+        : GRP_USR;
 }
 
 /* Dictionary class ========================================================*/

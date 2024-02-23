@@ -1,34 +1,33 @@
-/*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
-* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-*
-* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-*
-* This software is dual-licensed under the terms of the open source GNU
-* General Public License version 3 (or any later version), or alternatively,
-* under the terms of one of the closed source Quantum Leaps commercial
-* licenses.
-*
-* The terms of the open source GNU General Public License version 3
-* can be found at: <www.gnu.org/licenses/gpl-3.0>
-*
-* The terms of the closed source Quantum Leaps commercial licenses
-* can be found at: <www.state-machine.com/licensing>
-*
-* Redistributions in source code must retain this top-level comment block.
-* Plagiarizing this software to sidestep the license obligations is illegal.
-*
-* Contact information:
-* <www.state-machine.com>
-* <info@state-machine.com>
-============================================================================*/
-/*!
-* @date Last updated on: 2023-01-11
-* @version Last updated for version: 7.2.1
-*
-* @file
-* @brief QSPY transmit facilities
-*/
+//============================================================================
+// QSPY software tracing host-side utility
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2024-02-23
+//! @version Last updated for version: 7.3.3
+//!
+//! @file
+//! @brief QSPY transmit facilities
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -39,10 +38,12 @@
 #include "qspy.h"     /* QSPY data parser */
 #include "pal.h"      /* Platform Abstraction Layer */
 
-#define Q_SPY   1       /* this is QP implementation */
-#define QP_IMPL 1       /* this is QP implementation */
-#include "qpc_qs.h"     /* QS target-resident interface */
-#include "qpc_qs_pkg.h" /* QS package-scope interface */
+#define Q_SPY   1       // this is QP implementation
+#define QP_IMPL 1       // this is QP implementation
+typedef uint32_t QSObj; // dummy definition for including "qpc_qs.h"
+typedef uint32_t QEvt;  // dummy definition for including "qpc_qs.h"
+#include "qpc_qs.h"     // QS target-resident interface
+#include "qpc_qs_pkg.h" // QS package-scope interface
 
 /*..........................................................................*/
 static uint8_t   l_dstBuf[1024]; /* for encoding from FE to Target */

@@ -10,7 +10,7 @@
 @set PROJ=qview
 
 :: adjust the Python location for your system
-@set PYTHON=C:\tools\Python39-32\python.exe
+@set PYTHON=python
 
 :: cleanup any previous builds...
 @rmdir /S /Q build
@@ -23,12 +23,16 @@
 :: check the build...
 twine check dist/*
 
-:: upload to PyPi
-twine upload dist/*
+:: upload to PyPi -- skip for now
+:: twine upload dist/*
+
+:: copy/rename the "wheel" to the current dir
+@cp dist/%PROJ%-*.tar.gz %PROJ%.tar.gz
 
 :: cleanup after the build...
-@rmdir /S /Q build
-@rmdir /S /Q dist
-@rmdir /S /Q %PROJ%.egg-info
+@rm -rf build
+@rm -rf dist
+@rm -rf %PROJ%.egg-info
+@rm -rf %PROJ%-*
 
 @endlocal

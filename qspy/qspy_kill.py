@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #=============================================================================
-# qspy_exit utility
+# qspy_kill utility
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -43,7 +43,7 @@ import sys
 class QSpy:
 
     # public class constants
-    VERSION = 732
+    VERSION = 733
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables...
@@ -92,21 +92,21 @@ class QSpy:
         #print("sendTo", QSpy._tx_seq)
 
 #=============================================================================
-# main entry point to qspy_exit
+# main entry point to qspy_kill
 def main():
     # pylint: disable=protected-access
 
     # parse command-line arguments...
     parser = argparse.ArgumentParser(
-        prog="python qspy_exit.py",
-        description="QSPY-exit",
-        epilog="More info: https://www.state-machine.com/qspy.html#qspy_exit")
+        prog="python qspy_kill.py",
+        description="QSPY-kill",
+        epilog="More info: https://www.state-machine.com/qtools/qspy.html#qspy_kill")
     parser.add_argument('-v', '--version',
         action='version',
-        version=f"QSPY-exit {QSpy.VERSION//100}."\
+        version=f"QSPY-kill {QSpy.VERSION//100}."\
                 f"{(QSpy.VERSION//10) % 10}.{QSpy.VERSION % 10} "\
                 f"on Python {python_version()}",
-        help='Display QSPY-exit version')
+        help='Display QSPY-kill version')
 
     parser.add_argument('-q', '--qspy', nargs='?', default='', const='',
         help="optional qspy host, [:ud_port]")
@@ -138,12 +138,12 @@ def main():
 
 #=============================================================================
 if __name__ == "__main__":
-    print(f"\nQSPY-exit "\
+    print(f"\nQSPY-kill "\
         f"{QSpy.VERSION//100}.{(QSpy.VERSION//10) % 10}."\
         f"{QSpy.VERSION % 10} running on Python {python_version()}")
     print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
     if sys.version_info >= (3,6):
         main()
     else:
-        print("\nERROR: QSPY-exit requires Python 3.6 or newer")
+        print("\nERROR: QSPY-kill requires Python 3.6 or newer")
         sys.exit(-1)

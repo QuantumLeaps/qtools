@@ -28,8 +28,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-10-28
-* @version Last updated for version: 7.3.0
+* @date Last updated on: 2024-02-20
+* @version Last updated for version: 7.3.3
 *
 * @file
 * @brief main for QClean host utility
@@ -91,6 +91,7 @@ static FileType const l_fileTypes[] = {
     { ".bat",     4, CR_FLG | TAB_FLG                 },
     { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU linker */
     { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".pyi",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".java",    5, CR_FLG | TAB_FLG | LONG_LINE_FLG },
 
@@ -98,6 +99,8 @@ static FileType const l_fileTypes[] = {
     { "mak_",     4, CR_FLG           | LONG_LINE_FLG },
     { ".mak",     4, CR_FLG           | LONG_LINE_FLG },
     { ".make",    5, CR_FLG           | LONG_LINE_FLG },
+    { ".cmake",   6, CR_FLG | TAB_FLG                 },
+    { ".json",    5, CR_FLG | TAB_FLG                 },
 
     { ".html",    5, CR_FLG | TAB_FLG                 },
     { ".htm",     4, CR_FLG | TAB_FLG                 },
@@ -119,9 +122,10 @@ static FileType const l_fileTypes[] = {
     { ".project", 8, CR_FLG                           }, /* Eclipse project */
     { ".cproject",9, CR_FLG                           }, /* Eclipse CDT project */
 
+    { ".md5",     4, CR_FLG | TAB_FLG                 }, /* MD5 file */
     { ".pro",     4, CR_FLG | TAB_FLG                 }, /* Qt project */
 
-    { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB*/
+    { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB */
 
     { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* PC-Lint */
     { ".cfg",     4, CR_FLG | TAB_FLG                 }, /* RSM config */
@@ -336,7 +340,7 @@ int main(int argc, char *argv[]) {
     char const *rootDir = ".";
     int optChar;
 
-    PRINTF_S("%s", "QClean " VERSION " Copyright (c) 2005-2022 Quantum Leaps\n"
+    PRINTF_S("%s", "QClean " VERSION " Copyright (c) 2005-2024 Quantum Leaps\n"
            "Documentation: https://www.state-machine.com/qtools/qclean.html\n");
     PRINTF_S("%s", "Usage: qclean [root-dir] [options]\n"
     "       root-dir root directory for recursive cleanup (default is .)\n"

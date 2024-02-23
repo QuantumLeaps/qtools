@@ -49,7 +49,7 @@ import webbrowser
 #
 class QView:
     ## current version of QView
-    VERSION = 720
+    VERSION = 733
 
     # public static variables...
     ## menu to be customized
