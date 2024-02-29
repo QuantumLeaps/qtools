@@ -49,7 +49,7 @@ import webbrowser
 #
 class QView:
     ## current version of QView
-    VERSION = 733
+    VERSION = 734
 
     # public static variables...
     ## menu to be customized
@@ -57,6 +57,9 @@ class QView:
 
     ## canvas to be customized
     canvas      = None
+
+    ## frame to be customized
+    frame       = None
 
     # private class variables...
     _text_lines  = "end - 500 lines"
@@ -99,8 +102,11 @@ class QView:
         # View menu...
         m = Menu(main_menu, tearoff=0)
         QView._view_canvas = IntVar()
+        QView._view_frame  = IntVar()
         m.add_checkbutton(label="Canvas", variable=QView._view_canvas,
                           command=QView._onCanvasView)
+        m.add_checkbutton(label="Frame", variable=QView._view_frame,
+                          command=QView._onFrameView)
         main_menu.add_cascade(label="View", menu=m)
 
         # Global-Filters menu...
@@ -253,6 +259,15 @@ class QView:
         QView.canvas = Canvas(QView._canvas_toplevel)
         QView.canvas.pack()
 
+        # frame..............................................................
+        QView._frame_toplevel = Toplevel()
+        QView._frame_toplevel.withdraw() # start not showing
+        QView._frame_toplevel.protocol("WM_DELETE_WINDOW",
+                                        QView._onFrameClose)
+        QView._frame_toplevel.title("QView -- Frame")
+        QView.frame = Frame(QView._frame_toplevel)
+        QView.frame.pack()
+
         # tkinter variables for dialog boxes .................................
         QView._locAO_OBJ = StringVar()
         QView._currObj   = (StringVar(), StringVar(), StringVar(),
@@ -305,6 +320,12 @@ class QView:
     @staticmethod
     def show_canvas(view=1):
         QView._view_canvas.set(view)
+
+    ## Make the frame visible
+    # (to be used in the constructor of the customization class)
+    @staticmethod
+    def show_frame(view=1):
+        QView._view_frame.set(view)
 
     # private static functions...
     @staticmethod
@@ -453,6 +474,21 @@ class QView:
     def _onCanvasClose():
         QView._view_canvas.set(0)
         QView._canvas_toplevel.withdraw()
+
+    @staticmethod
+    def _onFrameView(*args):
+        if QView._view_frame.get():
+            QView._frame_toplevel.state("normal")
+            # make the frame jump to the front
+            QView._frame_toplevel.attributes("-topmost", 1)
+            QView._frame_toplevel.attributes("-topmost", 0)
+        else:
+            QView._frame_toplevel.withdraw()
+
+    @staticmethod
+    def _onFrameClose():
+        QView._view_frame.set(0)
+        QView._frame_toplevel.withdraw()
 
     @staticmethod
     def _onGlbFilter_SM(*args):
@@ -1399,6 +1435,10 @@ class QSpy:
 
             # only show the canvas, if visible
             QView._onCanvasView()
+
+            # only show the frame, if visible
+            QView._onFrameView()
+
             return
 
         elif recID == QSpy._PKT_DETACH:

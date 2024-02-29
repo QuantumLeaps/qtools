@@ -124,6 +124,50 @@ define the environment variable `QTOOLS` to point to the
 installation directory of QTools.
 
 
+## Build using `cmake`
+With the right set of C compilation tools on your Windows or Linux
+computer, you can build the tools by yourself.
+
+On a MS-Windows machine a setup with [MSys/MinGW64](https://www.msys2.org/) is recommended to
+perform the build. With this environment you will still be able to
+generate MS-Windows executable applications.
+Another alternative would be to install [MS Visual Studio](https://visualstudio.microsoft.com/).
+`CMake` is also able to generate build systems for this development environment.
+This however will not be a topic of this discussion. Please see the
+[CMake Documentation](https://cmake.org/cmake/help/latest/) for further
+details. Especially refer to the section on
+[cmake generators](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
+
+An appropriate [CMakeLists.txt](./CMakeLists.txt) file together with a [cmake presets
+file](./CMakePresets.json) is provided with this source code package.
+
+From within the `qtools` directory you may use `cmake` to build and
+install the 3 tools. For this you need the following in addition to the tools
+mentioned [above](#about-qtools)
+
+1. [CMake](https://cmake.org/) - build system generator ([cmake features](https://cmake.org/features/))
+
+2. [Ninja](https://ninja-build.org/) - small build system with a focus on speed
+
+To build with `cmake`
+1. From within the `qtools` directory do `cmake --preset qtools`
+2. Then build with
+   - `cmake --build --preset qtools` to build all tools at once or
+   - `cmake --build --preset qtools --target <tool>` with tool being `qclean`, `qfsgen` or `qspy`
+   - to build the `Debug` configuration use `cmake --build --preset qtools --config Debug`
+   - `Release` is the default configuration, if you don't specify a desired config
+3. The binaries are created in the `.../qtools/build/<config>` directory
+4. To install
+   - Build the `qtools` preset then
+   - call `cmake --install build [--config <config>]`
+   - The default installation location would be `/usr/local/bin` on a Linux machine or within
+     a MinGW environment on a Windows machine.
+   - add `--prefix <directory>` to the installation command line to select a different installation destination.
+     E.g. `cmake --install build --prefix /usr` will install the built applications from the `Release`
+     configuration into `/usr/bin`. On a Linux machine you might need to use `sudo` to raise your access rights
+     in order to install into system directories.
+
+
 # Licensing
 The various Licenses for distributed components are located in the
 LICENSES/ sub-directory of this QTools distribution.

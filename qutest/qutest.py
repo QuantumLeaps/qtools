@@ -57,7 +57,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 733
+    VERSION = 734
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -933,7 +933,7 @@ class QUTest:
             pass
 
     def _reset_target(self):
-        if QUTest._host_exe:
+        if QUTest._host_exe[0]:
             if not QUTest._have_assert:
                 #print("quitting exe")
                 QUTest._quithost_exe()
@@ -1523,7 +1523,7 @@ def main():
         if len(qspy_conf) > 1 and not qspy_conf[1] == '':
             QSpy.host_udp[1] = int(qspy_conf[1])
         if len(qspy_conf) > 2 and not qspy_conf[2] == '':
-            if QUTest._host_exe:
+            if QUTest._host_exe[0]:
                 QUTest._host_exe[1] = (QSpy.host_udp[0] + ":" + qspy_conf[2])
             else:
                 print("\nTCP port specified without host executable\n")
