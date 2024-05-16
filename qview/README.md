@@ -29,28 +29,31 @@ instrumented target and receive data from it (through QSPY).
 
 **NOTE** The embedded C or C++ code running inside the target needs to be
 built with the [QP/Spy software tracing system](file:///C:/qp_lab/qtools/html/qpspy.html)
-instrumentation enabled. This is acheived by building the "Spy" build configuration.
-
+instrumentation enabled. This is achieved by building the "Spy" build configuration.
 
 ![](https://www.state-machine.com/img/qview_targ.gif)
 
+# Usage without Installation
+The `qview.py` monitoring can be used standalone, **without installation** in your Python system (see [Examples below](#examples-for-windows)).
 
-Installation
-============
-The `qview.py` script can be used standalone, **without** any
-installation (see Using "qview" below).
+> **REMARK:**
+The latest `qview.py` script is included in the [QTools collection](https://github.com/QuantumLeaps/qtools). Also, the QTools collection for Windows already includes Python 3, so you don't need to install anything extra.
 
-Alternatively, you can **install** `qview.py` with `pip` from PyPi by
-executing the following command:
+# Installation with `pip`
+You can install the `qview` package with the standard `pip` package manager.
 
+> **NOTE:**
+The `qview` package is no longer available in the [PyPi package index](https://pypi.org)
+due to the overcomplicated "two-factor authentication".
 
-`pip install qview`
+Instead, you can direct `pip` to install directly from the `qview` directory
+(e.g., `/qp/qtools/qview`):
 
+`pip install /qp/qtools/qview/qview.tar.gz`
 
-Or directly from the sources directory (e.g., `/qp/qtools/qview`):
+Alternatively, you can direct `pip` to install from Quantum Leaps GitHub:
 
-
-`python setup.py install --install-dir=/qp/qtools/qview`
+`pip install https://github.com/QuantumLeaps/qtools/releases/latest/download/qview.tar.gz`
 
 
 Using "qview"
@@ -78,7 +81,7 @@ running the QSPY host utility. If not specified, the default
 is 'localhost:7701'.
 
 - `local_port` - optional the local UDP port to be used by "qview". If not
-specified, the default is '0', which means that the operating sytem will
+specified, the default is '0', which means that the operating system will
 choose an open port.
 
 
@@ -141,5 +144,3 @@ More information about the QP/QSPY software tracing system is available
 online at:
 
 - https://www.state-machine.com/qtools/qpspy.html
-
-

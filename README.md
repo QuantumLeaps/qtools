@@ -24,51 +24,64 @@ as Windows, Linux, and macOS.
 The following open-source tools are currently provided (NOTE: tools
 starting with 'q' are contributed by Quantum Leaps)
 
-1. qspy     - host application for receiving and displaying the
+1. [qspy](https://www.state-machine.com/qtools/qspy.html) -
+   host application for receiving and displaying the
               real-time data from embedded targets running the QS
               software tracing.
 
-2. qutest   - Python extension of the QSPY host application for **uint testing**
+2. [qutest](https://www.state-machine.com/qtools/qutest.html) -
+   Python extension of the QSPY host application for **uint testing**
               specifically designed for embedded systems, but also supports
               unit testing of embedded code on host computers
               ("dual targeting").
 
-3. qview    - Python extension of the QSPY host application for
+3. [qview](https://www.state-machine.com/qtools/qview.html) -
+   Python extension of the QSPY host application for
               visualization and monitoring of the QS real-time tracing
               data from embedded targets at real-time. QView enables
               developers to quickly build both GUI-based and "headless"
               scripts for their specific applications.
 
-4. qwin     - QWIN GUI toolkit for prototyping embedded systems on
+4. [qwin](https://www.state-machine.com/qtools/qwin.html) -
+   QWIN GUI toolkit for prototyping embedded systems on
               Windows in the C programming language. QWIN allows you
               to build realistic embedded front panels consisting of
               LCD displays (both graphical and segmented), buttons,
               and LEDs. QWIN is based on the Win32 API.
 
-5. qclean   - for cleanup of source code files
+5. [qcalc](https://www.state-machine.com/qtools/qcalc.html) -
+   programmer's calculator specifically designed for embedded systems programmers.
 
-6. qfsgen   - for generating ROM-based file systems to be used
-              in embedded web pages served by the HTTP server
+6. [qclean](https://www.state-machine.com/qtools/qclean.html) -
+   for cleanup of white space (tabs, trailing spaces, end-of-line) in source code files
 
-7. Unity    - traditional unit testing harness (framework) for embedded C
+7. [qfsgen](https://www.state-machine.com/qtools/qfsgen.html) -
+   for generating ROM-based file systems to be used in embedded web pages
+   served by the HTTP server
+
+8. Unity    - traditional unit testing harness (framework) for embedded C
               (version 2.5.2)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-8. GNU-make for Windows (32-bit version 4.2.1)
+9. GNU-make for Windows (32-bit version 4.2.1)
 
-9. LMFlash for Windows (32-bit build 1613)
+10. cmake for Windows (version 3.29.0-rc1)
+
+11. ninja for Windows (version 1.11.1)
+
+12. LMFlash for Windows (32-bit build 1613)
 
 
 Additionally, the QTools directory in the QP-bundle contains the
 following 3rd-party tools:
 
-10. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
+13. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
 
-11. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
 
-12. Python for Windows (version 3.10 32-bit)
+15. Python for Windows (version 3.10 32-bit)
 
 
 # Downloading and Installation
