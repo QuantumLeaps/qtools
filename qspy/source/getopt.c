@@ -82,8 +82,8 @@ static int permute_argv_once(void) {
         char *tmp = prev_argv[argv_index];
 
         /* Move the data */
-        memmove(&prev_argv[argv_index], &prev_argv[argv_index+1],
-                sizeof(char**) * (prev_argc - argv_index - 1));
+        (void)memmove(&prev_argv[argv_index], &prev_argv[argv_index + 1],
+            sizeof(char**) * (size_t)(prev_argc - (argv_index + 1)));
         prev_argv[prev_argc - 1] = tmp;
 
         nonopt++;

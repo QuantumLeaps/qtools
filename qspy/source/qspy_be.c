@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-23
-//! @version Last updated for version: 7.3.3
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for version: 7.4.0
 //!
 //! @file
 //! @brief Back-End connection point for the external Front-Ends
@@ -49,8 +49,8 @@ static uint8_t  l_txBeSeq;     /* transmit Back-End sequence number */
 static uint8_t  l_channels;    /* channels of the output (bitmask) */
 
 enum Channels {
-    BINARY_CH = (1 << 0),
-    TEXT_CH   = (1 << 1)
+    BINARY_CH = 1U, // (1U << 0U)
+    TEXT_CH   = (1U << 1U)
 };
 
 /* send a packet to Front-End */
@@ -120,16 +120,11 @@ void BE_parse(unsigned char *buf, uint32_t nBytes) {
         uint32_t len = QSPY_encode(qbuf, sizeof(qbuf), buf, nBytes);
         if (len > 0U) {
             if ((*PAL_vtbl.send2Target)(qbuf, len) != QSPY_SUCCESS) {
-                SNPRINTF_LINE("   <COMMS> ERROR    Sedning Data "
+                SNPRINTF_LINE("   <COMMS> ERROR    Sending Data "
                               "to the Target Rec=%d,Len=%d",
                               (int)buf[1], (int)len);
                 QSPY_printError();
             }
-#ifndef NDEBUG
-            if (l_testFile != (FILE *)0) {
-                fwrite(qbuf, 1, len, l_testFile);
-            }
-#endif
         }
         else {
             SNPRINTF_LINE("   <COMMS> ERROR    Target packet too big Len=%d",
@@ -275,7 +270,7 @@ int BE_parseRecFromTarget(QSpyRecord * const qrec) {
 }
 
 /*--------------------------------------------------------------------------*/
-void BE_sendShortPkt(int pktId) {
+static void BE_sendShortPkt(int pktId) {
     if ((pktId >= 128) || ((l_channels & BINARY_CH) != 0)) {
         uint8_t buf[4];
         uint8_t *pos = &buf[0];

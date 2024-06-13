@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-23
-//! @version Last updated for version: 7.3.3
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for version: 7.4.0
 //!
 //! @file
 //! @brief QSPY host utility: main parser
@@ -333,7 +333,7 @@ QSpyStatus QSpyRecord_OK(QSpyRecord * const me) {
             SNPRINTF_APPEND("%d bytes unused in ", me->len);
         }
         else {
-            SNPRINTF_APPEND("%d bytes needed in ", (-me->len));
+            SNPRINTF_APPEND("%d bytes needed in ", -(int)me->len);
         }
 
         /* is this a pre-defined QS record? */
@@ -705,9 +705,11 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
             }
             case QS_MEM_T: {
                 uint8_t const *mem = QSpyRecord_getMem(me, 1, &u32);
-                for (; u32 > 0U; --u32, ++mem) {
-                    SNPRINTF_APPEND(" %02X", (unsigned int)*mem);
-                    FPRINF_MATFILE(" %03d", (unsigned int)*mem);
+                if (mem) {
+                    for (; u32 > 0U; --u32, ++mem) {
+                        SNPRINTF_APPEND(" %02X", (unsigned int)*mem);
+                        FPRINF_MATFILE(" %03d", (unsigned int)*mem);
+                    }
                 }
                 break;
             }
@@ -799,7 +801,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* QEP records .....................................................*/
         case QS_QEP_STATE_ENTRY:
             s = "St-Entry";
-            /* fall through */
+            //lint -fallthrough
         case QS_QEP_STATE_EXIT: {
             if (s == 0) s = "St-Exit ";
             p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
@@ -817,13 +819,13 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QEP_STATE_INIT:
             s = "St-Init ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QEP_TRAN_HIST:
             if (s == 0) s = "St-Hist ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QEP_TRAN_EP:
             if (s == 0) s = "St-EP   ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QEP_TRAN_XP: {
             if (s == 0) s = "St-XP   ";
             p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
@@ -961,7 +963,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             else { /* former QS_QF_ACTIVE_ADD */
                 s = "Add  ";
             }
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_ACTIVE_RECALL: {
             if (QSPY_conf.version >= 620U) {
                 if (s == 0) s = "RCall";
@@ -1052,7 +1054,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         case QS_QF_ACTIVE_SUBSCRIBE:
             s = "Subsc";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_ACTIVE_UNSUBSCRIBE: {
             if (s == 0) s = "Unsub";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1072,7 +1074,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_POST:
             s = "Post ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_ACTIVE_POST_ATTEMPT: {
             if (s == 0) s = "PostA";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1162,7 +1164,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_GET:
             s = "AO-Get  ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_EQUEUE_GET: {
             if (s == 0) s = "EQ-Get  ";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1194,7 +1196,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ACTIVE_GET_LAST:
             s = "AO-GetL ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_EQUEUE_GET_LAST: {
             if (s == 0) s = "EQ-GetL ";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1226,11 +1228,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_EQUEUE_POST:
             s = "Post ";
             w = "Min";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_EQUEUE_POST_ATTEMPT:
             if (s == 0) s = "PostA";
             if (w == 0) w = "Mar";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_EQUEUE_POST_LIFO: {
             if (s == 0) s = "LIFO";
             if (w == 0) w = "Min";
@@ -1270,7 +1272,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         case QS_QF_MPOOL_GET:
             s = "Get  ";
             w = "Min";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_MPOOL_GET_ATTEMPT: {
             if (s == 0) s = "GetA ";
             if (w == 0) w = "Mar";
@@ -1311,7 +1313,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* QF */
         case QS_QF_NEW_ATTEMPT:
             s = "QF-NewA ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_NEW: {
             if (s == 0) s = "QF-New  ";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1428,7 +1430,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         case QS_QF_GC_ATTEMPT:
             s = "QF-gcA  ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_GC: {
             if (s == 0) s = "QF-gc   ";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1478,7 +1480,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_TIMEEVT_ARM:
             s = "Arm ";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_TIMEEVT_DISARM: {
             if (s == 0) s = "Dis ";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1601,7 +1603,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_CRIT_ENTRY:
             s = "QF-CritE";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_CRIT_EXIT: {
             if (s == 0) s = "QF-CritX";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1619,7 +1621,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_QF_ISR_ENTRY:
             s = "QF-IsrE";
-            /* fall through */
+            //lint -fallthrough
         case QS_QF_ISR_EXIT: {
             if (s == 0) s = "QF-IsrX";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -1646,7 +1648,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             else {
                 if (s == 0) s = "Sch-Pre ";
             }
-            /* fall through */
+            //lint -fallthrough
         case QS_SCHED_RESTORE: {
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
             a = QSpyRecord_getUint32(me, 1);
@@ -1675,7 +1677,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
 
         case QS_SCHED_LOCK:
             if (s == 0) s = "Sch-Lock";
-            /* fall through */
+            //lint -fallthrough
         case QS_SCHED_UNLOCK: {
             if (s == 0) s = "Sch-Unlk";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -2087,7 +2089,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             a = QSpyRecord_getUint32(me, 2);  /* offset */
             b = QSpyRecord_getUint32(me, 1);  /* data size */
             w = (char const *)QSpyRecord_getMem(me, (uint8_t)b, &c);
-            if (QSpyRecord_OK(me)) {
+            if (QSpyRecord_OK(me) && w) {
                 SNPRINTF_LINE("%010u Trg-Peek Offs=%d,Size=%d,Num=%d,Data=<",
                               t, a, b, c);
                 for (; c > 1U; --c, w += b) {
@@ -2151,13 +2153,13 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* Semaphore records ...............................................*/
         case QS_SEM_TAKE:
             if (s == 0) s = "Sem-Take";
-            /* fall through */
+            //lint -fallthrough
         case QS_SEM_BLOCK:
             if (s == 0) s = "Sem-Blk ";
-            /* fall through */
+            //lint -fallthrough
         case QS_SEM_SIGNAL:
             if (s == 0) s = "Sem-Sgnl";
-            /* fall through */
+            //lint -fallthrough
         case QS_SEM_BLOCK_ATTEMPT: {
             if (s == 0) s = "Sem-BlkA";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -2180,13 +2182,13 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         /* Mutex records ...............................................*/
         case QS_MTX_LOCK:
             if (s == 0) s = "Mtx-Lock";
-            /* fall through */
+            //lint -fallthrough
         case QS_MTX_UNLOCK:
             if (s == 0) s = "Mtx-Unlk";
-            /* fall through */
+            //lint -fallthrough
         case QS_MTX_LOCK_ATTEMPT:
             if (s == 0) s = "Mtx-LckA";
-            /* fall through */
+            //lint -fallthrough
         case QS_MTX_UNLOCK_ATTEMPT: {
             if (s == 0) s = "Mtx-UlkA";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -2207,7 +2209,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
         }
         case QS_MTX_BLOCK:
             if (s == 0) s = "Mtx-Blk ";
-            /* fall through */
+            //lint -fallthrough
         case QS_MTX_BLOCK_ATTEMPT: {
             if (s == 0) s = "Mtx-BlkA";
             t = QSpyRecord_getUint32(me, QSPY_conf.tstampSize);
@@ -2331,13 +2333,13 @@ void QSPY_parse(uint8_t const *buf, uint32_t nBytes) {
                 }
                 QSPY_printError();
             }
-            else { /* a healty record received */
+            else { /* a healthy record received */
                 QSpyRecord qrec;
                 int parse = 1;
                 ++l_seq; /* increment with natural wrap-around */
 
                 if (!isJustStarted) {
-                    /* data discountinuity found?
+                    /* data discontinuity found?
                     * but not for the QS_EMPTY record?
                     */
                     if ((l_seq != l_record[0])

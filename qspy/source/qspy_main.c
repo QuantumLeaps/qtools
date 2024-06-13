@@ -22,14 +22,13 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-23
-//! @version Last updated for version: 7.3.3
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for version: 7.4.0
 //!
 //! @file
 //! @brief main for QSPY host utility
 
 #include <stdint.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -78,7 +77,7 @@ extern char const * const l_lightPalette[];
 static char const * const *l_colorPalette = l_darkPalette;
 
 static char const l_introStr[] = \
-    "QSPY %s Copyright (c) 2005-2023 Quantum Leaps\n" \
+    "QSPY %s Copyright (c) 2005-2024 Quantum Leaps\n" \
     "Documentation: https://www.state-machine.com/qtools/qspy.html\n" \
     "Current timestamp: %s\n";
 
@@ -158,6 +157,7 @@ int main(int argc, char *argv[]) {
             /* get the event from the PAL... */
             nBytes = sizeof(l_buf);
             QSPYEvtType evt = (*PAL_vtbl.getEvt)(l_buf, &nBytes);
+            Q_ASSERT(nBytes <= sizeof(l_buf));
 
             switch (evt) {
                 case QSPY_NO_EVT: /* all intputs timed-out this time around */
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
                     if (nBytes > 0) {
                         QSPY_parse(l_buf, (uint32_t)nBytes);
                         if (l_savFile != (FILE *)0) {
-                            fwrite(l_buf, 1, nBytes, l_savFile);
+                            (void)fwrite(l_buf, 1, nBytes, l_savFile);
                         }
                     }
                     break;
@@ -205,10 +205,10 @@ void QSPY_cleanup(void) {
     PAL_closeKbd();  /* close the keyboard input (if open) */
 
     if (l_savFile != (FILE *)0) {
-        fclose(l_savFile);
+        (void)fclose(l_savFile);
     }
     if (l_outFile != (FILE *)0) {
-        fclose(l_outFile);
+        (void)fclose(l_outFile);
     }
 
     QSEQ_configFile((void*)0);
@@ -237,8 +237,8 @@ void Q_onError(char const * const module, int const id) {
 void QSPY_onPrintLn(void) {
     if (l_outFile != (FILE *)0) {
         /* output file receives all trace records, regardles of -q mode */
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
-        fputc('\n', l_outFile);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], l_outFile);
+        (void)fputc('\n', l_outFile);
     }
 
     if (QSPY_output.type < BE_OUT) { /* message to be forwarded to BE? */
@@ -250,28 +250,28 @@ void QSPY_onPrintLn(void) {
             colorPrintLn();
         }
         else {
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-            fputc('\n', stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+            (void)fputc('\n', stdout);
         }
     }
     else if (l_quiet > 0) {
         if ((l_quiet_ctr == 0U) || (QSPY_output.type != REG_OUT)) {
             if ((l_quiet < 99) || (QSPY_output.type != REG_OUT)) {
                 if (l_quiet_ctr != l_quiet - 1) {
-                    fputc('\n', stdout);
+                    (void)fputc('\n', stdout);
                 }
                 if (l_colorPalette) {
                     colorPrintLn();
                 }
                 else {
-                    fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-                    fputc('\n', stdout);
+                    (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+                    (void)fputc('\n', stdout);
                 }
                 l_quiet_ctr = l_quiet;
             }
         }
         else {
-            fputc('.', stdout);
+            (void)fputc('.', stdout);
         }
         --l_quiet_ctr;
     }
@@ -376,19 +376,19 @@ static QSpyStatus configure(int argc, char *argv[]) {
                 break;
             }
             case 'o': { /* save screen output to a file */
-                SNPRINTF_S(l_outFileName, sizeof(l_outFileName) - 1U,
+                (void)SNPRINTF_S(l_outFileName, sizeof(l_outFileName) - 1U,
                            "qspy%s.txt", l_tstampStr);
                 PRINTF_S("-o (%s)\n", l_outFileName);
                 break;
             }
             case 's': { /* save binary data to a file */
-                SNPRINTF_S(l_savFileName, sizeof(l_savFileName) - 1U,
+                (void)SNPRINTF_S(l_savFileName, sizeof(l_savFileName) - 1U,
                            "qspy%s.bin", l_tstampStr);
                 PRINTF_S("-s (%s)\n", l_savFileName);
                 break;
             }
             case 'm': { /* Matlab/Octave file output */
-                SNPRINTF_S(l_matFileName, sizeof(l_matFileName) - 1U,
+                (void)SNPRINTF_S(l_matFileName, sizeof(l_matFileName) - 1U,
                            "qspy%s.mat", l_tstampStr);
                 PRINTF_S("-m (%s)\n", l_matFileName);
                 break;
@@ -402,7 +402,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
                          "empty object-list for sequence diagram");
                     return QSPY_ERROR;
                 }
-                SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName) - 1U,
+                (void)SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName) - 1U,
                            "qspy%s.seq", l_tstampStr);
                 PRINTF_S("-g %s (%s)\n", l_seqList, l_seqFileName);
                 break;
@@ -614,7 +614,7 @@ static QSpyStatus configure(int argc, char *argv[]) {
     /* NOTE: dictionary file must be set and read AFTER configuring QSPY */
     if (l_dicFileName[0] != 'O') { /* not "OFF" ? */
         QSPY_setExternDict(l_dicFileName);
-        QSPY_readDict();
+        (void)QSPY_readDict();
     }
 
     return QSPY_SUCCESS;
@@ -674,7 +674,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
             break;
 
         case 'd':  /* save Dictionaries to a file */
-            QSPY_writeDict();
+            (void)QSPY_writeDict();
             break;
 
         case 'c':  /* clear the screen */
@@ -695,7 +695,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
 
         case 'o':  /* text output file open/close/toggle */
             if (l_outFile != (FILE *)0) {
-                fclose(l_outFile);
+                (void)fclose(l_outFile);
                 l_outFile = (FILE *)0;
                 STRNCPY_S(l_outFileName, sizeof(l_outFileName), "OFF");
                 if (opt == CMD_OPT_TOGGLE) {
@@ -704,7 +704,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
             }
             if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
                 STRNCPY_S(l_tstampStr, sizeof(l_tstampStr), QSPY_tstampStr());
-                SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
+                (void)SNPRINTF_S(l_outFileName, sizeof(l_outFileName),
                            "qspy%s.txt", l_tstampStr);
                 FOPEN_S(l_outFile, l_outFileName, "w");
                 if (l_outFile != (FILE *)0) {
@@ -723,7 +723,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
         case 'b':
         case 's':  /* binary output file open/close/toggle */
             if (l_savFile != (FILE *)0) {
-                fclose(l_savFile);
+                (void)fclose(l_savFile);
                 l_savFile = (FILE *)0;
                 STRNCPY_S(l_savFileName, sizeof(l_savFileName), "OFF");
                 if (opt == CMD_OPT_TOGGLE) {
@@ -731,7 +731,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
                 }
             }
             if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
-                SNPRINTF_S(l_savFileName, sizeof(l_savFileName),
+                (void)SNPRINTF_S(l_savFileName, sizeof(l_savFileName),
                            "qspy%s.bin", QSPY_tstampStr());
                 FOPEN_S(l_savFile, l_savFileName, "wb");
                 if (l_savFile == (FILE *)0) {
@@ -754,7 +754,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
                 }
             }
             if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
-                SNPRINTF_S(l_matFileName, sizeof(l_matFileName),
+                (void)SNPRINTF_S(l_matFileName, sizeof(l_matFileName),
                            "qspy%s.mat", QSPY_tstampStr());
                 FOPEN_S(l_matFile, l_matFileName, "w");
                 if (l_matFile != (FILE *)0) {
@@ -786,7 +786,7 @@ bool QSPY_command(uint8_t cmdId, uint8_t opt) {
                 }
             }
             if ((opt == CMD_OPT_ON) || (opt == CMD_OPT_TOGGLE)) {
-                SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName),
+                (void)SNPRINTF_S(l_seqFileName, sizeof(l_seqFileName),
                            "qspy%s.seq", QSPY_tstampStr());
                 FOPEN_S(l_seqFile, l_seqFileName, "w");
                 if (l_seqFile != (FILE *)0) {
@@ -817,9 +817,9 @@ char const* QSPY_tstampStr(void) {
     struct tm tstamp;
     static char tstampStr[64];
 
-    LOCALTIME_S(&tstamp, &rawtime);
+    (void)LOCALTIME_S(&tstamp, &rawtime);
 
-    SNPRINTF_S(tstampStr, sizeof(tstampStr), "%02d%02d%02d_%02d%02d%02d",
+    (void)SNPRINTF_S(tstampStr, sizeof(tstampStr), "%02d%02d%02d_%02d%02d%02d",
         (tstamp.tm_year + 1900) % 100,
         (tstamp.tm_mon + 1),
         tstamp.tm_mday,
@@ -928,44 +928,44 @@ static void colorPrintLn(void) {
         /* timestamp */
         char ch = QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP];
         QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP] = '\0';
-        fputs(l_colorPalette[PALETTE_TSTAMP], stdout);
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        (void)fputs(l_colorPalette[PALETTE_TSTAMP], stdout);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
         QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP] = ch;
 
         switch (QSPY_getGroup(QSPY_output.rec)) {
         case GRP_ERR: {
-            fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             break;
         }
         case GRP_INF: {
             /* description section */
             ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
-            fputs(l_colorPalette[PALETTE_DSC_INF], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_DSC_INF], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
             if (QSPY_output.len > COL_DESC) {
-                fputs(l_colorPalette[PALETTE_INF_TXT], stdout);
-                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+                (void)fputs(l_colorPalette[PALETTE_INF_TXT], stdout);
+                (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
             }
             break;
         }
         case GRP_DIC: {
-            fputs(l_colorPalette[PALETTE_DIC_TXT], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_DIC_TXT], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             break;
         }
         case GRP_TST: {
             /* description section */
             ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
-            fputs(l_colorPalette[PALETTE_DSC_TST], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_DSC_TST], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
             if (QSPY_output.len > COL_DESC) {
-                fputs(l_colorPalette[PALETTE_TST_TXT], stdout);
-                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+                (void)fputs(l_colorPalette[PALETTE_TST_TXT], stdout);
+                (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
             }
             break;
         }
@@ -973,12 +973,12 @@ static void colorPrintLn(void) {
             /* description section */
             ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
-            fputs(l_colorPalette[PALETTE_DSC_SM], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_DSC_SM], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
             if (QSPY_output.len > COL_DESC) {
-                fputs(l_colorPalette[PALETTE_SM_TXT], stdout);
-                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+                (void)fputs(l_colorPalette[PALETTE_SM_TXT], stdout);
+                (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
             }
             break;
         }
@@ -993,42 +993,42 @@ static void colorPrintLn(void) {
             /* description section */
             ch = QSPY_output.buf[QS_LINE_OFFSET + COL_DESC];
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = '\0';
-            fputs(l_colorPalette[PALETTE_DSC_QP], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_DSC_QP], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             QSPY_output.buf[QS_LINE_OFFSET + COL_DESC] = ch;
             if (QSPY_output.len > COL_DESC) {
-                fputs(l_colorPalette[PALETTE_QP_TXT], stdout);
-                fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
+                (void)fputs(l_colorPalette[PALETTE_QP_TXT], stdout);
+                (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_DESC], stdout);
             }
             break;
         }
         case GRP_USR: /* intentionally fall through */
         default: {
-            fputs(l_colorPalette[PALETTE_USR_TXT], stdout);
-            fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
+            (void)fputs(l_colorPalette[PALETTE_USR_TXT], stdout);
+            (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET + COL_TSTAMP], stdout);
             break;
         }
         }
-        fputs(B_DFLT "\n", stdout);
+        (void)fputs(B_DFLT "\n", stdout);
     }
     else if (QSPY_output.type == INF_OUT) {
-        fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-        fputs(B_DFLT_EOL "\n", stdout);
+        (void)fputs(l_colorPalette[PALETTE_INF_OUT], stdout);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        (void)fputs(B_DFLT_EOL "\n", stdout);
     }
     else if (QSPY_output.type == ERR_OUT) {
-        fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-        fputs(B_DFLT_EOL "\n", stdout);
+        (void)fputs(l_colorPalette[PALETTE_ERR_OUT], stdout);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        (void)fputs(B_DFLT_EOL "\n", stdout);
     }
     else if (QSPY_output.type == TST_OUT) {
-        fputs(l_colorPalette[PALETTE_TST_OUT], stdout);
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-        fputs(B_DFLT_EOL "\n", stdout);
+        (void)fputs(l_colorPalette[PALETTE_TST_OUT], stdout);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        (void)fputs(B_DFLT_EOL "\n", stdout);
     }
     else { /* USR_OUT */
-        fputs(l_colorPalette[PALETTE_USR_OUT], stdout);
-        fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
-        fputs(B_DFLT_EOL "\n", stdout);
+        (void)fputs(l_colorPalette[PALETTE_USR_OUT], stdout);
+        (void)fputs(&QSPY_output.buf[QS_LINE_OFFSET], stdout);
+        (void)fputs(B_DFLT_EOL "\n", stdout);
     }
 }

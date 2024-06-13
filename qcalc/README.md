@@ -14,21 +14,22 @@ for Windows and is typically included with other operating systems, such as
 Linux and MacOS.
 
 
-Usage without Installation
-==========================
+Installation
+============
 The `qcalc.py` script can be used standalone, **without** any
 installation (see Using "qcalc" below).
 
-Installing with `pip`
-=====================
-You can **install** `qcalc.py` with the standard `pip` package manager
-from [PyPi package index](https://pypi.org) by executing the following command:
+Alternatively, you can **install** `qcalc.py` with `pip` from PyPi by
+executing the following command:
+
 
 `pip install qcalc`
 
+
 Or directly from the sources directory (e.g., `/qp/qtools/qcalc`):
 
-`pip install /qp/qtools/qcalc/qcalc.tar.gz`
+
+`python setup.py install --install-dir=/qp/qtools/qcalc`
 
 
 Using "qcalc"
@@ -69,7 +70,7 @@ supports all mathematical functions (`sin()`, `cos()`, `tan()`,
 
 
 - `((0xBEEF << 16) | 1280) & ~0xFF` -- binary operators, mixed hex and decimal numbers
-- `($1011 << 24) | (1280 >> 8) ^ 0xFFF0` -- mixed binary, dec and hex numbers
+- `($1011 << 24) | (1280 >> 8) ^ 0xFFF0` -- mixed @ref qcalc_bin "binary", dec and hex numbers
 - `(1234 % 55) + 4321//33` -- remainder, integer division (note the `//` integer division operator
 - `pi/6` -- pi-constant
 - `pow(sin(ans),2) + pow(cos(ans),2)` -- scientific floating-point calculations, **ans-variable**
@@ -116,8 +117,8 @@ The ans Variable
 "qcalc" stores the result of the last computation in the `ans` variable.
 Here are some examples of expressions with the `ans` variable:
 
-- `1/ans` -- find the inverse of the last computation
-- `log(ans)/log(2)` -- find log-base-2 of the last computation
+- `1/ans` -- find the inverse of the last computation@n
+- `log(ans)/log(2)` -- find log-base-2 of the last computation@n
 
 
 64-bit Range
@@ -169,3 +170,5 @@ More information about the QTools collection is available
 online at:
 
 - https://www.state-machine.com/qtools/
+
+

@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-02-23
-//! @version Last updated for version: 7.3.3
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for version: 7.4.0
 //!
 //! @file
 //! @brief QSPY host utility: sequence diagram generation
@@ -42,6 +42,7 @@ enum {
 static FILE*       l_seqFile;
 static char        l_seqList[QS_SEQ_LIST_LEN_MAX];
 static char        l_seqNames[SEQ_ITEMS_MAX][QS_DNAME_LEN_MAX];
+static char        l_seqTokens[QS_SEQ_LIST_LEN_MAX];
 static int         l_seqNum;
 static int         l_seqLines;
 static int         l_seqSystem;
@@ -76,7 +77,7 @@ char const *my_strtok(char *str, char delim) {
     return token;
 }
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
-void QSEQ_config(void* seqFile, const char* seqList) {
+void QSEQ_config(void* seqFile, char const * seqList) {
     l_seqFile   = (FILE *)seqFile;
     l_seqNum    = 0;
     l_seqSystem = -1;
@@ -84,10 +85,9 @@ void QSEQ_config(void* seqFile, const char* seqList) {
         STRNCPY_S(l_seqList, sizeof(l_seqList), seqList);
 
         /* split the comma-separated 'seqList' into string array l_seqNames[] */
-        char seqTokens[QS_SEQ_LIST_LEN_MAX]; /* local mutable copy */
-        STRNCPY_S(seqTokens, sizeof(seqTokens), l_seqList);
+        STRNCPY_S(l_seqTokens, sizeof(l_seqTokens), l_seqList);
         char const *token;
-        for (token = my_strtok(seqTokens, ',');
+        for (token = my_strtok(l_seqTokens, ',');
              (token != (char*)0) && (l_seqNum < SEQ_ITEMS_MAX);
              token = my_strtok((char *)0, ','), ++l_seqNum)
         {
@@ -124,7 +124,7 @@ enum {
 /*..........................................................................*/
 void QSEQ_configFile(void* seqFile) {
     if (l_seqFile != (FILE*)0) {
-        fclose(l_seqFile);
+        (void)fclose(l_seqFile);
     }
     l_seqFile = (FILE*)seqFile;
     l_seqLines = 0;
@@ -170,12 +170,12 @@ void QSEQ_genHeader(void) {
     static uint32_t seq_header_len = 0;
     if (seq_header_len == 0) { /* not initialized yet? */
         int n;
-        int i = 0;
+        int i;
         int left_box_edge;
         char *seq_line = &seq_header[0];
 
         /* clear the whole header */
-        for (i = 0; (unsigned)i < sizeof(seq_header); ++i) {
+        for (i = 0; i < (int)sizeof(seq_header); ++i) {
             seq_header[i] = ' ';
         }
 
@@ -235,7 +235,7 @@ void QSEQ_genHeader(void) {
     if (l_seqLines == 0) {
         FPRINTF_S(l_seqFile, "-g %s\n\n", l_seqList);
     }
-    fwrite(seq_header, 1, seq_header_len, l_seqFile);
+    (void)fwrite(seq_header, 1, seq_header_len, l_seqFile);
     l_seqLines += 3;
 }
 /*..........................................................................*/
@@ -266,7 +266,8 @@ void QSEQ_genPost(uint32_t tstamp, int src, int dst, char const* sig,
     int i = 0;
     int j;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    (void)SNPRINTF_S(&seq_line[i], (int)sizeof(seq_line), "%010u",
+                     (unsigned)tstamp);
     i += 10;
     for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
         seq_line[i] = ((i - SEQ_LEFT_OFFSET)%SEQ_LANE_WIDTH) == 0
@@ -297,7 +298,6 @@ void QSEQ_genPost(uint32_t tstamp, int src, int dst, char const* sig,
         }
     }
     else if (src > dst) {
-        i = SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH;
         for (i = SEQ_LEFT_OFFSET + dst*SEQ_LANE_WIDTH;
                 i < SEQ_LEFT_OFFSET + src* SEQ_LANE_WIDTH; ++i)
         {
@@ -340,7 +340,7 @@ void QSEQ_genPost(uint32_t tstamp, int src, int dst, char const* sig,
     }
     seq_line[SEQ_LEFT_OFFSET + src*SEQ_LANE_WIDTH] = isAttempt ? 'A' : '*';
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 /*..........................................................................*/
@@ -357,7 +357,8 @@ void QSEQ_genPostLIFO(uint32_t tstamp, int src, char const* sig) {
     int i = 0;
     int j;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    (void)SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u",
+                     (unsigned)tstamp);
     i += 10;
     for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
         seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
@@ -388,7 +389,7 @@ void QSEQ_genPostLIFO(uint32_t tstamp, int src, char const* sig) {
     }
     seq_line[SEQ_LEFT_OFFSET + src * SEQ_LANE_WIDTH] = '*';
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 /*..........................................................................*/
@@ -411,7 +412,8 @@ void QSEQ_genPublish(uint32_t tstamp, int obj, char const* sig) {
     int i = 0;
     int j;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    (void)SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u",
+                     (unsigned)tstamp);
     i += 10;
     for (;
          i < SEQ_LEFT_OFFSET - SEQ_LANE_WIDTH + SEQ_BOX_WIDTH/2
@@ -449,7 +451,7 @@ void QSEQ_genPublish(uint32_t tstamp, int obj, char const* sig) {
     }
     seq_line[SEQ_LEFT_OFFSET + obj * SEQ_LANE_WIDTH] = '*';
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 /*..........................................................................*/
@@ -466,7 +468,8 @@ void QSEQ_genTran(uint32_t tstamp, int obj, char const* state) {
     int i = 0;
     int j;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    (void)SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u",
+                     (unsigned)tstamp);
     i += 10;
     for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
         seq_line[i] = ((i - SEQ_LEFT_OFFSET) % SEQ_LANE_WIDTH) == 0
@@ -476,7 +479,6 @@ void QSEQ_genTran(uint32_t tstamp, int obj, char const* state) {
     seq_line[i] = '|'; i += 1;
     seq_line[i] = '\n';
     seq_line_len = i + 1;
-    i = SEQ_LEFT_OFFSET + obj* SEQ_LANE_WIDTH;
 
     /* write the state annotation... */
     /* 1. scan the "state" string for special char and find its length */
@@ -521,7 +523,7 @@ void QSEQ_genTran(uint32_t tstamp, int obj, char const* state) {
         seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
     }
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 /*..........................................................................*/
@@ -538,7 +540,8 @@ void QSEQ_genAnnotation(uint32_t tstamp, int obj, char const* ann) {
     int i = 0;
     int j;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u", (unsigned)tstamp);
+    (void)SNPRINTF_S(&seq_line[i], sizeof(seq_line), "%010u",
+                     (unsigned)tstamp);
     i += 10;
     for (; i < SEQ_LEFT_OFFSET + (l_seqNum - 1)*SEQ_LANE_WIDTH; ++i) {
         seq_line[i] = ((i - SEQ_LEFT_OFFSET)%SEQ_LANE_WIDTH) == 0
@@ -548,7 +551,6 @@ void QSEQ_genAnnotation(uint32_t tstamp, int obj, char const* ann) {
     seq_line[i] = '|'; i += 1;
     seq_line[i] = '\n';
     seq_line_len = i + 1;
-    i = SEQ_LEFT_OFFSET + obj*SEQ_LANE_WIDTH;
     /* write the annotation */
     int len = (int)strlen(ann);
     if (len > SEQ_LABEL_MAX) {
@@ -569,7 +571,7 @@ void QSEQ_genAnnotation(uint32_t tstamp, int obj, char const* ann) {
         seq_line[SEQ_LEFT_OFFSET + l_seqSystem*SEQ_LANE_WIDTH] = '/';
     }
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 /*..........................................................................*/
@@ -585,7 +587,7 @@ void QSEQ_genTick(uint32_t rate, uint32_t nTick) {
     uint32_t seq_line_len;
     int i = 0;
 
-    SNPRINTF_S(&seq_line[i], sizeof(seq_line),
+    (void)SNPRINTF_S(&seq_line[i], sizeof(seq_line),
                "##########  Tick<%1u> Ctr=%010u",
                (unsigned)rate, (unsigned)nTick);
     i += 34;
@@ -603,7 +605,7 @@ void QSEQ_genTick(uint32_t rate, uint32_t nTick) {
     seq_line[i] = '\n';
     seq_line_len = i + 1;
     Q_ASSERT(seq_line_len <= sizeof(seq_line));
-    fwrite(seq_line, 1, seq_line_len, l_seqFile);
+    (void)fwrite(seq_line, 1, seq_line_len, l_seqFile);
     l_seqLines += 1;
 }
 

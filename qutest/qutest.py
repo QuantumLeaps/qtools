@@ -57,7 +57,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 734
+    VERSION = 740
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -126,15 +126,16 @@ class QUTest:
         self._is_inter   = False
         self._test_fname = ""
         self._test_dname = ""
+        self._context    = Context_()
 
         # The following _dsl_dict dictionary defines the QUTest testing
         # DSL (Domain Specific Language), which is documented separately
         # in the file "qutest_dsl.py".
         #
         self._dsl_dict  = {
+            "required": self.required,
             "include": self.include,
             "test": self.test,
-            "scenario": self.test, # alias for 'test' for BDD
             "skip": self.skip,
             "expect": self.expect,
             "glb_filter": self.glb_filter,
@@ -157,7 +158,10 @@ class QUTest:
             "poke": self.poke,
             "fill": self.fill,
             "note": self.note,
-            "tag": self.note,  # alias for 'note' for BDD
+            "scenario": scenario, # for BDD
+            "given": given,       # for BDD
+            "when": when,         # for BDD
+            "then": then,         # for BDD
             "pack": struct.pack,
             "test_file": self._test_fname,
             "test_dir": self._test_dname,
@@ -265,6 +269,11 @@ class QUTest:
         if not self._on_setup():
             self._fail("on_setup() failed")
             return
+
+    # SCENARIO DSL command .......................................................
+    def SCENARIO(self, title="", opt=0):
+        self.context = Context_() # reset the context
+        self.test(f"SCENARIO: {title}", opt)
 
     # expect DSL command .....................................................
     def expect(self, exp, ignore=False):
@@ -749,6 +758,13 @@ class QUTest:
         if self._to_skip == 0: # not skipping already?
             self._to_skip = n_tests
 
+    # required DSL command ....................................................
+    def required(self, cond, msg = ""):
+        if not cond:
+            self.note(msg)
+            QUTest_inst._fail()
+            raise ExitOnFailException
+
     # include DSL command ....................................................
     def include(self, fname):
         path = os.path.normcase(os.path.join(self._test_dname, fname))
@@ -779,6 +795,22 @@ class QUTest:
         if (dest & QUTest._OPT_TRACE) != 0:
             QSpy.qspy_show(msg, kind=0x0)
 
+    # GIVEN DSL command .....................................................
+    def GIVEN(self, msg="", dest=0x3):
+        self.note(f"\n   GIVEN: {msg}")
+
+    # WHEN DSL command .....................................................
+    def WHEN(self, msg="", dest=0x3):
+        self.note(f"    WHEN: {msg}")
+
+    # THEN DSL command .....................................................
+    def THEN(self, msg="", dest=0x3):
+        self.note(f"    THEN: {msg}")
+
+    # AND DSL command .....................................................
+    def AND(self, msg="", dest=0x3):
+        self.note(f"     AND: {msg}")
+
     # dummy callbacks --------------------------------------------------------
     def _dummy_on_reset(self):
         #print("_dummy_on_reset")
@@ -800,6 +832,7 @@ class QUTest:
 
         with open(fname, encoding="utf-8") as script_file:
             # pylint: disable=protected-access
+            global QUTest_inst
             QUTest_inst = QUTest()
             QUTest_inst._test_fname = fname
             QUTest_inst._test_dname = os.path.dirname(fname)
@@ -1050,6 +1083,89 @@ class QUTest:
         else:
             print(msg, end='')
 
+#=============================================================================
+# BDD support...
+
+class Context_:
+    pass
+
+class scenario:
+    def __init__(self, title, opt=0):
+        self.title = title
+        self.opt = opt
+
+    def __call__(self, action):
+        def wrapper():
+            pass
+
+        QUTest_inst.test(f"Scenario: {self.title}", self.opt)
+        QUTest_inst._context = action(Context_()) # clear the context!
+        return wrapper
+
+class given:
+    def __init__(self, *msgs):
+        self.msgs = msgs
+
+    def __call__(self, action):
+        def wrapper():
+            pass
+
+        global QUTest_inst
+        if QUTest_inst._state == QUTest._SKIP:
+            return wrapper
+
+        if len(self.msgs) > 0:
+            QUTest_inst.note(f"\n   Given: {self.msgs[0]}")
+            for msg in self.msgs[1:]:
+                QUTest_inst.note(f"     And: {msg}")
+        else:
+            QUTest_inst.note("\n   Given:")
+        QUTest_inst._context = action(QUTest_inst._context)
+        return wrapper
+
+class when:
+    def __init__(self, *msgs):
+        self.msgs = msgs
+
+    def __call__(self, action):
+        def wrapper():
+            pass
+
+        global QUTest_inst
+        if QUTest_inst._state == QUTest._SKIP:
+            return wrapper
+
+        if len(self.msgs) > 0:
+            QUTest_inst.note(f"    When: {self.msgs[0]}")
+            for msg in self.msgs[1:]:
+                QUTest_inst.note(f"     And: {msg}")
+        else:
+            QUTest_inst.note("    When:")
+        action(QUTest_inst._context)
+        return wrapper
+
+class then:
+    def __init__(self, *msgs):
+        self.msgs = msgs
+
+    def __call__(self, action):
+        def wrapper():
+            pass
+
+        global QUTest_inst
+        if QUTest_inst._state == QUTest._SKIP:
+            return wrapper
+
+        if len(self.msgs) > 0:
+            QUTest_inst.note(f"    Then: {self.msgs[0]}")
+            for msg in self.msgs[1:]:
+                QUTest_inst.note(f"     And: {msg}")
+        else:
+            QUTest_inst.note("    Then:")
+        action(QUTest_inst._context)
+        return wrapper
+
+#=============================================================================
 class ExitOnFailException(Exception):
     # test failed and exit-on-fail (-x) is set
     pass

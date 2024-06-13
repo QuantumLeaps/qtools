@@ -23,8 +23,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2023-12-12
-* @version Last updated for version: 7.3.1
+* @date Last updated on: 2024-06-21
+* @version Last updated for version: 7.4.0
 *
 * @file
 * @brief Platform Abstraction Layer (PAL)
@@ -94,7 +94,7 @@ void PAL_updateReadySet(int targetConn);
 #define Q_ASSERT(test_) ((test_) \
         ? (void)0 : Q_onError(__FILE__, __LINE__))
 
-void Q_onError(char const * const module, int const id);
+_Noreturn void Q_onError(char const * const module, int const id);
 #endif
 
 #endif /* PAL_H_ */

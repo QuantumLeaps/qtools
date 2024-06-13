@@ -18,11 +18,16 @@
 *.tmp
 *.log
 *.chm
+*.log
+*.csv
+*.html
 *.zip
 *.tar.gz
 *.avrsuo
+*.vcxproj.user
 version-*
 
+.vs/
 html/
 latex/
 test_priv/

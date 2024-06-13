@@ -1,0 +1,60 @@
+//============================================================================
+// QP/C Real-Time Embedded Framework (RTEF)
+// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for version: 7.4.0
+//!
+//! @file
+//! @brief PC-Lint-Plus option file for linting QSPY source code
+
+//============================================================================
+// general options
+-unit_check        // perform only subset check (suppresses Global Wrapup)
+-max_threads=1     // suppress message "no '-max_threads=N' option"
+++efreeze(686)     // never suppress (see PC-Lint-Plus in Safety-Critical)
+//-vf              // print names of all source files (for debugging linting)
+
+// include directories
+-i.                // compiler config
+-i../include       // QSPY includes
+
+// standards
+// language standard...
+co-gcc.lnt         // GCC config
+
+au-ds.lnt          // Dan Saks recommendations
+cpu.lnt            // size/alignment options for the chosen CPU
+
+//============================================================================
+// "no return" semantics for error/failure callbacks
+-sem(Q_onError, r_no)
+
+//============================================================================
+-e786    // string concatenation within initializer
+-e641    // implicit conversion of enum to integral type
+//-e534    // ignoring return value of function
+-e834    // operator '-' followed '-' could be confusing without parentheses
+-e816    // non-ISO format specification '%I64d'
+-e705    // format '%I64d' specifies type '__int64' (aka 'long long')
+         // which is nominally inconsistent with argument 'uint64_t'

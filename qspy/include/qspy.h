@@ -28,8 +28,8 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2024-02-16
-* @version Last updated for version: 7.3.3
+* @date Last updated on: 2024-06-21
+* @version Last updated for version: 7.4.0
 *
 * @file
 * @brief Host API
@@ -37,7 +37,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "7.3.3"
+#define QSPY_VER "7.4.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -333,7 +333,7 @@ char const* QSPY_getMatDict(char const* s);
 
 void QSEQ_configFile(void *seqFile);
 bool QSEQ_isActive(void);
-void QSEQ_config(void* seqFile, const char* seqList);
+void QSEQ_config(void* seqFile, char const* seqList);
 void QSEQ_updateDictionary(char const* name, KeyType key);
 int  QSEQ_find(KeyType key);
 void QSEQ_genHeader(void);

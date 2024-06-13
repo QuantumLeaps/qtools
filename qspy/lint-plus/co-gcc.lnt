@@ -1,0 +1,80 @@
+/* Compiler configuration for 'gcc' version '9.2.0'.
+   Using the options:
+   C specific options:
+   C++ specific options:
+   Generated on 2024-06-21 at 11:05:34 with pclp_config version '2.0' and database version '2.0'.
+ */
+
+// Base Options
+//     Extensions
++fdi  // Starts its #include search in the directory of the including file
++fgi  // Enable GNU inline semantics
++fld  // Enable support for gcc label designators
++ppw(include_next)  // Enable support for #include_next
++ppw(ident)  // Enable support for #ident
++ppw(warning)  // Enable support for #warning
++ppw(import)  // Enable support for #import
++ppw(sccs)  // Enable support for #sccs
++ppw(unassert)  // Enable support for #unassert
++cpp(.cc)  // Make .cc a C++ file extension in addition to the default of .cpp and .cxx
++rw(__typeof__)
++rw(_Decimal32)
++rw(_Decimal64)
++rw(_Decimal128)
++rw(__alignof)
++rw(__attribute)
++rw(__builtin_choose_expr)
++rw(__builtin_offsetof)
++rw(__builtin_types_compatible_p)
++rw(__builtin_va_arg)
++rw(__extension__)
++rw(__imag)
++rw(__label__)
++rw(__real)
++rw(__thread)
++rw(__PRETTY_FUNCTION__)
++rw(typeof)
+-rw_asgn(__inline,inline)
+-rw_asgn(__inline__,inline)
+-rw_asgn(__signed__,signed)
+-rw_asgn(__signed,signed)
+-rw_asgn(__volatile__,volatile)
+-rw_asgn(__volatile,volatile)
+-rw_asgn(__alignof__,__alignof)
+-rw_asgn(__const,const)
+-rw_asgn(asm,_up_to_brackets)
+-rw_asgn(__asm,_up_to_brackets)
+-rw_asgn(__asm__,_up_to_brackets)
+++dassert(x)=__lint_assert(!!(x))
+++d__attr_dealloc(dealloc,argno)=  // Avoid use of argument-accepting malloc attribute
+++d__attr_dealloc_free=  // Avoid use of __builtin_free
+
+//     Suppressions
+-emacro(530, va_start)
+-emacro(530, va_end)
+-emacro(413, offsetof)
+-emacro(160 523 505 866,assert)
+
+// Transformed compiler options
+
+// Size Options
+-si4 -sl4 -sll8 -ss2 -sw2 -sp4 -sf4 -sd8 -sld12 +fzl
+
+// Include Options
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0/i686-w64-mingw32"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0/i686-w64-mingw32")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0/backward"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include/c++/9.2.0/backward")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/include"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/include")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../include")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/include-fixed"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/include-fixed")
+--i"C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../i686-w64-mingw32/include"
++libdir("C:/qp/qtools/MinGW32/bin/../lib/gcc/i686-w64-mingw32/9.2.0/../../../../i686-w64-mingw32/include")
+
++libh(co-gcc.h)
+-header(co-gcc.h)

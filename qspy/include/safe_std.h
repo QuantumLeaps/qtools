@@ -22,8 +22,8 @@
 // <www.state-machine.com>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2022-07-30
-//! @version Last updated for: @ref qpc_7_1_3
+//! @date Last updated on: 2024-06-21
+//! @version Last updated for: @ref qtools_7_4_0
 //!
 //! @file
 //! @brief "safe" <stdio.h> and <string.h> facilities
@@ -37,29 +37,29 @@
 #ifdef _WIN32 // Windows OS?
 
 #define MEMMOVE_S(dest_, num_, src_, count_) \
-    memmove_s(dest_, num_, src_, count_)
+    (void)memmove_s(dest_, num_, src_, count_)
 
 #define STRNCPY_S(dest_, destsiz_, src_) \
-    strncpy_s(dest_, destsiz_, src_, _TRUNCATE)
+    (void)strncpy_s(dest_, destsiz_, src_, _TRUNCATE)
 
 #define STRCAT_S(dest_, destsiz_, src_) \
-    strcat_s(dest_, destsiz_, src_)
+    (void)strcat_s(dest_, destsiz_, src_)
 
 #define SNPRINTF_S(buf_, bufsiz_, format_, ...) \
     _snprintf_s(buf_, bufsiz_, _TRUNCATE, format_, __VA_ARGS__)
 
 #define PRINTF_S(format_, ...) \
-    printf_s(format_, __VA_ARGS__)
+    (void)printf_s(format_, __VA_ARGS__)
 
 #define FPRINTF_S(fp_, format_, ...) \
-    fprintf_s(fp_, format_, __VA_ARGS__)
+    (void)fprintf_s(fp_, format_, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FREAD_S(buf_, bufsiz_, elsiz_, count_, fp_) \
     fread_s(buf_, bufsiz_, elsiz_, count_, fp_)
 #else
 #define FREAD_S(buf_, bufsiz_, elsiz_, count_, fp_) \
-    fread(buf_, elsiz_, count_, fp_)
+    (void)fread(buf_, elsiz_, count_, fp_)
 #endif // _MSC_VER
 
 #define FOPEN_S(fp_, fName_, mode_) \
@@ -73,24 +73,24 @@ if (fopen_s(&fp_, fName_, mode_) != 0) { \
 #else // other OS (Linux, MacOS, etc.) .....................................
 
 #define MEMMOVE_S(dest_, num_, src_, count_) \
-    memmove(dest_, src_, count_)
+    (void)memmove(dest_, src_, count_)
 
 #define STRNCPY_S(dest_, destsiz_, src_) do { \
-    strncpy(dest_, src_, destsiz_);           \
+    (void)strncpy(dest_, src_, destsiz_);           \
     dest_[(destsiz_) - 1] = '\0';             \
 } while (false)
 
 #define STRCAT_S(dest_, destsiz_, src_) \
-    strcat(dest_, src_)
+    (void)strcat(dest_, src_)
 
 #define SNPRINTF_S(buf_, bufsiz_, format_, ...) \
     snprintf(buf_, bufsiz_, format_, __VA_ARGS__)
 
 #define PRINTF_S(format_, ...) \
-    printf(format_, __VA_ARGS__)
+    (void)printf(format_, __VA_ARGS__)
 
 #define FPRINTF_S(fp_, format_, ...) \
-    fprintf(fp_, format_, __VA_ARGS__)
+    (void)fprintf(fp_, format_, __VA_ARGS__)
 
 #define FREAD_S(buf_, bufsiz_, elsiz_, count_, fp_) \
     fread(buf_, elsiz_, count_, fp_)
