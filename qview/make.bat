@@ -24,7 +24,7 @@
 twine check dist/*
 
 :: upload to PyPi -- skip for now
-:: twine upload dist/*
+twine upload dist/* --verbose
 
 :: copy/rename the "wheel" to the current dir
 @cp dist/%PROJ%-*.tar.gz %PROJ%.tar.gz

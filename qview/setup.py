@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name="qview",
-    version="7.3.3",
+    version="7.4.1",
     author="Quantum Leaps",
     author_email="info@state-machine.com",
     description="QView visualization and monitoring",
@@ -20,7 +20,7 @@ setup(
     platforms="any",
     py_modules=["qview"],
     entry_points={"console_scripts": ["qview = qview:main"]},
-    classifiers=["Development Status :: 5 - Production/Stable",
+    classifiers=["Development Status :: 4 - Beta",
                  "Intended Audience :: Developers",
                  "Topic :: Software Development :: Embedded Systems",
                  "Topic :: System :: Monitoring",

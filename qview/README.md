@@ -9,8 +9,7 @@ visualize the data produced by
 and can also interact with the embedded target by sending various commands.
 
 
-General Requirements
-====================
+# General Requirements
 The "qview" package requires Python 3 with the
 [tkinter](https://docs.python.org/3/library/tkinter.html) package, which
 is included in the [QTools distribution](https://www.state-machine.com/qtools)
@@ -27,55 +26,44 @@ and "attach" to the [QSPY UDP socket](https://www.state-machine.com/qtools/qspy_
 After this communication has been established, "qview" can interact with the
 instrumented target and receive data from it (through QSPY).
 
-**NOTE** The embedded C or C++ code running inside the target needs to be
+> **NOTE** The embedded C or C++ code running inside the target needs to be
 built with the [QP/Spy software tracing system](file:///C:/qp_lab/qtools/html/qpspy.html)
 instrumentation enabled. This is achieved by building the "Spy" build configuration.
 
 ![](https://www.state-machine.com/img/qview_targ.gif)
 
-# Usage without Installation
-The `qview.py` monitoring can be used standalone, **without installation** in your Python system (see [Examples below](#examples-for-windows)).
+# Installing qview
+The `qview` monitoring must be installed in your Python distribution.
 
-> **REMARK:**
-The latest `qview.py` script is included in the [QTools collection](https://github.com/QuantumLeaps/qtools). Also, the QTools collection for Windows already includes Python 3, so you don't need to install anything extra.
+## Installation from PyPi
+The [qview project](https://pypi.org/project/qview/) is available on PyPi,
+so it can be installed with `pip` as follows:
 
-# Installation with `pip`
-You can install the `qview` package with the standard `pip` package manager.
+`pip install qview`
 
-> **NOTE:**
-The `qview` package is no longer available in the [PyPi package index](https://pypi.org)
-due to the overcomplicated "two-factor authentication".
-
-Instead, you can direct `pip` to install directly from the `qview` directory
-(e.g., `/qp/qtools/qview`):
-
-`pip install /qp/qtools/qview/qview.tar.gz`
-
+## Installation from QuantumLeaps GitHub
 Alternatively, you can direct `pip` to install from Quantum Leaps GitHub:
 
 `pip install https://github.com/QuantumLeaps/qtools/releases/latest/download/qview.tar.gz`
 
+## Installation from local package
+Alternatively, you can direct `pip` to install from local package:
 
-Using "qview"
-==============
-If you are using `qview` as a standalone Python script, you invoke
-it as follows:
-
-`python /path-to-qview-script/qview.py [<cust_script> [<qspy_host> [<qspy_port>]]]`
-
-Alternatively, if you've installed `qview` with `pip`, you invoke
-it as follows:
-
-`qview [cust_script] [qspy_host[:udp_port]] [local_port]`
+`pip install /qp/qtools/qview/qview.tar.gz`
 
 
-Command-line Options
---------------------
-- `cust_script` - optional customization Python scripts for your specific
-target sytem. If not specified, qview will provide only the generic facilities
-for interacting with the target (e.g., reset, setting QS filters,
-posting events, etc.)
+# Using qview
+If you've installed `qview` with `pip`, you can either run it standalone:
 
+`qview [qspy_host[:udp_port]] [local_port]`
+
+Or (more commonly) import it into **your script**, where you *customize QView*.
+In that case, you invoke your script as usual:
+
+`pythonw my_qivew.py [qspy_host[:udp_port]] [local_port]`
+
+
+## Command-line Options
 - `qspy_host[:udp_port]` - optional host-name/IP-address:port for the host
 running the QSPY host utility. If not specified, the default
 is 'localhost:7701'.
@@ -85,56 +73,30 @@ specified, the default is '0', which means that the operating system will
 choose an open port.
 
 
-Examples (for Windows):
------------------------
-`python %QTOOLS%\qview\qview.py`
+## Examples:
+`pythonw %QTOOLS%\qview\qview.py`
 
 opens the generic (not customized) "qview".
 
-`python %QTOOLS%\qview\qview.py dpp.py`
+`pythonw dpp.py`
 
 opens "qview" with the customization provided in the `dpp.py` script
 located in the current directory.
 
-`qview ..\qview\dpp.py localhost:7701`
+`pythonw dpp.py localhost:7701`
 
 opens "qview" (installed with `pip`) with the customization provided in the
 `dpp.py` script located in the directory `..\qview`.  The "qview" will
 attach to the QSPY utility running at `localhost:7701`.
 
-`qview dpp.py 192.168.1.100:7705`
+`pythonw dpp.py 192.168.1.100:7705`
 
 opens "qview" (installed with `pip`) with the customization provided in the
 `dpp.py` script located in the current directory. The "qview" will attach to
 the QSPY utility running remotely at IP address `192.168.1.100:7705`.
 
 
-Examples (for Linux/macOS):
----------------------------
-`python $(QTOOLS)/qview/qview.py`
-
-opens the generic (not customized) "qview".
-
-`python $(QTOOLS)/qview/qview.py dpp.py`
-
-opens "qview" with the customization provided in the `dpp.py` script
-located in the current directory.
-
-`qview *.py ../qview/dpp.py localhost:7701`
-
-opens "qview" (installed with `pip`) with the customization provided in the
-`dpp.py` script located in the directory `../qview`.  The "qview" will
-attach to the QSPY utility running at `localhost:7701`.
-
-`qview dpp.py 192.168.1.100:7705`
-
-opens "qview" (installed with `pip`) with the customization provided in the
-`dpp.py` script located in the current directory. The "qview" will attach to
-the QSPY utility running remotely at IP address `192.168.1.100:7705`.
-
-
-More Information
-================
+# More Information
 More information about the QView Visualization and Monitoring is available
 online at:
 
