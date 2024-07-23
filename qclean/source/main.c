@@ -1,39 +1,32 @@
-/*============================================================================
-* QTools Collection
-*
-*                   Q u a n t u m  L e a P s
-*                   ------------------------
-*                   Modern Embedded Software
-*
-* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-*
-* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-*
-* This software is dual-licensed under the terms of the open source GNU
-* General Public License version 3 (or any later version), or alternatively,
-* under the terms of one of the closed source Quantum Leaps commercial
-* licenses.
-*
-* The terms of the open source GNU General Public License version 3
-* can be found at: <www.gnu.org/licenses/gpl-3.0>
-*
-* The terms of the closed source Quantum Leaps commercial licenses
-* can be found at: <www.state-machine.com/licensing>
-*
-* Redistributions in source code must retain this top-level comment block.
-* Plagiarizing this software to sidestep the license obligations is illegal.
-*
-* Contact information:
-* <www.state-machine.com>
-* <info@state-machine.com>
-============================================================================*/
-/*!
-* @date Last updated on: 2024-02-20
-* @version Last updated for version: 7.3.3
-*
-* @file
-* @brief main for QClean host utility
-*/
+//============================================================================
+// QClean white space cleanup host utility
+//
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
+//
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -122,7 +115,7 @@ static FileType const l_fileTypes[] = {
     { ".project", 8, CR_FLG                           }, /* Eclipse project */
     { ".cproject",9, CR_FLG                           }, /* Eclipse CDT project */
 
-    { ".md5",     4, CR_FLG | TAB_FLG                 }, /* MD5 file */
+    { ".sha1",    5, CR_FLG | TAB_FLG                 }, /* Sha1 file */
     { ".pro",     4, CR_FLG | TAB_FLG                 }, /* Qt project */
 
     { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB */
@@ -141,7 +134,7 @@ static int const l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
 * the function returns 0.
 */
 unsigned isMatching(char const *fname) {
-    int const flen = strlen(fname);
+    int const flen = (int)strlen(fname);
 
     FileType const *ft = &l_fileTypes[0];
     for (int n = l_fileNum; n > 0; --n, ++ft) { /* go over all file types.. */
@@ -206,7 +199,8 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     char *src = src_buf;
     static char dst_buf[10*1024*1024]; /* 10MB buffer */
     char *dst = dst_buf;
-    int nBytes = FREAD_S(src_buf, sizeof(src_buf), 1U, sizeof(src_buf), f);
+    int nBytes = (int)FREAD_S(src_buf, sizeof(src_buf),
+                              1U, sizeof(src_buf), f);
     fclose(f);
     if (nBytes == sizeof(src_buf)) { /* full buffer? */
         PRINTF_S("\n%s(too big -- skipped)\n", fname);

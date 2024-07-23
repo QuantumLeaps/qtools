@@ -1,0 +1,6 @@
+@cls
+@echo without dictionaries...
+qspy -f dpp-qpc.bin
+
+@echo with dictionaries...
+qspy -f dpp-qpc.bin -d dpp-qpc.dic

@@ -2,6 +2,11 @@
 
 #=============================================================================
 # QView Monitoring for QP/Spy
+#
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
+#
 # Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
@@ -28,7 +33,9 @@
 # pylint: disable=missing-module-docstring,
 # pylint: disable=missing-class-docstring,
 # pylint: disable=missing-function-docstring
-# pylint: disable=broad-except
+# pylint: disable=protected-access
+# pylint: disable=invalid-name
+# pylint: disable=broad-exception-caught
 
 from tkinter import *
 from tkinter.ttk import * # override the basic Tk widgets with Ttk widgets
@@ -39,7 +46,6 @@ import socket
 import time
 import sys
 import struct
-import os
 import traceback
 import webbrowser
 
@@ -49,7 +55,7 @@ import webbrowser
 #
 class QView:
     ## current version of QView
-    VERSION = 741
+    VERSION = 800
 
     # public static variables...
     ## menu to be customized
@@ -110,10 +116,8 @@ class QView:
 
         # create the QView GUI
         QView._gui = Tk()
-        QView._gui.title("QView " + \
-            "%d.%d.%d"%(QView.VERSION//100, \
-                       (QView.VERSION//10) % 10, \
-                        QView.VERSION % 10))
+        QView._gui.title(f"QView {QView.VERSION//100}."\
+                f"{(QView.VERSION//10) % 10}.{QView.VERSION % 10}")
         QView._init_gui(QView._gui)
 
         err = QSpy._init()
@@ -163,10 +167,10 @@ class QView:
 
     # local filter groups...
     IDS_ALL= 0xF0
-    IDS_AO = (0x80 + 0)
-    IDS_EP = (0x80 + 64)
-    IDS_EQ = (0x80 + 80)
-    IDS_AP = (0x80 + 96)
+    IDS_AO = 0x80 + 0
+    IDS_EP = 0x80 + 64
+    IDS_EQ = 0x80 + 80
+    IDS_AP = 0x80 + 96
 
     # on_init() callback
     def on_init(self):
@@ -182,7 +186,7 @@ class QView:
 
     ## @brief Send the RESET packet to the Target
     @staticmethod
-    def reset_target(*args):
+    def reset_target():
         if QView._have_info:
             QSpy._sendTo(pack("<B", QSpy._TRGT_RESET))
         else:
@@ -191,14 +195,14 @@ class QView:
     ## @brief executes a given command in the Target
     # @sa qutest_dsl.command()
     @staticmethod
-    def command(cmdId, param1 = 0, param2 = 0, param3 = 0):
-        if isinstance(cmdId, int):
+    def command(cmd_id, param1 = 0, param2 = 0, param3 = 0):
+        if isinstance(cmd_id, int):
             QSpy._sendTo(pack("<BBIII", QSpy._TRGT_COMMAND,
-                             cmdId, param1, param2, param3))
+                             cmd_id, param1, param2, param3))
         else:
             QSpy._sendTo(pack("<BBIII", QSpy._QSPY_SEND_COMMAND,
                              0, param1, param2, param3),
-                cmdId) # add string command ID to end
+                cmd_id) # add string command ID to end
 
     ## @brief trigger system clock tick in the Target
     # @sa qutest_dsl.tick()
@@ -236,57 +240,57 @@ class QView:
             # negative filter argument meand 'remove' (disallow)
             is_neg = False
             if isinstance(arg, str):
-                is_neg = (arg[0] == '-') # is  request?
+                is_neg = arg[0] == '-' # is  request?
                 if is_neg:
                     arg = arg[1:]
                 try:
                     arg = QSpy._QS.index(arg)
                 except Exception:
                     QView._MessageDialog("Error in glb_filter()",
-                                         'arg="' + arg + '"\n' +
+                                         f'arg="{arg}"\n' +
                                          traceback.format_exc(3))
                     sys.exit(-5) # return: event-loop might not be running yet
             else:
-                is_neg = (arg < 0)
+                is_neg = arg < 0
                 if is_neg:
                     arg = -arg
 
             if arg < 0x7F:
                 _apply(1 << arg, is_neg)
-            elif arg == GRP_ON:
+            elif arg == QView.GRP_ON:
                 _apply(QSpy._GLB_FLT_MASK_ALL, is_neg)
-            elif arg == GRP_SM:
+            elif arg == QView.GRP_SM:
                 _apply(QSpy._GLB_FLT_MASK_SM, is_neg)
-            elif arg == GRP_AO:
+            elif arg == QView.GRP_AO:
                 _apply(QSpy._GLB_FLT_MASK_AO, is_neg)
-            elif arg == GRP_MP:
+            elif arg == QView.GRP_MP:
                 _apply(QSpy._GLB_FLT_MASK_MP, is_neg)
-            elif arg == GRP_EQ:
+            elif arg == QView.GRP_EQ:
                 _apply(QSpy._GLB_FLT_MASK_EQ, is_neg)
-            elif arg == GRP_TE:
+            elif arg == QView.GRP_TE:
                 _apply(QSpy._GLB_FLT_MASK_TE, is_neg)
-            elif arg == GRP_QF:
+            elif arg == QView.GRP_QF:
                 _apply(QSpy._GLB_FLT_MASK_QF, is_neg)
-            elif arg == GRP_SC:
+            elif arg == QView.GRP_SC:
                 _apply(QSpy._GLB_FLT_MASK_SC, is_neg)
-            elif arg == GRP_SEM:
+            elif arg == QView.GRP_SEM:
                 _apply(QSpy._GLB_FLT_MASK_SEM, is_neg)
-            elif arg == GRP_MTX:
+            elif arg == QView.GRP_MTX:
                 _apply(QSpy._GLB_FLT_MASK_MTX, is_neg)
-            elif arg == GRP_U0:
+            elif arg == QView.GRP_U0:
                 _apply(QSpy._GLB_FLT_MASK_U0, is_neg)
-            elif arg == GRP_U1:
+            elif arg == QView.GRP_U1:
                 _apply(QSpy._GLB_FLT_MASK_U1, is_neg)
-            elif arg == GRP_U2:
+            elif arg == QView.GRP_U2:
                 _apply(QSpy._GLB_FLT_MASK_U2, is_neg)
-            elif arg == GRP_U3:
+            elif arg == QView.GRP_U3:
                 _apply(QSpy._GLB_FLT_MASK_U3, is_neg)
-            elif arg == GRP_U4:
+            elif arg == QView.GRP_U4:
                 _apply(QSpy._GLB_FLT_MASK_U4, is_neg)
-            elif arg == GRP_UA:
+            elif arg == QView.GRP_UA:
                 _apply(QSpy._GLB_FLT_MASK_UA, is_neg)
             else:
-                assert 0, "invalid global filter arg=0x%X"%(arg)
+                assert 0, f"invalid global filter arg=0x{arg:02x}"
 
         QSpy._sendTo(pack("<BBQQ", QSpy._TRGT_GLB_FILTER, 16,
                           QView._glb_filter & 0xFFFFFFFFFFFFFFFF,
@@ -313,18 +317,18 @@ class QView:
 
             if arg < 0x7F:
                 _apply(1 << arg, is_neg)
-            elif arg == IDS_ALL:
+            elif arg == QView.IDS_ALL:
                 _apply(QSpy._LOC_FLT_MASK_ALL, is_neg)
-            elif arg == IDS_AO:
+            elif arg == QView.IDS_AO:
                 _apply(QSpy._LOC_FLT_MASK_AO, is_neg)
-            elif arg == IDS_EP:
+            elif arg == QView.IDS_EP:
                 _apply(QSpy._LOC_FLT_MASK_EP, is_neg)
-            elif arg == IDS_EQ:
+            elif arg == QView.IDS_EQ:
                 _apply(QSpy._LOC_FLT_MASK_EQ, is_neg)
-            elif arg == IDS_AP:
+            elif arg == QView.IDS_AP:
                 _apply(QSpy._LOC_FLT_MASK_AP, is_neg)
             else:
-                assert 0, "invalid local filter arg=0x%X"%(arg)
+                assert 0, f"invalid local filter arg=0x{arg:02x}"
 
         QSpy._sendTo(pack("<BBQQ", QSpy._TRGT_LOC_FILTER, 16,
                           QView._loc_filter & 0xFFFFFFFFFFFFFFFF,
@@ -363,7 +367,7 @@ class QView:
         if isinstance(obj_id, int):
             QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
                 QSpy._TRGT_CURR_OBJ, obj_kind, obj_id))
-            obj_id = "0x%08X"%(obj_id)
+            obj_id = f"0x{obj_id:08x}"
         else:
             QSpy._sendTo(pack("<BB" + QSpy._fmt[QSpy._size_objPtr],
                 QSpy._QSPY_SEND_CURR_OBJ, obj_kind, 0), obj_id)
@@ -715,7 +719,7 @@ class QView:
     ## Set QView customization.
     # @param cust the customization class instance
     @staticmethod
-    def customize(cust):
+    def customize():
         print("This QView version no longer supports QView.customize()\n",
               " use QView.main(<cust()>) instead")
         sys.exit(-1)
@@ -748,7 +752,7 @@ class QView:
         QView._gui.quit()
 
     @staticmethod
-    def _onExit(*args):
+    def _onExit():
         QView._quit()
 
     @staticmethod
@@ -756,7 +760,7 @@ class QView:
         QView._glb_filter = 0
         QView._loc_filter = QSpy._LOC_FLT_MASK_ALL
         QView._locAO_OBJ.set("")
-        for i in range(len(QView._currObj)):
+        for i, e in enumerate(QView._currObj):
             QView._currObj[i].set("")
         QView._updateMenus()
 
@@ -765,7 +769,7 @@ class QView:
 
         # internal helper function
         def _update_glb_filter_menu(label, mask):
-            x = (QView._glb_filter & mask)
+            x = QView._glb_filter & mask
             if x == 0:
                 status = "[ - ]"
             elif x == mask:
@@ -777,7 +781,7 @@ class QView:
 
         # internal helper function
         def _update_loc_filter_menu(label, mask):
-            x = (QView._loc_filter & mask)
+            x = QView._loc_filter & mask
             if x == 0:
                 status = "[ - ]"
             elif x == mask:
@@ -787,7 +791,7 @@ class QView:
             QView._menu_loc_filter.entryconfig(label,
                     accelerator=status)
 
-        for i in range(len(QView._currObj)):
+        for i, e in enumerate(QView._currObj):
             QView._menu_curr_obj.entryconfig(i,
                 accelerator=QView._currObj[i].get())
         QView._menu_events.entryconfig(0,
@@ -841,7 +845,7 @@ class QView:
                 accelerator=QView._locAO_OBJ.get())
 
     @staticmethod
-    def _trap_error(*args):
+    def _trap_error():
         QView._showerror("Runtime Error",
            traceback.format_exc(3))
         QView._quit(-3)
@@ -854,27 +858,27 @@ class QView:
         QView._quit(-3)
 
     @staticmethod
-    def _onSaveDict(*args):
+    def _onSaveDict():
         QSpy._sendTo(pack("<B", QSpy._QSPY_SAVE_DICT))
 
     @staticmethod
-    def _onSaveText(*args):
+    def _onSaveText():
         QSpy._sendTo(pack("<B", QSpy._QSPY_TEXT_OUT))
 
     @staticmethod
-    def _onSaveBin(*args):
+    def _onSaveBin():
         QSpy._sendTo(pack("<B", QSpy._QSPY_BIN_OUT))
 
     @staticmethod
-    def _onSaveMatlab(*args):
+    def _onSaveMatlab():
         QSpy._sendTo(pack("<B", QSpy._QSPY_MATLAB_OUT))
 
     @staticmethod
-    def _onSaveSequence(*args):
+    def _onSaveSequence():
         QSpy._sendTo(pack("<B", QSpy._QSPY_SEQUENCE_OUT))
 
     @staticmethod
-    def _onCanvasView(*args):
+    def _onCanvasView():
         if QView._view_canvas.get():
             QView._canvas_toplevel.state("normal")
             # make the canvas jump to the front
@@ -889,7 +893,7 @@ class QView:
         QView._canvas_toplevel.withdraw()
 
     @staticmethod
-    def _onFrameView(*args):
+    def _onFrameView():
         if QView._view_frame.get():
             QView._frame_toplevel.state("normal")
             # make the frame jump to the front
@@ -904,177 +908,175 @@ class QView:
         QView._frame_toplevel.withdraw()
 
     @staticmethod
-    def _onGlbFilter_SM(*args):
+    def _onGlbFilter_SM():
         QView._GlbFilterDialog("SM Group", QSpy._GLB_FLT_MASK_SM)
 
     @staticmethod
-    def _onGlbFilter_AO(*args):
+    def _onGlbFilter_AO():
         QView._GlbFilterDialog("AO Group", QSpy._GLB_FLT_MASK_AO)
 
     @staticmethod
-    def _onGlbFilter_QF(*args):
+    def _onGlbFilter_QF():
         QView._GlbFilterDialog("QF Group", QSpy._GLB_FLT_MASK_QF)
 
     @staticmethod
-    def _onGlbFilter_TE(*args):
+    def _onGlbFilter_TE():
         QView._GlbFilterDialog("TE Group", QSpy._GLB_FLT_MASK_TE)
 
     @staticmethod
-    def _onGlbFilter_EQ(*args):
+    def _onGlbFilter_EQ():
         QView._GlbFilterDialog("EQ Group", QSpy._GLB_FLT_MASK_EQ)
 
     @staticmethod
-    def _onGlbFilter_MP(*args):
+    def _onGlbFilter_MP():
         QView._GlbFilterDialog("MP Group", QSpy._GLB_FLT_MASK_MP)
 
     @staticmethod
-    def _onGlbFilter_SC(*args):
+    def _onGlbFilter_SC():
         QView._GlbFilterDialog("SC Group", QSpy._GLB_FLT_MASK_SC)
 
     @staticmethod
-    def _onGlbFilter_SEM(*args):
+    def _onGlbFilter_SEM():
         QView._GlbFilterDialog("SEM Group", QSpy._GLB_FLT_MASK_SEM)
 
     @staticmethod
-    def _onGlbFilter_MTX(*args):
+    def _onGlbFilter_MTX():
         QView._GlbFilterDialog("MTX Group", QSpy._GLB_FLT_MASK_MTX)
 
     @staticmethod
-    def _onGlbFilter_U0(*args):
+    def _onGlbFilter_U0():
         QView._GlbFilterDialog("U0 Group", QSpy._GLB_FLT_MASK_U0)
 
     @staticmethod
-    def _onGlbFilter_U1(*args):
+    def _onGlbFilter_U1():
         QView._GlbFilterDialog("U1 Group", QSpy._GLB_FLT_MASK_U1)
 
     @staticmethod
-    def _onGlbFilter_U2(*args):
+    def _onGlbFilter_U2():
         QView._GlbFilterDialog("U2 Group", QSpy._GLB_FLT_MASK_U2)
 
     @staticmethod
-    def _onGlbFilter_U3(*args):
+    def _onGlbFilter_U3():
         QView._GlbFilterDialog("U3 Group", QSpy._GLB_FLT_MASK_U3)
 
     @staticmethod
-    def _onGlbFilter_U4(*args):
+    def _onGlbFilter_U4():
         QView._GlbFilterDialog("U4 Group", QSpy._GLB_FLT_MASK_U4)
 
     @staticmethod
-    def _onLocFilter_AO(*args):
+    def _onLocFilter_AO():
         QView._LocFilterDialog("AO IDs", QSpy._LOC_FLT_MASK_AO)
 
     @staticmethod
-    def _onLocFilter_EP(*args):
+    def _onLocFilter_EP():
         QView._LocFilterDialog("EP IDs", QSpy._LOC_FLT_MASK_EP)
 
     @staticmethod
-    def _onLocFilter_EQ(*args):
+    def _onLocFilter_EQ():
         QView._LocFilterDialog("EQ IDs", QSpy._LOC_FLT_MASK_EQ)
 
     @staticmethod
-    def _onLocFilter_AP(*args):
+    def _onLocFilter_AP():
         QView._LocFilterDialog("AP IDs", QSpy._LOC_FLT_MASK_AP)
 
     @staticmethod
-    def _onLocFilter_AO_OBJ(*args):
+    def _onLocFilter_AO_OBJ():
         QView._LocFilterDialog_AO_OBJ()
 
     @staticmethod
-    def _onCurrObj_SM(*args):
+    def _onCurrObj_SM():
         QView._CurrObjDialog(QView.OBJ_SM, "SM_OBJ")
         QView._updateMenus()
 
     @staticmethod
-    def _onCurrObj_AO(*args):
+    def _onCurrObj_AO():
         QView._CurrObjDialog(QView.OBJ_AO, "AO_OBJ")
         QView._updateMenus()
 
     @staticmethod
-    def _onCurrObj_MP(*args):
+    def _onCurrObj_MP():
         QView._CurrObjDialog(QView.OBJ_MP, "MP_OBJ")
 
     @staticmethod
-    def _onCurrObj_EQ(*args):
+    def _onCurrObj_EQ():
         QView._CurrObjDialog(QView.OBJ_EQ, "EQ_OBJ")
 
     @staticmethod
-    def _onCurrObj_TE(*args):
-        QView._CurrObjDialog(QView.BJ_TE, "TE_OBJ")
+    def _onCurrObj_TE():
+        QView._CurrObjDialog(QView.OBJ_TE, "TE_OBJ")
 
     @staticmethod
-    def _onCurrObj_AP(*args):
+    def _onCurrObj_AP():
         QView._CurrObjDialog(QView.OBJ_AP, "AP_OBJ")
         QView._updateMenus()
 
     @staticmethod
-    def _onQueryCurr_SM(*args):
+    def _onQueryCurr_SM():
         QView.query_curr(QView.OBJ_SM)
 
     @staticmethod
-    def _onQueryCurr_AO(*args):
+    def _onQueryCurr_AO():
         QView.query_curr(QView.OBJ_AO)
 
     @staticmethod
-    def _onQueryCurr_MP(*args):
+    def _onQueryCurr_MP():
         QView.query_curr(QView.OBJ_MP)
 
     @staticmethod
-    def _onQueryCurr_EQ(*args):
+    def _onQueryCurr_EQ():
         QView.query_curr(QView.OBJ_EQ)
 
     @staticmethod
-    def _onQueryCurr_TE(*args):
+    def _onQueryCurr_TE():
         QView.query_curr(QView.OBJ_TE)
 
     @staticmethod
-    def _onQueryCurr_AP(*args):
+    def _onQueryCurr_AP():
         QView.query_curr(QView.OBJ_AP)
 
     @staticmethod
-    def _onTargetInfo(*args):
+    def _onTargetInfo():
         QSpy._sendTo(pack("<B", QSpy._TRGT_INFO))
 
     @staticmethod
-    def _onClearQspy(*args):
+    def _onClearQspy():
         QSpy._sendTo(pack("<B", QSpy._QSPY_CLEAR_SCREEN))
 
     @staticmethod
-    def _onTick0(*args):
+    def _onTick0():
         QView.tick(0)
 
     @staticmethod
-    def _onTick1(*args):
+    def _onTick1():
         QView.tick(1)
 
     @staticmethod
-    def _onEvt_PUBLISH(*args):
-        QView._EvtDialog("Publish Event", publish)
+    def _onEvt_PUBLISH():
+        QView._EvtDialog("Publish Event", QView.publish)
 
     @staticmethod
-    def _onEvt_POST(*args):
-        QView._EvtDialog("Post Event", post)
+    def _onEvt_POST():
+        QView._EvtDialog("Post Event", QView.post)
 
     @staticmethod
-    def _onEvt_INIT(*args):
-        QView._EvtDialog("Init Event", init)
+    def _onEvt_INIT():
+        QView._EvtDialog("Init Event", QView.init)
 
     @staticmethod
-    def _onEvt_DISPATCH(*args):
-        QView._EvtDialog("Dispatch Event", dispatch)
+    def _onEvt_DISPATCH():
+        QView._EvtDialog("Dispatch Event", QView.dispatch)
 
     @staticmethod
-    def _onHelp(*args):
+    def _onHelp():
         webbrowser.open("https://www.state-machine.com/qtools/qview.html",
                         new=2)
 
     @staticmethod
-    def _onAbout(*args):
+    def _onAbout():
         QView._MessageDialog("About QView",
-            "QView version   " + \
-            "%d.%d.%d"%(QView.VERSION//100, \
-                       (QView.VERSION//10) % 10, \
-                        QView.VERSION % 10) + \
-            "\n\nFor more information see:\n"
+            f"QView version   {QView.VERSION//100}."\
+            f"{(QView.VERSION//10) % 10}.{QView.VERSION % 10}"\
+            "\n\nFor more information see:\n"\
             "https://www.state-machine.com/qtools/qview.html")
 
     @staticmethod
@@ -1084,13 +1086,13 @@ class QView:
 
     @staticmethod
     def _strVar_value(strVar, base=0):
-        str = strVar.get().replace(" ", "") # cleanup spaces
-        strVar.set(str)
+        val = strVar.get().replace(" ", "") # cleanup spaces
+        strVar.set(val)
         try:
-            value = int(str, base=base)
+            value = int(val, base=base)
             return value # integer
         except Exception:
-            return str # string
+            return val # string
 
 
     #-------------------------------------------------------------------------
@@ -1270,6 +1272,7 @@ class QView:
     # deprecated
     class _LocFilterDialog_AO_OBJ(Dialog):
         def __init__(self):
+            self._obj = None
             super().__init__(QView._gui, "Local AO-OBJ Filter")
 
         def body(self, master):
@@ -1283,13 +1286,14 @@ class QView:
             return 1
 
         def apply(self):
-            ao_filter(self._obj)
+            QView.ao_filter(self._obj)
 
     #.........................................................................
     class _CurrObjDialog(Dialog):
         def __init__(self, obj_kind, label):
             self._obj_kind = obj_kind
             self._label = label
+            self._obj = None
             super().__init__(QView._gui, "Current Object")
 
         def body(self, master):
@@ -1306,12 +1310,17 @@ class QView:
             return 1
 
         def apply(self):
-            current_obj(self._obj_kind, self._obj)
+            QView.current_obj(self._obj_kind, self._obj)
 
     #.........................................................................
     class _CommandDialog(Dialog):
         def __init__(self):
+            self._cmdId = None
+            self._param1 = None
+            self._param2 = None
+            self._param3 = None
             super().__init__(QView._gui, "Command")
+
         def body(self, master):
             Label(master, text="command").grid(row=0,column=0,sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=25,
@@ -1352,12 +1361,16 @@ class QView:
             return 1
 
         def apply(self):
-            command(self._cmdId, self._param1, self._param2, self._param3)
+            QView.command(self._cmdId,
+                          self._param1, self._param2, self._param3)
 
     #.........................................................................
     class _NoteDialog(Dialog):
         def __init__(self):
+            self._note = None
+            self._note_kind = None
             super().__init__(QView._gui, "Show Note")
+
         def body(self, master):
             Label(master, text="message").grid(row=0,column=0,sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=65,
@@ -1365,10 +1378,12 @@ class QView:
             Label(master, text="kind").grid(row=1,column=0,sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=5,
                   textvariable=QView._note_kind).grid(row=1,column=1,sticky=W,padx=2)
+
         def validate(self):
             self._note = QView._note.get()
             self._note_kind = QView._strVar_value(QView._note_kind)
             return 1
+
         def apply(self):
             QSpy._sendTo(struct.pack("<BB", QSpy._QSPY_SHOW_NOTE, self._note_kind),
                 self._note)
@@ -1376,12 +1391,15 @@ class QView:
     #.........................................................................
     class _PeekDialog(Dialog):
         def __init__(self):
+            self._offs = None
+            self._size = None
+            self._len = None
             super().__init__(QView._gui, "Peek")
 
         def body(self, master):
             Label(master, text="obj/addr").grid(row=0,column=0,
                 sticky=E,padx=2)
-            Label(master, text=QView._currObj[OBJ_AP].get(),anchor=W,
+            Label(master, text=QView._currObj[QView.OBJ_AP].get(),anchor=W,
                 relief=SUNKEN).grid(row=0,column=1, columnspan=2,sticky=E+W)
             Label(master, text="offset").grid(row=1,column=0,sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=25,
@@ -1396,7 +1414,7 @@ class QView:
                 column=2,sticky=E,padx=2)
 
         def validate(self):
-            if QView._currObj[OBJ_AP].get() == "":
+            if QView._currObj[QView.OBJ_AP].get() == "":
                 QView._MessageDialog("Peek Error", "Current AP_OBJ not set")
                 return 0
             self._offs = QView._strVar_value(QView._peek_offs)
@@ -1410,16 +1428,19 @@ class QView:
             return 1
 
         def apply(self):
-            peek(self._offs, self._size, self._len)
+            QView.peek(self._offs, self._size, self._len)
 
     #.........................................................................
     class _PokeDialog(Dialog):
         def __init__(self):
+            self._offs = None
+            self._size = None
+            self._data = None
             super().__init__(QView._gui, "Poke")
 
         def body(self, master):
             Label(master, text="obj/addr").grid(row=0,column=0,sticky=E,padx=2)
-            Label(master, text=QView._currObj[OBJ_AP].get(), anchor=W,
+            Label(master, text=QView._currObj[QView.OBJ_AP].get(), anchor=W,
                   relief=SUNKEN).grid(row=0,column=1,sticky=E+W)
             Label(master, text="offset").grid(row=1,column=0,sticky=E,padx=2)
             Entry(master, relief=SUNKEN, width=25,
@@ -1430,7 +1451,7 @@ class QView:
                   textvariable=QView._poke_data).grid(row=2,column=1)
 
         def validate(self):
-            if QView._currObj[OBJ_AP].get() == "":
+            if QView._currObj[QView.OBJ_AP].get() == "":
                 QView._MessageDialog("Poke Error", "Current AP_OBJ not set")
                 return 0
             self._offs = QView._strVar_value(QView._poke_offs)
@@ -1455,16 +1476,18 @@ class QView:
             return 1
 
         def apply(self):
-            poke(self._offs, self._size, self._data)
+            QView.poke(self._offs, self._size, self._data)
 
     #.........................................................................
     class _EvtDialog(Dialog):
         def __init__(self, title, action):
             self._action = action
-            if action == dispatch:
-                self._obj = QView._currObj[OBJ_SM].get()
+            self._sig = None
+            self._params = None
+            if action == QView.dispatch:
+                self._obj = QView._currObj[QView.OBJ_SM].get()
             else:
-                self._obj = QView._currObj[OBJ_AO].get()
+                self._obj = QView._currObj[QView.OBJ_AO].get()
             super().__init__(QView._gui, title)
 
         def body(self, master):
@@ -1479,8 +1502,8 @@ class QView:
             Entry(master, relief=SUNKEN,
                   textvariable=QView._evt_sig).grid(row=2,column=1,
                   columnspan=2,sticky=E+W)
-            for i in range(len(QView._evt_par)):
-                Label(master, text="par%d"%(i+1)).grid(row=3+i,column=0,
+            for i, e in enumerate(QView._evt_par):
+                Label(master, text=f"par{i+1}").grid(row=3+i,column=0,
                       sticky=E,padx=2)
                 OptionMenu(master, QView._evt_dtype[i], *QView._dtypes).grid(
                       row=3+i,column=1,sticky=E,padx=2)
@@ -1494,26 +1517,26 @@ class QView:
                 QView._MessageDialog("Event error", "empty event sig")
                 return 0
             self._params = bytearray()
-            for i in range(len(QView._evt_par)):
+            for i, e in enumerate(QView._evt_par):
                 par = QView._strVar_value(QView._evt_par[i])
                 if par == "":
                     break
                 if not isinstance(par, int):
-                    QView._MessageDialog("Event Error: par%d"%(i),
+                    QView._MessageDialog(f"Event Error: par{i}",
                                          "data not integer")
                     return 0
                 idx = QView._dtypes.index(QView._evt_dtype[i].get())
                 size = QView._dsizes[idx]
                 if size == 1 and par > 0xFF:
-                    QView._MessageDialog("Event Error: par%d"%(i),
+                    QView._MessageDialog(f"Event Error: par{i}",
                                          "8-bit data out of range")
                     return 0
                 if size == 2 and par > 0xFFFF:
-                    QView._MessageDialog("Event Error: par%d"%(i),
+                    QView._MessageDialog(f"Event Error: par{i}",
                                          "16-bit data out of range")
                     return 0
                 if size == 4 and par > 0xFFFFFFFF:
-                    QView._MessageDialog("Event Error: par%d"%(i),
+                    QView._MessageDialog(f"Event Error: par{i}",
                                          "32-bit data out of range")
                     return 0
 
@@ -1851,13 +1874,8 @@ class QSpy:
 
             # only show the frame, if visible
             QView._onFrameView()
-
-            return
-
         elif recID == QSpy._PKT_DETACH:
             QView._quit()
-            return
-
 
     # regullar poll of the UDP socket after it has attached.
     @staticmethod
@@ -1894,16 +1912,22 @@ class QSpy:
                 QView.print_text(packet[3:])
 
             elif recID == QSpy._PKT_TARGET_INFO:
-                if dlen != 18:
+                if dlen == 18:
+                    QView._showerror("QP Version Error,",
+                                     "QP 8.0.0 or newer required")
+                    QView._quit(-2)
+                    return
+
+                if dlen != 20:
                     QView._showerror("UDP Socket Data Error",
                                      "Corrupted Target-info")
                     QView._quit(-2)
                     return
 
-                if packet[4] & 0x80 != 0: # big endian?
+                if packet[2] & 0x80 != 0: # big endian?
                     QSpy._fmt_endian = ">"
 
-                tstamp = packet[5:18]
+                tstamp = packet[7:20]
                 QSpy._size_objPtr  = tstamp[3] & 0x0F
                 QSpy._size_funPtr  = tstamp[3] >> 4
                 QSpy._size_tstamp  = tstamp[4] & 0x0F
@@ -1913,11 +1937,11 @@ class QSpy:
                 QSpy._size_poolCtr = tstamp[2] >> 4
                 QSpy._size_poolBlk = tstamp[2] & 0x0F
                 QSpy._size_tevtCtr = tstamp[1] >> 4
-                QSpy._fmt_target = "%02d%02d%02d_%02d%02d%02d"\
-                    %(tstamp[12], tstamp[11], tstamp[10],
-                      tstamp[9], tstamp[8], tstamp[7])
+                QSpy._fmt_target = \
+                    f"{tstamp[12]:02d}{tstamp[11]:02d}{tstamp[10]:02d}"\
+                    f"{tstamp[9]:02d}{tstamp[8]:02d}{tstamp[7]:02d}"
                 #print("******* Target:", QSpy._fmt_target)
-                QView._target.configure(text="Target: " + QSpy._fmt_target)
+                QView._target.configure(text=f"Target: {QSpy._fmt_target}")
                 QView._have_info = True
 
                 # is this also target reset?
@@ -1927,7 +1951,7 @@ class QSpy:
                         QView._inst.on_reset()
                     except Exception:
                         QView._showerror("Runtime Error",
-                                            traceback.format_exc(3))
+                                         traceback.format_exc(3))
                         QView._quit(-3)
                         return
 
@@ -1941,6 +1965,8 @@ class QSpy:
                     return
 
             elif recID == QSpy._PKT_DETACH:
+                QView._showerror("UDP Socket Data Error",
+                                 "QSPY detached")
                 QView._quit()
                 return
 
@@ -1957,15 +1983,15 @@ class QSpy:
                         QView._quit(-3)
                         return
             QSpy._rx_seq += 1
-            QView._rx.configure(text="%d"%(QSpy._rx_seq))
+            QView._rx.configure(text=f"{QSpy._rx_seq}")
 
 
     @staticmethod
-    def _sendTo(packet, str=None):
+    def _sendTo(packet, sig_name=None):
         tx_packet = bytearray([QSpy._tx_seq & 0xFF])
         tx_packet.extend(packet)
-        if str is not None:
-            tx_packet.extend(bytes(str, "utf-8"))
+        if sig_name is not None:
+            tx_packet.extend(bytes(sig_name, "utf-8"))
             tx_packet.extend(b"\0") # zero-terminate
         try:
             QSpy._sock.sendto(tx_packet, QSpy._host_addr)
@@ -1975,12 +2001,12 @@ class QSpy:
             QView._quit(-1)
         QSpy._tx_seq += 1
         if not QView._gui is None:
-            QView._tx.configure(text="%d"%(QSpy._tx_seq))
+            QView._tx.configure(text=f"{QSpy._tx_seq}")
 
     @staticmethod
     def _sendEvt(ao_prio, signal, params = None):
         #print("evt:", signal, params)
-        fmt = "<BB" + QSpy._fmt[QSpy._size_sig] + "H"
+        fmt = f"<BB{QSpy._fmt[QSpy._size_sig]}H"
         if params is not None:
             length = len(params)
         else:

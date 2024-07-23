@@ -1,0 +1,58 @@
+-d241031
+-v800
+-q2
+-T4
+-O4
+-F4
+-S2
+-E2
+-Q1
+-P2
+-B2
+-C4
+-t241010_104644
+
+Obj-Dic:
+4
+0x0800503C l_SysTick_Handler
+0x20001204 Philo::inst[0]
+0x20001230 Philo::inst[0].m_timeEvt
+0x20001254 Philo::inst[1]
+0x20001280 Philo::inst[1].m_timeEvt
+0x200012A4 Philo::inst[2]
+0x200012D0 Philo::inst[2].m_timeEvt
+0x200012F4 Philo::inst[3]
+0x20001320 Philo::inst[3].m_timeEvt
+0x20001344 Philo::inst[4]
+0x20001370 Philo::inst[4].m_timeEvt
+0x20001394 Table::inst
+0x200013C8 EvtPool1
+0x20001518 QS_RX
+***
+Fun-Dic:
+4
+0x08000BD7 QP::QHsm::top
+0x08000D6D Philo::thinking
+0x08000DFD Philo::hungry
+0x08000EA5 Philo::eating
+0x08001029 Table::active
+0x080012C5 Table::serving
+0x080013CD Table::paused
+***
+Usr-Dic:
+1
+0x00000064 PHILO_STAT
+0x00000065 PAUSED_STAT
+0x00000066 CONTEXT_SW
+0x0000007C QUTEST_ON_POST
+***
+Sig-Dic:
+4
+00000004 0x00000000 EAT_SIG
+00000005 0x00000000 DONE_SIG
+00000006 0x00000000 PAUSE_SIG
+00000007 0x00000000 SERVE_SIG
+00000008 0x00000000 TEST_SIG
+00000010 0x00000000 TIMEOUT_SIG
+00000011 0x00000000 HUNGRY_SIG
+***

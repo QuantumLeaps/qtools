@@ -1,4 +1,8 @@
-![QTools Collection](https://www.state-machine.com/img/qtools_banner.jpg)
+<p align="center">
+<a href="https://www.state-machine.com/products/qtools" title="QTools collection">
+<img src="https://www.state-machine.com/img/qtools_banner.jpg"/>
+</a>
+</p>
 
 # What's New?
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qtools)](https://github.com/QuantumLeaps/qtools/releases/latest)
@@ -25,63 +29,63 @@ The following open-source tools are currently provided (NOTE: tools
 starting with 'q' are contributed by Quantum Leaps)
 
 1. [qspy](https://www.state-machine.com/qtools/qspy.html) -
-   host application for receiving and displaying the
-              real-time data from embedded targets running the QS
-              software tracing.
+   host application for receiving and displaying the real-time data from
+   embedded targets running the QS software tracing.
 
 2. [qutest](https://www.state-machine.com/qtools/qutest.html) -
-   Python extension of the QSPY host application for **uint testing**
-              specifically designed for embedded systems, but also supports
-              unit testing of embedded code on host computers
-              ("dual targeting").
+   Python extension of the `qspy` host application for
+   **unit and integration testing** specifically designed for embedded systems,
+   but also supports unit testing of embedded code on host computers
+   ("dual targeting").
 
 3. [qview](https://www.state-machine.com/qtools/qview.html) -
-   Python extension of the QSPY host application for
-              visualization and monitoring of the QS real-time tracing
-              data from embedded targets at real-time. QView enables
-              developers to quickly build both GUI-based and "headless"
-              scripts for their specific applications.
+   Python extension of the `qspy` host application for visualization and
+   monitoring of the QS real-time tracing data from embedded targets at
+   real-time. QView enables developers to quickly build both GUI-based and
+   "headless" scripts for their specific applications.
 
 4. [qwin](https://www.state-machine.com/qtools/qwin.html) -
-   QWIN GUI toolkit for prototyping embedded systems on
-              Windows in the C programming language. QWIN allows you
-              to build realistic embedded front panels consisting of
-              LCD displays (both graphical and segmented), buttons,
-              and LEDs. QWIN is based on the Win32 API.
+   QWIN GUI toolkit for prototyping embedded systems on Windows in the
+   C programming language. QWIN enables developers to build realistic embedded
+   front panels consisting of LCD displays (both graphical and segmented),
+   buttons, and LEDs. QWIN is based on the Win32 API.
 
 5. [qcalc](https://www.state-machine.com/qtools/qcalc.html) -
    programmer's calculator specifically designed for embedded systems programmers.
 
 6. [qclean](https://www.state-machine.com/qtools/qclean.html) -
-   for cleanup of white space (tabs, trailing spaces, end-of-line) in source code files
+   for *fast* cleanup of white space (tabs, trailing spaces, end-of-line)
+   in source code files
 
 7. [qfsgen](https://www.state-machine.com/qtools/qfsgen.html) -
    for generating ROM-based file systems to be used in embedded web pages
    served by the HTTP server
 
-8. Unity    - traditional unit testing harness (framework) for embedded C
-              (version 2.5.2)
+8. Unity - traditional unit testing harness (framework) for embedded C
+   (version 2.5.2)
 
 Additionally, QTools for Windows contains the following open-source,
 3rd-party tools:
 
-9. GNU-make for Windows (32-bit version 4.2.1)
+9. `make` for Windows (GNU-make-32-bit version 4.2.1)
 
-10. cmake for Windows (version 3.29.0-rc1)
+10. `cmake` for Windows (version 3.29.0-rc1)
 
-11. ninja for Windows (version 1.11.1)
+11. `ninja` for Windows (version 1.11.1)
 
-12. LMFlash for Windows (32-bit build 1613)
+12. Termite serial terminal for Windows (version 3.4)
+
+13. LMFlash for Windows (32-bit build 1613)
 
 
 Additionally, the QTools directory in the QP-bundle contains the
 following 3rd-party tools:
 
-13. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
+14. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
 
-14. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
+15. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
 
-15. Python for Windows (version 3.10 32-bit)
+16. Python for Windows (version 3.10 32-bit)
 
 
 # Downloading and Installation
@@ -107,14 +111,13 @@ On Windows, installation of QTools consists of unzipping the
 although the recommended default is `C:\qp`.
 
 After unzipping the archive, you need to add the following directories
-to the PATH:
+to the PATH (`<qp>` stands for the directory, where you installed qp):
+- `<qp>\qtools\bin`
+- `<qp>\qtools\mingw32\bin`
 
-- <qp>\qtools\bin
-- <qp>\qtools\mingw32\bin
-
-Also, to use the [QUTest unit testing][QUTest] you need to
-define the environment variable `QTOOLS` to point to the
-installation directory of QTools.
+> NOTE: To use the [QUTest unit testing][QUTest] you need to define the
+environment variable `QTOOLS` to point to the installation directory
+of QTools.
 
 
 ## QTools on Linux/macOS
@@ -122,88 +125,46 @@ On Linux/MacOS, installation of QTools consists of unzipping the
 `qtools-posix_<ver>.zip` archive into a directory of your choice,
 although the recommended default is `~/qp`.
 
-> NOTE: To use the QTools, you first need to **build** the tools on
-your machine.
+After unzipping the archive, you need to add the following directories
+to the PATH (`<qp>` stands for the directory, where you installed qp):
+- `<qp>/qtools/bin`
 
-For example, to build the QSPY host application, you need to go to the
-directory qtools/qspy/posix and type make to build the executable.
-The provided Makefile will automatically copy the qspy executable to
-the qtools/bin directory.
-
-Simiarly, you need to build the QCLEAN and QFSGEN utilities.
-
-> NOTE: To use the [QUTest unit testing][QUTest] you need to
-define the environment variable `QTOOLS` to point to the
-installation directory of QTools.
-
-
-## Build using `cmake`
-With the right set of C compilation tools on your Windows or Linux
-computer, you can build the tools by yourself.
-
-On a MS-Windows machine a setup with [MSys/MinGW64](https://www.msys2.org/) is recommended to
-perform the build. With this environment you will still be able to
-generate MS-Windows executable applications.
-Another alternative would be to install [MS Visual Studio](https://visualstudio.microsoft.com/).
-`CMake` is also able to generate build systems for this development environment.
-This however will not be a topic of this discussion. Please see the
-[CMake Documentation](https://cmake.org/cmake/help/latest/) for further
-details. Especially refer to the section on
-[cmake generators](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
-
-An appropriate [CMakeLists.txt](./CMakeLists.txt) file together with a [cmake presets
-file](./CMakePresets.json) is provided with this source code package.
-
-From within the `qtools` directory you may use `cmake` to build and
-install the 3 tools. For this you need the following in addition to the tools
-mentioned [above](#about-qtools)
-
-1. [CMake](https://cmake.org/) - build system generator ([cmake features](https://cmake.org/features/))
-
-2. [Ninja](https://ninja-build.org/) - small build system with a focus on speed
-
-To build with `cmake`
-1. From within the `qtools` directory do `cmake --preset qtools`
-2. Then build with
-   - `cmake --build --preset qtools` to build all tools at once or
-   - `cmake --build --preset qtools --target <tool>` with tool being `qclean`, `qfsgen` or `qspy`
-   - to build the `Debug` configuration use `cmake --build --preset qtools --config Debug`
-   - `Release` is the default configuration, if you don't specify a desired config
-3. The binaries are created in the `.../qtools/build/<config>` directory
-4. To install
-   - Build the `qtools` preset then
-   - call `cmake --install build [--config <config>]`
-   - The default installation location would be `/usr/local/bin` on a Linux machine or within
-     a MinGW environment on a Windows machine.
-   - add `--prefix <directory>` to the installation command line to select a different installation destination.
-     E.g. `cmake --install build --prefix /usr` will install the built applications from the `Release`
-     configuration into `/usr/bin`. On a Linux machine you might need to use `sudo` to raise your access rights
-     in order to install into system directories.
+> NOTE: To use the [QUTest unit testing][QUTest] you need to define the
+environment variable `QTOOLS` to point to the installation directory
+of QTools.
 
 
 # Licensing
 The various Licenses for distributed components are located in the
 LICENSES/ sub-directory of this QTools distribution.
 
-Most tools included in this collection are distributed under the terms
-of the GNU General Public License (GPL) as published by the Free
+- The [qspy host utility](https://www.state-machine.com/qtools/qspy.html)
+is distributed under the terms of QSPY LICENSE AGREEMENT, included in the file
+`LICENSE-qspy.txt` in the `LICENSES/` sub-directory.
+
+- The [Termite host utility for Windows](https://www.compuphase.com/software_termite.htm)
+is is distributed under the terms of the Termite license, included in the file
+`LICENSE-Termite.txt` in the `LICENSES/` sub-directory.
+
+- The [LMFlash host utility for Windows](https://www.ti.com/tool/LMFLASHPROGRAMMER)
+is is distributed under the terms of the LMFlash license, included in the file
+`LICENSE-LMFlash.txt` in the `LICENSES/` sub-directory. Specifically, the LMFlash
+utility is distributed according to Section 2a "Demonstration License".
+
+- The [Python package for Windows](https://www.python.org/) is distributed
+under the terms of the PYTHON LICENSE AGREEMENT, included in the file
+`LICENSE-Python.txt` in the `LICENSES/` sub-directory.
+
+Most other tools included in this collection are distributed under the
+terms of the GNU General Public License (GPL) as published by the Free
 Software Foundation, either version 2 of the License, or (at your
 option) any later version. The text of GPL version 2 is included in the
-file GPL-2.0-or-later.txt in the LICENSES/ sub-directory.
+file GPL-2.0-or-later.txt in the `LICENSES/` sub-directory.
 
-Some of the tools are distributed under the terms of the MIT open source
-license. The complete text of the MIT license is included in the comments
-and also in the file LICENSE-MIT.txt in the LICENSES/ sub-directory.
-
-
-The Python package is distributed under the terms of the PYTHON LICENSE
-AGREEMENT, included in the file LICENSE-Python.txt in the LICENSES/
+Some other the tools are distributed under the terms of the MIT open
+source license. The complete text of the MIT license is included in the
+comments and also in the file LICENSE-MIT.txt in the `LICENSES/`
 sub-directory.
-
-The LMFlash utility for Windows is is distributed under the terms of the
-LMFlash license, included in the file LICENSE-LMFlash.txt in the LICENSES/
-sub-directory. Specifically, the LMFlash utility is distributed according
-to Section 2a "Demonstration License".
 
 
 # Source Code
@@ -222,7 +183,7 @@ the files have been pruned to reduce the size of the distribution.
 Please refer to the MinGW project for the source code.
 
 ### The GNU-ARM Embedded Toolchain for Windows
-Have been takend from:
+Have been taken from:
 - https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 
 The installer gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe has been used.
@@ -241,10 +202,10 @@ Has been taken from the GitHub at:
 
 
 # How to Help this Project?
-If you like this project, please give it a star (in the upper-right corner of your browser window):
+If you like this project, please give it a star (in the upper-right corner
+of your browser window):
 
-![GitHub star](https://www.state-machine.com/img/github-star.jpg)
-
+<p align="center"><img src="https://www.state-machine.com/img/github-star.jpg"/></p>
 
 # Contact information:
 - https://www.state-machine.com

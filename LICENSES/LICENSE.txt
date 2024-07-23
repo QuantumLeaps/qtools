@@ -1,33 +1,30 @@
-QTools Collection
-=================
-Most tools included in the QTools collection for Windows are distributed
-under the terms of the GNU General Public License (GPL) as published by
-the Free Software Foundation, either version 2 of the License, or (at
-your option) any later version. The text of GPL version 2 is included
-in the file qtools/LICENSES/GPL-2.0-or-later.txt.
+The various licenses for QTools components are located in the
+LICENSES/ sub-directory of this QTools distribution.
 
-Some of the tools are distributed under the terms of the MIT open source
-license. The complete text of the MIT license is included in the file
-qtools/LICENSES/LICENSE-MIT.txt as well as in the source code comments.
+- The [qspy host utility](https://www.state-machine.com/qtools/qspy.html)
+is distributed under the terms of QSPY LICENSE AGREEMENT, included in the file
+`LICENSE-qspy.txt` in the `LICENSES/` sub-directory.
 
-The Python package is distributed under the terms of the PYTHON LICENSE
-AGREEMENT, included in the file PYTHON_LICENSE.txt in the file
-qtools/LICENSES/LICENSE-Python.txt.
+- The [Termite host utility for Windows](https://www.compuphase.com/software_termite.htm)
+is is distributed under the terms of the Termite license, included in the file
+`LICENSE-Termite.txt` in the `LICENSES/` sub-directory.
 
-The LMFlash utility for Windows is is distributed under the terms
-of the LMFlash license, included in the file:
-qtools/LICENSES/LICENSE-LMFlash.txt
+- The [LMFlash host utility for Windows](https://www.ti.com/tool/LMFLASHPROGRAMMER)
+is is distributed under the terms of the LMFlash license, included in the file
+`LICENSE-LMFlash.txt` in the `LICENSES/` sub-directory. Specifically, the LMFlash
+utility is distributed according to Section 2a "Demonstration License".
 
-Specifically, the LMFlash utility is distributed according to Section 2a
-"Demonstration License".
+- The [Python package for Windows](https://www.python.org/) is distributed
+under the terms of the PYTHON LICENSE AGREEMENT, included in the file
+`LICENSE-Python.txt` in the `LICENSES/` sub-directory.
 
-The freewaer Termite utility for Windows is is distributed under the terms
-of the zlib/libpng License included in the file:
-qtools/LICENSES/LICENS-Termite.txt
+Most other tools included in this collection are distributed under the
+terms of the GNU General Public License (GPL) as published by the Free
+Software Foundation, either version 2 of the License, or (at your
+option) any later version. The text of GPL version 2 is included in the
+file GPL-2.0-or-later.txt in the `LICENSES/` sub-directory.
 
-
-Contact Information:
-=============
-- https://www.state-machine.com
-- mailto:info@state-machine.com
-
+Some other the tools are distributed under the terms of the MIT open
+source license. The complete text of the MIT license is included in the
+comments and also in the file LICENSE-MIT.txt in the `LICENSES/`
+sub-directory.

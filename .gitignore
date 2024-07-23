@@ -27,24 +27,15 @@
 *.vcxproj.user
 version-*
 
-.vs/
+priv*/
+bin*/
 html/
 latex/
-test_priv/
-bin/*.exe
-bin/*.dll
-bin/*.conf
-bin/qspy
-bin/qclean
-bin/qfsgen
 gnu_arm-eabi/
 libexec/
-dbg/
-rel/
-spy/
-settings/
 share/
 
+.vs/
 Debug/
 Release/
 Spy/
@@ -52,5 +43,3 @@ Spy/
 lib/
 obj/
 output/
-
-qspy/doxygen/html/

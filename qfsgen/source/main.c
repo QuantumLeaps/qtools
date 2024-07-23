@@ -1,34 +1,32 @@
-/*============================================================================
-* QP/C Real-Time Embedded Framework (RTEF)
-* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
-*
-* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
-*
-* This software is dual-licensed under the terms of the open source GNU
-* General Public License version 3 (or any later version), or alternatively,
-* under the terms of one of the closed source Quantum Leaps commercial
-* licenses.
-*
-* The terms of the open source GNU General Public License version 3
-* can be found at: <www.gnu.org/licenses/gpl-3.0>
-*
-* The terms of the closed source Quantum Leaps commercial licenses
-* can be found at: <www.state-machine.com/licensing>
-*
-* Redistributions in source code must retain this top-level comment block.
-* Plagiarizing this software to sidestep the license obligations is illegal.
-*
-* Contact information:
-* <www.state-machine.com>
-* <info@state-machine.com>
-============================================================================*/
-/*!
-* @date Last updated on: 2023-10-26
-* @version Last updated for: @ref qtools_7_3_0
-*
-* @file
-* @brief QFSgen ROM file system generator main function
-*/
+//============================================================================
+// QFSGEN ROM file system generation host utility
+//
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
+//
+// Copyright (C) 2005 Quantum Leaps, LLC. <state-machine.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//
+// This software is dual-licensed under the terms of the open source GNU
+// General Public License version 3 (or any later version), or alternatively,
+// under the terms of one of the closed source Quantum Leaps commercial
+// licenses.
+//
+// The terms of the open source GNU General Public License version 3
+// can be found at: <www.gnu.org/licenses/gpl-3.0>
+//
+// The terms of the closed source Quantum Leaps commercial licenses
+// can be found at: <www.state-machine.com/licensing>
+//
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// Contact information:
+// <www.state-machine.com>
+// <info@state-machine.com>
+//============================================================================
 #include <stdbool.h>
 
 #include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
@@ -113,7 +111,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     }
 
     ++l_nFiles;
-    /* copy the file name into the buffer and masage it a bit */
+    /* copy the file name into the buffer and massage it a bit */
     s = fname;
     d = buf;
     while (*s != '\0') {
@@ -130,7 +128,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     PRINTF_S("\nAdding: %s%s", l_fsDir, buf);
     FPRINTF_S(l_file, "/* %s */\x0A", buf);
 
-    /* defive the C-variable name from the file name */
+    /* define the C-variable name from the file name */
     s = buf + 1; /* skip the first '/' */
     d = fvar;
     while (*s != '\0') {
@@ -216,7 +214,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
     i = 0;
     while ((nBytes = fread(buf, 1, sizeof(buf), fin)) != 0) {
         char const *pc = buf;
-        int n = nBytes;
+        size_t n = nBytes;
         while (n-- != 0) {
             if (i == 0) { /* new line? */
                 ++i;
@@ -258,7 +256,7 @@ void onMatchFound(char const *fullPath, unsigned flags, int ro_info) {
 int main(int argc, char *argv[]) {
     char const *fileName = "fsdata.h";
 
-    PRINTF_S("QFSGen %s Copyright (c) 2005-2020 Quantum Leaps\n"
+    PRINTF_S("QFSGen %s Copyright (c) 2005 Quantum Leaps\n"
              "Documentation: https://state-machine.com/qtools/qfsgen.html\n",
              VERSION);
     PRINTF_S("Usage: qfsgen fs-dir [output-file] [-h]\n"
