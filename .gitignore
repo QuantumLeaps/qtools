@@ -27,6 +27,8 @@
 *.vcxproj.user
 version-*
 
+qspy/include/
+qspy/source/
 priv*/
 bin*/
 html/

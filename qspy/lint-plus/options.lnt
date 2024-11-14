@@ -1,29 +1,22 @@
 //============================================================================
-// QP/C Real-Time Embedded Framework (RTEF)
-// Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+// QSPY software tracing host-side utility
 //
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+//                   Q u a n t u m  L e a P s
+//                   ------------------------
+//                   Modern Embedded Software
 //
-// This software is dual-licensed under the terms of the open source GNU
-// General Public License version 3 (or any later version), or alternatively,
-// under the terms of one of the closed source Quantum Leaps commercial
-// licenses.
+// Copyright(C) 2005 Quantum Leaps, LLC.All rights reserved.
 //
-// The terms of the open source GNU General Public License version 3
-// can be found at: <www.gnu.org/licenses/gpl-3.0>
+// This software is licensed under the terms of the Quantum Leaps
+// QSPY SOFTWARE TRACING HOST UTILITY SOFTWARE END USER LICENSE.
+// Please see the file LICENSE-qspy.txt for the complete license text.
 //
-// The terms of the closed source Quantum Leaps commercial licenses
-// can be found at: <www.state-machine.com/licensing>
-//
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
-//
-// Contact information:
-// <www.state-machine.com>
+// Quantum Leaps contact information :
+// <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
-//! @date Last updated on: 2024-06-21
-//! @version Last updated for version: 7.4.0
+//! @date Last updated on: 2024-10-31
+//! @version Last updated for version: 8.0.0
 //!
 //! @file
 //! @brief PC-Lint-Plus option file for linting QSPY source code
@@ -37,7 +30,7 @@
 
 // include directories
 -i.                // compiler config
--i../include       // QSPY includes
+-i../priv_inc      // QSPY includes
 
 // standards
 // language standard...
