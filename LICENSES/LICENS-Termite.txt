@@ -1,7 +1,7 @@
-Copyright (c) 2019–2023, Thiadmer Riemersma, CompuPhase
+Copyright (c) 20192023, Thiadmer Riemersma, CompuPhase
 Updated: 2019-05-23
 
-This software is provided ‘as-is’, without any express or implied
+This software is provided as-is, without any express or implied
 warranty. In no event will the authors be held liable for any damages
 arising from the use of this software.
 

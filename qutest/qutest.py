@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 800
+    VERSION = 801
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -998,7 +998,7 @@ class QUTest:
             QUTest._have_target = True
             QUTest._have_info = False
             # pylint: disable=consider-using-with
-            Popen(QUTest._host_exe[0])
+            Popen(QUTest._host_exe)
 
         else: # running remote target
             QUTest._have_target = True

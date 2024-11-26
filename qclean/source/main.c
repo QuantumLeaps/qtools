@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "safe_std.h" /* "safe" <stdio.h> and <string.h> facilities */
+#include "safe_std.h" // "safe" <stdio.h> and <string.h> facilities
 #include "qclean.h"
 #include "getopt.h"
 
@@ -40,23 +40,24 @@ static int  l_nReadOnly  = 0;
 static int  l_nCleaned   = 0;
 static int  l_nDirty     = 0;
 static int  l_lineLimit  = 0;
-static bool l_noCleanup  = false; /* perform cleanup by default */
-static bool l_doReadOnly = false; /* don't check read-only files by default */
+static bool l_noCleanup  = false; // perform cleanup by default
+static bool l_doReadOnly = false; // don't check read-only files by default
 
 enum Constants {
     TAB        = 0x09,
     LF         = 0x0A,
     CR         = 0x0D,
-    TAB_SIZE   = 4,           /* default TAB size */
-    LINE_LIMIT = 80           /* default line limit */
+    TAB_SIZE   = 4,           // default TAB size
+    LINE_LIMIT = 80           // default line limit
 };
 
 enum TodoFlags {
-    TRAIL_WS_FLG  = (1 << 0), /* clean Trailing Whitespace (always cleaned) */
-    TAB_FLG       = (1 << 1), /* clean TABs */
-    CR_FLG        = (1 << 2), /* clean CR (LF EOL convention) */
-    LONG_LINE_FLG = (1 << 3), /* find/found long lines */
-    LF_FLG        = (1 << 4), /* cleaned single LF (CRLF EOL convention) */
+    TRAIL_WS_FLG  = (1 << 0), // clean Trailing Whitespace (always cleaned)
+    TAB_FLG       = (1 << 1), // clean TABs
+    CR_FLG        = (1 << 2), // clean CR (LF EOL convention)
+    LONG_LINE_FLG = (1 << 3), // find/found long lines
+    LF_FLG        = (1 << 4), // cleaned single LF (CRLF EOL convention)
+    ASCII_FLG     = (1 << 5), // clean non-ascii characters)
 };
 
 typedef struct {
@@ -65,10 +66,9 @@ typedef struct {
     uint8_t flags;
 } FileType;
 
-/* array of file types recognized by QClean...
-* NOTE: For greater flexibility, this array could be read from an external
-* config file in the future.
-*/
+// array of file types recognized by QClean...
+// NOTE: For greater flexibility, this array could be read from an external
+// config file in the future.
 static FileType const l_fileTypes[] = {
     { ".c",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".h",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
@@ -77,12 +77,12 @@ static FileType const l_fileTypes[] = {
     { ".s",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".S",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".asm",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".txt",     4, CR_FLG | TAB_FLG                 },
+    { ".txt",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
     { ".xml",     4, CR_FLG | TAB_FLG                 },
-    { ".dox",     4, CR_FLG | TAB_FLG                 }, /* Doxygen */
-    { ".md",      3, CR_FLG | TAB_FLG                 }, /* markdown */
-    { ".bat",     4, CR_FLG | TAB_FLG                 },
-    { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU linker */
+    { ".dox",     4, CR_FLG | TAB_FLG | ASCII_FLG     }, // Doxygen
+    { ".md",      3, CR_FLG | TAB_FLG                 }, // markdown
+    { ".bat",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
+    { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // GNU linker
     { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyi",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
@@ -92,67 +92,75 @@ static FileType const l_fileTypes[] = {
     { "mak_",     4, CR_FLG           | LONG_LINE_FLG },
     { ".mak",     4, CR_FLG           | LONG_LINE_FLG },
     { ".make",    5, CR_FLG           | LONG_LINE_FLG },
-    { ".cmake",   6, CR_FLG | TAB_FLG                 },
-    { ".json",    5, CR_FLG | TAB_FLG                 },
+    { ".cmake",   6, CR_FLG           | TAB_FLG       },
+    { ".json",    5, CR_FLG           | TAB_FLG       },
 
     { ".html",    5, CR_FLG | TAB_FLG                 },
     { ".htm",     4, CR_FLG | TAB_FLG                 },
     { ".css",     4, CR_FLG | TAB_FLG                 },
 
-    { ".eww",     4, CR_FLG                           }, /* IAR workspace */
-    { ".ewp",     4, CR_FLG                           }, /* IAR project */
-    { ".ewd",     4, CR_FLG                           }, /* IAR debug config */
-    { ".icf",     4, CR_FLG | TAB_FLG                 }, /* IAR linker */
+    { ".eww",     4, CR_FLG                           }, // IAR workspace
+    { ".ewp",     4, CR_FLG                           }, // IAR project
+    { ".ewd",     4, CR_FLG                           }, // IAR debug config
+    { ".icf",     4, CR_FLG | TAB_FLG                 }, // IAR linker
 
-    { ".uvprojx", 8, CR_FLG                           }, /* uVision project */
-    { ".uvoptx",  7, CR_FLG                           }, /* uVision option */
+    { ".uvprojx", 8, CR_FLG                           }, // uVision project
+    { ".uvoptx",  7, CR_FLG                           }, // uVision option
 
-    { ".sln",     4, CR_FLG                           }, /* VS solution */
-    { ".vcxproj", 8, CR_FLG                           }, /* VS project */
-    { ".filters", 8, CR_FLG                           }, /* VS sub-folders */
-    { ".vcxproj.filters",16, CR_FLG                   }, /* VS sub-folders */
+    { ".sln",     4, CR_FLG                           }, // VS solution
+    { ".vcxproj", 8, CR_FLG                           }, // VS project
+    { ".filters", 8, CR_FLG                           }, // VS sub-folders
+    { ".vcxproj.filters",16, CR_FLG                   }, // VS sub-folders
 
-    { ".project", 8, CR_FLG                           }, /* Eclipse project */
-    { ".cproject",9, CR_FLG                           }, /* Eclipse CDT project */
+    { ".project", 8, CR_FLG                           }, // Eclipse project
+    { ".cproject",9, CR_FLG                           }, // Eclipse CDT project
 
-    { ".sha1",    5, CR_FLG | TAB_FLG                 }, /* Sha1 file */
-    { ".pro",     4, CR_FLG | TAB_FLG                 }, /* Qt project */
+    { ".sha1",    5, CR_FLG | TAB_FLG                 }, // Sha1 file
+    { ".pro",     4, CR_FLG | TAB_FLG                 }, // Qt project
 
-    { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB */
+    { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // MATLAB
 
-    { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* PC-Lint */
-    { ".cfg",     4, CR_FLG | TAB_FLG                 }, /* RSM config */
-
-    { ".properties",11, CR_FLG                        }, /* MPLABX properties */
+    { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // lint
+    { ".cfg",     4, CR_FLG | TAB_FLG                 }, // RSM config
 };
 static int const l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
+static const uint32_t ascii[256/32] = {
+    0x00002600u, // TAB, LF, CR
+    0xFFFFFFFFu, // ' '..'?'
+    0xFFFFFFFFu, // '@'..'_'
+    0x7FFFFFFFu, // '`'..'~'
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+};
+#define IS_ASCII(ch_) ((ascii[ch_ >> 5u] & (1u << (ch_ & 0x1Fu))) != 0u)
 
-/*..........................................................................*/
-/* This function looks for a match between the fname and any of the file
-* types defined in the l_fileTypes array. If a match is found, the function
-* returns the flags associated with the matching file type. Otherwise
-* the function returns 0.
-*/
+//............................................................................
+// This function looks for a match between the fname and any of the file
+// types defined in the l_fileTypes array. If a match is found, the function
+// returns the flags associated with the matching file type. Otherwise
+// the function returns 0.
 unsigned isMatching(char const *fname) {
     int const flen = (int)strlen(fname);
 
     FileType const *ft = &l_fileTypes[0];
-    for (int n = l_fileNum; n > 0; --n, ++ft) { /* go over all file types.. */
+    for (int n = l_fileNum; n > 0; --n, ++ft) { // go over all file types..
         char const *s = &ft->pattern[0];
-        if (((*s == '.') && (flen > ft->len)) /* extension */
-            || (flen >= ft->len))             /* beginning of file name */
+        if (((*s == '.') && (flen > ft->len)) // extension
+            || (flen >= ft->len))             // beginning of file name
         {
             char const *t = &fname[flen - ft->len];
             int i;
-            for (i = ft->len; i > 0; --i, ++s, ++t) { /* compare to pattern */
-                if (*s != *t) { /* mismatch? */
+            for (i = ft->len; i > 0; --i, ++s, ++t) { // compare to pattern
+                if (*s != *t) { // mismatch?
                     break;
                 }
             }
-            if (i == 0) { /* match found? */
+            if (i == 0) { // match found?
                 unsigned flags = (unsigned)ft->flags;
                 if (l_lineLimit == 0) {
-                    flags &= ~LONG_LINE_FLG; /* don't report long lines */
+                    flags &= ~LONG_LINE_FLG; // don't report long lines
                 }
                 return flags;
             }
@@ -160,7 +168,7 @@ unsigned isMatching(char const *fname) {
     }
     return 0U;
 }
-/*..........................................................................*/
+//............................................................................
 void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     char prev = 0x00;
     bool isReadOnly = false;
@@ -169,16 +177,16 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     PRINTF_S("%c", '.');
 
     FILE *f;
-    if (ro_info >= 0) { /* read-only information available right away? */
+    if (ro_info >= 0) { // read-only information available right away?
         if (ro_info > 0) {
             isReadOnly = true;
             ++l_nReadOnly;
         }
     }
-    else { /* read-only information not available */
-        /* open for reading/writing (non destructive) */
+    else { // read-only information not available
+        // open for reading/writing (non destructive)
         FOPEN_S(f, fname, "r+");
-        if (f == (FILE*)0) { /* can't write */
+        if (f == (FILE*)0) { // can't write
             isReadOnly = true;
             ++l_nReadOnly;
         }
@@ -190,19 +198,19 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         return;
     }
 
-    FOPEN_S(f, fname, "rb"); /* open for reading */
+    FOPEN_S(f, fname, "rb"); // open for reading
     if (f == (FILE*)0) {
         return;
     }
 
-    static char src_buf[10*1024*1024]; /* 10MB buffer */
-    char *src = src_buf;
-    static char dst_buf[10*1024*1024]; /* 10MB buffer */
-    char *dst = dst_buf;
+    static uint8_t src_buf[10*1024*1024]; // 10MB buffer
+    uint8_t *src = src_buf;
+    static uint8_t dst_buf[10*1024*1024]; // 10MB buffer
+    uint8_t *dst = dst_buf;
     int nBytes = (int)FREAD_S(src_buf, sizeof(src_buf),
                               1U, sizeof(src_buf), f);
     fclose(f);
-    if (nBytes == sizeof(src_buf)) { /* full buffer? */
+    if (nBytes == sizeof(src_buf)) { // full buffer?
         PRINTF_S("\n%s(too big -- skipped)\n", fname);
         return;
     }
@@ -210,24 +218,26 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     bool foundLLs = false;
     int lineCtr = 1;
     int lineLen = 0;
+
     for (; nBytes > 0; --nBytes, ++src) {
-        switch (*src) {
+        uint8_t ch = *src;
+        switch (ch) {
             case TAB: {
-                if ((flags & TAB_FLG) != 0) { /* cleanup tabs? */
+                if ((flags & TAB_FLG) != 0u) { // cleanup tabs?
                     int tab;
                     for (tab = TAB_SIZE; tab > 0; --tab) {
                         *dst++ = ' ';
                     }
-                    found |= TAB_FLG; /* removed TAB */
+                    found |= TAB_FLG; // removed TAB
                 }
                 else {
-                    *dst++ = *src; /* copy TAB over */
+                    *dst++ = *src; // copy TAB over
                 }
                 lineLen += 4;
                 break;
             }
             case LF: {
-                if (((flags & LONG_LINE_FLG) != 0)
+                if (((flags & LONG_LINE_FLG) != 0u)
                     && (lineLen > l_lineLimit))
                 {
                     foundLLs = true;
@@ -235,48 +245,60 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 lineLen = 0;
                 ++lineCtr;
 
-                /* always cleanup trailing blanks... */
+                // always cleanup trailing blanks...
                 for (; (*(dst - 1) == ' ') && (dst > dst_buf); --dst) {
-                    found |= TRAIL_WS_FLG; /* removed trailing blank */
+                    found |= TRAIL_WS_FLG; // removed trailing blank
                 }
 
-                if (((flags & CR_FLG) == 0) /* don't clean CRLF? */
-                    && (prev != CR))  /* CR NOT present? */
+                if (((flags & CR_FLG) == 0u) // don't clean CRLF?
+                    && (prev != CR))  // CR NOT present?
                 {
-                    *dst++ = CR;      /* add CR to the stream */
-                    found |= LF_FLG;  /* cleaned up single LF */
+                    *dst++ = CR;      // add CR to the stream
+                    found |= LF_FLG;  // cleaned up single LF
                 }
-                *dst++ = LF;          /* copy LF over */
+                *dst++ = LF;          // copy LF over
                 break;
             }
             case CR: {
-                if ((flags & CR_FLG) != 0) { /* clean CR? */
-                    /* don't copy CR over */
+                if ((flags & CR_FLG) != 0u) { // clean CR?
+                    // don't copy CR over
                     found |= CR_FLG;
                 }
                 else {
-                    *dst++ = CR; /* copy CR over */
+                    *dst++ = CR; // copy CR over
                     lineLen += 1;
                 }
                 break;
             }
             default: {
-                *dst++ = *src;
-                lineLen += 1;
+                if ((flags & ASCII_FLG) != 0u) { // clean non ASCII?
+                    if (IS_ASCII(ch)) {
+                        *dst++ = ch;
+                        lineLen += 1;
+                    }
+                    else {
+                        // don't copy non-ASCII over
+                        found |= ASCII_FLG;
+                    }
+                }
+                else {
+                    *dst++ = ch;
+                    lineLen += 1;
+                }
                 break;
             }
         }
-        prev = *src;
+        prev = ch;
         if (dst >= &dst_buf[sizeof(dst_buf)]) {
             PRINTF_S("\n%s\n", "Error: too big!");
             return;
         }
     }
-    if (found) { /* anything found? */
+    if (found) { // anything found?
         PRINTF_S("\n%s", fname);
-        if (!l_noCleanup && !isReadOnly) { /* not read-only? */
+        if (!l_noCleanup && !isReadOnly) { // not read-only?
             ++l_nCleaned;
-            /* binary to use LF EOL convention */
+            // binary to use LF EOL convention
             FOPEN_S(f, fname, "wb");
             if (f == 0) {
                 PRINTF_S(" %s\n", "ERROR: cannot modify!");
@@ -295,6 +317,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         if ((found  & TAB_FLG     ) != 0) PRINTF_S("%s", "TABs,");
         if ((found  & CR_FLG      ) != 0) PRINTF_S("%s", "CRs,");
         if ((found  & LF_FLG      ) != 0) PRINTF_S("%s", "LFs,");
+        if ((found  & ASCII_FLG   ) != 0) PRINTF_S("%s", "Non-ASCII,");
     }
     if (foundLLs) {
         ++l_nDirty;
@@ -315,7 +338,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     fflush(stdout);
 }
 
-/*..........................................................................*/
+//............................................................................
 static char const l_helpStr[] =
     "\nUsage: qclean [root-dir] [options]\n"
     "\n"
@@ -329,7 +352,7 @@ static char const l_helpStr[] =
     "-r                      check also read-only files\n"
     "-l[limit]     %d        line length limit (not checked when -l absent)\n";
 
-/*..........................................................................*/
+//............................................................................
 int main(int argc, char *argv[]) {
     char const *rootDir = ".";
     int optChar;
@@ -340,38 +363,38 @@ int main(int argc, char *argv[]) {
     "       root-dir root directory for recursive cleanup (default is .)\n"
     "       options  control the cleanup, -h prints the help\n");
 
-    /* parse the command-line parameters ...*/
-    if ((argc > 1) && (argv[1][0] != '-')) { /* root directory */
+    // parse the command-line parameters ...*/
+    if ((argc > 1) && (argv[1][0] != '-')) { // root directory
         rootDir = argv[1];
     }
     PRINTF_S("root-directory: %s\n", rootDir);
     while ((optChar = getopt(argc, argv, ":hqrl::")) != -1) {
          switch (optChar) {
-             case 'h': { /* help */
+             case 'h': { // help
                  PRINTF_S(l_helpStr, LINE_LIMIT);
                  return 0;
              }
-             case 'q': { /* query only (no cleanup) */
+             case 'q': { // query only (no cleanup)
                  l_noCleanup = true;
                  PRINTF_S("%s\n", "-q query-only");
                  break;
              }
-             case 'r': { /* check also read-only files */
+             case 'r': { // check also read-only files
                  l_doReadOnly = true;
                  PRINTF_S("%s\n", "-r check also read-only files");
                  break;
              }
-             case 'l': { /* check long lines */
-                 if (optarg != NULL) { /* is optional argument provided? */
+             case 'l': { // check long lines
+                 if (optarg != NULL) { // is optional argument provided?
                      l_lineLimit = (int)strtoul(optarg, NULL, 10);
                  }
-                 else { /* apply the default */
+                 else { // apply the default
                      l_lineLimit = LINE_LIMIT;
                  }
                  PRINTF_S("-l line-length:%d\n", l_lineLimit);
                  break;
              }
-             default: { /* unknown option */
+             default: { // unknown option
                  PRINTF_S(l_helpStr, LINE_LIMIT);
                  return -1;
              }
