@@ -57,6 +57,7 @@ enum TodoFlags {
     CR_FLG        = (1 << 2), /* clean CR (LF EOL convention) */
     LONG_LINE_FLG = (1 << 3), /* find/found long lines */
     LF_FLG        = (1 << 4), /* cleaned single LF (CRLF EOL convention) */
+    ASCII_FLG     = (1 << 5), /* clean non-ascii characters) */
 };
 
 typedef struct {
@@ -70,30 +71,30 @@ typedef struct {
 * config file in the future.
 */
 static FileType const l_fileTypes[] = {
-    { ".c",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".h",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".cpp",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".hpp",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".s",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".S",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".asm",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".txt",     4, CR_FLG | TAB_FLG                 },
-    { ".xml",     4, CR_FLG | TAB_FLG                 },
-    { ".dox",     4, CR_FLG | TAB_FLG                 }, /* Doxygen */
-    { ".md",      3, CR_FLG | TAB_FLG                 }, /* markdown */
-    { ".bat",     4, CR_FLG | TAB_FLG                 },
-    { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* GNU linker */
-    { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".pyi",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
-    { ".java",    5, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".c",       2, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".h",       2, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".cpp",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".hpp",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".s",       2, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".S",       2, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".asm",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".txt",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
+    { ".xml",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
+    { ".dox",     4, CR_FLG | TAB_FLG | ASCII_FLG     }, /* Doxygen */
+    { ".md",      3, CR_FLG | TAB_FLG | ASCII_FLG     }, /* markdown */
+    { ".bat",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
+    { ".ld",      3, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG }, /* GNU linker */
+    { ".py",      3, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".pyi",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".pyw",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
+    { ".java",    5, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG },
 
-    { "Makefile", 8, CR_FLG           | LONG_LINE_FLG },
-    { "mak_",     4, CR_FLG           | LONG_LINE_FLG },
-    { ".mak",     4, CR_FLG           | LONG_LINE_FLG },
-    { ".make",    5, CR_FLG           | LONG_LINE_FLG },
-    { ".cmake",   6, CR_FLG | TAB_FLG                 },
-    { ".json",    5, CR_FLG | TAB_FLG                 },
+    { "Makefile", 8, CR_FLG           | ASCII_FLG | LONG_LINE_FLG },
+    { "mak_",     4, CR_FLG           | ASCII_FLG | LONG_LINE_FLG },
+    { ".mak",     4, CR_FLG           | ASCII_FLG | LONG_LINE_FLG },
+    { ".make",    5, CR_FLG           | ASCII_FLG | LONG_LINE_FLG },
+    { ".cmake",   6, CR_FLG           | ASCII_FLG | TAB_FLG       },
+    { ".json",    5, CR_FLG           | ASCII_FLG | TAB_FLG       },
 
     { ".html",    5, CR_FLG | TAB_FLG                 },
     { ".htm",     4, CR_FLG | TAB_FLG                 },
@@ -115,17 +116,26 @@ static FileType const l_fileTypes[] = {
     { ".project", 8, CR_FLG                           }, /* Eclipse project */
     { ".cproject",9, CR_FLG                           }, /* Eclipse CDT project */
 
-    { ".sha1",    5, CR_FLG | TAB_FLG                 }, /* Sha1 file */
-    { ".pro",     4, CR_FLG | TAB_FLG                 }, /* Qt project */
+    { ".sha1",    5, CR_FLG | TAB_FLG | ASCII_FLG     }, /* Sha1 file */
+    { ".pro",     4, CR_FLG | TAB_FLG | ASCII_FLG     }, /* Qt project */
 
-    { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* MATLAB */
+    { ".m",       2, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG }, /* MATLAB */
 
-    { ".lnt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, /* PC-Lint */
-    { ".cfg",     4, CR_FLG | TAB_FLG                 }, /* RSM config */
-
-    { ".properties",11, CR_FLG                        }, /* MPLABX properties */
+    { ".lnt",     4, CR_FLG | TAB_FLG | ASCII_FLG | LONG_LINE_FLG }, /* PC-Lint */
+    { ".cfg",     4, CR_FLG | TAB_FLG | ASCII_FLG                 }, /* RSM config */
 };
 static int const l_fileNum = sizeof(l_fileTypes)/sizeof(l_fileTypes[0]);
+static const uint32_t ascii[256/32] = {
+    0x00002600u, // TAB, LF, CR
+    0xFFFFFFFFu, // ' '..'?'
+    0xFFFFFFFFu, // '@'..'_'
+    0x7FFFFFFFu, // '`'..'~'
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+    0x00000000u, // non ASCII
+};
+#define IS_ASCII(ch_) ((ascii[ch_ >> 5u] & (1u << (ch_ & 0x1Fu))) != 0u) 
 
 /*..........................................................................*/
 /* This function looks for a match between the fname and any of the file
@@ -195,10 +205,10 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         return;
     }
 
-    static char src_buf[10*1024*1024]; /* 10MB buffer */
-    char *src = src_buf;
-    static char dst_buf[10*1024*1024]; /* 10MB buffer */
-    char *dst = dst_buf;
+    static uint8_t src_buf[10*1024*1024]; /* 10MB buffer */
+    uint8_t *src = src_buf;
+    static uint8_t dst_buf[10*1024*1024]; /* 10MB buffer */
+    uint8_t *dst = dst_buf;
     int nBytes = (int)FREAD_S(src_buf, sizeof(src_buf),
                               1U, sizeof(src_buf), f);
     fclose(f);
@@ -210,10 +220,12 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
     bool foundLLs = false;
     int lineCtr = 1;
     int lineLen = 0;
+
     for (; nBytes > 0; --nBytes, ++src) {
-        switch (*src) {
+        uint8_t ch = *src;
+        switch (ch) {
             case TAB: {
-                if ((flags & TAB_FLG) != 0) { /* cleanup tabs? */
+                if ((flags & TAB_FLG) != 0u) { /* cleanup tabs? */
                     int tab;
                     for (tab = TAB_SIZE; tab > 0; --tab) {
                         *dst++ = ' ';
@@ -227,7 +239,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 break;
             }
             case LF: {
-                if (((flags & LONG_LINE_FLG) != 0)
+                if (((flags & LONG_LINE_FLG) != 0u)
                     && (lineLen > l_lineLimit))
                 {
                     foundLLs = true;
@@ -240,7 +252,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                     found |= TRAIL_WS_FLG; /* removed trailing blank */
                 }
 
-                if (((flags & CR_FLG) == 0) /* don't clean CRLF? */
+                if (((flags & CR_FLG) == 0u) /* don't clean CRLF? */
                     && (prev != CR))  /* CR NOT present? */
                 {
                     *dst++ = CR;      /* add CR to the stream */
@@ -250,7 +262,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 break;
             }
             case CR: {
-                if ((flags & CR_FLG) != 0) { /* clean CR? */
+                if ((flags & CR_FLG) != 0u) { /* clean CR? */
                     /* don't copy CR over */
                     found |= CR_FLG;
                 }
@@ -261,12 +273,24 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
                 break;
             }
             default: {
-                *dst++ = *src;
-                lineLen += 1;
+                if ((flags & ASCII_FLG) != 0u) { /* clean non ASCII? */
+                    if (IS_ASCII(ch)) {
+                        *dst++ = ch;
+                        lineLen += 1;
+                    }
+                    else {
+                        /* don't copy non-ASCII over */
+                        found |= ASCII_FLG;
+                    }
+                }
+                else {
+                    *dst++ = ch;
+                    lineLen += 1;
+                }
                 break;
             }
         }
-        prev = *src;
+        prev = ch;
         if (dst >= &dst_buf[sizeof(dst_buf)]) {
             PRINTF_S("\n%s\n", "Error: too big!");
             return;
@@ -295,6 +319,7 @@ void onMatchFound(char const *fname, unsigned flags, int ro_info) {
         if ((found  & TAB_FLG     ) != 0) PRINTF_S("%s", "TABs,");
         if ((found  & CR_FLG      ) != 0) PRINTF_S("%s", "CRs,");
         if ((found  & LF_FLG      ) != 0) PRINTF_S("%s", "LFs,");
+        if ((found  & ASCII_FLG   ) != 0) PRINTF_S("%s", "Non-ASCII,");
     }
     if (foundLLs) {
         ++l_nDirty;
