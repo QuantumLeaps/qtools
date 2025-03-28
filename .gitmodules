@@ -1,0 +1,3 @@
+[submodule "spexygen"]
+	path = spexygen
+	url = https://github.com/QuantumLeaps/spexygen.git

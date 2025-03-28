@@ -61,31 +61,29 @@ starting with 'q' are contributed by Quantum Leaps)
    for generating ROM-based file systems to be used in embedded web pages
    served by the HTTP server
 
-8. Unity - traditional unit testing harness (framework) for embedded C
+8. [spexygen](https://github.com/QuantumLeaps/spexygen) -
+   for generating *traceable* formal specifications based on Doxygen
+
+9. [Unity](https://github.com/ThrowTheSwitch/Unity) -
+   traditional unit testing harness (framework) for embedded C
    (version 2.5.2)
 
-Additionally, QTools for Windows contains the following open-source,
-3rd-party tools:
+Additionally, QTools collection for **Windows** contains the following
+open-source, 3rd-party tools:
 
-9. `make` for Windows (GNU-make-32-bit version 4.2.1)
+10. `make` for Windows (GNU-make-32-bit version 4.2.1)
 
-10. `cmake` for Windows (version 3.29.0-rc1)
+11. `cmake` for Windows (version 3.29.0-rc1)
 
-11. `ninja` for Windows (version 1.11.1)
+12. `ninja` for Windows (version 1.11.1)
 
-12. Termite serial terminal for Windows (version 3.4)
+13. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
 
-13. LMFlash for Windows (32-bit build 1613)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
 
+15. Python for Windows (version 3.10 32-bit)
 
-Additionally, the QTools directory in the QP-bundle contains the
-following 3rd-party tools:
-
-14. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
-
-15. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
-
-16. Python for Windows (version 3.10 32-bit)
+16. LMFlash for Windows (32-bit build 1613)
 
 
 # Downloading and Installation
