@@ -77,13 +77,12 @@ open-source, 3rd-party tools:
 
 12. `ninja` for Windows (version 1.11.1)
 
-13. GNU C/C++ toolset for Windows (MinGW 32-bit version 9.2.0)
+13. GNU C/C++ toolset for Windows (MinGW 32-bit version 14.2.0)
+    including Python3 for Windows (version 3.12.9)
 
-14. GNU C/C++ toolset for ARM-EABI (GCC version 10.3-2021.10)
+14. GNU C/C++ toolset for ARM-EABI (GCC version 14.2-2024.12.10)
 
-15. Python for Windows (version 3.10 32-bit)
-
-16. LMFlash for Windows (32-bit build 1613)
+15. LMFlash for Windows (32-bit build 1613)
 
 
 # Downloading and Installation
@@ -182,10 +181,10 @@ Please refer to the MinGW project for the source code.
 
 ### The GNU-ARM Embedded Toolchain for Windows
 Have been taken from:
-- https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+- https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 
-The installer gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe has been used.
-(Version 8-2018-q4-major Released: December 20, 2018)
+The ZIP file arm-gnu-toolchain-14.2.rel1-mingw-w64-i686-arm-none-eabi.zip has been used.
+(Version 14.2.Rel1 Released: December 10, 2024)
 
 ### The GNU make executable for Windows
 Has been taken from the MinGW project at SourceForge.net:
