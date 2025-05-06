@@ -55,7 +55,7 @@ import webbrowser
 #
 class QView:
     ## current version of QView
-    VERSION = 800
+    VERSION = 804
 
     # public static variables...
     ## menu to be customized
@@ -95,7 +95,7 @@ class QView:
         arg  = 1 # skip the "qview" argument
 
         if "-h" in argv or "--help" in argv or "?" in argv:
-            print("\nUsage: python qview.pyw "
+            print("\nUsage: python qview.py "
                 "[qspy_host[:udp_port]] [local_port]\n\n"
                 "help at: https://www.state-machine.com/qtools/QView.html")
             sys.exit(0)
@@ -123,7 +123,6 @@ class QView:
         err = QSpy._init()
         if err:
             sys.exit(err) # simple return: event-loop is not running yet
-
 
         QView._inst.on_init()
 
@@ -1665,7 +1664,7 @@ class QSpy:
         "QS_MTX_BLOCK_ATTEMPT",   "QS_MTX_UNLOCK_ATTEMPT",
 
         # [81] Reserved QS records
-        "QS_RESERVED_81",
+        "QS_QF_ACTIVE_DEFER_ATTEMPT",
         "QS_RESERVED_82",         "QS_RESERVED_83",
         "QS_RESERVED_84",         "QS_RESERVED_85",
         "QS_RESERVED_86",         "QS_RESERVED_87",
@@ -1694,7 +1693,7 @@ class QSpy:
     # global filter masks
     _GLB_FLT_MASK_ALL= 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     _GLB_FLT_MASK_SM = 0x000000000000000003800000000003FE
-    _GLB_FLT_MASK_AO = 0x0000000000000000000020000007FC00
+    _GLB_FLT_MASK_AO = 0x0000000000020000000020000007FC00
     _GLB_FLT_MASK_QF = 0x000000000000000000001FC0FC800000
     _GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     _GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
