@@ -26,9 +26,21 @@
 *.avrsuo
 *.vcxproj.user
 version-*
+qspy/include/be.h
+qspy/include/crypto.h
+qspy/include/getopt.h
+qspy/include/safe_std.h
+qspy/source/crypto.c
+qspy/source/crypto_secret.c
+qspy/source/getopt.c
+qspy/source/qspy_be.c
+qspy/source/qspy_dict.c
+qspy/source/qspy_main.c
+qspy/source/qspy_pal_posix.c
+qspy/source/qspy_pal_win.c
+qspy/source/qspy_seq.c
+qspy/source/qspy_tx.c
 
-qspy/include/
-qspy/source/
 priv*/
 bin*/
 html/

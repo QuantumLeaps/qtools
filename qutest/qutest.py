@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 803
+    VERSION = 804
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -1392,7 +1392,7 @@ class QSpy:
         "QS_MTX_BLOCK_ATTEMPT",   "QS_MTX_UNLOCK_ATTEMPT",
 
         # [81] Reserved QS records
-                                  "QS_RESERVED_81",
+                                  "QS_QF_ACTIVE_DEFER_ATTEMPT",
         "QS_RESERVED_82",         "QS_RESERVED_83",
         "QS_RESERVED_84",         "QS_RESERVED_85",
         "QS_RESERVED_86",         "QS_RESERVED_87",
@@ -1421,7 +1421,7 @@ class QSpy:
     # global filter masks
     GLB_FLT_MASK_ALL= 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     GLB_FLT_MASK_SM = 0x000000000000000003800000000003FE
-    GLB_FLT_MASK_AO = 0x0000000000000000000020000007FC00
+    GLB_FLT_MASK_AO = 0x0000000000020000000020000007FC00
     GLB_FLT_MASK_QF = 0x000000000000000000001FC0FC800000
     GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
