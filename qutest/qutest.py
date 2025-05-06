@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 803
+    VERSION = 804
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -912,7 +912,7 @@ class QUTest:
 
             # properly end the last test in the group
             QUTest_inst._test_end()
-            QUTest._quithost_exe()
+            QUTest._quithost_exe(9)
 
     def _interact(self):
         self._is_inter   = True
@@ -992,7 +992,7 @@ class QUTest:
     def _reset_target(self):
         if QUTest._host_exe[0]:
             if not QUTest._have_assert:
-                QUTest._quithost_exe()
+                QUTest._quithost_exe(1)
 
             # lauch a new instance of the host executable
             QUTest._have_target = True
@@ -1015,7 +1015,7 @@ class QUTest:
             QUTest._have_assert = False
             QUTest._need_reset  = False
         else:
-            QUTest._quithost_exe()
+            QUTest._quithost_exe(2)
             raise RuntimeError("Target reset failed")
 
         self._timestamp = 0
@@ -1079,9 +1079,13 @@ class QUTest:
         self._tran(QUTest._FAIL)
         if QUTest._opt_exit_on_fail:
             raise ExitOnFailException
+        # ignore all input until timeout
+        while QSpy.receive():
+            pass
 
     @staticmethod
-    def _quithost_exe():
+    def _quithost_exe(source):
+        QUTest.trace(f"attempt to quit host exe from={source}")
         if QUTest._host_exe[0] and QUTest._have_target:
             QUTest.trace("quitting host exe...")
             QUTest._have_target = False
@@ -1392,7 +1396,7 @@ class QSpy:
         "QS_MTX_BLOCK_ATTEMPT",   "QS_MTX_UNLOCK_ATTEMPT",
 
         # [81] Reserved QS records
-                                  "QS_RESERVED_81",
+                                  "QS_QF_ACTIVE_DEFER_ATTEMPT",
         "QS_RESERVED_82",         "QS_RESERVED_83",
         "QS_RESERVED_84",         "QS_RESERVED_85",
         "QS_RESERVED_86",         "QS_RESERVED_87",
@@ -1421,7 +1425,7 @@ class QSpy:
     # global filter masks
     GLB_FLT_MASK_ALL= 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     GLB_FLT_MASK_SM = 0x000000000000000003800000000003FE
-    GLB_FLT_MASK_AO = 0x0000000000000000000020000007FC00
+    GLB_FLT_MASK_AO = 0x0000000000020000000020000007FC00
     GLB_FLT_MASK_QF = 0x000000000000000000001FC0FC800000
     GLB_FLT_MASK_TE = 0x00000000000000000000003F00000000
     GLB_FLT_MASK_EQ = 0x00000000000000000000400000780000
@@ -1501,14 +1505,14 @@ class QSpy:
                 QUTest._last_record = ""
                 return False # timeout
             # don"t catch OSError
-        else:
+        else: # debug mode
             while True:
                 try:
                     packet = QSpy._sock.recv(4096)
                     break
                 except socket.timeout:
-                    print("\nwaiting for Target "\
-                        "(press Enter to quit this test)...", end="")
+                    print("waiting for Target output "\
+                        "(press Enter to quit this test)...")
                     if os.name == "nt":
                         if msvcrt.kbhit():
                             if msvcrt.getch() == b'\r':
@@ -1573,7 +1577,7 @@ class QSpy:
             QSpy._is_attached = True
 
         elif rec_id == QSpy._PKT_DETACH:
-            QUTest._quithost_exe()
+            QUTest._quithost_exe(0)
             QUTest._last_record = ""
             QSpy._detach()
             raise ExitOnDetachException()
@@ -1732,11 +1736,12 @@ def main():
     QUTest.trace("debug:", QUTest._is_debug)
     QUTest.trace("_log_file:", log)
     QUTest.trace("host_udp:", QSpy.host_udp)
+    QUTest.trace("opt: t", QUTest._opt_trace)
     QUTest.trace("opt: x", QUTest._opt_exit_on_fail)
     QUTest.trace("opt: i", QUTest._opt_interactive)
     QUTest.trace("opt: c", QUTest._opt_clear_qspy)
     QUTest.trace("opt: o", QUTest._opt_save_qspy_txt)
-    QUTest.trace("opt: o", QUTest._opt_save_qspy_bin)
+    QUTest.trace("opt: b", QUTest._opt_save_qspy_bin)
     #return 0
 
     # init QSpy socket
@@ -1855,7 +1860,7 @@ def main():
     if QUTest._opt_save_qspy_bin:
         QSpy.send_to(struct.pack("<BB", QSpy._QSPY_BIN_OUT, 0))
 
-    QUTest._quithost_exe()
+    QUTest._quithost_exe(99)
     QSpy._detach()
 
     return sys.exit(QUTest._num_failed) # report to the caller (e.g., make)
