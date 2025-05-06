@@ -240,6 +240,46 @@ FAILED    : 2 [ 2 4 ]
 ==============================[ FAIL (  2.7s) ]===============================
 ```
 
+# The "qutestify" Utility
+While working with QUTest, it is often convenient to copy the parts of
+the QSPY raw output and convert them into QUTest expectations. For example,
+the following raw output:
+
+```
+0000000007 Disp===> Obj=TstSM_inst,Sig=B_SIG,State=TstSM_s211
+===RTC===> St-Exit  Obj=TstSM_inst,State=TstSM_s211
+===RTC===> St-Exit  Obj=TstSM_inst,State=TstSM_s21
+===RTC===> St-Entry Obj=TstSM_inst,State=TstSM_s22
+0000000008 ===>Tran Obj=TstSM_inst,Sig=B_SIG,State=TstSM_s2->TstSM_s22
+0000000009 Trg-Done QS_RX_EVENT
+```
+shall be transfored into the following expectations in a test script:
+
+```
+expect("@timestamp Disp===> Obj=TstSM_inst,Sig=B_SIG,State=TstSM_s211")
+expect("===RTC===> St-Exit  Obj=TstSM_inst,State=TstSM_s211")
+expect("===RTC===> St-Exit  Obj=TstSM_inst,State=TstSM_s21")
+expect("===RTC===> St-Entry Obj=TstSM_inst,State=TstSM_s22")
+expect("@timestamp ===>Tran Obj=TstSM_inst,Sig=B_SIG,State=TstSM_s2->TstSM_s22")
+expect("@timestamp Trg-Done QS_RX_EVENT")
+```
+
+The small Python utility `qutestify.py` is provided to automate the process.
+The utility takes a test script file name as parameter. It works by scanning
+the provided test script file for the signatures of raw QSpy output. Every
+recognized line is transformed into `expect("...")`.
+
+Here is an example of the `qutestify` run:
+
+```
+> python3 %QTOOLS%\qutest\qutestify.py test.py
+
+QUTestestify utility 8.0.4
+Copyright (c) 2005-2025 Quantum Leaps, www.state-machine.com
+qutestifying: test.py
+changed lines: 6.
+```
+
 # More Information
 More information about the QUTest unit testing harness is available
 online at:

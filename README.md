@@ -22,7 +22,7 @@ at: https://www.state-machine.com/qtools/
 
 # About QTools
 QTools is a collection of various open source tools for working with the
-[QP Real-Time Embedded Frameworks (RTEFs)][QP] on desktop platforms, such
+[QP Real-Time Event Frameworks (RTEFs)][QP] on desktop platforms, such
 as Windows, Linux, and macOS.
 
 The following open-source tools are currently provided (NOTE: tools
@@ -30,13 +30,13 @@ starting with 'q' are contributed by Quantum Leaps)
 
 1. [qspy](https://www.state-machine.com/qtools/qspy.html) -
    host application for receiving and displaying the real-time data from
-   embedded targets running the QS software tracing.
+   embedded targets running the [QS software tracing](#software-tracing-support).
 
 2. [qutest](https://www.state-machine.com/qtools/qutest.html) -
    Python extension of the `qspy` host application for
-   **unit and integration testing** specifically designed for embedded systems,
-   but also supports unit testing of embedded code on host computers
-   ("dual targeting").
+   [trace-based testing (TBT)](#trace-based-testing-support) specifically
+   designed for on-target testing of embedded systems, but also supports
+   testing of embedded code on host computers ("dual targeting").
 
 3. [qview](https://www.state-machine.com/qtools/qview.html) -
    Python extension of the `qspy` host application for visualization and
@@ -83,6 +83,16 @@ open-source, 3rd-party tools:
 14. GNU C/C++ toolset for ARM-EABI (GCC version 14.2-2024.12.10)
 
 15. LMFlash for Windows (32-bit build 1613)
+
+
+## Software Tracing Support
+The QUTools collection contains host-based tools that support the
+[Software Tracing built into QP][QP-Spy].
+
+
+## Trace-Based Testing (TBT)
+The QUTools collection contains host-based tools that support the
+[trace-based testing (TBT)][TBT] of event-driven QP applications.
 
 
 # Downloading and Installation
@@ -205,4 +215,6 @@ of your browser window):
 - info@state-machine.com
 
    [QP]: <https://www.state-machine.com/products/#QP>
+   [QP-Spy]: <https://www.state-machine.com/qtools/qpspy.html>
+   [TBT]: <https://www.state-machine.com/qtools/qutest.html#qutest_tbt>
    [QUTest]: <https://www.state-machine.com/qtools/qutest.html>
