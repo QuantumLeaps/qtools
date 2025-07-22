@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 804
+    VERSION = 805
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -177,8 +177,8 @@ class QUTest:
             "then": then,              # for BDD (alternative 2)
 
             "pack": struct.pack,
-            "test_file": self._test_fname,
-            "test_dir": self._test_dname,
+            "test_file": self.test_file,
+            "test_dir": self.test_dir,
             "on_reset": self._dummy_on_reset,
             "on_setup": self._dummy_on_setup,
             "on_teardown": self._dummy_on_teardown,
@@ -363,13 +363,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
-        bitmask = 0
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("glb_bitmask")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
@@ -444,12 +443,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("loc_filter")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
