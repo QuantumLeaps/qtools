@@ -18,7 +18,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "8.0.4"
+#define QSPY_VER "8.1.0"
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,25 +163,16 @@ typedef struct {
     int  rx_status; // the type of the RX status
 } QSPY_LastOutput;
 
-typedef enum {
+// Record groups (augment enum QSpyGroups from qpc_qs.h) 
+enum QSpyGroups_plus {
     GRP_ERR,
     GRP_INF,
     GRP_DIC,
     GRP_TST,
-    GRP_SM,
-    GRP_AO,
-    GRP_EQ,
-    GRP_MP,
-    GRP_TE,
-    GRP_QF,
-    GRP_SC,
-    GRP_SEM,
-    GRP_MTX,
-    GRP_USR
-} QSRreRecGroup;
+};
 
 // returns the "group" of a given QS record-ID
-QSRreRecGroup QSPY_getGroup(int recId);
+int QSPY_getGroup(int recId);
 
 // last output generated
 extern QSPY_LastOutput QSPY_output;

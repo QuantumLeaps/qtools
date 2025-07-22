@@ -21,12 +21,11 @@
 #include <time.h>
 #include <inttypes.h>
 
-#include "safe_std.h"   // "safe" <stdio.h> and <string.h> facilities
-#include "qspy.h"       // QSPY data parser
-#include "pal.h"        // Platform Abstraction Layer
-
 #define Q_SPY   1       // this is QS implementation
 #define QP_IMPL 1       // this is QP implementation
+typedef int      int_t;   // dummy definition for including "qpc_qs.h"
+typedef int      enum_t;  // dummy definition for including "qpc_qs.h"
+typedef uint16_t QSignal; // dummy definition for including "qpc_qs.h"
 typedef uint32_t QSFun;   // dummy definition for including "qpc_qs.h"
 typedef uint32_t QSObj;   // dummy definition for including "qpc_qs.h"
 typedef uint32_t QEvt;    // dummy definition for including "qpc_qs.h"
@@ -34,6 +33,10 @@ typedef uint32_t QActive; // dummy definition for including "qpc_qs.h"
 typedef uint32_t QPSet;   // dummy definition for including "qpc_qs.h"
 #include "qpc_qs.h"       // QS target-resident interface
 #include "qpc_qs_pkg.h"   // QS package-scope interface
+
+#include "safe_std.h"   // "safe" <stdio.h> and <string.h> facilities
+#include "qspy.h"       // QSPY data parser
+#include "pal.h"        // Platform Abstraction Layer
 
 // global objects ............................................................
 QSPY_LastOutput QSPY_output;
@@ -180,8 +183,10 @@ QSpyRecRender const l_recRender[QS_USER] = {
     { "QS_MTX_BLOCK_ATTEMPT",             GRP_MTX },
     { "QS_MTX_UNLOCK_ATTEMPT",            GRP_MTX },
 
-    // [81] reserved and unused
+    // [81] Additional QF (AO) records
     { "QS_QF_ACTIVE_DEFER_ATTEMPT",       GRP_AO  },
+
+    // [82] Additional QF (AO) records
     { "QS_RESERVED",                      GRP_ERR },
     { "QS_RESERVED",                      GRP_ERR },
     { "QS_RESERVED",                      GRP_ERR },
@@ -210,6 +215,7 @@ static char const *  l_qs_obj[] = {
     "EQ",
     "TE",
     "AP",
+    "EP",
     "SM_AO"
 };
 
@@ -758,7 +764,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 //============================================================================
 // predefined QS records...
 static void QSpyRecord_process(QSpyRecord * const me) {
-    uint32_t t, a, b, c, d, e;
+    uint32_t t, a, b, c, d, e, f;
     uint64_t p, q, r;
     char buf[QS_FNAME_LEN_MAX];
     char const *s = 0;
@@ -1819,91 +1825,152 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             c = 0;
             d = 0;
             e = 0;
-            p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+            f = 0;
+            p = 0;
             q = 0;
-            switch (a) {
-                case SM_OBJ:
-                    q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
-                    break;
-                case MP_OBJ:
-                    b = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
-                    c = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
-                    break;
-                case EQ_OBJ:
-                    b = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
-                    c = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
-                    break;
-                case TE_OBJ:
-                    q = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
-                    b = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
-                    c = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
-                    d = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
-                    e = QSpyRecord_getUint32(me, 1);
-                    break;
-                case AP_OBJ:
-                    break;
-                default:
-                    break;
-            }
-            if (QSPY_conf.qpVersion < 690U) {
+            if (QSPY_conf.qpVersion < 810U) {
+                p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                 switch (a) {
-                    case AO_OBJ:
+                    case OBJ_SM: //lint -fallthrough
+                    case OBJ_AO:
+                        q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
+                        break;
+                    case OBJ_MP:
+                        b = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
+                        c = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
+                        break;
+                    case OBJ_EQ:
                         b = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
                         c = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
                         break;
-                }
-            }
-            else {
-                switch (a) {
-                    case AO_OBJ:
-                        q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
+                    case OBJ_TE:
+                        q = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        b = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
+                        c = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
+                        d = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
+                        e = QSpyRecord_getUint32(me, 1);
                         break;
-                }
-            }
-            if (QSpyRecord_OK(me)) {
-                SNPRINTF_LINE("%010u Query-%s Obj=%s",
-                       t,
-                       l_qs_obj[a],
-                       Dictionary_get(&QSPY_objDict, p, (char *)0));
-                switch (a) {
-                    case SM_OBJ:
-                        SNPRINTF_APPEND(",State=%s",
-                            Dictionary_get(&QSPY_funDict, q, (char *)0));
-                        break;
-                    case MP_OBJ:
-                        SNPRINTF_APPEND(",Free=%u,Min=%u",
-                            b, c);
-                        break;
-                    case EQ_OBJ:
-                        SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
-                            b, c);
-                        break;
-                    case TE_OBJ:
-                        SNPRINTF_APPEND(
-                            ",Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
-                            (e & 0x0FU),
-                            SigDictionary_get(&QSPY_sigDict, d, q, (char *)0),
-                            b, c,
-                            (e & 0xF0U));
-                        break;
-                    case AP_OBJ:
+                    case OBJ_AP:
                         break;
                     default:
                         break;
                 }
-                if (QSPY_conf.qpVersion < 690U) {
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u Query-%s Obj=%s",
+                           t,
+                           l_qs_obj[a],
+                           Dictionary_get(&QSPY_objDict, p, (char *)0));
                     switch (a) {
-                        case AO_OBJ:
+                        case OBJ_SM: //lint -fallthrough
+                        case OBJ_AO:
+                            SNPRINTF_APPEND(",State=%s",
+                                Dictionary_get(&QSPY_funDict, q, (char *)0));
+                            break;
+                        case OBJ_MP:
+                            SNPRINTF_APPEND(",Free=%u,Min=%u",
+                                b, c);
+                            break;
+                        case OBJ_EQ:
                             SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
                                 b, c);
                             break;
+                        case OBJ_TE:
+                            SNPRINTF_APPEND(
+                                ",Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
+                                (e & 0x0FU),
+                                SigDictionary_get(&QSPY_sigDict, d, q, (char *)0),
+                                b, c,
+                                (e & 0xF0U));
+                            break;
+                        case OBJ_AP:
+                            break;
+                        default:
+                            break;
                     }
                 }
-                else {
+            } 
+            else { // new queries
+                switch (a) {
+                    case OBJ_SM:
+                        p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
+                        break;
+                    case OBJ_AO:
+                        b = QSpyRecord_getUint32(me, 1U);
+                        c = QSpyRecord_getUint32(me, 2U);
+                        d = QSpyRecord_getUint32(me, 2U);
+                        e = QSpyRecord_getUint32(me, 2U);
+                        break;
+                    case OBJ_MP:
+                        p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        b = QSpyRecord_getUint32(me, 2U);
+                        c = QSpyRecord_getUint32(me, 2U);
+                        d = QSpyRecord_getUint32(me, 2U);
+                        e = QSpyRecord_getUint32(me, 2U);
+                        break;
+                    case OBJ_EQ:
+                        p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        b = QSpyRecord_getUint32(me, 2U);
+                        c = QSpyRecord_getUint32(me, 2U);
+                        d = QSpyRecord_getUint32(me, 2U);
+                        break;
+                    case OBJ_TE:
+                        p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        q = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
+                        b = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
+                        c = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
+                        d = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
+                        e = QSpyRecord_getUint32(me, 1U);
+                        break;
+                    case OBJ_EP:
+                        b = QSpyRecord_getUint32(me, 1U);
+                        c = QSpyRecord_getUint32(me, 2U);
+                        d = QSpyRecord_getUint32(me, 2U);
+                        e = QSpyRecord_getUint32(me, 2U);
+                        f = QSpyRecord_getUint32(me, 2U);
+                        break;
+                    case OBJ_AP:
+                        break;
+                    default:
+                        break;
+                }
+                if (QSpyRecord_OK(me)) {
+                    SNPRINTF_LINE("%010u Query-%s",
+                           t,
+                           l_qs_obj[a]);
+                    s = Dictionary_get(&QSPY_objDict, p, (char *)0);
                     switch (a) {
-                        case AO_OBJ:
-                            SNPRINTF_APPEND(",State=%s",
-                                Dictionary_get(&QSPY_funDict, q, (char *)0));
+                        case OBJ_SM:
+                            SNPRINTF_APPEND(" Obj=%s,State=%s",
+                                s, Dictionary_get(&QSPY_funDict, q, (char*)0));
+                            break;
+                        case OBJ_AO:
+                            SNPRINTF_APPEND(" Pri=%u,Que<Use=%u,Free=%u,Min=%u>",
+                                b, c, d, e);
+                            break;
+                        case OBJ_MP:
+                            SNPRINTF_APPEND(" Obj=%s,Use=%u,Free=%u,Min=%u,Size=%u",
+                                s, b, c, d, e);
+                            break;
+                        case OBJ_EQ:
+                            SNPRINTF_APPEND(" Obj=%s,Use=%u,Free=%u,Min=%u",
+                                s, b, c, d);
+                            break;
+                        case OBJ_TE:
+                            SNPRINTF_APPEND(
+                                " Obj=%s,Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
+                                s, (e & 0x0FU),
+                                SigDictionary_get(&QSPY_sigDict, d, q, (char *)0),
+                                b, c,
+                                (e & 0xF0U));
+                            break;
+                        case OBJ_EP:
+                            SNPRINTF_APPEND(" Id=%u,Use=%u,Free=%u,Min=%u,Size=%u",
+                                b, c, d, e, f);
+                            break;
+                        case OBJ_AP:
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -2271,10 +2338,10 @@ KeyType QSPY_findEnum(char const *name, uint8_t group) {
     return Dictionary_findKey(&QSPY_enumDict[group], name);
 }
 //............................................................................
-QSRreRecGroup QSPY_getGroup(int recId) {
-    return recId < QS_USER
+int QSPY_getGroup(int recId) {
+    return (recId < QS_USER) // is it a Predefined record?
         ? l_recRender[recId].group
-        : GRP_USR;
+        : GRP_UA;
 }
 
 // Dictionary class ========================================================*/

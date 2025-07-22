@@ -7,19 +7,20 @@
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// SPDX-License-Identifier: LicenseRef-QL-commercial
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is licensed under the terms of the Quantum Leaps commercial
-// licenses. Please contact Quantum Leaps for more information about the
-// available licensing options.
+// This software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
-// RESTRICTIONS
-// You may NOT :
-// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
-//     transfer rights in this software,
-// (b) remove or alter any trademark, logo, copyright or other proprietary
-//     notices, legends, symbols or labels present in this software,
-// (c) plagiarize this software to sidestep the licensing obligations.
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// NOTE:
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -172,29 +173,31 @@ enum QSpyPre {
     QS_MTX_BLOCK_ATTEMPT, //!< a mutex blocking was attempted
     QS_MTX_UNLOCK_ATTEMPT,//!< a mutex unlock was attempted
 
-    // [81]
+    // [81] Additional QF (AO) records
     QS_QF_ACTIVE_DEFER_ATTEMPT, //!< AO attempted to deferr an event
+
+    // [82] keep always last
     QS_PRE_MAX            //!< the # predefined signals
 };
 
 //! QS-TX record groups for QS_GLB_FILTER()
 enum QSpyGroups {
-    QS_ALL_RECORDS = 0xF0,//!< all maskable QS records
-    QS_SM_RECORDS,        //!< State Machine QS records
-    QS_AO_RECORDS,        //!< Active Object QS records
-    QS_EQ_RECORDS,        //!< Event Queues QS records
-    QS_MP_RECORDS,        //!< Memory Pools QS records
-    QS_TE_RECORDS,        //!< Time Events QS records
-    QS_QF_RECORDS,        //!< QF QS records
-    QS_SC_RECORDS,        //!< Scheduler QS records
-    QS_SEM_RECORDS,       //!< Semaphore QS records
-    QS_MTX_RECORDS,       //!< Mutex QS records
-    QS_U0_RECORDS,        //!< User Group 100-104 records
-    QS_U1_RECORDS,        //!< User Group 105-109 records
-    QS_U2_RECORDS,        //!< User Group 110-114 records
-    QS_U3_RECORDS,        //!< User Group 115-119 records
-    QS_U4_RECORDS,        //!< User Group 120-124 records
-    QS_UA_RECORDS         //!< All User records
+    GRP_ALL = 0xF0, //!< all maskable QS records
+    GRP_SM,         //!< State Machine QS records
+    GRP_AO,         //!< Active Object QS records
+    GRP_EQ,         //!< Event Queues QS records
+    GRP_MP,         //!< Memory Pools QS records
+    GRP_TE,         //!< Time Events QS records
+    GRP_QF,         //!< QF QS records
+    GRP_SC,         //!< Scheduler QS records
+    GRP_SEM,        //!< Semaphore QS records
+    GRP_MTX,        //!< Mutex QS records
+    GRP_U0,         //!< User Group 100-104 records
+    GRP_U1,         //!< User Group 105-109 records
+    GRP_U2,         //!< User Group 110-114 records
+    GRP_U3,         //!< User Group 115-119 records
+    GRP_U4,         //!< User Group 120-124 records
+    GRP_UA,         //!< All User records
 };
 
 //! QS user record group offsets for QS_GLB_FILTER()
@@ -272,7 +275,7 @@ typedef void (* QSpyFunPtr )(void);
 #define QS_FLUSH()           (QS_onFlush())
 
 #define QS_BEGIN_ID(rec_, qsId_) \
-if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
+if (QS_fltCheck_((rec_), (qsId_))) { \
     QS_CRIT_STAT \
     QS_CRIT_ENTRY(); \
     QS_beginRec_((uint_fast8_t)(rec_)); \
@@ -284,7 +287,7 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
 }
 
 #define QS_BEGIN_INCRIT(rec_, qsId_) \
-if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
+if (QS_fltCheck_((rec_), (qsId_))) { \
     QS_beginRec_((uint_fast8_t)(rec_)); \
     QS_TIME_PRE(); {
 
@@ -292,13 +295,8 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
     QS_endRec_(); \
 }
 
-#define QS_GLB_CHECK_(rec_) \
-    (((uint_fast8_t)QS_filt_.glb[(uint_fast8_t)(rec_) >> 3U] \
-          & ((uint_fast8_t)1U << ((uint_fast8_t)(rec_) & 7U))) != 0U)
-
-#define QS_LOC_CHECK_(qsId_) \
-    (((uint_fast8_t)QS_filt_.loc[(uint_fast8_t)(qsId_) >> 3U] \
-          & ((uint_fast8_t)1U << ((uint_fast8_t)(qsId_) & 7U))) != 0U)
+#define QS_GLB_CHECK_(rec_)  (QS_glbCheck_((rec_)))
+#define QS_LOC_CHECK_(qsId_) (QS_locCheck_((qsId_)))
 
 #ifndef QS_REC_DONE
     #define QS_REC_DONE() ((void)0)
@@ -424,7 +422,7 @@ void QS_TR_ISR_EXIT(
 #endif
 
 #define QS_EOD     ((uint16_t)0xFFFFU)
-#define QS_CMD     ((uint8_t)7U)
+#define QS_CMD     ((uint8_t)0x07U)
 #define QS_HEX_FMT ((uint8_t)0x0FU)
 
 //============================================================================
@@ -582,6 +580,10 @@ extern QS_Attr QS_priv_;
 void QS_glbFilter_(int_fast16_t const filter);
 void QS_locFilter_(int_fast16_t const filter);
 
+bool QS_fltCheck_(uint_fast8_t const rec, uint_fast8_t const qsId);
+bool QS_glbCheck_(uint_fast8_t const rec);
+bool QS_locCheck_(uint_fast8_t const qsId);
+
 void QS_beginRec_(uint_fast8_t const rec);
 void QS_endRec_(void);
 
@@ -719,20 +721,15 @@ extern struct QS_RxAttr * const QS_rxPriv_;
 
 //! @static @public @memberof QS
 //! Kinds of objects used in QS-RX
-enum QS_QSpyObjKind {
-    SM_OBJ,    //!< state machine object
-    AO_OBJ,    //!< active object
-    MP_OBJ,    //!< event pool object
-    EQ_OBJ,    //!< raw queue object
-    TE_OBJ,    //!< time event object
-    AP_OBJ,    //!< generic Application-specific object
-    MAX_OBJ
-};
-
-//! @static @public @memberof QS
-//! Object combinations for QS-RX
-enum QS_OSpyObjComb {
-    SM_AO_OBJ = (enum_t)MAX_OBJ //!< combination of SM and AO
+enum QSpyObjKind {
+    OBJ_SM,    //!< state machine object
+    OBJ_AO,    //!< active object
+    OBJ_MP,    //!< event pool object
+    OBJ_EQ,    //!< raw queue object
+    OBJ_TE,    //!< time event object
+    OBJ_AP,    //!< generic Application-specific object
+    OBJ_EP,    //!< event pool object
+    OBJ_MAX
 };
 
 //! @static @public @memberof QS
@@ -750,12 +747,16 @@ void QS_rxParse(void);
 void QS_rxParseBuf(uint16_t const len);
 
 //! @static @public @memberof QS
-void QS_setCurrObj(
-    uint8_t const obj_kind,
-    void * const obj_ptr);
+void QS_setCurrObj(uint8_t const obj_kind, void * const obj_ptr);
 
 //! @static @public @memberof QS
 void *QS_getCurrObj(uint8_t const obj_kind);
+
+//! @static @public @memberof QS
+void QS_setCurrId(uint8_t const obj_kind, uint8_t const obj_id);
+
+//! @static @public @memberof QS
+uint8_t QS_getCurrId(uint8_t const obj_kind);
 
 //! @static @public @memberof QS
 uint16_t QS_rxGetNfree(void);

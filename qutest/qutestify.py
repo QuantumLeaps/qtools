@@ -33,7 +33,7 @@
 import os
 import sys
 
-VERSION = 804
+VERSION = 810
 
 def main():
     # process command-line arguments...
