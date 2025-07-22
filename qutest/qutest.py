@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 804
+    VERSION = 805
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -363,13 +363,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
-        bitmask = 0
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("glb_bitmask")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
@@ -444,12 +443,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("loc_filter")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
