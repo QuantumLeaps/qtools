@@ -33,7 +33,7 @@
 import os
 import sys
 
-VERSION = 804
+VERSION = 810
 
 def main():
     # process command-line arguments...
@@ -77,6 +77,9 @@ def main():
         elif line.startswith('           Tick'):
             lchnum += 1
             new_lines.append(f'expect("           Tick{line[15:-1]}")\n')
+        elif line.startswith('           TE'):
+            lchnum += 1
+            new_lines.append(f'expect("           TE{line[13:-1]}")\n')
         else:
             new_lines.append(line)
 

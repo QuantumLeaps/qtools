@@ -1,5 +1,5 @@
 //============================================================================
-// QP/C-Spy software tracing target-resident component
+// QP/C Real-Time Event Framework (RTEF)
 //
 // Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 //
@@ -7,21 +7,22 @@
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// SPDX-License-Identifier: LicenseRef-QL-commercial
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is licensed under the terms of the Quantum Leaps commercial
-// licenses. Please contact Quantum Leaps for more information about the
-// available licensing options.
+// This software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
-// RESTRICTIONS
-// You may NOT :
-// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
-//     transfer rights in this software,
-// (b) remove or alter any trademark, logo, copyright or other proprietary
-//     notices, legends, symbols or labels present in this software,
-// (c) plagiarize this software to sidestep the licensing obligations.
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
 //
-// Quantum Leaps contact information :
+// NOTE:
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
+//
+// Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
 // <info@state-machine.com>
 //============================================================================
@@ -32,7 +33,7 @@
 //! @cond INTERNAL
 
 //! QS received record types (RX channel)
-enum QSpyRxRecords {
+typedef enum {
     QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
     QS_RX_COMMAND,        //!< execute a user-defined command in the Target
     QS_RX_RESET,          //!< reset the Target
@@ -49,18 +50,18 @@ enum QSpyRxRecords {
     QS_RX_CURR_OBJ,       //!< set the "current-object" in the Target
     QS_RX_TEST_CONTINUE,  //!< continue a test after QS_TEST_PAUSE()
     QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
-    QS_RX_EVENT           //!< inject an event to the Target
-};
+    QS_RX_EVENT,          //!< inject an event to the Target
+} QS_RxRecords;
 
 //----------------------------------------------------------------------------
-#define QS_FRAME       0x7EU
-#define QS_ESC         0x7DU
-#define QS_ESC_XOR     0x20U
-#define QS_GOOD_CHKSUM 0xFFU
+#define QS_FRAME          ((uint8_t)0x7EU)
+#define QS_ESC            ((uint8_t)0x7DU)
+#define QS_ESC_XOR        ((uint8_t)0x20U)
+#define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
 
 //----------------------------------------------------------------------------
-#define QS_BEGIN_PRE(rec_, qsId_) \
-    if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
+#define QS_BEGIN_PRE(rec_, qsId_)        \
+    if (QS_fltCheck_((rec_), (qsId_))) { \
         QS_beginRec_((uint_fast8_t)(rec_));
 #define QS_END_PRE()           QS_endRec_(); }
 
@@ -71,14 +72,7 @@ enum QSpyRxRecords {
 #define QS_U32_PRE(data_)      (QS_u32_raw_((uint32_t)(data_)))
 #define QS_STR_PRE(msg_)       (QS_str_raw_((msg_)))
 #define QS_OBJ_PRE(obj_)       (QS_obj_raw_(obj_))
-
-#if (!defined Q_SIGNAL_SIZE || (Q_SIGNAL_SIZE == 1U))
-    #define QS_SIG_PRE(sig_)   (QS_u8_raw_((uint8_t)(sig_)))
-#elif (Q_SIGNAL_SIZE == 2U)
-    #define QS_SIG_PRE(sig_)   (QS_u16_raw_((uint16_t)(sig_)))
-#elif (Q_SIGNAL_SIZE == 4U)
-    #define QS_SIG_PRE(sig_)   (QS_u32_raw_((uint32_t)(sig_)))
-#endif
+#define QS_SIG_PRE(sig_)       (QS_u16_raw_((uint16_t)(sig_)))
 
 #if (!defined QS_FUN_PTR_SIZE || (QS_FUN_PTR_SIZE == 2U))
     #define QS_FUN_PRE(fun_)   (QS_u16_raw_((uint16_t)(fun_)))
@@ -149,6 +143,8 @@ enum QSpyRxRecords {
         QS_INSERT_BYTE_((uint8_t)((b_) ^ QS_ESC_XOR)) \
         ++QS_priv_.used;                              \
     }
+
+#define QS_PTR2UNIT_CAST(T_, ptr_) ((T_)(ptr_))
 
 //! @endcond
 

@@ -7,19 +7,20 @@
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// SPDX-License-Identifier: LicenseRef-QL-commercial
+// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 //
-// This software is licensed under the terms of the Quantum Leaps commercial
-// licenses. Please contact Quantum Leaps for more information about the
-// available licensing options.
+// This software is dual-licensed under the terms of the open-source GNU
+// General Public License (GPL) or under the terms of one of the closed-
+// source Quantum Leaps commercial licenses.
 //
-// RESTRICTIONS
-// You may NOT :
-// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
-//     transfer rights in this software,
-// (b) remove or alter any trademark, logo, copyright or other proprietary
-//     notices, legends, symbols or labels present in this software,
-// (c) plagiarize this software to sidestep the licensing obligations.
+// Redistributions in source code must retain this top-level comment block.
+// Plagiarizing this software to sidestep the license obligations is illegal.
+//
+// NOTE:
+// The GPL does NOT permit the incorporation of this code into proprietary
+// programs. Please contact Quantum Leaps for commercial licensing options,
+// which expressly supersede the GPL and are designed explicitly for
+// closed-source distribution.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -53,8 +54,8 @@ typedef struct {
     //! @endcond
 } QS;
 
-//! pre-defined QS record IDs
-enum QSpyPre {
+//! pre-defined QS record IDs (for QS_GLB_FILTER())
+enum QS_GlbPre {
     // [0] QS session (not maskable)
     QS_EMPTY,             //!< QS record for cleanly starting a session
 
@@ -172,57 +173,50 @@ enum QSpyPre {
     QS_MTX_BLOCK_ATTEMPT, //!< a mutex blocking was attempted
     QS_MTX_UNLOCK_ATTEMPT,//!< a mutex unlock was attempted
 
-    // [81]
-    QS_QF_ACTIVE_DEFER_ATTEMPT, //!< AO attempted to deferr an event
+    // [81] Additional QF (AO) records
+    QS_QF_ACTIVE_DEFER_ATTEMPT, //!< AO attempted to defer an event
+
+    // [82] keep always last
     QS_PRE_MAX            //!< the # predefined signals
 };
 
-//! QS-TX record groups for QS_GLB_FILTER()
-enum QSpyGroups {
-    QS_ALL_RECORDS = 0xF0,//!< all maskable QS records
-    QS_SM_RECORDS,        //!< State Machine QS records
-    QS_AO_RECORDS,        //!< Active Object QS records
-    QS_EQ_RECORDS,        //!< Event Queues QS records
-    QS_MP_RECORDS,        //!< Memory Pools QS records
-    QS_TE_RECORDS,        //!< Time Events QS records
-    QS_QF_RECORDS,        //!< QF QS records
-    QS_SC_RECORDS,        //!< Scheduler QS records
-    QS_SEM_RECORDS,       //!< Semaphore QS records
-    QS_MTX_RECORDS,       //!< Mutex QS records
-    QS_U0_RECORDS,        //!< User Group 100-104 records
-    QS_U1_RECORDS,        //!< User Group 105-109 records
-    QS_U2_RECORDS,        //!< User Group 110-114 records
-    QS_U3_RECORDS,        //!< User Group 115-119 records
-    QS_U4_RECORDS,        //!< User Group 120-124 records
-    QS_UA_RECORDS         //!< All User records
-};
+// QS record groups (for QS_GLB_FILTER())
+#define QS_GRP_ALL  ((int_fast16_t)0xF0)
+#define QS_GRP_SM   ((int_fast16_t)0xF1)
+#define QS_GRP_AO   ((int_fast16_t)0xF2)
+#define QS_GRP_EQ   ((int_fast16_t)0xF3)
+#define QS_GRP_MP   ((int_fast16_t)0xF4)
+#define QS_GRP_TE   ((int_fast16_t)0xF5)
+#define QS_GRP_QF   ((int_fast16_t)0xF6)
+#define QS_GRP_SC   ((int_fast16_t)0xF7)
+#define QS_GRP_SEM  ((int_fast16_t)0xF8)
+#define QS_GRP_MTX  ((int_fast16_t)0xF9)
+#define QS_GRP_U0   ((int_fast16_t)0xFA)
+#define QS_GRP_U1   ((int_fast16_t)0xFB)
+#define QS_GRP_U2   ((int_fast16_t)0xFC)
+#define QS_GRP_U3   ((int_fast16_t)0xFD)
+#define QS_GRP_U4   ((int_fast16_t)0xFE)
+#define QS_GRP_UA   ((int_fast16_t)0xFF)
 
-//! QS user record group offsets for QS_GLB_FILTER()
-enum QSpyUserOffsets {
-    QS_USER  = 100,          //!< the first record available to QS users
-    QS_USER0 = QS_USER,      //!< offset for User Group 0
-    QS_USER1 = (enum_t)QS_USER0 + 5, //!< offset for User Group 1
-    QS_USER2 = (enum_t)QS_USER1 + 5, //!< offset for User Group 2
-    QS_USER3 = (enum_t)QS_USER2 + 5, //!< offset for User Group 3
-    QS_USER4 = (enum_t)QS_USER3 + 5  //!< offset for User Group 4
-};
+// QS user record group offsets (for app-specific records)
+#define QS_USER     ((enum_t)100)
+#define QS_USER0    QS_USER
+#define QS_USER1    ((enum_t)(QS_USER + 5))
+#define QS_USER2    ((enum_t)(QS_USER + 10))
+#define QS_USER3    ((enum_t)(QS_USER + 15))
+#define QS_USER4    ((enum_t)(QS_USER + 20))
 
-//! QS ID offsets for QS_LOC_FILTER()
-enum QSpyIdOffsets {
-    QS_AO_ID = 0,  //!< offset for AO priorities
-    QS_EP_ID = 64, //!< offset for event-pool IDs
-    QS_EQ_ID = 80, //!< offset for event-queue IDs
-    QS_AP_ID = 96  //!< offset for Application-specific IDs
-};
+// QS ID groups (for QS_LOC_FILTER())
+#define QS_ID_AO   ((int_fast16_t)0)
+#define QS_ID_EP   ((int_fast16_t)64)
+#define QS_ID_EQ   ((int_fast16_t)80)
+#define QS_ID_AP   ((int_fast16_t)96)
 
-//! QS ID groups for QS_LOC_FILTER()
-enum QSpyIdGroups {
-    QS_ALL_IDS = 0xF0,                    //!< all QS IDs
-    QS_AO_IDS  = 0x80 + (enum_t)QS_AO_ID, //!< AO IDs (priorities)
-    QS_EP_IDS  = 0x80 + (enum_t)QS_EP_ID, //!< event-pool IDs
-    QS_EQ_IDS  = 0x80 + (enum_t)QS_EQ_ID, //!< event-queue IDs
-    QS_AP_IDS  = 0x80 + (enum_t)QS_AP_ID  //!< Application-specific IDs
-};
+#define QS_IDS_AO  ((int_fast16_t)(0x80 + QS_ID_AO))
+#define QS_IDS_EP  ((int_fast16_t)(0x80 + QS_ID_EP))
+#define QS_IDS_EQ  ((int_fast16_t)(0x80 + QS_ID_EQ))
+#define QS_IDS_AP  ((int_fast16_t)(0x80 + QS_ID_AP))
+#define QS_IDS_ALL ((int_fast16_t)0xF0)
 
 //! @struct QSpyId
 typedef struct {
@@ -272,7 +266,7 @@ typedef void (* QSpyFunPtr )(void);
 #define QS_FLUSH()           (QS_onFlush())
 
 #define QS_BEGIN_ID(rec_, qsId_) \
-if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
+if (QS_fltCheck_((rec_), (qsId_))) { \
     QS_CRIT_STAT \
     QS_CRIT_ENTRY(); \
     QS_beginRec_((uint_fast8_t)(rec_)); \
@@ -284,7 +278,7 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
 }
 
 #define QS_BEGIN_INCRIT(rec_, qsId_) \
-if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
+if (QS_fltCheck_((rec_), (qsId_))) { \
     QS_beginRec_((uint_fast8_t)(rec_)); \
     QS_TIME_PRE(); {
 
@@ -292,55 +286,50 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
     QS_endRec_(); \
 }
 
-#define QS_GLB_CHECK_(rec_) \
-    (((uint_fast8_t)QS_filt_.glb[(uint_fast8_t)(rec_) >> 3U] \
-          & ((uint_fast8_t)1U << ((uint_fast8_t)(rec_) & 7U))) != 0U)
-
-#define QS_LOC_CHECK_(qsId_) \
-    (((uint_fast8_t)QS_filt_.loc[(uint_fast8_t)(qsId_) >> 3U] \
-          & ((uint_fast8_t)1U << ((uint_fast8_t)(qsId_) & 7U))) != 0U)
+#define QS_GLB_CHECK_(rec_)  (QS_glbCheck_((rec_)))
+#define QS_LOC_CHECK_(qsId_) (QS_locCheck_((qsId_)))
 
 #ifndef QS_REC_DONE
     #define QS_REC_DONE() ((void)0)
 #endif // ndef QS_REC_DONE
 
 #define QS_I8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4U) & 0x7U) | (uint8_t)QS_I8_ENUM_T, \
+    (QS_u8_fmt_((uint8_t)(((width_) << 4U) & 0x7U) | QS_I8_ENUM_FMT, \
                 (data_)))
 
 #define QS_U8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U8_T, (data_)))
+    (QS_u8_fmt_((uint8_t)(((width_) << 4U)) | QS_U8_FMT, (data_)))
 
 #define QS_I16(width_, data_) \
-    (QS_u16_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I16_T, (data_)))
+    (QS_u16_fmt_((uint8_t)(((width_) << 4U)) | QS_I16_FMT, (data_)))
 
 #define QS_U16(width_, data_) \
-    (QS_u16_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U16_T, (data_)))
+    (QS_u16_fmt_((uint8_t)(((width_) << 4U)) | QS_U16_FMT, (data_)))
 
 #define QS_I32(width_, data_) \
-    (QS_u32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I32_T, (data_)))
+    (QS_u32_fmt_((uint8_t)(((width_) << 4U)) | QS_I32_FMT, (data_)))
 
 #define QS_U32(width_, data_) \
-    (QS_u32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U32_T, (data_)))
+    (QS_u32_fmt_((uint8_t)(((width_) << 4U)) | QS_U32_FMT, (data_)))
 
 #define QS_I64(width_, data_) \
-    (QS_u64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_I64_T, (data_)))
+    (QS_u64_fmt_((uint8_t)(((width_) << 4U)) | QS_I64_FMT, (data_)))
 
 #define QS_U64(width_, data_) \
-    (QS_u64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_U64_T, (data_)))
+    (QS_u64_fmt_((uint8_t)(((width_) << 4U)) | QS_U64_FMT, (data_)))
 
 #define QS_F32(width_, data_) \
-    (QS_f32_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_F32_T, (data_)))
+    (QS_f32_fmt_((uint8_t)(((width_) << 4U)) | QS_F32_FMT, (data_)))
 
 #define QS_F64(width_, data_) \
-    (QS_f64_fmt_((uint8_t)(((width_) << 4)) | (uint8_t)QS_F64_T, (data_)))
+    (QS_f64_fmt_((uint8_t)(((width_) << 4U)) | QS_F64_FMT, (data_)))
 
 #define QS_STR(str_) (QS_str_fmt_((str_)))
 
 #define QS_MEM(mem_, size_) (QS_mem_fmt_((mem_), (size_)))
 
 #define QS_ENUM(group_, value_) \
-    (QS_u8_fmt_((uint8_t)(0x80U | ((group_) << 4U)) | (uint8_t)QS_I8_ENUM_T,\
+    (QS_u8_fmt_((uint8_t)(0x80U | ((group_) << 4U)) | QS_I8_ENUM_FMT, \
                 (uint8_t)(value_)))
 
 #if (QS_TIME_SIZE == 2U)
@@ -350,34 +339,24 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
 #endif //  (QS_TIME_SIZE == 4U)
 
 #if (QS_OBJ_PTR_SIZE == 2U)
-    #define QS_OBJ(obj_) (QS_u16_fmt_(QS_OBJ_T, (uint16_t)(obj_)))
+    #define QS_OBJ(obj_) (QS_u16_fmt_(QS_OBJ_FMT, (uint16_t)(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 4U)
-    #define QS_OBJ(obj_) (QS_u32_fmt_(QS_OBJ_T, (uint32_t)(obj_)))
+    #define QS_OBJ(obj_) (QS_u32_fmt_(QS_OBJ_FMT, (uint32_t)(obj_)))
 #elif (QS_OBJ_PTR_SIZE == 8U)
-    #define QS_OBJ(obj_) (QS_u64_fmt_(QS_OBJ_T, (uint64_t)(obj_)))
+    #define QS_OBJ(obj_) (QS_u64_fmt_(QS_OBJ_FMT, (uint64_t)(obj_)))
 #endif // (QS_OBJ_PTR_SIZE == 8U)
 
 #if (QS_FUN_PTR_SIZE == 2U)
-    #define QS_FUN(fun_) (QS_u16_fmt_(QS_FUN_T, (uint16_t)(fun_)))
+    #define QS_FUN(fun_) (QS_u16_fmt_(QS_FUN_FMT, (uint16_t)(fun_)))
 #elif (QS_FUN_PTR_SIZE == 4U)
-    #define QS_FUN(fun_) (QS_u32_fmt_(QS_FUN_T, (uint32_t)(fun_)))
+    #define QS_FUN(fun_) (QS_u32_fmt_(QS_FUN_FMT, (uint32_t)(fun_)))
 #elif (QS_FUN_PTR_SIZE == 8U)
-    #define QS_FUN(fun_) (QS_u64_fmt_(QS_FUN_T, (uint64_t)(fun_)))
+    #define QS_FUN(fun_) (QS_u64_fmt_(QS_FUN_FMT, (uint64_t)(fun_)))
 #endif // (QS_FUN_PTR_SIZE == 8U)
 
-#if (Q_SIGNAL_SIZE == 1U)
-    #define QS_SIG(sig_, obj_) \
-            QS_u8_fmt_(QS_SIG_T, (sig_)); \
-            QS_obj_raw_(obj_)
-#elif (Q_SIGNAL_SIZE == 2U)
-    #define QS_SIG(sig_, obj_) \
-            QS_u16_fmt_(QS_SIG_T, (sig_)); \
-            QS_obj_raw_(obj_)
-#elif (Q_SIGNAL_SIZE == 4U)
-    #define QS_SIG(sig_, obj_) \
-            QS_u32_fmt_(QS_SIG_T, (sig_)); \
-            QS_obj_raw_(obj_)
-#endif //  (Q_SIGNAL_SIZE == 4U)
+#define QS_SIG(sig_, obj_) \
+    QS_u16_fmt_(QS_SIG_FMT, (sig_)); \
+    QS_obj_raw_(obj_)
 
 #define QS_SIG_DICTIONARY(sig_, obj_) \
     (QS_sig_dict_pre_((QSignal)(sig_), (obj_), #sig_))
@@ -399,19 +378,13 @@ if (QS_GLB_CHECK_(rec_) && QS_LOC_CHECK_(qsId_)) { \
 
 #define QS_RX_PUT(b_) (QS_rxPut((b_)))
 
-#define QS_TR_CRIT_ENTRY()
-#define QS_TR_CRIT_EXIT()
+#define QS_TR_CRIT_ENTRY()  (QS_crit_entry_pre_())
+#define QS_TR_CRIT_EXIT()   (QS_crit_exit_pre_())
 
-#define QS_TR_ISR_ENTRY(isrnest_, prio_) do { \
-    QS_BEGIN_PRE(QS_QF_ISR_ENTRY, 0U)         \
-        QS_TIME_PRE();                        \
-        QS_2u8_raw_((isrnest_), (prio_));     \
-    QS_END_PRE()                              \
-}
-
-void QS_TR_ISR_EXIT(
-    uint_fast8_t isrnest,
-    uint_fast8_t prio);
+#define QS_TR_ISR_ENTRY(isrnest_, prio_) \
+    (QS_isr_entry_pre_((isrnest_), (prio_)))
+#define QS_TR_ISR_EXIT(isrnest_, prio_) \
+    (QS_isr_exit_pre_((isrnest_), (prio_)))
 
 #define QS_ONLY(code_) (code_)
 
@@ -424,8 +397,7 @@ void QS_TR_ISR_EXIT(
 #endif
 
 #define QS_EOD     ((uint16_t)0xFFFFU)
-#define QS_CMD     ((uint8_t)7U)
-#define QS_HEX_FMT ((uint8_t)0x0FU)
+#define QS_CMD     ((uint8_t)0x07U)
 
 //============================================================================
 #ifndef QS_CRIT_STAT
@@ -444,7 +416,6 @@ void QS_TR_ISR_EXIT(
     #error Memory isolation not supported in this QP edition, need SafeQP
 #endif
 
-//============================================================================
 //============================================================================
 #ifdef Q_UTEST
 
@@ -493,7 +464,7 @@ bool QHsmDummy_isIn_(
     QAsm * const me,
     QStateHandler const state);
 
-QStateHandler QHsmDummy_getStateHandler_(QAsm * const me);
+QStateHandler QHsmDummy_getStateHandler_(QAsm const * const me);
 
 //----------------------------------------------------------------------------
 //! @class QActiveDummy
@@ -582,6 +553,10 @@ extern QS_Attr QS_priv_;
 void QS_glbFilter_(int_fast16_t const filter);
 void QS_locFilter_(int_fast16_t const filter);
 
+bool QS_fltCheck_(uint_fast8_t const rec, uint_fast8_t const qsId);
+bool QS_glbCheck_(uint_fast8_t const rec);
+bool QS_locCheck_(uint_fast8_t const qsId);
+
 void QS_beginRec_(uint_fast8_t const rec);
 void QS_endRec_(void);
 
@@ -612,27 +587,31 @@ void QS_usr_dict_pre_(enum_t const rec, char const * const name);
 void QS_enum_dict_pre_(enum_t const value, uint8_t const group,
     char const * const name);
 
+void QS_crit_entry_pre_(void);
+void QS_crit_exit_pre_(void);
+void QS_isr_entry_pre_(uint8_t const isrnest, uint8_t const prio);
+void QS_isr_exit_pre_(uint8_t const isrnest, uint8_t const prio);
+
 void QS_assertion_pre_(char const * const module, int_t const id,
     uint32_t const delay);
 
-//! Enumerates data elements for app-specific trace records
-enum QS_preType {
-    QS_I8_ENUM_T, //!< signed 8-bit integer or enum format
-    QS_U8_T,      //!< unsigned 8-bit integer format
-    QS_I16_T,     //!< signed 16-bit integer format
-    QS_U16_T,     //!< unsigned 16-bit integer format
-    QS_I32_T,     //!< signed 32-bit integer format
-    QS_U32_T,     //!< unsigned 32-bit integer format
-    QS_F32_T,     //!< 32-bit floating point format
-    QS_F64_T,     //!< 64-bit floating point format
-    QS_STR_T,     //!< zero-terminated ASCII string format
-    QS_MEM_T,     //!< up to 255-bytes memory block format
-    QS_SIG_T,     //!< event signal format
-    QS_OBJ_T,     //!< object pointer format
-    QS_FUN_T,     //!< function pointer format
-    QS_I64_T,     //!< signed 64-bit integer format
-    QS_U64_T      //!< unsigned 64-bit integer format
-};
+// Formats for data elements for app-specific trace records
+#define QS_I8_ENUM_FMT ((uint8_t)0x0U)
+#define QS_U8_FMT      ((uint8_t)0x1U)
+#define QS_I16_FMT     ((uint8_t)0x2U)
+#define QS_U16_FMT     ((uint8_t)0x3U)
+#define QS_I32_FMT     ((uint8_t)0x4U)
+#define QS_U32_FMT     ((uint8_t)0x5U)
+#define QS_F32_FMT     ((uint8_t)0x6U)
+#define QS_F64_FMT     ((uint8_t)0x7U)
+#define QS_STR_FMT     ((uint8_t)0x8U)
+#define QS_MEM_FMT     ((uint8_t)0x9U)
+#define QS_SIG_FMT     ((uint8_t)0xAU)
+#define QS_OBJ_FMT     ((uint8_t)0xBU)
+#define QS_FUN_FMT     ((uint8_t)0xCU)
+#define QS_I64_FMT     ((uint8_t)0xDU)
+#define QS_U64_FMT     ((uint8_t)0xEU)
+#define QS_HEX_FMT     ((uint8_t)0xFU)
 
 // @struct TProbe
 struct QS_TProbe {
@@ -717,22 +696,16 @@ extern struct QS_RxAttr * const QS_rxPriv_;
 //----------------------------------------------------------------------------
 // QS-RX (QS receive channel)
 
-//! @static @public @memberof QS
-//! Kinds of objects used in QS-RX
-enum QS_QSpyObjKind {
-    SM_OBJ,    //!< state machine object
-    AO_OBJ,    //!< active object
-    MP_OBJ,    //!< event pool object
-    EQ_OBJ,    //!< raw queue object
-    TE_OBJ,    //!< time event object
-    AP_OBJ,    //!< generic Application-specific object
-    MAX_OBJ
-};
-
-//! @static @public @memberof QS
-//! Object combinations for QS-RX
-enum QS_OSpyObjComb {
-    SM_AO_OBJ = (enum_t)MAX_OBJ //!< combination of SM and AO
+//! Object kinds used in QS-RX (NOTE: watch out for backwards compatibility!)
+enum QS_ObjKind {
+    QS_OBJ_SM,    //!< State Machine
+    QS_OBJ_AO,    //!< Active Object
+    QS_OBJ_MP,    //!< Event Pool
+    QS_OBJ_EQ,    //!< Event Queue
+    QS_OBJ_TE,    //!< Time Event
+    QS_OBJ_AP,    //!< generic Application-specific object
+    QS_OBJ_SM_AO, //!< state machine AND active object
+    QS_OBJ_EP,    //!< Event Pool
 };
 
 //! @static @public @memberof QS
@@ -750,15 +723,19 @@ void QS_rxParse(void);
 void QS_rxParseBuf(uint16_t const len);
 
 //! @static @public @memberof QS
-void QS_setCurrObj(
-    uint8_t const obj_kind,
-    void * const obj_ptr);
+uint16_t QS_rxGetFree(void);
 
 //! @static @public @memberof QS
-void *QS_getCurrObj(uint8_t const obj_kind);
+bool QS_setCurrObj(enum QS_ObjKind const obj_kind, void * const obj_ptr);
 
 //! @static @public @memberof QS
-uint16_t QS_rxGetNfree(void);
+void *QS_getCurrObj(enum QS_ObjKind const obj_kind);
+
+//! @static @public @memberof QS
+bool QS_setCurrId(enum QS_ObjKind const obj_kind, uint8_t const obj_id);
+
+//! @static @public @memberof QS
+uint8_t QS_getCurrId(enum QS_ObjKind const obj_kind);
 
 //! @static @public @memberof QS
 void QS_doInput(void);
@@ -773,12 +750,12 @@ void QS_onCommand(
     uint32_t param2,
     uint32_t param3);
 
-    typedef enum {
+typedef enum {
     QS_TARGET_NO_RESET,
     QS_TARGET_RESET
-} QSResetAction;
+} QS_ResetAction;
 
-void QS_target_info_pre_(QSResetAction const act);
+void QS_target_info_pre_(QS_ResetAction const act);
 
 #if (defined Q_UTEST) && (Q_UTEST != 0)
 void QS_processTestEvts_(void);

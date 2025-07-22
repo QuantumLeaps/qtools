@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 804
+    VERSION = 810
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -177,8 +177,8 @@ class QUTest:
             "then": then,              # for BDD (alternative 2)
 
             "pack": struct.pack,
-            "test_file": self._test_fname,
-            "test_dir": self._test_dname,
+            "test_file": self.test_file,
+            "test_dir": self.test_dir,
             "on_reset": self._dummy_on_reset,
             "on_setup": self._dummy_on_setup,
             "on_teardown": self._dummy_on_teardown,
@@ -193,6 +193,7 @@ class QUTest:
             "OBJ_EQ": QSpy._OBJ_EQ,
             "OBJ_TE": QSpy._OBJ_TE,
             "OBJ_AP": QSpy._OBJ_AP,
+            "OBJ_EP": QSpy._OBJ_EP,
             "OBJ_SM_AO": QSpy._OBJ_SM_AO,
             "GRP_ALL": QSpy.GRP_ALL,
             "GRP_SM": QSpy.GRP_SM,
@@ -363,13 +364,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
-        bitmask = 0
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("glb_bitmask")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
@@ -444,12 +444,12 @@ class QUTest:
                 return bits & ~mask
             return bits | mask
 
+        bitmask = 0 # 128-bit integer bitmask
         if self._to_skip > 0:
             pass # ignore
         elif self._state == QUTest._INIT:
             self._before_test("loc_filter")
         elif self._state == QUTest._TEST:
-            bitmask = 0 # 128-bit integer bitmask
             for arg in args:
                 # NOTE: positive filter argument means 'add' (allow),
                 # negative filter argument means 'remove' (disallow)
@@ -971,23 +971,22 @@ class QUTest:
                        'exp: end-of-test')
             return
 
-        exp = "           Trg-Ack  QS_RX_TEST_TEARDOWN"
-        if QUTest._last_record == exp:
-
-            self._dsl_dict["on_teardown"]() # on_teardown() callback
-
-            QUTest.display("                                             "\
-                            f"                [ PASS ({elapsed:5.1f}s) ]",
-                            QUTest._COL_PASS1, QUTest._COL_PASS2)
-            QSpy.qspy_show(f"[{QUTest._test_num:2d}]------------------------"\
-               f"---------------------------------[ PASS ({elapsed:5.1f}s) ]")
+        if QUTest._last_record != "           Trg-Ack  QS_RX_TEST_TEARDOWN":
+            self._fail(f'got: "{QUTest._last_record}"',
+                        'exp: end-of-test')
+            # ignore all input until timeout
+            while QSpy.receive():
+                pass
             return
 
-        self._fail(f'got: "{QUTest._last_record}"',
-                    'exp: end-of-test')
-        # ignore all input until timeout
-        while QSpy.receive():
-            pass
+        self._dsl_dict["on_teardown"]() # on_teardown() callback
+
+        QUTest.display("                                             "\
+                        f"                [ PASS ({elapsed:5.1f}s) ]",
+                        QUTest._COL_PASS1, QUTest._COL_PASS2)
+        QSpy.qspy_show(f"[{QUTest._test_num:2d}]------------------------"\
+           f"---------------------------------[ PASS ({elapsed:5.1f}s) ]")
+
 
     def _reset_target(self):
         if QUTest._host_exe[0]:
@@ -1003,7 +1002,7 @@ class QUTest:
         else: # running remote target
             QUTest._have_target = True
             QUTest._have_info = False
-            if not (QUTest._is_debug or QUTest._have_assert):
+            if not QUTest._is_debug and not QUTest._have_assert:
                 QSpy.send_to(struct.pack("<B", QSpy.TO_TRG_RESET))
 
         # ignore all input until have-target-info or timeout
@@ -1090,7 +1089,7 @@ class QUTest:
             QUTest.trace("quitting host exe...")
             QUTest._have_target = False
             QSpy.send_to(struct.pack("<B", QSpy.TO_TRG_RESET))
-            time.sleep(QUTest.TIMEOUT) # wait until host-exe quits
+            time.sleep(0.2 * QUTest.TIMEOUT) # wait until host-exe quits
 
     @staticmethod
     def _time():
@@ -1299,13 +1298,14 @@ class QSpy:
     IDS_AP = (0x80 + 96)
 
     # kinds of objects (local-filter and curr-obj)...
-    _OBJ_SM = 0
-    _OBJ_AO = 1
-    _OBJ_MP = 2
-    _OBJ_EQ = 3
-    _OBJ_TE = 4
-    _OBJ_AP = 5
-    _OBJ_SM_AO = 6
+    _OBJ_SM = 0    # State Machine
+    _OBJ_AO = 1    # Active Object
+    _OBJ_MP = 2    # Memory Pool
+    _OBJ_EQ = 3    # Event Queue
+    _OBJ_TE = 4    # Time Event
+    _OBJ_AP = 5    # Application
+    _OBJ_SM_AO = 6 # State Machine & Active Object
+    _OBJ_EP = 7    # Event Pool
 
     # event processing commands for QS-RX
     EVT_PUBLISH   = 0
