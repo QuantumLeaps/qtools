@@ -33,7 +33,7 @@
 //! @cond INTERNAL
 
 //! QS received record types (RX channel)
-enum QSpyRxRecords {
+typedef enum {
     QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
     QS_RX_COMMAND,        //!< execute a user-defined command in the Target
     QS_RX_RESET,          //!< reset the Target
@@ -51,13 +51,13 @@ enum QSpyRxRecords {
     QS_RX_TEST_CONTINUE,  //!< continue a test after QS_TEST_PAUSE()
     QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
     QS_RX_EVENT,          //!< inject an event to the Target
-};
+} QS_RxRecords;
 
 //----------------------------------------------------------------------------
-#define QS_FRAME       0x7EU
-#define QS_ESC         0x7DU
-#define QS_ESC_XOR     0x20U
-#define QS_GOOD_CHKSUM 0xFFU
+#define QS_FRAME          ((uint8_t)0x7EU)
+#define QS_ESC            ((uint8_t)0x7DU)
+#define QS_ESC_XOR        ((uint8_t)0x20U)
+#define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
 
 //----------------------------------------------------------------------------
 #define QS_BEGIN_PRE(rec_, qsId_)        \
@@ -72,14 +72,7 @@ enum QSpyRxRecords {
 #define QS_U32_PRE(data_)      (QS_u32_raw_((uint32_t)(data_)))
 #define QS_STR_PRE(msg_)       (QS_str_raw_((msg_)))
 #define QS_OBJ_PRE(obj_)       (QS_obj_raw_(obj_))
-
-#if (!defined Q_SIGNAL_SIZE || (Q_SIGNAL_SIZE == 1U))
-    #define QS_SIG_PRE(sig_)   (QS_u8_raw_((uint8_t)(sig_)))
-#elif (Q_SIGNAL_SIZE == 2U)
-    #define QS_SIG_PRE(sig_)   (QS_u16_raw_((uint16_t)(sig_)))
-#elif (Q_SIGNAL_SIZE == 4U)
-    #define QS_SIG_PRE(sig_)   (QS_u32_raw_((uint32_t)(sig_)))
-#endif
+#define QS_SIG_PRE(sig_)       (QS_u16_raw_((uint16_t)(sig_)))
 
 #if (!defined QS_FUN_PTR_SIZE || (QS_FUN_PTR_SIZE == 2U))
     #define QS_FUN_PRE(fun_)   (QS_u16_raw_((uint16_t)(fun_)))
