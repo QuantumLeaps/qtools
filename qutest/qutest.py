@@ -194,6 +194,7 @@ class QUTest:
             "OBJ_TE": QSpy._OBJ_TE,
             "OBJ_AP": QSpy._OBJ_AP,
             "OBJ_EP": QSpy._OBJ_EP,
+            "OBJ_SM_AO": QSpy._OBJ_SM_AO,
             "GRP_ALL": QSpy.GRP_ALL,
             "GRP_SM": QSpy.GRP_SM,
             "GRP_AO": QSpy.GRP_AO,
@@ -1305,6 +1306,7 @@ class QSpy:
     _OBJ_TE = 4  # Time Event
     _OBJ_AP = 5  # Application
     _OBJ_EP = 6  # Event Pool
+    _OBJ_SM_AO = 7 # State Machine & Active Object
 
     # event processing commands for QS-RX
     EVT_PUBLISH   = 0

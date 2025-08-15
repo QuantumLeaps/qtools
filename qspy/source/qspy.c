@@ -69,142 +69,142 @@ typedef struct {
 // rendering information for QSPY records
 // QS record names... NOTE: keep in synch with qspy_qs.h
 QSpyRecRender const l_recRender[QS_USER] = {
-    { "QS_EMPTY",                         GRP_INF },
+    { "QS_EMPTY",                         QS_GRP_INF },
 
     // [1] QEP records
-    { "QS_QEP_STATE_ENTRY",               GRP_SM },
-    { "QS_QEP_STATE_EXIT",                GRP_SM },
-    { "QS_QEP_STATE_INIT",                GRP_SM },
-    { "QS_QEP_INIT_TRAN",                 GRP_SM },
-    { "QS_QEP_INTERN_TRAN",               GRP_SM },
-    { "QS_QEP_TRAN",                      GRP_SM },
-    { "QS_QEP_IGNORED",                   GRP_SM },
-    { "QS_QEP_DISPATCH",                  GRP_SM },
-    { "QS_QEP_UNHANDLED",                 GRP_SM },
+    { "QS_QEP_STATE_ENTRY",               QS_GRP_SM },
+    { "QS_QEP_STATE_EXIT",                QS_GRP_SM },
+    { "QS_QEP_STATE_INIT",                QS_GRP_SM },
+    { "QS_QEP_INIT_TRAN",                 QS_GRP_SM },
+    { "QS_QEP_INTERN_TRAN",               QS_GRP_SM },
+    { "QS_QEP_TRAN",                      QS_GRP_SM },
+    { "QS_QEP_IGNORED",                   QS_GRP_SM },
+    { "QS_QEP_DISPATCH",                  QS_GRP_SM },
+    { "QS_QEP_UNHANDLED",                 QS_GRP_SM },
 
     // [10] QF (AP) records
-    { "QS_QF_ACTIVE_DEFER",               GRP_AO },
-    { "QS_QF_ACTIVE_RECALL",              GRP_AO },
-    { "QS_QF_ACTIVE_SUBSCRIBE",           GRP_AO },
-    { "QS_QF_ACTIVE_UNSUBSCRIBE",         GRP_AO },
-    { "QS_QF_ACTIVE_POST",                GRP_AO },
-    { "QS_QF_ACTIVE_POST_LIFO",           GRP_AO },
-    { "QS_QF_ACTIVE_GET",                 GRP_AO },
-    { "QS_QF_ACTIVE_GET_LAST",            GRP_AO },
-    { "QS_QF_ACTIVE_RECALL_ATTEMPT",      GRP_AO },
+    { "QS_QF_ACTIVE_DEFER",               QS_GRP_AO },
+    { "QS_QF_ACTIVE_RECALL",              QS_GRP_AO },
+    { "QS_QF_ACTIVE_SUBSCRIBE",           QS_GRP_AO },
+    { "QS_QF_ACTIVE_UNSUBSCRIBE",         QS_GRP_AO },
+    { "QS_QF_ACTIVE_POST",                QS_GRP_AO },
+    { "QS_QF_ACTIVE_POST_LIFO",           QS_GRP_AO },
+    { "QS_QF_ACTIVE_GET",                 QS_GRP_AO },
+    { "QS_QF_ACTIVE_GET_LAST",            QS_GRP_AO },
+    { "QS_QF_ACTIVE_RECALL_ATTEMPT",      QS_GRP_AO },
 
     // [19] QF (EQ) records
-    { "QS_QF_EQUEUE_POST",                GRP_EQ },
-    { "QS_QF_EQUEUE_POST_LIFO",           GRP_EQ },
-    { "QS_QF_EQUEUE_GET",                 GRP_EQ },
-    { "QS_QF_EQUEUE_GET_LAST",            GRP_EQ },
+    { "QS_QF_EQUEUE_POST",                QS_GRP_EQ },
+    { "QS_QF_EQUEUE_POST_LIFO",           QS_GRP_EQ },
+    { "QS_QF_EQUEUE_GET",                 QS_GRP_EQ },
+    { "QS_QF_EQUEUE_GET_LAST",            QS_GRP_EQ },
 
     // [23] QF records
-    { "QS_QF_NEW_ATTEMPT",                GRP_QF },
+    { "QS_QF_NEW_ATTEMPT",                QS_GRP_QF },
 
     // [24] Memory Pool (MP) records
-    { "QS_QF_MPOOL_GET",                  GRP_MP },
-    { "QS_QF_MPOOL_PUT",                  GRP_MP },
+    { "QS_QF_MPOOL_GET",                  QS_GRP_MP },
+    { "QS_QF_MPOOL_PUT",                  QS_GRP_MP },
 
     // [26] Additional Framework (QF) records
-    { "QS_QF_PUBLISH",                    GRP_QF },
-    { "QS_QF_NEW_REF",                    GRP_QF },
-    { "QS_QF_NEW",                        GRP_QF },
-    { "QS_QF_GC_ATTEMPT",                 GRP_QF },
-    { "QS_QF_GC",                         GRP_QF },
-    { "QS_QF_TICK",                       GRP_QF },
+    { "QS_QF_PUBLISH",                    QS_GRP_QF },
+    { "QS_QF_NEW_REF",                    QS_GRP_QF },
+    { "QS_QF_NEW",                        QS_GRP_QF },
+    { "QS_QF_GC_ATTEMPT",                 QS_GRP_QF },
+    { "QS_QF_GC",                         QS_GRP_QF },
+    { "QS_QF_TICK",                       QS_GRP_QF },
 
     // [32] Time Event (TE) records
-    { "QS_QF_TIMEEVT_ARM",                GRP_TE },
-    { "QS_QF_TIMEEVT_AUTO_DISARM",        GRP_TE },
-    { "QS_QF_TIMEEVT_DISARM_ATTEMPT",     GRP_TE },
-    { "QS_QF_TIMEEVT_DISARM",             GRP_TE },
-    { "QS_QF_TIMEEVT_REARM",              GRP_TE },
-    { "QS_QF_TIMEEVT_POST",               GRP_TE },
+    { "QS_QF_TIMEEVT_ARM",                QS_GRP_TE },
+    { "QS_QF_TIMEEVT_AUTO_DISARM",        QS_GRP_TE },
+    { "QS_QF_TIMEEVT_DISARM_ATTEMPT",     QS_GRP_TE },
+    { "QS_QF_TIMEEVT_DISARM",             QS_GRP_TE },
+    { "QS_QF_TIMEEVT_REARM",              QS_GRP_TE },
+    { "QS_QF_TIMEEVT_POST",               QS_GRP_TE },
 
     // [38] Additional Framework (QF) records
-    { "QS_QF_DELETE_REF",                 GRP_QF },
-    { "QS_QF_CRIT_ENTRY",                 GRP_QF },
-    { "QS_QF_CRIT_EXIT",                  GRP_QF },
-    { "QS_QF_ISR_ENTRY",                  GRP_QF },
-    { "QS_QF_ISR_EXIT",                   GRP_QF },
-    { "QS_QF_INT_DISABLE",                GRP_QF },
-    { "QS_QF_INT_ENABLE",                 GRP_QF },
+    { "QS_QF_DELETE_REF",                 QS_GRP_QF },
+    { "QS_QF_CRIT_ENTRY",                 QS_GRP_QF },
+    { "QS_QF_CRIT_EXIT",                  QS_GRP_QF },
+    { "QS_QF_ISR_ENTRY",                  QS_GRP_QF },
+    { "QS_QF_ISR_EXIT",                   QS_GRP_QF },
+    { "QS_QF_INT_DISABLE",                QS_GRP_QF },
+    { "QS_QF_INT_ENABLE",                 QS_GRP_QF },
 
     // [45] Additional Active Object (AO) records
-    { "QS_QF_ACTIVE_POST_ATTEMPT",        GRP_AO },
+    { "QS_QF_ACTIVE_POST_ATTEMPT",        QS_GRP_AO },
 
     // [46] Additional Event Queue (EQ) records
-    { "QS_QF_EQUEUE_POST_ATTEMPT",        GRP_EQ },
+    { "QS_QF_EQUEUE_POST_ATTEMPT",        QS_GRP_EQ },
 
     // [47] Additional Memory Pool (MP) records
-    { "QS_QF_MPOOL_GET_ATTEMPT",          GRP_MP },
+    { "QS_QF_MPOOL_GET_ATTEMPT",          QS_GRP_MP },
 
     // [48] Scheduler (SC) records
-    { "QS_SCHED_PREEMPT",                 GRP_SC },
-    { "QS_SCHED_RESTORE",                 GRP_SC },
-    { "QS_SCHED_LOCK",                    GRP_SC },
-    { "QS_SCHED_UNLOCK",                  GRP_SC },
-    { "QS_SCHED_NEXT",                    GRP_SC },
-    { "QS_SCHED_IDLE",                    GRP_SC },
-    { "QS_ENUM_DICT",                     GRP_DIC },
+    { "QS_SCHED_PREEMPT",                 QS_GRP_SC },
+    { "QS_SCHED_RESTORE",                 QS_GRP_SC },
+    { "QS_SCHED_LOCK",                    QS_GRP_SC },
+    { "QS_SCHED_UNLOCK",                  QS_GRP_SC },
+    { "QS_SCHED_NEXT",                    QS_GRP_SC },
+    { "QS_SCHED_IDLE",                    QS_GRP_SC },
+    { "QS_ENUM_DICT",                     QS_GRP_DIC },
 
     // [55] Additional QEP records
-    { "QS_QEP_TRAN_HIST",                 GRP_SM },
-    { "QS_QEP_TRAN_EP",                   GRP_SM }, // now QS_RESERVED_56
-    { "QS_QEP_TRAN_XP",                   GRP_SM }, // now QS_RESERVED_56
+    { "QS_QEP_TRAN_HIST",                 QS_GRP_SM },
+    { "QS_QEP_TRAN_EP",                   QS_GRP_SM }, // now QS_RESERVED_56
+    { "QS_QEP_TRAN_XP",                   QS_GRP_SM }, // now QS_RESERVED_56
 
     // [58] Miscellaneous QS records (not maskable)
-    { "QS_TEST_PAUSED",                   GRP_TST },
-    { "QS_TEST_PROBE_GET",                GRP_TST },
-    { "QS_SIG_DICT",                      GRP_DIC },
-    { "QS_OBJ_DICT",                      GRP_DIC },
-    { "QS_FUN_DICT",                      GRP_DIC },
-    { "QS_USR_DICT",                      GRP_DIC },
-    { "QS_TARGET_INFO",                   GRP_INF },
-    { "QS_TARGET_DONE",                   GRP_TST },
-    { "QS_RX_STATUS",                     GRP_TST },
-    { "QS_QUERY_DATA",                    GRP_TST },
-    { "QS_PEEK_DATA",                     GRP_TST },
-    { "QS_ASSERT_FAIL",                   GRP_ERR },
-    { "QS_QF_RUN",                        GRP_INF },
+    { "QS_TEST_PAUSED",                   QS_GRP_TST },
+    { "QS_TEST_PROBE_GET",                QS_GRP_TST },
+    { "QS_SIG_DICT",                      QS_GRP_DIC },
+    { "QS_OBJ_DICT",                      QS_GRP_DIC },
+    { "QS_FUN_DICT",                      QS_GRP_DIC },
+    { "QS_USR_DICT",                      QS_GRP_DIC },
+    { "QS_TARGET_INFO",                   QS_GRP_INF },
+    { "QS_TARGET_DONE",                   QS_GRP_TST },
+    { "QS_RX_STATUS",                     QS_GRP_TST },
+    { "QS_QUERY_DATA",                    QS_GRP_TST },
+    { "QS_PEEK_DATA",                     QS_GRP_TST },
+    { "QS_ASSERT_FAIL",                   QS_GRP_ERR },
+    { "QS_QF_RUN",                        QS_GRP_INF },
 
     // [71] Semaphore (SEM) records
-    { "QS_SEM_TAKE",                      GRP_SEM },
-    { "QS_SEM_BLOCK",                     GRP_SEM },
-    { "QS_SEM_SIGNAL",                    GRP_SEM },
-    { "QS_SEM_BLOCK_ATTEMPT",             GRP_SEM },
+    { "QS_SEM_TAKE",                      QS_GRP_SEM },
+    { "QS_SEM_BLOCK",                     QS_GRP_SEM },
+    { "QS_SEM_SIGNAL",                    QS_GRP_SEM },
+    { "QS_SEM_BLOCK_ATTEMPT",             QS_GRP_SEM },
 
     // [75] Mutex (MTX) records
-    { "QS_MTX_LOCK",                      GRP_MTX },
-    { "QS_MTX_BLOCK",                     GRP_MTX },
-    { "QS_MTX_UNLOCK",                    GRP_MTX },
-    { "QS_MTX_LOCK_ATTEMPT",              GRP_MTX },
-    { "QS_MTX_BLOCK_ATTEMPT",             GRP_MTX },
-    { "QS_MTX_UNLOCK_ATTEMPT",            GRP_MTX },
+    { "QS_MTX_LOCK",                      QS_GRP_MTX },
+    { "QS_MTX_BLOCK",                     QS_GRP_MTX },
+    { "QS_MTX_UNLOCK",                    QS_GRP_MTX },
+    { "QS_MTX_LOCK_ATTEMPT",              QS_GRP_MTX },
+    { "QS_MTX_BLOCK_ATTEMPT",             QS_GRP_MTX },
+    { "QS_MTX_UNLOCK_ATTEMPT",            QS_GRP_MTX },
 
     // [81] Additional QF (AO) records
-    { "QS_QF_ACTIVE_DEFER_ATTEMPT",       GRP_AO  },
+    { "QS_QF_ACTIVE_DEFER_ATTEMPT",       QS_GRP_AO  },
 
     // [82] Additional QF (AO) records
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
-    { "QS_RESERVED",                      GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
+    { "QS_RESERVED",                      QS_GRP_ERR },
 };
 
 // QS object kinds... NOTE: keep in synch with qspy_qs.h
@@ -619,7 +619,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
 
         char const *s;
         switch (fmt) {
-            case QS_I8_ENUM_T: {
+            case QS_I8_ENUM_FMT: {
                 if ((width & 0x8U) == 0U) { // QS_I8() data element
                     i32 = QSpyRecord_getInt32(me, 1);
                     SNPRINTF_APPEND(ifmt[width], (long)i32);
@@ -634,40 +634,40 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 }
                 break;
             }
-            case QS_U8_T: {
+            case QS_U8_FMT: {
                 u32 = QSpyRecord_getUint32(me, 1);
                 SNPRINTF_APPEND(is_hex ? uhfmt[2] : ufmt[width],
                                 (unsigned long)u32);
                 FPRINF_MATFILE(ufmt[width], (unsigned long)u32);
                 break;
             }
-            case QS_I16_T: {
+            case QS_I16_FMT: {
                 i32 = QSpyRecord_getInt32(me, 2);
                 SNPRINTF_APPEND(ifmt[width], (long)i32);
                 FPRINF_MATFILE(ifmt[width], (long)i32);
                 break;
             }
-            case QS_U16_T: {
+            case QS_U16_FMT: {
                 u32 = QSpyRecord_getUint32(me, 2);
                 SNPRINTF_APPEND(is_hex ? uhfmt[4] : ufmt[width],
                                 (unsigned long)u32);
                 FPRINF_MATFILE(ufmt[width], (unsigned long)u32);
                 break;
             }
-            case QS_I32_T: {
+            case QS_I32_FMT: {
                 i32 = QSpyRecord_getInt32(me, 4);
                 SNPRINTF_APPEND(ifmt[width], (long)i32);
                 FPRINF_MATFILE(ifmt[width], (long)i32);
                 break;
             }
-            case QS_U32_T: {
+            case QS_U32_FMT: {
                 u32 = QSpyRecord_getUint32(me, 4);
                 SNPRINTF_APPEND(is_hex ? uhfmt[8] : ufmt[width],
                                 (unsigned long)u32);
                 FPRINF_MATFILE(ufmt[width], (unsigned long)u32);
                 break;
             }
-            case QS_F32_T: {
+            case QS_F32_FMT: {
                 union {
                    uint32_t u;
                    float    f;
@@ -677,7 +677,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 FPRINF_MATFILE(efmt[width], (double)x.f);
                 break;
             }
-            case QS_F64_T: {
+            case QS_F64_FMT: {
                 union F64Rep {
                     uint64_t u;
                     double   d;
@@ -687,13 +687,13 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 FPRINF_MATFILE(efmt[width], data.d);
                 break;
             }
-            case QS_STR_T: {
+            case QS_STR_FMT: {
                 s = QSpyRecord_getStr(me);
                 SNPRINTF_APPEND("%s", s);
                 FPRINF_MATFILE("%s", s);
                 break;
             }
-            case QS_MEM_T: {
+            case QS_MEM_FMT: {
                 uint8_t const *mem = QSpyRecord_getMem(me, 1, &u32);
                 if (mem) {
                     for (; u32 > 0U; --u32, ++mem) {
@@ -703,7 +703,7 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 }
                 break;
             }
-            case QS_SIG_T: {
+            case QS_SIG_FMT: {
                 u32 = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
                 u64 = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                 if (u64 != 0U) {
@@ -718,33 +718,33 @@ static void QSpyRecord_processUser(QSpyRecord * const me) {
                 FPRINF_MATFILE("%u %"PRId64, u32, u64);
                 break;
             }
-            case QS_OBJ_T: {
+            case QS_OBJ_FMT: {
                 u64 = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                 SNPRINTF_APPEND("%s",
                     Dictionary_get(&QSPY_objDict, u64, (char *)0));
                 FPRINF_MATFILE("%"PRId64, u64);
                 break;
             }
-            case QS_FUN_T: {
+            case QS_FUN_FMT: {
                 u64 = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
                 SNPRINTF_APPEND("%s",
                     Dictionary_get(&QSPY_funDict, u64, (char *)0));
                 FPRINF_MATFILE("%"PRId64, u64);
                 break;
             }
-            case QS_I64_T: {
+            case QS_I64_FMT: {
                 i64 = QSpyRecord_getInt64(me, 8);
                 SNPRINTF_APPEND(ilfmt[width], i64);
                 FPRINF_MATFILE(ilfmt[width], i64);
                 break;
             }
-            case QS_U64_T: {
+            case QS_U64_FMT: {
                 u64 = QSpyRecord_getUint64(me, 8);
                 SNPRINTF_APPEND(is_hex ? "0x%16"PRIX64 : ulfmt[width], u64);
                 FPRINF_MATFILE(ulfmt[width], u64);
                 break;
             }
-            case 0x0FU: { // former QS_U32_HEX_T
+            case QS_HEX_FMT: {
                 u32 = QSpyRecord_getUint32(me, 4);
                 SNPRINTF_APPEND(uhfmt[width], (unsigned long)u32);
                 FPRINF_MATFILE(uhfmt[width], (unsigned long)u32);
@@ -1831,26 +1831,26 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             if (QSPY_conf.qpVersion < 810U) {
                 p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                 switch (a) {
-                    case OBJ_SM: //lint -fallthrough
-                    case OBJ_AO:
+                    case QS_OBJ_SM: //lint -fallthrough
+                    case QS_OBJ_AO:
                         q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
                         break;
-                    case OBJ_MP:
+                    case QS_OBJ_MP:
                         b = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
                         c = QSpyRecord_getUint32(me, QSPY_conf.poolCtrSize);
                         break;
-                    case OBJ_EQ:
+                    case QS_OBJ_EQ:
                         b = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
                         c = QSpyRecord_getUint32(me, QSPY_conf.queueCtrSize);
                         break;
-                    case OBJ_TE:
+                    case QS_OBJ_TE:
                         q = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         b = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
                         c = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
                         d = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
                         e = QSpyRecord_getUint32(me, 1);
                         break;
-                    case OBJ_AP:
+                    case QS_OBJ_AP:
                         break;
                     default:
                         break;
@@ -1861,20 +1861,20 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                            l_qs_obj[a],
                            Dictionary_get(&QSPY_objDict, p, (char *)0));
                     switch (a) {
-                        case OBJ_SM: //lint -fallthrough
-                        case OBJ_AO:
+                        case QS_OBJ_SM: //lint -fallthrough
+                        case QS_OBJ_AO:
                             SNPRINTF_APPEND(",State=%s",
                                 Dictionary_get(&QSPY_funDict, q, (char *)0));
                             break;
-                        case OBJ_MP:
+                        case QS_OBJ_MP:
                             SNPRINTF_APPEND(",Free=%u,Min=%u",
                                 b, c);
                             break;
-                        case OBJ_EQ:
+                        case QS_OBJ_EQ:
                             SNPRINTF_APPEND(",Que<Free=%u,Min=%u>",
                                 b, c);
                             break;
-                        case OBJ_TE:
+                        case QS_OBJ_TE:
                             SNPRINTF_APPEND(
                                 ",Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
                                 (e & 0x0FU),
@@ -1882,7 +1882,7 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                 b, c,
                                 (e & 0xF0U));
                             break;
-                        case OBJ_AP:
+                        case QS_OBJ_AP:
                             break;
                         default:
                             break;
@@ -1891,30 +1891,30 @@ static void QSpyRecord_process(QSpyRecord * const me) {
             } 
             else { // new queries
                 switch (a) {
-                    case OBJ_SM:
+                    case QS_OBJ_SM:
                         p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         q = QSpyRecord_getUint64(me, QSPY_conf.funPtrSize);
                         break;
-                    case OBJ_AO:
+                    case QS_OBJ_AO:
                         b = QSpyRecord_getUint32(me, 1U);
                         c = QSpyRecord_getUint32(me, 2U);
                         d = QSpyRecord_getUint32(me, 2U);
                         e = QSpyRecord_getUint32(me, 2U);
                         break;
-                    case OBJ_MP:
+                    case QS_OBJ_MP:
                         p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         b = QSpyRecord_getUint32(me, 2U);
                         c = QSpyRecord_getUint32(me, 2U);
                         d = QSpyRecord_getUint32(me, 2U);
                         e = QSpyRecord_getUint32(me, 2U);
                         break;
-                    case OBJ_EQ:
+                    case QS_OBJ_EQ:
                         p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         b = QSpyRecord_getUint32(me, 2U);
                         c = QSpyRecord_getUint32(me, 2U);
                         d = QSpyRecord_getUint32(me, 2U);
                         break;
-                    case OBJ_TE:
+                    case QS_OBJ_TE:
                         p = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         q = QSpyRecord_getUint64(me, QSPY_conf.objPtrSize);
                         b = QSpyRecord_getUint32(me, QSPY_conf.tevtCtrSize);
@@ -1922,14 +1922,14 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                         d = QSpyRecord_getUint32(me, QSPY_conf.sigSize);
                         e = QSpyRecord_getUint32(me, 1U);
                         break;
-                    case OBJ_EP:
+                    case QS_OBJ_EP:
                         b = QSpyRecord_getUint32(me, 1U);
                         c = QSpyRecord_getUint32(me, 2U);
                         d = QSpyRecord_getUint32(me, 2U);
                         e = QSpyRecord_getUint32(me, 2U);
                         f = QSpyRecord_getUint32(me, 2U);
                         break;
-                    case OBJ_AP:
+                    case QS_OBJ_AP:
                         break;
                     default:
                         break;
@@ -1940,23 +1940,23 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                            l_qs_obj[a]);
                     s = Dictionary_get(&QSPY_objDict, p, (char *)0);
                     switch (a) {
-                        case OBJ_SM:
+                        case QS_OBJ_SM:
                             SNPRINTF_APPEND(" Obj=%s,State=%s",
                                 s, Dictionary_get(&QSPY_funDict, q, (char*)0));
                             break;
-                        case OBJ_AO:
+                        case QS_OBJ_AO:
                             SNPRINTF_APPEND(" Pri=%u,Que<Use=%u,Free=%u,Min=%u>",
                                 b, c, d, e);
                             break;
-                        case OBJ_MP:
+                        case QS_OBJ_MP:
                             SNPRINTF_APPEND(" Obj=%s,Use=%u,Free=%u,Min=%u,Size=%u",
                                 s, b, c, d, e);
                             break;
-                        case OBJ_EQ:
+                        case QS_OBJ_EQ:
                             SNPRINTF_APPEND(" Obj=%s,Use=%u,Free=%u,Min=%u",
                                 s, b, c, d);
                             break;
-                        case OBJ_TE:
+                        case QS_OBJ_TE:
                             SNPRINTF_APPEND(
                                 " Obj=%s,Rate=%u,Sig=%s,Tim=%u,Int=%u,Flags=0x%02X",
                                 s, (e & 0x0FU),
@@ -1964,11 +1964,11 @@ static void QSpyRecord_process(QSpyRecord * const me) {
                                 b, c,
                                 (e & 0xF0U));
                             break;
-                        case OBJ_EP:
+                        case QS_OBJ_EP:
                             SNPRINTF_APPEND(" Id=%u,Use=%u,Free=%u,Min=%u,Size=%u",
                                 b, c, d, e, f);
                             break;
-                        case OBJ_AP:
+                        case QS_OBJ_AP:
                             break;
                         default:
                             break;
@@ -2341,7 +2341,7 @@ KeyType QSPY_findEnum(char const *name, uint8_t group) {
 int QSPY_getGroup(int recId) {
     return (recId < QS_USER) // is it a Predefined record?
         ? l_recRender[recId].group
-        : GRP_UA;
+        : QS_GRP_UA;
 }
 
 // Dictionary class ========================================================*/

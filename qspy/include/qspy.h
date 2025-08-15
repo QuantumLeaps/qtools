@@ -118,7 +118,8 @@ uint32_t QSPY_encode(uint8_t *dstBuf, uint32_t dstSize,
                      uint8_t const *srcBuf, uint32_t srcBytes);
 uint32_t QSPY_encodeResetCmd(uint8_t *dstBuf, uint32_t dstSize);
 uint32_t QSPY_encodeInfoCmd (uint8_t *dstBuf, uint32_t dstSize);
-uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize, uint8_t rate);
+uint32_t QSPY_encodeTickCmd (uint8_t *dstBuf, uint32_t dstSize,
+                             uint8_t rate);
 
 SigType QSPY_findSig(char const *name, ObjType obj);
 KeyType QSPY_findObj(char const *name);
@@ -165,10 +166,10 @@ typedef struct {
 
 // Record groups (augment enum QSpyGroups from qpc_qs.h) 
 enum QSpyGroups_plus {
-    GRP_ERR,
-    GRP_INF,
-    GRP_DIC,
-    GRP_TST,
+    QS_GRP_ERR,
+    QS_GRP_INF,
+    QS_GRP_DIC,
+    QS_GRP_TST,
 };
 
 // returns the "group" of a given QS record-ID

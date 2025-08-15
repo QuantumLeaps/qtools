@@ -33,7 +33,7 @@
 //! @cond INTERNAL
 
 //! QS received record types (RX channel)
-enum QSpyRxRecords {
+typedef enum {
     QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
     QS_RX_COMMAND,        //!< execute a user-defined command in the Target
     QS_RX_RESET,          //!< reset the Target
@@ -51,13 +51,13 @@ enum QSpyRxRecords {
     QS_RX_TEST_CONTINUE,  //!< continue a test after QS_TEST_PAUSE()
     QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
     QS_RX_EVENT,          //!< inject an event to the Target
-};
+} QS_RxRecords;
 
 //----------------------------------------------------------------------------
-#define QS_FRAME       0x7EU
-#define QS_ESC         0x7DU
-#define QS_ESC_XOR     0x20U
-#define QS_GOOD_CHKSUM 0xFFU
+#define QS_FRAME          ((uint8_t)0x7EU)
+#define QS_ESC            ((uint8_t)0x7DU)
+#define QS_ESC_XOR        ((uint8_t)0x20U)
+#define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
 
 //----------------------------------------------------------------------------
 #define QS_BEGIN_PRE(rec_, qsId_)        \
