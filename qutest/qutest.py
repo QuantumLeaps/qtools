@@ -194,6 +194,7 @@ class QUTest:
             "OBJ_TE": QSpy._OBJ_TE,
             "OBJ_AP": QSpy._OBJ_AP,
             "OBJ_EP": QSpy._OBJ_EP,
+            "OBJ_SM_AO": QSpy._OBJ_SM_AO,
             "GRP_ALL": QSpy.GRP_ALL,
             "GRP_SM": QSpy.GRP_SM,
             "GRP_AO": QSpy.GRP_AO,
@@ -970,23 +971,22 @@ class QUTest:
                        'exp: end-of-test')
             return
 
-        exp = "           Trg-Ack  QS_RX_TEST_TEARDOWN"
-        if QUTest._last_record == exp:
-
-            self._dsl_dict["on_teardown"]() # on_teardown() callback
-
-            QUTest.display("                                             "\
-                            f"                [ PASS ({elapsed:5.1f}s) ]",
-                            QUTest._COL_PASS1, QUTest._COL_PASS2)
-            QSpy.qspy_show(f"[{QUTest._test_num:2d}]------------------------"\
-               f"---------------------------------[ PASS ({elapsed:5.1f}s) ]")
+        if QUTest._last_record != "           Trg-Ack  QS_RX_TEST_TEARDOWN":
+            self._fail(f'got: "{QUTest._last_record}"',
+                        'exp: end-of-test')
+            # ignore all input until timeout
+            while QSpy.receive():
+                pass
             return
 
-        self._fail(f'got: "{QUTest._last_record}"',
-                    'exp: end-of-test')
-        # ignore all input until timeout
-        while QSpy.receive():
-            pass
+        self._dsl_dict["on_teardown"]() # on_teardown() callback
+
+        QUTest.display("                                             "\
+                        f"                [ PASS ({elapsed:5.1f}s) ]",
+                        QUTest._COL_PASS1, QUTest._COL_PASS2)
+        QSpy.qspy_show(f"[{QUTest._test_num:2d}]------------------------"\
+           f"---------------------------------[ PASS ({elapsed:5.1f}s) ]")
+
 
     def _reset_target(self):
         if QUTest._host_exe[0]:
@@ -1089,7 +1089,7 @@ class QUTest:
             QUTest.trace("quitting host exe...")
             QUTest._have_target = False
             QSpy.send_to(struct.pack("<B", QSpy.TO_TRG_RESET))
-            time.sleep(QUTest.TIMEOUT) # wait until host-exe quits
+            time.sleep(0.2 * QUTest.TIMEOUT) # wait until host-exe quits
 
     @staticmethod
     def _time():
@@ -1305,6 +1305,7 @@ class QSpy:
     _OBJ_TE = 4  # Time Event
     _OBJ_AP = 5  # Application
     _OBJ_EP = 6  # Event Pool
+    _OBJ_SM_AO = 7 # State Machine & Active Object
 
     # event processing commands for QS-RX
     EVT_PUBLISH   = 0
