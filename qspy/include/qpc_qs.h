@@ -7,20 +7,19 @@
 //                    ------------------------
 //                    Modern Embedded Software
 //
-// SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+// SPDX-License-Identifier: LicenseRef-QL-commercial
 //
-// This software is dual-licensed under the terms of the open-source GNU
-// General Public License (GPL) or under the terms of one of the closed-
-// source Quantum Leaps commercial licenses.
+// This software is licensed under the terms of the Quantum Leaps commercial
+// licenses. Please contact Quantum Leaps for more information about the
+// available licensing options.
 //
-// Redistributions in source code must retain this top-level comment block.
-// Plagiarizing this software to sidestep the license obligations is illegal.
-//
-// NOTE:
-// The GPL does NOT permit the incorporation of this code into proprietary
-// programs. Please contact Quantum Leaps for commercial licensing options,
-// which expressly supersede the GPL and are designed explicitly for
-// closed-source distribution.
+// RESTRICTIONS
+// You may NOT :
+// (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
+//     transfer rights in this software,
+// (b) remove or alter any trademark, logo, copyright or other proprietary
+//     notices, legends, symbols or labels present in this software,
+// (c) plagiarize this software to sidestep the licensing obligations.
 //
 // Quantum Leaps contact information:
 // <www.state-machine.com/licensing>
@@ -47,13 +46,6 @@
 //! @endcond
 
 //============================================================================
-//! @class QS
-typedef struct {
-    //! @cond INTERNAL
-    uint8_t dummy;
-    //! @endcond
-} QS;
-
 //! pre-defined QS record IDs (for QS_GLB_FILTER())
 enum QS_GlbPre {
     // [0] QS session (not maskable)
@@ -206,17 +198,21 @@ enum QS_GlbPre {
 #define QS_USER3    ((enum_t)(QS_USER + 15))
 #define QS_USER4    ((enum_t)(QS_USER + 20))
 
-// QS ID groups (for QS_LOC_FILTER())
+// QS ID group offsets (for QS_LOC_FILTER())
 #define QS_ID_AO   ((int_fast16_t)0)
 #define QS_ID_EP   ((int_fast16_t)64)
 #define QS_ID_EQ   ((int_fast16_t)80)
 #define QS_ID_AP   ((int_fast16_t)96)
 
-#define QS_IDS_AO  ((int_fast16_t)(0x80 + QS_ID_AO))
-#define QS_IDS_EP  ((int_fast16_t)(0x80 + QS_ID_EP))
-#define QS_IDS_EQ  ((int_fast16_t)(0x80 + QS_ID_EQ))
-#define QS_IDS_AP  ((int_fast16_t)(0x80 + QS_ID_AP))
+// QS ID groups (for QS_LOC_FILTER())
 #define QS_IDS_ALL ((int_fast16_t)0xF0)
+#define QS_IDS_AO  ((int_fast16_t)0xF1)
+#define QS_IDS_EP  ((int_fast16_t)0xF2)
+#define QS_IDS_EQ  ((int_fast16_t)0xF3)
+#define QS_IDS_AP  ((int_fast16_t)0xF4)
+
+#define QS_EOD     ((uint16_t)0xFFFFU)
+#define QS_CMD     ((uint8_t)0x07U)
 
 //! @struct QSpyId
 typedef struct {
@@ -266,7 +262,7 @@ typedef void (* QSpyFunPtr )(void);
 #define QS_FLUSH()           (QS_onFlush())
 
 #define QS_BEGIN_ID(rec_, qsId_) \
-if (QS_fltCheck_((rec_), (qsId_))) { \
+if (QS_fltCheck_((rec_) >> 5U, (uint32_t)1U << ((rec_) & 0x1FU), (qsId_))) { \
     QS_CRIT_STAT \
     QS_CRIT_ENTRY(); \
     QS_beginRec_((uint_fast8_t)(rec_)); \
@@ -278,7 +274,9 @@ if (QS_fltCheck_((rec_), (qsId_))) { \
 }
 
 #define QS_BEGIN_INCRIT(rec_, qsId_) \
-if (QS_fltCheck_((rec_), (qsId_))) { \
+if (QS_fltCheck_((rec_) >> 5U, \
+    (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_))) \
+{ \
     QS_beginRec_((uint_fast8_t)(rec_)); \
     QS_TIME_PRE(); {
 
@@ -286,7 +284,8 @@ if (QS_fltCheck_((rec_), (qsId_))) { \
     QS_endRec_(); \
 }
 
-#define QS_GLB_CHECK_(rec_)  (QS_glbCheck_((rec_)))
+#define QS_GLB_CHECK_(rec_) \
+    (QS_glbCheck_((rec_) >> 5U, (uint_fast32_t)1U << ((rec_) & 0x1FU)))
 #define QS_LOC_CHECK_(qsId_) (QS_locCheck_((qsId_)))
 
 #ifndef QS_REC_DONE
@@ -396,9 +395,6 @@ if (QS_fltCheck_((rec_), (qsId_))) { \
     typedef double float64_t;
 #endif
 
-#define QS_EOD     ((uint16_t)0xFFFFU)
-#define QS_CMD     ((uint8_t)0x07U)
-
 //============================================================================
 #ifndef QS_CRIT_STAT
     #define QS_CRIT_STAT QF_CRIT_STAT
@@ -412,149 +408,52 @@ if (QS_fltCheck_((rec_), (qsId_))) { \
     #define QS_CRIT_EXIT() QF_CRIT_EXIT()
 #endif // ndef QS_CRIT_EXIT
 
+//============================================================================
+//! @class QS
+typedef struct {
+    //! @cond INTERNAL
+    uint8_t dummy;
+    //! @endcond
+} QS;
+
+//! @cond INTERNAL
+
 #if defined(QS_MEM_SYS) || defined(QS_MEM_APP)
     #error Memory isolation not supported in this QP edition, need SafeQP
 #endif
 
-//============================================================================
-#ifdef Q_UTEST
-
-//============================================================================
-// QP-stub for QUTest
-// NOTE: The QP-stub is needed for unit testing QP applications,
-// but might NOT be needed for testing QP itself.
-#if (Q_UTEST != 0)
-
-//----------------------------------------------------------------------------
-// critical section for QP-stub...
-typedef uint_fast8_t QCritStatus;
-QCritStatus QF_critEntry(void);
-void QF_critExit(QCritStatus critStat);
-
-//----------------------------------------------------------------------------
-// scheduler locking for QP-stub...
-typedef uint_fast8_t QSchedStatus;
-QSchedStatus QF_schedLock(uint_fast8_t const ceiling);
-void QF_schedUnlock(QSchedStatus const prevCeil);
-
-//----------------------------------------------------------------------------
-//! @class QHsmDummy
-//! @extends QAsm
-typedef struct {
-    QAsm super; //!< @protected @memberof QHsmDummy
-} QHsmDummy;
-
-//! @public @memberof QHsmDummy
-void QHsmDummy_ctor(QHsmDummy * const me);
-
-//! @private @memberof QHsmDummy
-void QHsmDummy_init_(
-    QAsm * const me,
-    void const * const par,
-    uint_fast8_t const qsId);
-
-//! @private @memberof QHsmDummy
-void QHsmDummy_dispatch_(
-    QAsm * const me,
-    QEvt const * const e,
-    uint_fast8_t const qsId);
-
-//! @private @memberof QHsmDummy
-bool QHsmDummy_isIn_(
-    QAsm * const me,
-    QStateHandler const state);
-
-QStateHandler QHsmDummy_getStateHandler_(QAsm const * const me);
-
-//----------------------------------------------------------------------------
-//! @class QActiveDummy
-//! @extends QActive
-typedef struct {
-    QActive super; //!< @protected @memberof QActiveDummy
-} QActiveDummy;
-
-//! @public @memberof QActiveDummy
-void QActiveDummy_ctor(QActiveDummy * const me);
-
-//! @private @memberof QActiveDummy
-void QActiveDummy_init_(
-    QAsm * const me,
-    void const * const par,
-    uint_fast8_t const qsId);
-
-//! @private @memberof QActiveDummy
-void QActiveDummy_dispatch_(
-    QAsm * const me,
-    QEvt const * const e,
-    uint_fast8_t const qsId);
-
-//! @private @memberof QActiveDummy
-bool QActiveDummy_fakePost_(
-    QActive * const me,
-    QEvt const * const e,
-    uint_fast16_t const margin,
-    void const * const sender);
-
-//! @private @memberof QActiveDummy
-void QActiveDummy_fakePostLIFO_(
-    QActive * const me,
-    QEvt const * const e);
-
-#endif // Q_UTEST != 0
-
-//----------------------------------------------------------------------------
-#define QS_TEST_PROBE_DEF(fun_) \
-    uint32_t const qs_tp_ = QS_getTestProbe_((void (*)(void))(fun_));
-
-#define QS_TEST_PROBE(code_) \
-    if (qs_tp_ != 0U) { code_ }
-
-#define QS_TEST_PROBE_ID(id_, code_) \
-    if (qs_tp_ == (uint32_t)(id_)) { code_ }
-
-#define QS_TEST_PAUSE()  (QS_test_pause_())
-
-#else // Q_UTEST not defined
-
-// dummy definitions when not building for QUTEST
-#define QS_TEST_PROBE_DEF(fun_)
-#define QS_TEST_PROBE(code_)
-#define QS_TEST_PROBE_ID(id_, code_)
-#define QS_TEST_PAUSE()  ((void)0)
-
-#endif // Q_UTEST
-
-//============================================================================
-
 //----------------------------------------------------------------------------
 //! @struct QS_Filter
 typedef struct {
-    uint8_t glb[16];
-    uint8_t loc[16];
+    uint32_t glb[4];
+    uint32_t loc[4];
 } QS_Filter;
 
 //! @static @private @memberof QS
 extern QS_Filter QS_filt_;
 
+//! @struct QS_Attr
 typedef struct {
-    uint8_t         *buf;
-    QSCtr            end;
-    QSCtr   volatile head;
-    QSCtr   volatile tail;
-    QSCtr   volatile used;
-    uint8_t volatile seq;
-    uint8_t volatile chksum;
-    uint8_t volatile critNest;
-    uint8_t          flags;
+    uint8_t *buf;      //!< @private @memberof QS
+    QSCtr    end;      //!< @private @memberof QS
+    QSCtr    head;     //!< @private @memberof QS
+    QSCtr    tail;     //!< @private @memberof QS
+    QSCtr    used;     //!< @private @memberof QS
+    uint8_t  seq;      //!< @private @memberof QS
+    uint8_t  chksum;   //!< @private @memberof QS
+    uint8_t  critNest; //!< @private @memberof QS
+    uint8_t  flags;    //!< @private @memberof QS
 } QS_Attr;
 
+//! @static @private @memberof QS
 extern QS_Attr QS_priv_;
 
-void QS_glbFilter_(int_fast16_t const filter);
-void QS_locFilter_(int_fast16_t const filter);
+void QS_glbFilter_(int_fast16_t const filterSpec);
+void QS_locFilter_(int_fast16_t const filterSpec);
 
-bool QS_fltCheck_(uint_fast8_t const rec, uint_fast8_t const qsId);
-bool QS_glbCheck_(uint_fast8_t const rec);
+bool QS_fltCheck_(uint_fast8_t const recIdx, uint_fast32_t const recBit,
+                  uint_fast8_t const qsId);
+bool QS_glbCheck_(uint_fast8_t const recIdx, uint_fast32_t const recBit);
 bool QS_locCheck_(uint_fast8_t const qsId);
 
 void QS_beginRec_(uint_fast8_t const rec);
@@ -593,7 +492,7 @@ void QS_isr_entry_pre_(uint8_t const isrnest, uint8_t const prio);
 void QS_isr_exit_pre_(uint8_t const isrnest, uint8_t const prio);
 
 void QS_assertion_pre_(char const * const module, int_t const id,
-    uint32_t const delay);
+    uint16_t const delay);
 
 // Formats for data elements for app-specific trace records
 #define QS_I8_ENUM_FMT ((uint8_t)0x0U)
@@ -619,6 +518,31 @@ struct QS_TProbe {
     uint32_t data;
     uint8_t  idx;
 };
+
+typedef struct {
+    struct QS_TProbe tpBuf[16];
+    QPSet     readySet;
+    QPSet     readySet_dis;
+    QSTimeCtr testTime;
+    uint8_t   tpNum;
+    uint8_t   intLock;
+    uint8_t   lockCeil;
+    uint8_t   memProt;
+    bool      inTestLoop;
+} QSTestAttr;
+
+extern QSTestAttr QS_tstPriv_;
+
+void QS_test_pause_(void);
+uint32_t QS_getTestProbe_(QSpyFunPtr const api);
+
+struct QS_RxAttr; // forward declaration
+
+//! @static @private @memberof QS
+extern struct QS_RxAttr * const QS_rxPriv_;
+
+//! @endcond
+//----------------------------------------------------------------------------
 
 //! @static @public @memberof QS
 void QS_initBuf(
@@ -646,53 +570,9 @@ void QS_onFlush(void);
 //! @static @public @memberof QS
 QSTimeCtr QS_onGetTime(void);
 
-//! @static @public @memberof QS
-void QS_onTestSetup(void);
-
-//! @static @public @memberof QS
-void QS_onTestTeardown(void);
-
-//! @static @public @memberof QS
-void QS_onTestEvt(QEvt * e);
-
-//! @static @public @memberof QS
-void QS_onTestPost(
-    void const * sender,
-    QActive * recipient,
-    QEvt const * e,
-    bool status);
-
-//! @static @public @memberof QS
-void QS_onTestLoop(void);
-
 #define QUTEST_ON_POST 124
 #define QS_RXATTR_SIZE 128U
 
-//----------------------------------------------------------------------------
-//! @cond INTERNAL
-typedef struct {
-    struct QS_TProbe tpBuf[16];
-    QPSet     readySet;
-    QPSet     readySet_dis;
-    QSTimeCtr testTime;
-    uint8_t   tpNum;
-    uint8_t   intLock;
-    uint8_t   lockCeil;
-    uint8_t   memProt;
-    bool      inTestLoop;
-} QSTestAttr;
-
-extern QSTestAttr QS_tstPriv_;
-
-void QS_test_pause_(void);
-uint32_t QS_getTestProbe_(QSpyFunPtr const api);
-
-struct QS_RxAttr; // forward declaration
-
-//! @static @private @memberof QS
-extern struct QS_RxAttr * const QS_rxPriv_;
-
-//! @endcond
 //----------------------------------------------------------------------------
 // QS-RX (QS receive channel)
 
@@ -750,15 +630,141 @@ void QS_onCommand(
     uint32_t param2,
     uint32_t param3);
 
+//! @cond INTERNAL
 typedef enum {
     QS_TARGET_NO_RESET,
     QS_TARGET_RESET
 } QS_ResetAction;
 
 void QS_target_info_pre_(QS_ResetAction const act);
+//! @endcond
 
-#if (defined Q_UTEST) && (Q_UTEST != 0)
+//============================================================================
+#ifdef Q_UTEST
+
+//! @static @public @memberof QS
+void QS_onTestSetup(void);
+
+//! @static @public @memberof QS
+void QS_onTestTeardown(void);
+
+//! @static @public @memberof QS
+void QS_onTestEvt(QEvt * e);
+
+//! @static @public @memberof QS
+void QS_onTestPost(
+    void const * sender,
+    QActive * recipient,
+    QEvt const * e,
+    bool status);
+
+//! @static @public @memberof QS
+void QS_onTestLoop(void);
+
+//============================================================================
+// QP-stub for QUTest
+// NOTE: The QP-stub is needed for unit testing QP applications,
+// but might NOT be needed for testing QP itself.
+#if (Q_UTEST != 0)
+
+//----------------------------------------------------------------------------
+//! @class QHsmDummy
+//! @extends QAsm
+typedef struct {
+    QAsm super; //!< @protected @memberof QHsmDummy
+} QHsmDummy;
+
+//! @public @memberof QHsmDummy
+void QHsmDummy_ctor(QHsmDummy * const me);
+
+//! @cond INTERNAL
+//! @private @memberof QHsmDummy
+void QHsmDummy_init_(
+    QAsm * const me,
+    void const * const par,
+    uint_fast8_t const qsId);
+
+//! @private @memberof QHsmDummy
+void QHsmDummy_dispatch_(
+    QAsm * const me,
+    QEvt const * const e,
+    uint_fast8_t const qsId);
+
+//! @private @memberof QHsmDummy
+bool QHsmDummy_isIn_(
+    QAsm * const me,
+    QStateHandler const state);
+
+QStateHandler QHsmDummy_getStateHandler_(QAsm const * const me);
+//! @endcond
+
+//----------------------------------------------------------------------------
+//! @class QActiveDummy
+//! @extends QActive
+typedef struct {
+    QActive super; //!< @protected @memberof QActiveDummy
+} QActiveDummy;
+
+//! @public @memberof QActiveDummy
+void QActiveDummy_ctor(QActiveDummy * const me);
+
+//! @cond INTERNAL
+//! @private @memberof QActiveDummy
+void QActiveDummy_init_(
+    QAsm * const me,
+    void const * const par,
+    uint_fast8_t const qsId);
+
+//! @private @memberof QActiveDummy
+void QActiveDummy_dispatch_(
+    QAsm * const me,
+    QEvt const * const e,
+    uint_fast8_t const qsId);
+
+//! @private @memberof QActiveDummy
+bool QActiveDummy_fakePost_(
+    QActive * const me,
+    QEvt const * const e,
+    uint_fast16_t const margin,
+    void const * const sender);
+
+//! @private @memberof QActiveDummy
+void QActiveDummy_fakePostLIFO_(
+    QActive * const me,
+    QEvt const * const e);
+
+//! @static @private @memberof QS
 void QS_processTestEvts_(void);
+//! @endcond
+
+//----------------------------------------------------------------------------
+// critical section for QP-stub...
+typedef uint_fast8_t QCritStatus;
+QCritStatus QF_critEntry(void);
+void QF_critExit(QCritStatus critStat);
+//............................................................................
+// scheduler locking for QP-stub...
+typedef uint_fast8_t QSchedStatus;
+QSchedStatus QF_schedLock(uint_fast8_t const ceiling);
+void QF_schedUnlock(QSchedStatus const prevCeil);
+
 #endif // Q_UTEST != 0
+
+//----------------------------------------------------------------------------
+#define QS_TEST_PROBE_DEF(fun_) \
+    uint32_t const qs_tp_ = QS_getTestProbe_((void (*)(void))(fun_));
+#define QS_TEST_PROBE(code_)         if (qs_tp_ != 0U) { code_ }
+#define QS_TEST_PROBE_ID(id_, code_) if (qs_tp_ == (uint32_t)(id_)) { code_ }
+#define QS_TEST_PAUSE()              (QS_test_pause_())
+
+#else // Q_UTEST not defined
+
+// dummy definitions when not building for QUTEST
+#define QS_TEST_PROBE_DEF(fun_)
+#define QS_TEST_PROBE(code_)
+#define QS_TEST_PROBE_ID(id_, code_)
+#define QS_TEST_PAUSE()  ((void)0)
+
+#endif // Q_UTEST
 
 #endif // QS_H_

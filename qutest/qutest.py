@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 810
+    VERSION = 811
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -1013,7 +1013,7 @@ class QUTest:
         if QUTest._have_info:
             QUTest._have_assert = False
             QUTest._need_reset  = False
-        else:
+        elif QUTest._host_exe[0]:
             QUTest._quithost_exe(2)
             raise RuntimeError("Target reset failed")
 
@@ -1074,6 +1074,7 @@ class QUTest:
             f"! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ![ FAIL ({elapsed:5.1f}s) ]")
         QUTest._num_failed += 1
         QUTest._str_failed += f" {QUTest._test_num}"
+        QUTest._have_assert = False
         QUTest._need_reset = True
         self._tran(QUTest._FAIL)
         if QUTest._opt_exit_on_fail:

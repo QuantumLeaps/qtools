@@ -18,7 +18,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "8.1.0"
+#define QSPY_VER "8.1.1"
 
 #ifdef __cplusplus
 extern "C" {
