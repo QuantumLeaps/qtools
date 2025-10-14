@@ -50,10 +50,10 @@ SigDictionary QSPY_sigDict;
 Dictionary    QSPY_enumDict[8];
 
 //============================================================================
-static DictEntry     l_funSto[512];
-static DictEntry     l_objSto[256];
+static DictEntry     l_funSto[8192];
+static DictEntry     l_objSto[2048];
 static DictEntry     l_usrSto[128 + 1 - QS_USER];
-static SigDictEntry  l_sigSto[512];
+static SigDictEntry  l_sigSto[8192];
 static DictEntry     l_enumSto[8][256];
 
 //............................................................................
