@@ -199,10 +199,10 @@ enum QS_GlbPre {
 #define QS_USER4    ((enum_t)(QS_USER + 20))
 
 // QS ID group offsets (for QS_LOC_FILTER())
-#define QS_ID_AO   ((int_fast16_t)0)
-#define QS_ID_EP   ((int_fast16_t)64)
-#define QS_ID_EQ   ((int_fast16_t)80)
-#define QS_ID_AP   ((int_fast16_t)96)
+#define QS_ID_AO   ((uint_fast16_t)0)
+#define QS_ID_EP   ((uint_fast16_t)64)
+#define QS_ID_EQ   ((uint_fast16_t)80)
+#define QS_ID_AP   ((uint_fast16_t)96)
 
 // QS ID groups (for QS_LOC_FILTER())
 #define QS_IDS_ALL ((int_fast16_t)0xF0)
@@ -262,7 +262,9 @@ typedef void (* QSpyFunPtr )(void);
 #define QS_FLUSH()           (QS_onFlush())
 
 #define QS_BEGIN_ID(rec_, qsId_) \
-if (QS_fltCheck_((rec_) >> 5U, (uint32_t)1U << ((rec_) & 0x1FU), (qsId_))) { \
+if (QS_fltCheck_((uint32_t)(rec_) >> 5U, \
+                 (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU), \
+                 (qsId_))) { \
     QS_CRIT_STAT \
     QS_CRIT_ENTRY(); \
     QS_beginRec_((uint_fast8_t)(rec_)); \
@@ -274,8 +276,8 @@ if (QS_fltCheck_((rec_) >> 5U, (uint32_t)1U << ((rec_) & 0x1FU), (qsId_))) { \
 }
 
 #define QS_BEGIN_INCRIT(rec_, qsId_) \
-if (QS_fltCheck_((rec_) >> 5U, \
-    (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_))) \
+if (QS_fltCheck_((uint32_t)(rec_) >> 5U, \
+                 (uint_fast32_t)1U << ((uint32_t)(rec_) & 0x1FU), (qsId_))) \
 { \
     QS_beginRec_((uint_fast8_t)(rec_)); \
     QS_TIME_PRE(); {
@@ -285,7 +287,8 @@ if (QS_fltCheck_((rec_) >> 5U, \
 }
 
 #define QS_GLB_CHECK_(rec_) \
-    (QS_glbCheck_((rec_) >> 5U, (uint_fast32_t)1U << ((rec_) & 0x1FU)))
+    (QS_glbCheck_((uint32_t)(rec_) >> 5U, \
+                  (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU)))
 #define QS_LOC_CHECK_(qsId_) (QS_locCheck_((qsId_)))
 
 #ifndef QS_REC_DONE

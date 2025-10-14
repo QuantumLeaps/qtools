@@ -60,7 +60,8 @@ typedef enum {
 
 //----------------------------------------------------------------------------
 #define QS_BEGIN_PRE(rec_, qsId_) \
-if (QS_fltCheck_((rec_)>>5U, (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_)))\
+if (QS_fltCheck_((uint32_t)(rec_)>>5U, \
+                 (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU), (qsId_))) \
 { \
     QS_beginRec_((uint_fast8_t)(rec_));
 
