@@ -46,8 +46,8 @@
 //! @endcond
 
 //============================================================================
-//! pre-defined QS record IDs (for QS_GLB_FILTER())
-enum QS_GlbPre {
+//! Pre-defined QS record IDs (for QS_GLB_FILTER())
+enum QS_GlbPredef {
     // [0] QS session (not maskable)
     QS_EMPTY,             //!< QS record for cleanly starting a session
 
@@ -199,10 +199,10 @@ enum QS_GlbPre {
 #define QS_USER4    ((enum_t)(QS_USER + 20))
 
 // QS ID group offsets (for QS_LOC_FILTER())
-#define QS_ID_AO   ((int_fast16_t)0)
-#define QS_ID_EP   ((int_fast16_t)64)
-#define QS_ID_EQ   ((int_fast16_t)80)
-#define QS_ID_AP   ((int_fast16_t)96)
+#define QS_ID_AO   ((uint_fast16_t)0)
+#define QS_ID_EP   ((uint_fast16_t)64)
+#define QS_ID_EQ   ((uint_fast16_t)80)
+#define QS_ID_AP   ((uint_fast16_t)96)
 
 // QS ID groups (for QS_LOC_FILTER())
 #define QS_IDS_ALL ((int_fast16_t)0xF0)
@@ -262,7 +262,9 @@ typedef void (* QSpyFunPtr )(void);
 #define QS_FLUSH()           (QS_onFlush())
 
 #define QS_BEGIN_ID(rec_, qsId_) \
-if (QS_fltCheck_((rec_) >> 5U, (uint32_t)1U << ((rec_) & 0x1FU), (qsId_))) { \
+if (QS_fltCheck_((uint32_t)(rec_) >> 5U, \
+                 (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU), \
+                 (qsId_))) { \
     QS_CRIT_STAT \
     QS_CRIT_ENTRY(); \
     QS_beginRec_((uint_fast8_t)(rec_)); \
@@ -274,8 +276,8 @@ if (QS_fltCheck_((rec_) >> 5U, (uint32_t)1U << ((rec_) & 0x1FU), (qsId_))) { \
 }
 
 #define QS_BEGIN_INCRIT(rec_, qsId_) \
-if (QS_fltCheck_((rec_) >> 5U, \
-    (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_))) \
+if (QS_fltCheck_((uint32_t)(rec_) >> 5U, \
+                 (uint_fast32_t)1U << ((uint32_t)(rec_) & 0x1FU), (qsId_))) \
 { \
     QS_beginRec_((uint_fast8_t)(rec_)); \
     QS_TIME_PRE(); {
@@ -285,7 +287,8 @@ if (QS_fltCheck_((rec_) >> 5U, \
 }
 
 #define QS_GLB_CHECK_(rec_) \
-    (QS_glbCheck_((rec_) >> 5U, (uint_fast32_t)1U << ((rec_) & 0x1FU)))
+    (QS_glbCheck_((uint32_t)(rec_) >> 5U, \
+                  (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU)))
 #define QS_LOC_CHECK_(qsId_) (QS_locCheck_((qsId_)))
 
 #ifndef QS_REC_DONE
@@ -411,29 +414,6 @@ if (QS_fltCheck_((rec_) >> 5U, \
 //============================================================================
 //! @class QS
 typedef struct {
-    //! @cond INTERNAL
-    uint8_t dummy;
-    //! @endcond
-} QS;
-
-//! @cond INTERNAL
-
-#if defined(QS_MEM_SYS) || defined(QS_MEM_APP)
-    #error Memory isolation not supported in this QP edition, need SafeQP
-#endif
-
-//----------------------------------------------------------------------------
-//! @struct QS_Filter
-typedef struct {
-    uint32_t glb[4];
-    uint32_t loc[4];
-} QS_Filter;
-
-//! @static @private @memberof QS
-extern QS_Filter QS_filt_;
-
-//! @struct QS_Attr
-typedef struct {
     uint8_t *buf;      //!< @private @memberof QS
     QSCtr    end;      //!< @private @memberof QS
     QSCtr    head;     //!< @private @memberof QS
@@ -443,10 +423,22 @@ typedef struct {
     uint8_t  chksum;   //!< @private @memberof QS
     uint8_t  critNest; //!< @private @memberof QS
     uint8_t  flags;    //!< @private @memberof QS
-} QS_Attr;
+} QS;
 
 //! @static @private @memberof QS
-extern QS_Attr QS_priv_;
+extern QS QS_priv_;
+
+//----------------------------------------------------------------------------
+//! @cond INTERNAL
+
+//! @struct QS_Filter
+typedef struct {
+    uint32_t glb[4];
+    uint32_t loc[4];
+} QS_Filter;
+
+//! @static @private @memberof QS
+extern QS_Filter QS_filt_;
 
 void QS_glbFilter_(int_fast16_t const filterSpec);
 void QS_locFilter_(int_fast16_t const filterSpec);
@@ -512,6 +504,9 @@ void QS_assertion_pre_(char const * const module, int_t const id,
 #define QS_U64_FMT     ((uint8_t)0xEU)
 #define QS_HEX_FMT     ((uint8_t)0xFU)
 
+//! @endcond
+//----------------------------------------------------------------------------
+
 // @struct TProbe
 struct QS_TProbe {
     QSFun    addr;
@@ -533,16 +528,10 @@ typedef struct {
 
 extern QSTestAttr QS_tstPriv_;
 
-void QS_test_pause_(void);
-uint32_t QS_getTestProbe_(QSpyFunPtr const api);
-
 struct QS_RxAttr; // forward declaration
 
 //! @static @private @memberof QS
 extern struct QS_RxAttr * const QS_rxPriv_;
-
-//! @endcond
-//----------------------------------------------------------------------------
 
 //! @static @public @memberof QS
 void QS_initBuf(
@@ -630,14 +619,12 @@ void QS_onCommand(
     uint32_t param2,
     uint32_t param3);
 
-//! @cond INTERNAL
 typedef enum {
     QS_TARGET_NO_RESET,
     QS_TARGET_RESET
 } QS_ResetAction;
 
 void QS_target_info_pre_(QS_ResetAction const act);
-//! @endcond
 
 //============================================================================
 #ifdef Q_UTEST
@@ -660,6 +647,10 @@ void QS_onTestPost(
 
 //! @static @public @memberof QS
 void QS_onTestLoop(void);
+
+void QS_test_pause_(void);
+
+uint32_t QS_getTestProbe_(QSpyFunPtr const api);
 
 //============================================================================
 // QP-stub for QUTest
@@ -764,6 +755,13 @@ void QF_schedUnlock(QSchedStatus const prevCeil);
 #define QS_TEST_PROBE(code_)
 #define QS_TEST_PROBE_ID(id_, code_)
 #define QS_TEST_PAUSE()  ((void)0)
+
+//----------------------------------------------------------------------------
+// memory protection facilities
+
+#ifdef QF_MEM_ISOLATE
+    #error Memory isolation not supported in this QP edition, need SafeQP
+#endif
 
 #endif // Q_UTEST
 

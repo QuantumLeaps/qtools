@@ -18,7 +18,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "8.1.1"
+#define QSPY_VER "8.1.2"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,10 +46,10 @@ typedef struct {
 enum {
     QS_MIN_VERSION      = 660,  // minimum required version
     QS_RECORD_SIZE_MAX  = 512,  // max QS record size [bytes]
-    QS_LINE_LEN_MAX     = 8192, // max length of a QSPY line [chars]
+    QS_LINE_LEN_MAX     = 65528, // max length of a QSPY line [chars]
     QS_FNAME_LEN_MAX    = 256,  // max length of filenames [chars]
     QS_SEQ_LIST_LEN_MAX = 1024, // max length of the Seq list [chars]
-    QS_DNAME_LEN_MAX    = 64,   // max dictionary name length [chars]
+    QS_DNAME_LEN_MAX    = 128,  // max dictionary name length [chars]
 };
 
 // pointer to the callback function for customized QS record parsing

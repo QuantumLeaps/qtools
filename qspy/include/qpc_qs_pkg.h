@@ -29,38 +29,9 @@
 #define QS_PKG_H_
 
 //============================================================================
-//! @cond INTERNAL
-
-//! QS received record types (RX channel)
-typedef enum {
-    QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
-    QS_RX_COMMAND,        //!< execute a user-defined command in the Target
-    QS_RX_RESET,          //!< reset the Target
-    QS_RX_TICK,           //!< call system clock tick in the Target
-    QS_RX_PEEK,           //!< peek Target memory
-    QS_RX_POKE,           //!< poke Target memory
-    QS_RX_FILL,           //!< fill Target memory
-    QS_RX_TEST_SETUP,     //!< test setup
-    QS_RX_TEST_TEARDOWN,  //!< test teardown
-    QS_RX_TEST_PROBE,     //!< set a Test-Probe in the Target
-    QS_RX_GLB_FILTER,     //!< set global filters in the Target
-    QS_RX_LOC_FILTER,     //!< set local  filters in the Target
-    QS_RX_AO_FILTER,      //!< set local AO filter in the Target
-    QS_RX_CURR_OBJ,       //!< set the "current-object" in the Target
-    QS_RX_TEST_CONTINUE,  //!< continue a test after QS_TEST_PAUSE()
-    QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
-    QS_RX_EVENT,          //!< inject an event to the Target
-} QS_RxRecords;
-
-//----------------------------------------------------------------------------
-#define QS_FRAME          ((uint8_t)0x7EU)
-#define QS_ESC            ((uint8_t)0x7DU)
-#define QS_ESC_XOR        ((uint8_t)0x20U)
-#define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
-
-//----------------------------------------------------------------------------
 #define QS_BEGIN_PRE(rec_, qsId_) \
-if (QS_fltCheck_((rec_)>>5U, (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_)))\
+if (QS_fltCheck_((uint32_t)(rec_)>>5U, \
+                 (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU), (qsId_))) \
 { \
     QS_beginRec_((uint_fast8_t)(rec_));
 
@@ -127,6 +98,33 @@ if (QS_fltCheck_((rec_)>>5U, (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_)))\
 #endif
 
 //----------------------------------------------------------------------------
+//! QS received record types (RX channel)
+typedef enum {
+    QS_RX_INFO,           //!< query Target info (ver, config, tstamp)
+    QS_RX_COMMAND,        //!< execute a user-defined command in the Target
+    QS_RX_RESET,          //!< reset the Target
+    QS_RX_TICK,           //!< call system clock tick in the Target
+    QS_RX_PEEK,           //!< peek Target memory
+    QS_RX_POKE,           //!< poke Target memory
+    QS_RX_FILL,           //!< fill Target memory
+    QS_RX_TEST_SETUP,     //!< test setup
+    QS_RX_TEST_TEARDOWN,  //!< test teardown
+    QS_RX_TEST_PROBE,     //!< set a Test-Probe in the Target
+    QS_RX_GLB_FILTER,     //!< set global filters in the Target
+    QS_RX_LOC_FILTER,     //!< set local  filters in the Target
+    QS_RX_AO_FILTER,      //!< set local AO filter in the Target
+    QS_RX_CURR_OBJ,       //!< set the "current-object" in the Target
+    QS_RX_TEST_CONTINUE,  //!< continue a test after QS_TEST_PAUSE()
+    QS_RX_QUERY_CURR,     //!< query the "current object" in the Target
+    QS_RX_EVENT,          //!< inject an event to the Target
+} QS_RxRecords;
+
+#define QS_FRAME          ((uint8_t)0x7EU)
+#define QS_ESC            ((uint8_t)0x7DU)
+#define QS_ESC_XOR        ((uint8_t)0x20U)
+#define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
+
+//----------------------------------------------------------------------------
 #define QS_INSERT_BYTE_(b_) \
     buf[head] = (b_);       \
     ++head;                 \
@@ -146,7 +144,5 @@ if (QS_fltCheck_((rec_)>>5U, (uint_fast32_t)1U << ((rec_) & 0x1FU), (qsId_)))\
     }
 
 #define QS_PTR2UNIT_CAST(T_, ptr_) ((T_)(ptr_))
-
-//! @endcond
 
 #endif // QS_PKG_H_
