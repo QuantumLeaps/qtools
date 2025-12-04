@@ -507,27 +507,6 @@ void QS_assertion_pre_(char const * const module, int_t const id,
 //! @endcond
 //----------------------------------------------------------------------------
 
-// @struct TProbe
-struct QS_TProbe {
-    QSFun    addr;
-    uint32_t data;
-    uint8_t  idx;
-};
-
-typedef struct {
-    struct QS_TProbe tpBuf[16];
-    QPSet     readySet;
-    QPSet     readySet_dis;
-    QSTimeCtr testTime;
-    uint8_t   tpNum;
-    uint8_t   intLock;
-    uint8_t   lockCeil;
-    uint8_t   memProt;
-    bool      inTestLoop;
-} QSTestAttr;
-
-extern QSTestAttr QS_tstPriv_;
-
 struct QS_RxAttr; // forward declaration
 
 //! @static @private @memberof QS
@@ -548,7 +527,7 @@ uint8_t const * QS_getBlock(uint16_t * const pNbytes);
 void QS_doOutput(void);
 
 //! @static @public @memberof QS
-uint8_t QS_onStartup(void const * arg);
+uint8_t QS_onStartup(void const * const arg);
 
 //! @static @public @memberof QS
 void QS_onCleanup(void);
@@ -560,7 +539,6 @@ void QS_onFlush(void);
 QSTimeCtr QS_onGetTime(void);
 
 #define QUTEST_ON_POST 124
-#define QS_RXATTR_SIZE 128U
 
 //----------------------------------------------------------------------------
 // QS-RX (QS receive channel)
@@ -628,7 +606,6 @@ void QS_target_info_pre_(QS_ResetAction const act);
 
 //============================================================================
 #ifdef Q_UTEST
-
 //! @static @public @memberof QS
 void QS_onTestSetup(void);
 
@@ -648,9 +625,39 @@ void QS_onTestPost(
 //! @static @public @memberof QS
 void QS_onTestLoop(void);
 
+//! @cond INTERNAL
+struct QS_TProbe {
+    QSFun    addr;
+    uint32_t data;
+    uint8_t  idx;
+};
+
+//! @static @private @memberof QS
+uint32_t QS_getTestProbe_(QSpyFunPtr const api);
+
+typedef struct {
+    struct QS_TProbe tpBuf[16];
+    QPSet     readySet;
+    QPSet     readySet_dis;
+    QSTimeCtr testTime;
+    uint8_t   tpNum;
+    uint8_t   intLock;
+    uint8_t   lockCeil;
+    uint8_t   memProt;
+    bool      inTestLoop;
+} QSTestAttr;
+
+//! @static @private @memberof QS
+extern QSTestAttr QS_tstPriv_;
+
+//! @static @private @memberof QS
 void QS_test_pause_(void);
 
-uint32_t QS_getTestProbe_(QSpyFunPtr const api);
+#if (Q_UTEST != 0)
+//! @static @private @memberof QS
+void QS_processTestEvts_(void);
+#endif // Q_UTEST != 0
+//! @endcond
 
 //============================================================================
 // QP-stub for QUTest
@@ -686,6 +693,7 @@ bool QHsmDummy_isIn_(
     QAsm * const me,
     QStateHandler const state);
 
+//! @private @memberof QHsmDummy
 QStateHandler QHsmDummy_getStateHandler_(QAsm const * const me);
 //! @endcond
 
@@ -723,9 +731,6 @@ bool QActiveDummy_fakePost_(
 void QActiveDummy_fakePostLIFO_(
     QActive * const me,
     QEvt const * const e);
-
-//! @static @private @memberof QS
-void QS_processTestEvts_(void);
 //! @endcond
 
 //----------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 </p>
 
 # What's New?
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qtools)](https://github.com/QuantumLeaps/qtools/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qtools)][GitHub]
 
 View QTools Revision History at:
 https://www.state-machine.com/qtools/history.html
@@ -73,16 +73,15 @@ open-source, 3rd-party tools:
 
 10. `make` for Windows (GNU-make-32-bit version 4.4.1)
 
-11. `cmake` for Windows (version 3.29.0-rc1)
+11. GNU C/C++ toolset for Windows (MinGW 32-bit version 15.2.0)
+    including:
+    - `Python` for Windows (version 3.9.7)
+    - `cmake` for Windows (version 4.2.3)
+    - `ninja` for Windows (version 1.13.2)
 
-12. `ninja` for Windows (version 1.11.1)
+12. GNU C/C++ toolset for ARM-EABI (GCC version 15.2.Rel1-2025.12.17)
 
-13. GNU C/C++ toolset for Windows (MinGW 32-bit version 14.2.0)
-    including Python3 for Windows (version 3.12.9)
-
-14. GNU C/C++ toolset for ARM-EABI (GCC version 14.2-2024.12.10)
-
-15. LMFlash for Windows (32-bit build 1613)
+13. LMFlash for Windows (32-bit build 1613)
 
 
 ## Software Tracing Support
@@ -154,10 +153,6 @@ is is distributed under the terms of the LMFlash license, included in the file
 `LICENSE-LMFlash.txt` in the `LICENSES/` sub-directory. Specifically, the LMFlash
 utility is distributed according to Section 2a "Demonstration License".
 
-- The [Python package for Windows](https://www.python.org/) is distributed
-under the terms of the PYTHON LICENSE AGREEMENT, included in the file
-`LICENSE-Python.txt` in the `LICENSES/` sub-directory.
-
 Most other tools included in this collection are distributed under the
 terms of the GNU General Public License (GPL) as published by the Free
 Software Foundation, either version 2 of the License, or (at your
@@ -178,19 +173,27 @@ subdirectory, except for the QSPY source code, which is provided in the
 have been developed and are copyrighted by Quantum Leaps.
 
 ### The GCC C and C++ compilers for Windows
-Have been taken from the MSYS2 project at
-- https://www.msys2.org/
+Have been taken from
+- https://winlibs.com/
 
-The installer mingw-get-setup.exe has been used and after the installation,
-the files have been pruned to reduce the size of the distribution.
-Please refer to the MinGW project for the source code.
+The following pre-built ZIP archive was used:
+
+`winlibs-i686-posix-dwarf-gcc-15.2.0-mingw-w64ucrt-13.0.0-r6.7z`
+
+Please refer to the WinLibs project for the source code.
+
+> NOTE: The mingw32 directory from WinLibs has been pruned to save space and
+to avoid virus alerts. Among others, files `gdb.exe` and `gdbserver.exe` have
+been deleted because they were known to trigger virus alerts in the past.
+
 
 ### The GNU-ARM Embedded Toolchain for Windows
 Have been taken from:
 - https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 
-The ZIP file arm-gnu-toolchain-14.2.rel1-mingw-w64-i686-arm-none-eabi.zip has been used.
-(Version 14.2.Rel1 Released: December 10, 2024)
+The ZIP file `arm-gnu-toolchain-15.2.rel1-mingw-w64-i686-arm-none-eabi.zip`
+has been used.
+(Version 15.2.Rel1-2025.12.17)
 
 ### The GNU make executable for Windows
 Has been taken from the MinGW distribution (mingw32)
@@ -214,6 +217,8 @@ of your browser window):
 - https://www.state-machine.com
 - info@state-machine.com
 
+   [Hist]: <https://github.com/QuantumLeaps/qtools/releases/latest>
+   [GitHub]: <https://github.com/QuantumLeaps/qtools/releases/latest>
    [QP]: <https://www.state-machine.com/products/#QP>
    [QP-Spy]: <https://www.state-machine.com/qtools/qpspy.html>
    [TBT]: <https://www.state-machine.com/qtools/qutest.html#qutest_tbt>

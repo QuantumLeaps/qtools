@@ -40,6 +40,7 @@ qspy/source/qspy_pal_posix.c
 qspy/source/qspy_pal_win.c
 qspy/source/qspy_seq.c
 qspy/source/qspy_tx.c
+qspy/test/
 
 priv*/
 bin*/
