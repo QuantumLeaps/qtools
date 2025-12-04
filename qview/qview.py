@@ -411,7 +411,7 @@ class QView:
     # @description
     # The qunpack() facility is similar to Python `struct.unpack()`,
     # specifically designed for unpacking binary QP/Spy packets.
-    # qunpack() handles all data formats supported by struct.unpack()`,
+    # qunpack() handles all data formats supported by struct.unpack(),
     # plus data formats specific to QP/Spy. The main benefit of qunpack()
     # is that it automatically applies the Target-supplied info about
     # various the sizes of various elements, such as Target timestamp,
