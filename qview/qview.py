@@ -55,7 +55,7 @@ import webbrowser
 #
 class QView:
     ## current version of QView
-    VERSION = 804
+    VERSION = 813
 
     # public static variables...
     ## menu to be customized
@@ -143,6 +143,8 @@ class QView:
     OBJ_EQ = 3
     OBJ_TE = 4
     OBJ_AP = 5
+    OBJ_SM_AO = 6
+    OBJ_EP = 7
 
     # global filter groups...
     GRP_ALL= 0xF0
@@ -219,8 +221,10 @@ class QView:
     # @sa qutest_dsl.poke()
     @staticmethod
     def poke(offset, size, data):
-        fmt = "<BHBB" + ("x","B","H","x","I")[size]
-        QSpy._sendTo(pack(fmt, QSpy._TRGT_POKE, offset, size, 1, data))
+        length = len(data)
+        num = length // size
+        QSpy._sendTo(pack("<BHBB", QSpy._TRGT_POKE,
+                     offset, size, num) + data)
 
     ## @brief Set/clear the Global-Filter in the Target.
     # @sa qutest_dsl.glb_filter()
@@ -1427,7 +1431,8 @@ class QView:
             return 1
 
         def apply(self):
-            QView.peek(self._offs, self._size, self._len)
+            QSpy._sendTo(pack("<BHBB", QSpy._TRGT_PEEK,
+                              self._offs, self._size, self._len))
 
     #.........................................................................
     class _PokeDialog(Dialog):
@@ -1475,7 +1480,9 @@ class QView:
             return 1
 
         def apply(self):
-            QView.poke(self._offs, self._size, self._data)
+            fmt = "<BHBB" + ("x","B","H","x","I")[self._size]
+            QSpy._sendTo(pack(fmt, QSpy._TRGT_POKE,
+                              self._offs, self._size, 1, self._data))
 
     #.........................................................................
     class _EvtDialog(Dialog):
