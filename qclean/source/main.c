@@ -41,6 +41,7 @@ static int  l_nCleaned   = 0;
 static int  l_nDirty     = 0;
 static int  l_lineLimit  = 0;
 static bool l_noCleanup  = false; // perform cleanup by default
+static bool l_checkMode  = false; // return non-zero if dirty files are found
 static bool l_doReadOnly = false; // don't check read-only files by default
 
 enum Constants {
@@ -349,6 +350,7 @@ static char const l_helpStr[] =
     "OPTIONS:\n"
     "-h                      help (show this message and exit)\n"
     "-q                      query only (no cleanup when -q present)\n"
+    "-c                      check only (no cleanup, non-zero if dirty)\n"
     "-r                      check also read-only files\n"
     "-l[limit]     %d        line length limit (not checked when -l absent)\n";
 
@@ -368,7 +370,7 @@ int main(int argc, char *argv[]) {
         rootDir = argv[1];
     }
     PRINTF_S("root-directory: %s\n", rootDir);
-    while ((optChar = getopt(argc, argv, ":hqrl::")) != -1) {
+    while ((optChar = getopt(argc, argv, ":hcqrl::")) != -1) {
          switch (optChar) {
              case 'h': { // help
                  PRINTF_S(l_helpStr, LINE_LIMIT);
@@ -377,6 +379,12 @@ int main(int argc, char *argv[]) {
              case 'q': { // query only (no cleanup)
                  l_noCleanup = true;
                  PRINTF_S("%s\n", "-q query-only");
+                 break;
+             }
+             case 'c': { // check only (no cleanup, non-zero if dirty)
+                 l_noCleanup = true;
+                 l_checkMode = true;
+                 PRINTF_S("%s\n", "-c check-only");
                  break;
              }
              case 'r': { // check also read-only files
@@ -407,8 +415,9 @@ int main(int argc, char *argv[]) {
            "----------------------------------------\n"
            "Files processed:%d ", l_nFiles);
     if (l_noCleanup) {
-        PRINTF_S("read-only:%d%s, nothing-cleaned(-q), still-dirty:%d\n",
+        PRINTF_S("read-only:%d%s, nothing-cleaned(%s), still-dirty:%d\n",
                l_nReadOnly, (l_doReadOnly ? "(checked)" : "(skipped)"),
+               (l_checkMode ? "-c" : "-q"),
                l_nDirty);
     }
     else {
@@ -417,5 +426,5 @@ int main(int argc, char *argv[]) {
                l_nCleaned,
                l_nDirty);
     }
-    return 0;
+    return ((l_checkMode && (l_nDirty > 0)) ? 1 : 0);
 }
