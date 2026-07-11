@@ -30,7 +30,7 @@
 #ifndef QCLEAN_H_
 #define QCLEAN_H_
 
-#define VERSION "8.1.0"
+#define VERSION "8.1.5"
 
 unsigned isMatching  (char const *fullPath);
 void     onMatchFound(char const *fullPath, unsigned flags, int ro_info);

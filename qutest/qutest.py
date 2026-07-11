@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 813
+    VERSION = 815
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -1655,6 +1655,8 @@ def main():
         help="Optional host executable or debug/DEBUG")
     parser.add_argument('-q', '--qspy', nargs='?', default='', const='',
         help="optional qspy host, [:ud_port][:tcp_port]")
+    parser.add_argument('-d', '--default', nargs='?', default='*.py', const='',
+        help="optional default tests to run (default *.py)")
     parser.add_argument('-l', '--log', nargs='?', default='', const='',
         help="Optional log directory (might not exist yet)")
     parser.add_argument('-o', '--opt', nargs='?', default='', const='',
@@ -1690,6 +1692,7 @@ def main():
                 print("\nTCP port specified without host executable\n")
                 return sys.exit(-1)
 
+    default = args.default
     log = args.log
     if log != '':
         if not (log.endswith('/') or log.endswith('\\')):
@@ -1718,14 +1721,10 @@ def main():
     QUTest._opt_save_qspy_bin = 'b' in args.opt
 
     if not args.scripts: # scripts not provided?
-        QUTest.trace("applying default *.py")
-        args.scripts = ['*.py'] # apply the default "*.py"
+        QUTest.trace(f"applying default {default}")
+        args.scripts = [default] # apply the default
     scripts = []
     for script in args.scripts:
-        if script.endswith('.exe'):
-            print("\nIncorrect test script(s). Old QUTEST command-line?\n")
-            parser.print_help()
-            return sys.exit(-1)
         scripts.extend(glob(script))
     # still no scripts?
     if (not scripts) and (not QUTest._opt_interactive):

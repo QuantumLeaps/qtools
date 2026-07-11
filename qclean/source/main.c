@@ -85,6 +85,7 @@ static FileType const l_fileTypes[] = {
     { ".bat",     4, CR_FLG | TAB_FLG | ASCII_FLG     },
     { ".ld",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // GNU linker
     { ".py",      3, CR_FLG | TAB_FLG | LONG_LINE_FLG },
+    { ".pyt",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyi",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".pyw",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG },
     { ".java",    5, CR_FLG | TAB_FLG | LONG_LINE_FLG },
@@ -95,6 +96,7 @@ static FileType const l_fileTypes[] = {
     { ".make",    5, CR_FLG           | LONG_LINE_FLG },
     { ".cmake",   6, CR_FLG           | TAB_FLG       },
     { ".json",    5, CR_FLG           | TAB_FLG       },
+    { ".asc",     4, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // PGP signature
 
     { ".html",    5, CR_FLG | TAB_FLG                 },
     { ".htm",     4, CR_FLG | TAB_FLG                 },
@@ -116,7 +118,8 @@ static FileType const l_fileTypes[] = {
     { ".project", 8, CR_FLG                           }, // Eclipse project
     { ".cproject",9, CR_FLG                           }, // Eclipse CDT project
 
-    { ".sha1",    5, CR_FLG | TAB_FLG                 }, // Sha1 file
+    { ".sha1",    5, CR_FLG | TAB_FLG                 }, // SHA-1 file
+    { ".sha256",  7, CR_FLG | TAB_FLG                 }, // SHA-256 file
     { ".pro",     4, CR_FLG | TAB_FLG                 }, // Qt project
 
     { ".m",       2, CR_FLG | TAB_FLG | LONG_LINE_FLG }, // MATLAB

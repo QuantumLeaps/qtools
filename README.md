@@ -4,6 +4,22 @@
 </a>
 </p>
 
+# Issue Tacking and Support
+
+> [!IMPORTANT]
+> **This repository does NOT use GitHub Issues for technical support.**
+
+Please use the following official support channels [hosted on SourceForge](https://sourceforge.net/p/qpc):
+- **Bug Reports:** [**Bug Tracker database**](https://sourceforge.net/p/qpc/bugs)
+- **Feature Requests:** [**Feature Requests database**](https://sourceforge.net/p/qpc/feature-requests)
+- **Questions & Discussion:** [**Free Support Forum**](https://sourceforge.net/p/qpc/discussion/668726)
+
+[![Free Support Forum](https://www.state-machine.com/attachments/support.png "Free QP/QM Support Forum")](https://sourceforge.net/p/qpc/discussion/668726)
+
+> [!NOTE]
+> The [QP/QM Free Support Forum](https://sourceforge.net/p/qpc/discussion/668726) has been active for decades &mdash; *predating GitHub* &mdash; and provides a **searchable** archive of answers, troubleshooting guidance, and resolved issues. Posts to this forum benefit the entire community and are typically answered the same day.
+
+
 # What's New?
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/QuantumLeaps/qtools)][GitHub]
 
@@ -199,8 +215,8 @@ has been used.
 Has been taken from the MinGW distribution (mingw32)
 
 ### The UNIX file and directory utilities
-Have been taken from the Gow (Gnu On Windows) project at GitHub:
-- https://github.com/bmatzelle/gow
+Have been taken from the Git for Windows v2.53.0(2) project:
+- https://git-scm.com/install/windows
 
 ### The Unity Unit Testing Harness for Embedded C
 Has been taken from the GitHub at:
@@ -213,9 +229,10 @@ of your browser window):
 
 <p align="center"><img src="https://www.state-machine.com/img/github-star.jpg"/></p>
 
-# Contact information:
-- https://www.state-machine.com
-- info@state-machine.com
+# Contact Information
+- [Quantum Leaps website](https://www.state-machine.com)
+- [Quantum Leaps licensing](https://www.state-machine.com/licensing)
+- [info@state-machine.com](mailto:info@state-machine.com)
 
    [Hist]: <https://github.com/QuantumLeaps/qtools/releases/latest>
    [GitHub]: <https://github.com/QuantumLeaps/qtools/releases/latest>
