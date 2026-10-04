@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #=============================================================================
 # QUTest Python scripting support
@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 815
+    VERSION = 816
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
@@ -1720,12 +1720,25 @@ def main():
     QUTest._opt_save_qspy_txt = 'o' in args.opt
     QUTest._opt_save_qspy_bin = 'b' in args.opt
 
-    if not args.scripts: # scripts not provided?
+    explicit = bool(args.scripts) # scripts provided explicitly?
+    if not explicit: # scripts not provided?
         QUTest.trace(f"applying default {default}")
         args.scripts = [default] # apply the default
+    # resolve the scripts:
+    # - the scripts are run in the order of the arguments;
+    # - the matches of each wildcard argument are sorted, so that the order
+    #   (and the numbering of the tests) is the same on all hosts;
+    # - an explicitly provided argument that matches no file is an error;
+    # - a script matched by more than one argument is run only once.
     scripts = []
     for script in args.scripts:
-        scripts.extend(glob(script))
+        found = sorted(glob(script), key=lambda p: p.replace('\\', '/'))
+        if (not found) and explicit:
+            print(f"\nTest script not found: {script}")
+            return sys.exit(-1)
+        for scr in found:
+            if scr not in scripts:
+                scripts.append(scr)
     # still no scripts?
     if (not scripts) and (not QUTest._opt_interactive):
         print("\nFound no test scripts to run")
@@ -1779,6 +1792,10 @@ def main():
         msg = "Target    : remote"
     QUTest.display(msg)
     QSpy.qspy_show(msg)
+    if scripts:
+        msg = f"Scripts   : {', '.join(scripts)}"
+        QUTest.display(msg)
+        QSpy.qspy_show(msg)
 
     # run all the test scripts...
     if scripts:
