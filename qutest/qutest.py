@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #=============================================================================
 # QUTest Python scripting support
@@ -62,7 +62,7 @@ else:
 class QUTest:
 
     # public class constants
-    VERSION = 815
+    VERSION = 816
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables
