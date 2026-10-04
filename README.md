@@ -53,6 +53,15 @@ starting with 'q' are contributed by Quantum Leaps)
    [trace-based testing (TBT)](#trace-based-testing-support) specifically
    designed for on-target testing of embedded systems, but also supports
    testing of embedded code on host computers ("dual targeting").
+   QUTest also includes the following Python scripts (in the `qutest`
+   directory):
+   - `qimpact.py` - instrumentation-impact check, which verifies that the
+     QS instrumentation (`Q_SPY`, `Q_UTEST`) is purely additive, so that the
+     test results and code coverage of the instrumented test build apply
+     to the production build (used in the host unit tests of the QP
+     frameworks; see [qutest/README.md](qutest/README.md));
+   - `qutestify.py` - converter of the raw QSPY output to the test
+     expectations inside QUTest test scripts.
 
 3. [qview](https://www.state-machine.com/qtools/qview.html) -
    Python extension of the `qspy` host application for visualization and

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 Setup script.
-To build qutest install:
+To build the qutest package (qutest, qimpact, qutestify):
 [sudo] python setup.py sdist bdist_wheel
 '''
 
@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name="qutest",
-    version="8.1.5",
+    version="8.1.6",
     author="Quantum Leaps",
     author_email="info@state-machine.com",
     description="QUTest Python scripting support",
@@ -18,8 +18,10 @@ setup(
     url="https://www.state-machine.com/qtools/qutest.html",
     license="GPL/commercial",
     platforms="any",
-    py_modules=["qutest"],
-    entry_points={"console_scripts": ["qutest = qutest:main"]},
+    py_modules=["qutest", "qimpact", "qutestify"],
+    entry_points={"console_scripts": ["qutest = qutest:main",
+                                      "qimpact = qimpact:main",
+                                      "qutestify = qutestify:main"]},
     classifiers=["Development Status :: 5 - Production/Stable",
                  "Intended Audience :: Developers",
                  "Topic :: Software Development :: Embedded Systems",

@@ -33,7 +33,7 @@
 import os
 import sys
 
-VERSION = 810
+VERSION = 816
 
 def main():
     # process command-line arguments...
@@ -44,7 +44,7 @@ def main():
     if '-h' in argv or '--help' in argv or '?' in argv \
         or '--version' in argv:
         print(f"QUTest script converter {VERSION//100}."\
-              f"{(VERSION//10) % 10}.{VERSION % 10}"\
+              f"{(VERSION//10) % 10}.{VERSION % 10}\n"\
               f"Usage: python qutestify.py <test-script>")
         sys.exit(0)
 
@@ -92,10 +92,10 @@ def main():
 
 #=============================================================================
 if __name__ == "__main__":
-    print(f"\nQUTestestify utility "\
+    print(f"\nQUTestify utility "\
         f"{VERSION//100}.{(VERSION//10) % 10}."\
         f"{VERSION % 10}")
-    print("Copyright (c) 2005-2025 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2026 Quantum Leaps, www.state-machine.com")
     if sys.version_info >= (3,6):
         main()
     else:
