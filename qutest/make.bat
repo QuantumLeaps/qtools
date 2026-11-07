@@ -21,10 +21,10 @@
 %PYTHON% setup.py sdist bdist_wheel
 
 :: check the build...
-twine check dist/*
+%PYTHON% -m twine check dist/*
 
 :: upload to PyPi -- skip for now
-twine upload dist/*
+%PYTHON% -m twine upload dist/*
 
 :: copy/rename the "wheel" to the current dir
 @cp dist/%PROJ%-*.tar.gz %PROJ%.tar.gz

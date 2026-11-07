@@ -169,7 +169,7 @@ enum QS_GlbPredef {
     QS_QF_ACTIVE_DEFER_ATTEMPT, //!< AO attempted to defer an event
 
     // [82] keep always last
-    QS_PRE_MAX            //!< the # predefined signals
+    QS_PRE_MAX            //!< the # predefined QS records
 };
 
 // QS record groups (for QS_GLB_FILTER())
@@ -296,7 +296,7 @@ if (QS_fltCheck_((uint32_t)(rec_) >> 5U, \
 #endif // ndef QS_REC_DONE
 
 #define QS_I8(width_, data_) \
-    (QS_u8_fmt_((uint8_t)(((width_) << 4U) & 0x7U) | QS_I8_ENUM_FMT, \
+    (QS_u8_fmt_((uint8_t)(((width_) & 0x7U) << 4U) | QS_I8_ENUM_FMT, \
                 (data_)))
 
 #define QS_U8(width_, data_) \

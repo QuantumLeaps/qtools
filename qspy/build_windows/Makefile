@@ -16,11 +16,12 @@
 # <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
-# building configurations: Debug (default), Release, and Spy
-# make
-# make CONF=dbg
-#
-# cleaning configurations: Debug (default), Release, and Spy
+# building configurations: Release (default) and Debug (CONF=dbg)
+# make                      -- Release
+# make CONF=dbg             -- Debug
+# make DEF=-DCRYPTO_SECRET  -- Release with the license verification
+#                              (in-house builds; needs crypto_secret.c)
+# cleaning:
 # make clean
 # make CONF=dbg clean
 
@@ -104,14 +105,12 @@ CPPFLAGS = -c -ffunction-sections -fdata-sections \
 
 endif  # .....................................................................
 
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-	LINKFLAGS :=
-else
-ifndef GCC_OLD
-	LINKFLAGS := -no-pie
-endif
-endif
+# NOTE: this Makefile is for Windows (MinGW GCC), so the executable
+# extension is .exe (and 'uname', which does not exist on Windows, is NOT
+# used). The executable keeps the default address-space layout
+# randomization (no -no-pie).
+TARGET_EXT := .exe
+LINKFLAGS  :=
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -134,7 +133,7 @@ endif
 
 all: $(TARGET_EXE)
 
-$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
+$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
 
 $(BIN_DIR)/%.d : %.cpp

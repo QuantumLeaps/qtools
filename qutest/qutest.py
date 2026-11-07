@@ -7,26 +7,39 @@
 #                    ------------------------
 #                    Modern Embedded Software
 #
-# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+# Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 #
-# SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+# SPDX-License-Identifier: LicenseRef-QL-commercial
 #
-# This software is dual-licensed under the terms of the open source GNU
-# General Public License version 3 (or any later version), or alternatively,
-# under the terms of one of the closed source Quantum Leaps commercial
-# licenses.
+# This software is licensed under the terms of the Quantum Leaps commercial
+# license agreement. This header is a notice of that license, not a
+# substitute for it; the signed agreement governs in case of conflict.
+# Use of this software requires a valid Quantum Leaps commercial or
+# evaluation license. Contact Quantum Leaps for licensing options.
 #
-# The terms of the open source GNU General Public License version 3
-# can be found at: <www.gnu.org/licenses/gpl-3.0>
+# RESTRICTIONS
+# Unless otherwise agreed in writing with Quantum Leaps, the licensee
+# may NOT:
+# (a) redistribute, encumber, sell, rent, lease, sublicense, or otherwise
+#     transfer rights in this software to any third party,
+# (b) remove, obscure, or alter any trademark, copyright, or other
+#     proprietary notice, legend, symbol, or label present in this
+#     software,
+# (c) create derivative works, or modify or repackage this software, for
+#     the purpose of concealing its origin or evading the licensing
+#     obligations that apply to it,
+# (d) use this software, or any portion of it, as input to train,
+#     fine-tune, evaluate, or otherwise develop any artificial
+#     intelligence or machine learning model, or use such a model to
+#     replicate, emulate, or compete with the functionality of this
+#     software, whether for internal use or in any product or service
+#     offered to a third party.
 #
-# The terms of the closed source Quantum Leaps commercial licenses
-# can be found at: <www.state-machine.com/licensing>
+# This software is provided "AS IS," without warranty of any kind, express
+# or implied, except as expressly stated in the governing license agreement.
 #
-# Redistributions in source code must retain this top-level comment block.
-# Plagiarizing this software to sidestep the license obligations is illegal.
-#
-# Contact information:
-# <www.state-machine.com>
+# Quantum Leaps contact information:
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 #=============================================================================
 
@@ -40,10 +53,11 @@ from fnmatch import fnmatchcase
 from glob import glob
 from platform import python_version
 from datetime import datetime
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 from inspect import getframeinfo, stack
 
 import argparse
+import atexit
 import socket
 import struct
 import time
@@ -68,8 +82,10 @@ class QUTest:
     # private class variables
     _host_exe    = [None, None] # list to be convered to a tuple
     _have_target = False
+    _host_proc   = None # Popen object of the running host executable
     _have_info   = False
     _have_assert = False
+    _last_assert = False # the last received record was an assertion
     _need_reset  = True
     _is_debug    = False
     _num_groups  = 0
@@ -129,6 +145,7 @@ class QUTest:
         self._state      = QUTest._INIT
         self._timestamp  = 0
         self._to_skip    = 0
+        self._skip_next  = 0 # skip() requested while a test was running
         self._is_inter   = False
         self._test_fname = ""
         self._test_dname = ""
@@ -241,6 +258,12 @@ class QUTest:
         # end the previous test
         self._test_end()
 
+        # apply a skip() request made while the previous test was running
+        # (only now, so that the previous test could complete normally)
+        if self._skip_next > 0:
+            self._to_skip = self._skip_next
+            self._skip_next = 0
+
         # start the new test...
         QUTest._test_start = QUTest._time()
         QUTest._test_num += 1
@@ -274,10 +297,13 @@ class QUTest:
 
         if opt & QUTest._OPT_NORESET != 0:
             if self._state == QUTest._FAIL:
-                self._fail("NORESET-test follows a failed test")
+                self._fail("NORESET test after FAILED test")
+                return
+            if self._state == QUTest._SKIP:
+                self._fail("NORESET test after SKIPPED test")
                 return
             if QUTest._need_reset:
-                self._fail("NORESET-test needs reset")
+                self._fail("NORESET test needs reset")
                 return
             self._tran(QUTest._TEST)
         else:
@@ -303,6 +329,8 @@ class QUTest:
         elif self._state == QUTest._TEST:
 
             if not QSpy.receive(): # timeout?
+                if exp.startswith("@timestamp"): # show it as it would match
+                    exp = f"{self._timestamp + 1:010d}{exp[10:]}"
                 self._fail('got: "" (timeout)',
                           f'exp: "{exp}"')
                 return False
@@ -317,7 +345,7 @@ class QUTest:
                 exp = f"{self._timestamp:010d}{exp[10:]}"
                 pattern = exp.replace("[", "\2")
                 pattern = pattern.replace("]", "\3")
-            elif exp[0:9].isdigit():
+            elif exp[0:10].isdigit(): # literal 10-digit timestamp?
                 self._timestamp += 1
                 pattern = exp.replace("[", "\2")
                 pattern = pattern.replace("]", "\3")
@@ -330,6 +358,14 @@ class QUTest:
 
             if not fnmatchcase(names, pattern):
                 self._fail(f'got: "{QUTest._last_record}"',
+                           f'exp: "{exp}"')
+                return False
+
+            # an assertion must be expected explicitly (with "=ASSERT=");
+            # an assertion matched only by a wildcard is a failure
+            if QUTest._last_assert and "=ASSERT=" not in exp:
+                self._fail('unexpected assertion: '
+                           f'"{QUTest._last_record}"',
                            f'exp: "{exp}"')
                 return False
 
@@ -349,12 +385,21 @@ class QUTest:
 
     # ensure DSL command .....................................................
     def ensure(self, bool_expr):
-        if not bool_expr:
-            #code_context = getframeinfo(stack()[1][0]).code_context
-            #self._fail(''.join(code_context).strip())
-            self._fail('ensure')
-            return False
-        return True
+        if self._to_skip > 0:
+            pass # ignore
+        elif self._state == QUTest._INIT:
+            if not bool_expr: # only a failing ensure() is an error here
+                self._before_test("ensure")
+        elif self._state == QUTest._TEST:
+            if not bool_expr:
+                self._fail('ensure')
+                return False
+            return True
+        elif self._state in (QUTest._FAIL, QUTest._SKIP):
+            pass # ignore (don't fail the test again or fail a skipped test)
+        else:
+            assert 0, "invalid state in ensure"
+        return bool(bool_expr)
 
     # glb_filter DSL command .................................................
     def glb_filter(self, *args):
@@ -375,7 +420,8 @@ class QUTest:
                 # negative filter argument means 'remove' (disallow)
                 is_neg = False
                 if isinstance(arg, str):
-                    is_neg = (arg[0] == '-') # is  request?
+                    assert arg != "", 'invalid global filter arg=""'
+                    is_neg = (arg[0] == '-') # is remove request?
                     if is_neg:
                         arg = arg[1:]
                     try:
@@ -387,7 +433,7 @@ class QUTest:
                     if is_neg:
                         arg = -arg
 
-                if arg < 0x7F:
+                if arg < 125: # QS record 0..124 (QS_USER + 24)
                     bitmask = _apply(bitmask, 1 << arg, is_neg)
                 elif arg == QSpy.GRP_ALL:
                     bitmask = _apply(bitmask, QSpy.GLB_FLT_MASK_ALL, is_neg)
@@ -457,7 +503,7 @@ class QUTest:
                 if is_neg:
                     arg = -arg
 
-                if arg < 0x7F:
+                if arg < 128: # QS-ID 0..127
                     bitmask = _apply(bitmask, 1 << arg, is_neg)
                 elif arg == QSpy.IDS_ALL:
                     bitmask = _apply(bitmask, QSpy.LOC_FLT_MASK_ALL, is_neg)
@@ -496,7 +542,7 @@ class QUTest:
             remove = 0
             fmt = "<BB" + QSpy.trg_objPtr
             if isinstance(obj_id, str):
-                if obj_id == '-': # is it remvoe request?
+                if obj_id.startswith('-'): # is it remove request?
                     obj_id = obj_id[1:]
                     remove = 1
                 QSpy.send_to(struct.pack(
@@ -599,7 +645,7 @@ class QUTest:
     def command(self, cmd_id, param1 = 0, param2 = 0, param3 = 0):
         if self._to_skip > 0:
             pass # ignore
-        if self._state == QUTest._INIT:
+        elif self._state == QUTest._INIT:
             self._before_test("command")
         elif self._state == QUTest._TEST:
             fmt = "<BBIII"
@@ -773,8 +819,13 @@ class QUTest:
 
     # skip DSL command .......................................................
     def skip(self, n_tests = 9999):
-        if self._to_skip == 0: # not skipping already?
-            self._to_skip = n_tests
+        if self._to_skip == 0 and self._skip_next == 0: # not skipping yet?
+            if self._state == QUTest._TEST:
+                # a test is running: let it complete and skip the NEXT
+                # n_tests tests (the request is applied in test())
+                self._skip_next = n_tests
+            else:
+                self._to_skip = n_tests
 
     # required DSL command ....................................................
     def required(self, cond, msg = ""):
@@ -808,6 +859,8 @@ class QUTest:
     def note(self, msg, dest=0x3):
         if self._to_skip > 0:
             return
+        if self._state == QUTest._FAIL: # the rest of a failed test is not
+            return                      # executed, so its notes are omitted
         if (dest & QUTest._OPT_SCREEN) != 0:
             QUTest.display(msg)
         if (dest & QUTest._OPT_TRACE) != 0:
@@ -887,14 +940,16 @@ class QUTest:
             except RuntimeError as err:
                 QUTest.display(str(err), QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QSpy.qspy_show(str(err))
-                QUTest_inst._fail()
+                if QUTest_inst._state != QUTest._FAIL: # not failed yet?
+                    QUTest_inst._fail()
 
             except SyntaxError:
                 QUTest.display(traceback.format_exc(limit=0),
                     QUTest._COL_ERR1, QUTest._COL_ERR2)
                 QSpy.qspy_show(traceback.format_exc(limit=0))
                 QUTest._num_failed += 1
-                QUTest._str_failed += f" {QUTest._num_groups}"
+                # a failure of the group (before any test): "group:<n>"
+                QUTest._str_failed += f" group:{QUTest._num_groups}"
 
             except ExitOnDetachException:
                 QUTest.display("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "\
@@ -911,7 +966,13 @@ class QUTest:
                 QUTest_inst._interact()
 
             # properly end the last test in the group
-            QUTest_inst._test_end()
+            try:
+                QUTest_inst._test_end()
+            except RuntimeError as err: # e.g., UDP error during teardown
+                QUTest.display(str(err), QUTest._COL_ERR1, QUTest._COL_ERR2)
+                QSpy.qspy_show(str(err))
+                if QUTest_inst._state != QUTest._FAIL: # not failed yet?
+                    QUTest_inst._fail()
             QUTest._quithost_exe(9)
 
     def _interact(self):
@@ -980,6 +1041,25 @@ class QUTest:
             return
 
         self._dsl_dict["on_teardown"]() # on_teardown() callback
+        if self._state != QUTest._TEST: # did on_teardown() fail the test?
+            return # the FAIL verdict has already been reported
+
+        # end-of-test marker: request the Target info and require that it is
+        # the NEXT thing to arrive. The Target processes the requests in
+        # order and its output stays in order, so any output produced after
+        # the teardown acknowledgement (e.g., by QS_onTestTeardown()) and not
+        # consumed by on_teardown() arrives before it -> unexpected output.
+        cnt = QSpy._info_cnt
+        QSpy.send_to(struct.pack("<B", QSpy.TO_TRG_INFO))
+        while QSpy._info_cnt == cnt:
+            if not QSpy.receive(): # timeout?
+                self._fail('got: "" (timeout)',
+                           'exp: end-of-test (Target info)')
+                return
+            if QSpy._info_cnt == cnt: # anything else is unexpected
+                self._fail(f'got: "{QUTest._last_record}"',
+                           'exp: end-of-test (no more output)')
+                return
 
         QUTest.display("                                             "\
                         f"                [ PASS ({elapsed:5.1f}s) ]",
@@ -990,14 +1070,17 @@ class QUTest:
 
     def _reset_target(self):
         if QUTest._host_exe[0]:
-            if not QUTest._have_assert:
-                QUTest._quithost_exe(1)
+            # end the previous instance of the host executable, which must
+            # have exited before the next one starts. (After an assertion
+            # no reset request is sent, because the asserted instance exits
+            # by itself, but its exit is still awaited and enforced.)
+            QUTest._quithost_exe(1)
 
             # lauch a new instance of the host executable
             QUTest._have_target = True
             QUTest._have_info = False
             # pylint: disable=consider-using-with
-            Popen(QUTest._host_exe)
+            QUTest._host_proc = Popen(QUTest._host_exe)
 
         else: # running remote target
             QUTest._have_target = True
@@ -1035,7 +1118,8 @@ class QUTest:
         return True
 
     def _before_test(self, command):
-        QUTest._num_failed += 1
+        # NOTE: the failure is counted (once) by the SyntaxError handler
+        # in _run_script()
         self._tran(QUTest._FAIL)
         msg = f'"{command}" before any test'
         raise SyntaxError(msg)
@@ -1073,15 +1157,21 @@ class QUTest:
         QSpy.qspy_show(f"[{QUTest._test_num:2d}]! ! ! ! ! ! ! ! ! ! ! "\
             f"! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ![ FAIL ({elapsed:5.1f}s) ]")
         QUTest._num_failed += 1
-        QUTest._str_failed += f" {QUTest._test_num}"
+        if self._state == QUTest._INIT: # failure before any test in the group
+            QUTest._str_failed += f" group:{QUTest._num_groups}"
+        else: # failure of a test (test numbers are unique in the run)
+            QUTest._str_failed += f" {QUTest._test_num}"
         QUTest._have_assert = False
         QUTest._need_reset = True
         self._tran(QUTest._FAIL)
         if QUTest._opt_exit_on_fail:
             raise ExitOnFailException
         # ignore all input until timeout
-        while QSpy.receive():
-            pass
+        try:
+            while QSpy.receive():
+                pass
+        except RuntimeError:
+            pass # the test has already failed (and has been counted)
 
     @staticmethod
     def _quithost_exe(source):
@@ -1090,7 +1180,42 @@ class QUTest:
             QUTest.trace("quitting host exe...")
             QUTest._have_target = False
             QSpy.send_to(struct.pack("<B", QSpy.TO_TRG_RESET))
-            time.sleep(0.2 * QUTest.TIMEOUT) # wait until host-exe quits
+        QUTest._end_host_proc() # wait until the host exe has quit
+
+    @staticmethod
+    def _end_host_proc():
+        # make sure that the host executable launched by qutest.py has
+        # exited. It normally exits within milliseconds after the reset
+        # request (or by itself after an assertion). An unresponsive host
+        # executable is terminated, so that it can never linger and
+        # interfere with the subsequent tests ("leaked" host executable).
+        proc = QUTest._host_proc
+        if proc is None:
+            return
+        QUTest._host_proc = None
+        try:
+            proc.wait(timeout=QUTest.TIMEOUT)
+            return # exited normally
+        except TimeoutExpired:
+            pass
+        msg = "Host executable did not exit -> terminated"
+        QUTest.display(msg, QUTest._COL_ERR1, QUTest._COL_ERR2)
+        QSpy.qspy_show(msg)
+        proc.terminate()
+        try:
+            proc.wait(timeout=QUTest.TIMEOUT)
+        except TimeoutExpired:
+            proc.kill()
+            proc.wait()
+
+    @staticmethod
+    def _atexit():
+        # last line of defense: no host executable survives qutest.py,
+        # also on sys.exit() and on uncaught exceptions
+        try:
+            QUTest._end_host_proc()
+        except Exception: # pylint: disable=broad-except
+            pass
 
     @staticmethod
     def _time():
@@ -1210,6 +1335,9 @@ class QSpy:
     _sock = None
     _is_attached = False
     _tx_seq = 0
+    _rx_seq = 0       # last sequence number received from QSPY
+    _info_cnt = 0     # number of Target-info packets received
+    _qspy_addr = None # resolved (IP, port) of QSPY; other sources rejected
     host_udp = ["localhost", 7701] # list to be converted to a tuple
     _local_port = 0 # let the OS decide the best local port
 
@@ -1275,8 +1403,8 @@ class QSpy:
     GRP_ALL= 0xF0
     GRP_SM = 0xF1
     GRP_AO = 0xF2
-    GRP_MP = 0xF3
-    GRP_EQ = 0xF4
+    GRP_EQ = 0xF3 # values as QS_GRP_xxx in qs.h
+    GRP_MP = 0xF4
     GRP_TE = 0xF5
     GRP_QF = 0xF6
     GRP_SC = 0xF7
@@ -1293,10 +1421,10 @@ class QSpy:
 
     # local filter groups...
     IDS_ALL= 0xF0
-    IDS_AO = (0x80 + 0)
-    IDS_EP = (0x80 + 64)
-    IDS_EQ = (0x80 + 80)
-    IDS_AP = (0x80 + 96)
+    IDS_AO = 0xF1 # values as QS_IDS_xxx in qs.h
+    IDS_EP = 0xF2
+    IDS_EQ = 0xF3
+    IDS_AP = 0xF4
 
     # kinds of objects (local-filter and curr-obj)...
     _OBJ_SM = 0    # State Machine
@@ -1454,6 +1582,14 @@ class QSpy:
         QSpy._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         QSpy._sock.settimeout(QUTest.TIMEOUT) # timeout for blocking socket
         try:
+            # the address from which all UDP packets must come (QSPY)
+            QSpy._qspy_addr = (socket.gethostbyname(QSpy.host_udp[0]),
+                               QSpy.host_udp[1])
+        except OSError:
+            print(f"UDP Socket Error: can't resolve the QSPY host "\
+                  f"{QSpy.host_udp[0]}")
+            sys.exit(-1)
+        try:
             QSpy._sock.bind(("0.0.0.0", QSpy._local_port))
             QUTest.trace(f'bind: ("0.0.0.0", {QSpy._local_port})')
         except Exception:
@@ -1489,8 +1625,11 @@ class QSpy:
         if QSpy._sock is None:
             return
         QSpy.send_to(struct.pack("<B", QSpy._QSPY_DETACH))
-        time.sleep(QUTest.TIMEOUT)
-        #QSpy._sock.shutdown(socket.SHUT_RDWR)
+        # NOTE: no delay before closing the socket (previously a fixed 1 s,
+        # M8). The DETACH datagram is handed to the OS by send_to() above.
+        # QSPY 8.1.6 or newer handles a front-end that has closed its socket
+        # (see QSPY: SIO_UDP_CONNRESET, front-end take-over); an older
+        # Windows QSPY could terminate if it still forwarded output here.
         QSpy._sock.close()
         QSpy._sock = None
         QSpy._is_attached = False
@@ -1499,9 +1638,10 @@ class QSpy:
     @staticmethod
     def receive():
         # pylint: disable=protected-access
+        QUTest._last_assert = False
         if not QUTest._is_debug:
             try:
-                packet = QSpy._sock.recv(4096)
+                packet, addr = QSpy._sock.recvfrom(4096)
             except socket.timeout:
                 QUTest._last_record = ""
                 return False # timeout
@@ -1509,7 +1649,7 @@ class QSpy:
         else: # debug mode
             while True:
                 try:
-                    packet = QSpy._sock.recv(4096)
+                    packet, addr = QSpy._sock.recvfrom(4096)
                     break
                 except socket.timeout:
                     print("waiting for Target output "\
@@ -1532,12 +1672,39 @@ class QSpy:
             QUTest._last_record = ""
             raise RuntimeError("UDP packet from QSpy too short")
 
+        # accept packets only from QSPY (the socket is bound to all
+        # interfaces and is not connected, so anybody could send to it)
+        if addr != QSpy._qspy_addr:
+            QUTest._last_record = ""
+            raise RuntimeError(
+                f"UDP packet from a foreign source {addr[0]}:{addr[1]} "\
+                f"(QSPY is {QSpy._qspy_addr[0]}:{QSpy._qspy_addr[1]})")
+
         rec_id = packet[1]
+
+        # check the continuity of the packets from QSPY: QSPY numbers every
+        # packet to the front-end, starting with the attach confirmation,
+        # EXCEPT the Target-info packet, which it forwards raw from the
+        # Target (with the Target's sequence number). A gap means that
+        # packets were lost (UDP), so the output can't be verified.
+        if rec_id == QSpy._PKT_ATTACH_CONF:
+            QSpy._rx_seq = packet[0] # (re)start the receive sequence
+        elif rec_id != QSpy._PKT_TARGET_INFO:
+            QSpy._rx_seq = (QSpy._rx_seq + 1) & 0xFF
+            if packet[0] != QSpy._rx_seq:
+                exp_seq = QSpy._rx_seq
+                QSpy._rx_seq = packet[0] # re-synchronize
+                QUTest._last_record = ""
+                raise RuntimeError(
+                    f"UDP data discontinuity from QSPY "\
+                    f"Seq={exp_seq}->{packet[0]} (lost packets)")
+
         if rec_id == QSpy._PKT_TEXT_ECHO: # text packet (most common)
             QUTest._last_record = packet[3:].decode("utf-8")
             # QS_ASSERTION?
             if dlen > 3 and packet[2] == QSpy._PKT_ASSERTION:
                 QUTest._have_assert = True
+                QUTest._last_assert = True
                 QUTest._have_target = False
                 QUTest._need_reset  = True
                 if QSpy.trg_QPver < 720: # before QP 7.2.0?
@@ -1572,6 +1739,7 @@ class QSpy:
                  f"{trg_info[9]:02d}{trg_info[8]:02d}{trg_info[7]:02d}"
             QUTest.trace("Target:", QSpy.trg_tstamp)
             QUTest._have_info = True
+            QSpy._info_cnt += 1
 
         elif rec_id == QSpy._PKT_ATTACH_CONF:
             QUTest._last_record = ""
@@ -1666,6 +1834,7 @@ def main():
                         help="List (comma-separated) of test scripts to run")
     args = parser.parse_args()
     QUTest.trace(args)
+    atexit.register(QUTest._atexit) # no leaked host executable on exit
 
     # process command-line argumens...
     if args.exe != '':
@@ -1883,7 +2052,10 @@ def main():
     QUTest._quithost_exe(99)
     QSpy._detach()
 
-    return sys.exit(QUTest._num_failed) # report to the caller (e.g., make)
+    # report to the caller (e.g., make): the number of failures, saturated
+    # at 255, because only the low 8 bits of the exit status survive on
+    # POSIX (e.g., 256 failures would otherwise exit with 0, i.e., success)
+    return sys.exit(min(QUTest._num_failed, 255))
 
 #=============================================================================
 if __name__ == "__main__":

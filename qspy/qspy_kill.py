@@ -1,27 +1,22 @@
 #!/usr/bin/env python
 
 #=============================================================================
-# qspy_kill utility
-# Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
+# qspy_kill utility (part of QSPY)
 #
-# SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
+#                    Q u a n t u m  L e a P s
+#                    ------------------------
+#                    Modern Embedded Software
 #
-# This software is dual-licensed under the terms of the open source GNU
-# General Public License version 3 (or any later version), or alternatively,
-# under the terms of one of the closed source Quantum Leaps commercial
-# licenses.
+# Copyright (C) 2005-2026 Quantum Leaps, LLC. All rights reserved.
 #
-# The terms of the open source GNU General Public License version 3
-# can be found at: <www.gnu.org/licenses/gpl-3.0>
+# SPDX-License-Identifier: LicenseRef-QL-commercial
 #
-# The terms of the closed source Quantum Leaps commercial licenses
-# can be found at: <www.state-machine.com/licensing>
+# This software is licensed under the terms of the Quantum Leaps
+# QSPY SOFTWARE TRACING HOST UTILITY SOFTWARE END USER LICENSE.
+# Please see the file LICENSE-qspy.txt for the complete license text.
 #
-# Redistributions in source code must retain this top-level comment block.
-# Plagiarizing this software to sidestep the license obligations is illegal.
-#
-# Contact information:
-# <www.state-machine.com>
+# Quantum Leaps contact information:
+# <www.state-machine.com/licensing>
 # <info@state-machine.com>
 #=============================================================================
 
@@ -43,7 +38,7 @@ import sys
 class QSpy:
 
     # public class constants
-    VERSION = 733
+    VERSION = 816
     TIMEOUT = 1.000 # timeout value [seconds]
 
     # private class variables...
@@ -132,8 +127,20 @@ def main():
     if err:
         return sys.exit(err)
 
-    QSpy.send_to(struct.pack("<BB", QSpy._QSPY_DETACH, 1))
+    # QSPY accepts commands only from an attached Front-End (QSPY 8.1.6),
+    # so attach first (binary channel only) and wait for the confirmation
+    QSpy.send_to(struct.pack("<BB", QSpy._QSPY_ATTACH, 0x01))
+    try:
+        packet = QSpy._sock.recv(4096)
+    except (socket.timeout, OSError):
+        packet = b""
+    if len(packet) < 2 or packet[1] != QSpy._QSPY_ATTACH:
+        print(f"ERROR: QSPY at {QSpy._host_udp[0]}:{QSpy._host_udp[1]} "
+              "did not respond (not running?)")
+        return 1
 
+    QSpy.send_to(struct.pack("<BB", QSpy._QSPY_DETACH, 1)) # detach + exit
+    print("QSPY exit requested")
     return 0 # report to the caller (e.g., make)
 
 #=============================================================================
@@ -141,9 +148,9 @@ if __name__ == "__main__":
     print(f"\nQSPY-kill "\
         f"{QSpy.VERSION//100}.{(QSpy.VERSION//10) % 10}."\
         f"{QSpy.VERSION % 10} running on Python {python_version()}")
-    print("Copyright (c) 2005-2023 Quantum Leaps, www.state-machine.com")
+    print("Copyright (c) 2005-2026 Quantum Leaps, www.state-machine.com")
     if sys.version_info >= (3,6):
-        main()
+        sys.exit(main())
     else:
         print("\nERROR: QSPY-kill requires Python 3.6 or newer")
         sys.exit(-1)

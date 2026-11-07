@@ -28,74 +28,11 @@
 #ifndef QS_PKG_H_
 #define QS_PKG_H_
 
-//============================================================================
-#define QS_BEGIN_PRE(rec_, qsId_) \
-if (QS_fltCheck_((uint32_t)(rec_)>>5U, \
-                 (uint32_t)1U << ((uint32_t)(rec_) & 0x1FU), (qsId_))) \
-{ \
-    QS_beginRec_((uint_fast8_t)(rec_));
-
-#define QS_END_PRE()           QS_endRec_(); }
-
-#define QS_U8_PRE(data_)       (QS_u8_raw_((uint8_t)(data_)))
-#define QS_2U8_PRE(data1_, data2_) \
-    (QS_2u8_raw_((uint8_t)(data1_), (uint8_t)(data2_)))
-#define QS_U16_PRE(data_)      (QS_u16_raw_((uint16_t)(data_)))
-#define QS_U32_PRE(data_)      (QS_u32_raw_((uint32_t)(data_)))
-#define QS_STR_PRE(msg_)       (QS_str_raw_((msg_)))
-#define QS_OBJ_PRE(obj_)       (QS_obj_raw_(obj_))
-#define QS_SIG_PRE(sig_)       (QS_u16_raw_((uint16_t)(sig_)))
-
-#if (!defined QS_FUN_PTR_SIZE || (QS_FUN_PTR_SIZE == 2U))
-    #define QS_FUN_PRE(fun_)   (QS_u16_raw_((uint16_t)(fun_)))
-#elif (QS_FUN_PTR_SIZE == 4U)
-    #define QS_FUN_PRE(fun_)   (QS_u32_raw_((uint32_t)(fun_)))
-#elif (QS_FUN_PTR_SIZE == 8U)
-    #define QS_FUN_PRE(fun_)   (QS_u64_raw_((uint64_t)(fun_)))
-#else
-    #define QS_FUN_PRE(fun_)   (QS_u32_raw_((uint32_t)(fun_)))
-#endif
-
-//----------------------------------------------------------------------------
-#if (!defined QF_EQUEUE_CTR_SIZE || (QF_EQUEUE_CTR_SIZE == 1U))
-    #define QS_EQC_PRE(ctr_)   QS_u8_raw_((uint8_t)(ctr_))
-#elif (QF_EQUEUE_CTR_SIZE == 2U)
-    #define QS_EQC_PRE(ctr_)   QS_u16_raw_((uint16_t)(ctr_))
-#elif (QF_EQUEUE_CTR_SIZE == 4U)
-    #define QS_EQC_PRE(ctr_)   QS_u32_raw_((uint32_t)(ctr_))
-#endif
-
-#if (!defined QF_EVENT_SIZ_SIZE || (QF_EVENT_SIZ_SIZE == 1U))
-    #define QS_EVS_PRE(size_)  QS_u8_raw_((uint8_t)(size_))
-#elif (QF_EVENT_SIZ_SIZE == 2U)
-    #define QS_EVS_PRE(size_)  QS_u16_raw_((uint16_t)(size_))
-#elif (QF_EVENT_SIZ_SIZE == 4U)
-    #define QS_EVS_PRE(size_)  QS_u32_raw_((uint32_t)(size_))
-#endif
-
-#if (!defined QF_MPOOL_SIZ_SIZE || (QF_MPOOL_SIZ_SIZE == 1U))
-    #define QS_MPS_PRE(size_)  QS_u8_raw_((uint8_t)(size_))
-#elif (QF_MPOOL_SIZ_SIZE == 2U)
-    #define QS_MPS_PRE(size_)  QS_u16_raw_((uint16_t)(size_))
-#elif (QF_MPOOL_SIZ_SIZE == 4U)
-    #define QS_MPS_PRE(size_)  QS_u32_raw_((uint32_t)(size_))
-#endif
-
-#if (!defined QF_MPOOL_CTR_SIZE || (QF_MPOOL_CTR_SIZE == 1U))
-    #define QS_MPC_PRE(ctr_)   QS_u8_raw_((uint8_t)(ctr_))
-#elif (QF_MPOOL_CTR_SIZE == 2U)
-    #define QS_MPC_PRE(ctr_)   QS_u16_raw_((uint16_t)(ctr_))
-#elif (QF_MPOOL_CTR_SIZE == 4U)
-    #define QS_MPC_PRE(ctr_)   QS_u32_raw_((uint16_t)(ctr_))
-#endif
-
-#if (!defined QF_TIMEEVT_CTR_SIZE || (QF_TIMEEVT_CTR_SIZE == 1U))
-    #define QS_TEC_PRE(ctr_)   QS_u8_raw_((uint8_t)(ctr_))
-#elif (QF_TIMEEVT_CTR_SIZE == 2U)
-    #define QS_TEC_PRE(ctr_)   QS_u16_raw_((uint16_t)(ctr_))
-#elif (QF_TIMEEVT_CTR_SIZE == 4U)
-    #define QS_TEC_PRE(ctr_)   QS_u32_raw_((uint32_t)(ctr_))
-#endif
+// NOTE: QSPY uses ONLY the QS protocol constants from the QP package
+// header qs_pkg.h: the QS-RX record IDs and the framing constants below.
+// They MUST be kept identical to qs_pkg.h/qs_pkg.hpp of the QP frameworks
+// (qpc, qpcpp, safe-qpc, safe-qpcpp). The Target-side QS macros of
+// qs_pkg.h are deliberately NOT part of this file (QSPY does not use them).
 
 //----------------------------------------------------------------------------
 //! QS received record types (RX channel)
@@ -123,26 +60,5 @@ typedef enum {
 #define QS_ESC            ((uint8_t)0x7DU)
 #define QS_ESC_XOR        ((uint8_t)0x20U)
 #define QS_GOOD_CHKSUM    ((uint8_t)0xFFU)
-
-//----------------------------------------------------------------------------
-#define QS_INSERT_BYTE_(b_) \
-    buf[head] = (b_);       \
-    ++head;                 \
-    if (head == end) {      \
-        head = 0U;          \
-    }
-
-#define QS_INSERT_ESC_BYTE_(b_)                       \
-    chksum = (uint8_t)(chksum + (b_));                \
-    if (((b_) != QS_FRAME) && ((b_) != QS_ESC)) {     \
-        QS_INSERT_BYTE_(b_)                           \
-    }                                                 \
-    else {                                            \
-        QS_INSERT_BYTE_(QS_ESC)                       \
-        QS_INSERT_BYTE_((uint8_t)((b_) ^ QS_ESC_XOR)) \
-        ++QS_priv_.used;                              \
-    }
-
-#define QS_PTR2UNIT_CAST(T_, ptr_) ((T_)(ptr_))
 
 #endif // QS_PKG_H_

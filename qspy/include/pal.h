@@ -62,7 +62,6 @@ QSpyStatus PAL_openTargetFile(char const *fName);
 
 QSpyStatus PAL_openKbd(bool kbd_inp, bool color);
 void       PAL_closeKbd(void);
-void       PAL_exit(void);
 
 QSPYEvtType PAL_receiveBe (unsigned char *buf, uint32_t *pBytes);
 QSPYEvtType PAL_receiveKbd(unsigned char *buf, uint32_t *pBytes);

@@ -16,8 +16,12 @@
 # <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
-# building configurations: Debug (default), Release, and Spy
-# make
+# building configurations: Release (default) and Debug (CONF=dbg)
+# make                      -- Release
+# make CONF=dbg             -- Debug
+# make DEF=-DCRYPTO_SECRET  -- Release with the license verification
+#                              (in-house builds; needs crypto_secret.c)
+# cleaning:
 # make clean
 # make CONF=dbg clean
 
@@ -64,9 +68,15 @@ LIBS      :=
 #-----------------------------------------------------------------------------
 # GNU toolset:
 #
-CC    := gcc
-CPP   := g++
-LINK  := gcc    # for C programs
+# NOTE: Apple clang (Xcode or Command Line Tools), NOT a Homebrew GCC: clang uses
+# the linker and the SDK of the same (selected) Apple toolchain
+CC    := clang
+CPP   := clang++
+LINK  := clang  # for C programs
+
+# the oldest macOS version the executable runs on (all Apple-silicon Macs);
+# without it, the executable requires the macOS version of the build machine
+MACOS_MIN ?= 11.0
 #LINK  := g++   # for C++ programs
 
 #-----------------------------------------------------------------------------
@@ -83,7 +93,7 @@ ifeq (dbg, $(CONF)) # Debug configuration ....................................
 
 BIN_DIR := dbg
 
-CFLAGS = -c -g -std=c11 -ffunction-sections -fdata-sections \
+CFLAGS = -c -g -std=gnu11 -mmacosx-version-min=$(MACOS_MIN) -ffunction-sections -fdata-sections \
 	-O -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES)
 
 CPPFLAGS = -c -g -ffunction-sections -fdata-sections \
@@ -93,7 +103,7 @@ else  # default Release configuration ........................................
 
 BIN_DIR := rel
 
-CFLAGS = -c -std=c11 -ffunction-sections -fdata-sections \
+CFLAGS = -c -std=gnu11 -mmacosx-version-min=$(MACOS_MIN) -ffunction-sections -fdata-sections \
 	-O3 -Wall -Wextra -Wpedantic $(INCLUDES) $(DEFINES) -DNDEBUG
 
 CPPFLAGS = -c -ffunction-sections -fdata-sections \
@@ -101,14 +111,10 @@ CPPFLAGS = -c -ffunction-sections -fdata-sections \
 
 endif  # .....................................................................
 
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-	LINKFLAGS :=
-else
-ifndef GCC_OLD
-	LINKFLAGS := -no-pie
-endif
-endif
+# NOTE: no special link flags: the toolchain defaults are used, so that the
+# objects and the link always match (e.g., position-independent executable
+# where the compiler defaults to it), the same as for the Windows build
+LINKFLAGS := -mmacosx-version-min=$(MACOS_MIN)
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -131,7 +137,7 @@ endif
 
 all: $(TARGET_EXE)
 
-$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
+$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
 
 $(BIN_DIR)/%.d : %.cpp

@@ -16,10 +16,14 @@
 # <info@state-machine.com>
 ##############################################################################
 # examples of invoking this Makefile:
-# building configurations: Debug (default), Release, and Spy
-# make
+# building configurations: Release (default) and Debug (CONF=dbg)
+# make                      -- Release
+# make CONF=dbg             -- Debug
+# make DEF=-DCRYPTO_SECRET  -- Release with the license verification
+#                              (in-house builds; needs crypto_secret.c)
+# cleaning:
 # make clean
-# make make DEF=-DCRYPTO_SECRET
+# make CONF=dbg clean
 
 #-----------------------------------------------------------------------------
 # project name
@@ -101,14 +105,10 @@ CPPFLAGS = -c -ffunction-sections -fdata-sections \
 
 endif  # .....................................................................
 
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-	LINKFLAGS :=
-else
-ifndef GCC_OLD
-	LINKFLAGS := -no-pie
-endif
-endif
+# NOTE: no special link flags: the toolchain defaults are used, so that the
+# objects and the link always match (e.g., position-independent executable
+# where the compiler defaults to it), the same as for the Windows build
+LINKFLAGS :=
 
 #-----------------------------------------------------------------------------
 C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
@@ -131,7 +131,7 @@ endif
 
 all: $(TARGET_EXE)
 
-$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT) $(RC_OBJS_EXT)
+$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
 	$(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(LIBS)
 
 $(BIN_DIR)/%.d : %.cpp

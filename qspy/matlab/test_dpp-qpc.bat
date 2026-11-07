@@ -1,1 +1,0 @@
-qspy -f dpp-qpc.bin -m

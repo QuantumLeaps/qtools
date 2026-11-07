@@ -1,19 +1,9 @@
--d241031
--v800
--q1
--T4
--O4
--F4
--S2
--E2
--Q1
--P2
--B2
--C4
--t241008_210100
+# QSPY dictionaries, converted from format 1
+qspy-dic 2
+target build=241008_210100 qp=qpc ver=800 date=241031 endian=little
+sizes obj=4 fun=4 tstamp=4 sig=2 evt=2 qctr=1 pctr=2 pblk=2 tctr=4
 
-Obj-Dic:
-4
+section obj
 0x08004F1C l_EXTI0_1_IRQHandler
 0x08004F20 l_SysTick_Handler
 0x08005140 QS_RX
@@ -29,9 +19,9 @@ Obj-Dic:
 0x20000F70 Philo_inst[4].timeEvt
 0x20000F94 Table_inst
 0x20001050 EvtPool1
-***
-Fun-Dic:
-4
+end obj
+
+section fun
 0x08000A99 Philo_eating
 0x08000B39 Philo_thinking
 0x08000BC5 Philo_hungry
@@ -39,16 +29,16 @@ Fun-Dic:
 0x08000D41 Table_paused
 0x08000E41 Table_serving
 0x08001359 QHsm_top
-***
-Usr-Dic:
-1
-0x00000064 PHILO_STAT
-0x00000065 PAUSED_STAT
-0x00000066 CONTEXT_SW
-0x0000007C QUTEST_ON_POST
-***
-Sig-Dic:
-4
+end fun
+
+section usr
+100 PHILO_STAT
+101 PAUSED_STAT
+102 CONTEXT_SW
+124 QUTEST_ON_POST
+end usr
+
+section sig
 00000004 0x00000000 EAT_SIG
 00000005 0x00000000 DONE_SIG
 00000006 0x00000000 PAUSE_SIG
@@ -56,4 +46,6 @@ Sig-Dic:
 00000008 0x00000000 TEST_SIG
 00000010 0x00000000 TIMEOUT_SIG
 00000011 0x00000000 HUNGRY_SIG
-***
+end sig
+
+end

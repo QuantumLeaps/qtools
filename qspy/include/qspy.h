@@ -18,7 +18,7 @@
 #ifndef QSPY_H_
 #define QSPY_H_
 
-#define QSPY_VER "8.1.3"
+#define QSPY_VER "8.1.6"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +38,15 @@ typedef struct {
     uint8_t const *start; // start of the record
     uint8_t const *pos;   // current position in the stream
     uint32_t tot_len;     // total length of the record, including chksum
-    int32_t  len;         // current length of the stream
-    uint8_t  rec;         // the record-ID (see enum QSpyRecords in qs.h)
+    int32_t  len;         // current length of the stream (< 0: error)
+    uint8_t  rec;         // the record-ID (see enum QS_GlbPredef in qpc_qs.h)
+    char const *err;      // the data item missing (when len < 0)
 } QSpyRecord;
+
+// QSpyRecord.len value for an invalid data size (see QSpyRecord_OK())
+#define QS_REC_BAD_SIZE ((int32_t)-0x7FFF)
+// QSpyRecord.len value for invalid data (see QSpyRecord_OK())
+#define QS_REC_BAD_DATA ((int32_t)-0x7FFE)
 
 // limits
 enum {
@@ -73,7 +79,7 @@ uint8_t const *QSpyRecord_getMem(QSpyRecord * const me,
 typedef struct {
     uint32_t qpDate;    // e.g., 241008, 0 means "no-target-info"
     uint16_t qpVersion; // e.g., 732
-    uint8_t  qpType;    // 1==qpc, 2==qpcpp
+    uint8_t  qpType;    // 0==none/unknown, 1==qpc, 2==qpcpp
     uint8_t  endianness;
     uint8_t  objPtrSize;
     uint8_t  funPtrSize;
@@ -86,6 +92,12 @@ typedef struct {
     uint8_t  tevtCtrSize;
     uint8_t  tbuild[6];
 } QSpyConfig;
+
+// checks the data sizes in a configuration (NULL when OK)
+char const *QSPY_checkConfig(QSpyConfig const * const cfg);
+
+// configures the dictionary key sizes from the current configuration
+void QSPY_configDictionaries(void);
 
 typedef uint64_t KeyType;
 typedef uint32_t SigType;
@@ -185,24 +197,26 @@ extern char const * const QSPY_line;
     int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET],      \
                 (QS_LINE_LEN_MAX - QS_LINE_OFFSET),            \
                 format_,  __VA_ARGS__);                        \
-    if ((0 < n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) { \
+    if ((0 <= n_) && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET)) {\
         QSPY_output.len = n_;                                  \
     }                                                          \
-    else {                                                     \
-        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;    \
+    else { /* truncated: the line is full */                   \
+        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET - 1;\
     }                                                          \
 } while (0)
 
 #define SNPRINTF_APPEND(format_, ...) do {                                 \
-    int n_ = SNPRINTF_S(&QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],\
-                (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len),      \
-                format_, __VA_ARGS__);                                     \
-    if ((0 < n_)                                                           \
-        && (n_ < QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len)) {    \
-        QSPY_output.len += n_;                                             \
-    }                                                                      \
-    else {                                                                 \
-        QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET;                \
+    int rem_ = (QS_LINE_LEN_MAX - QS_LINE_OFFSET - QSPY_output.len);       \
+    if (rem_ > 1) { /* room left in the line? */                           \
+        int n_ = SNPRINTF_S(                                               \
+                &QSPY_output.buf[QS_LINE_OFFSET + QSPY_output.len],        \
+                rem_, format_, __VA_ARGS__);                               \
+        if ((0 <= n_) && (n_ < rem_)) {                                    \
+            QSPY_output.len += n_;                                         \
+        }                                                                  \
+        else { /* truncated: the line is full */                           \
+            QSPY_output.len = QS_LINE_LEN_MAX - QS_LINE_OFFSET - 1;        \
+        }                                                                  \
     }                                                                      \
 } while (0)
 
@@ -224,13 +238,14 @@ typedef struct {
     int        capacity;
     int        entries;
     int        keySize;
+    bool       overflow; // overflow reported (until the next reset)
 } Dictionary;
 
 void Dictionary_ctor(Dictionary* const me,
     DictEntry* sto, uint32_t capacity);
 void Dictionary_config(Dictionary* const me, int keySize);
 char const* Dictionary_at(Dictionary* const me, unsigned idx);
-void Dictionary_put(Dictionary* const me, KeyType key, char const* name);
+bool Dictionary_put(Dictionary* const me, KeyType key, char const* name);
 char const* Dictionary_get(Dictionary* const me, KeyType key, char* buf);
 int Dictionary_find(Dictionary* const me, KeyType key);
 KeyType Dictionary_findKey(Dictionary* const me, char const* name);
@@ -248,13 +263,16 @@ typedef struct {
     int           capacity;
     int           entries;
     int           ptrSize;
+    bool          overflow; // overflow reported (until the next reset)
 } SigDictionary;
 
 void SigDictionary_ctor(SigDictionary* const me,
     SigDictEntry* sto, uint32_t capacity);
 void SigDictionary_config(SigDictionary* const me, int ptrSize);
-void SigDictionary_put(SigDictionary* const me,
+bool SigDictionary_put(SigDictionary* const me,
     SigType sig, ObjType obj, char const* name);
+int SigDictionary_findExact(SigDictionary* const me,
+                            SigType sig, ObjType obj);
 char const* SigDictionary_get(SigDictionary* const me,
                               SigType sig, ObjType obj, char* buf);
 int SigDictionary_find(SigDictionary* const me,
@@ -303,16 +321,12 @@ QSpyStatus QSPY_writeDict(void);
 
 bool QDIC_isActive(void);
 
-void Dictionary_write(Dictionary const* const me, FILE* stream);
-bool Dictionary_read(Dictionary* const me, FILE* stream);
 
-void SigDictionary_write(SigDictionary const* const me, FILE* stream);
-bool SigDictionary_read(SigDictionary* const me, FILE* stream);
 char const* QSPY_getMatDict(char const* s);
 
 void QSEQ_configFile(void *seqFile);
 bool QSEQ_isActive(void);
-void QSEQ_config(void* seqFile, char const* seqList);
+bool QSEQ_config(void* seqFile, char const* seqList);
 void QSEQ_updateDictionary(char const* name, KeyType key);
 int  QSEQ_find(KeyType key);
 void QSEQ_genHeader(void);
